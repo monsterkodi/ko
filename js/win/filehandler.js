@@ -1,8 +1,8 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, valid: undefined}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, valid: undefined, first: function (o) {return o != null ? o.length ? o[0] : undefined : o}}
 
-var electron, File, filelist, first, kerror, klog, kxk, post, prefs, reversed, slash, _
+var electron, File, filelist, kerror, klog, kxk, post, prefs, reversed, slash, _
 
 kxk = require('kxk')
 _ = kxk._
@@ -295,7 +295,7 @@ class FileHandler
         var recent
 
         recent = window.state.get('recentFiles',[])
-        if (file === first(recent))
+        if (file === _k_.first(recent))
         {
             return
         }

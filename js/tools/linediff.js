@@ -1,8 +1,8 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
+var _k_ = {last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
-var kxk, last, lineDiff
+var kxk, lineDiff
 
 kxk = require('kxk')
 last = kxk.last
@@ -51,7 +51,7 @@ lineDiff = function (oldLine, newLine)
                 }
                 else
                 {
-                    lst = last(changes)
+                    lst = _k_.last(changes)
                     if ((lst != null ? lst.change : undefined) === 'change' && lst.old + lst.length === oi)
                     {
                         lst.length += 1

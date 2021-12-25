@@ -127,6 +127,8 @@ function Window extends win
             'Paste'                 ➜ return window.focusEditor.paste()
             'New Tab'               ➜ return post.emit 'newEmptyTab'
             'New Window'            ➜ return post.toMain 'newWindowWithFile' editor.currentFile
+            'Cycle Windows'         ➜ return post.toMain 'activateNextWindow' window.winID
+            'Arrange Windows'       ➜ return post.toMain 'arrangeWindows'
             'Toggle Scheme'         ➜ return scheme.toggle()
             'Toggle Center Text'    ➜ return toggleCenterText()
             'Toggle Tab Pinned'     ➜ return toggleTabPinned()

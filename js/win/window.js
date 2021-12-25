@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, isFunc: function (o) {return typeof o === 'function'}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }}
 
@@ -151,6 +151,12 @@ Window = (function ()
 
             case 'New Window':
                 return post.toMain('newWindowWithFile',editor.currentFile)
+
+            case 'Cycle Windows':
+                return post.toMain('activateNextWindow',window.winID)
+
+            case 'Arrange Windows':
+                return post.toMain('arrangeWindows')
 
             case 'Toggle Scheme':
                 return scheme.toggle()
@@ -371,7 +377,7 @@ window.onresize = function ()
 }
 post.on('split',function (s)
 {
-    var _294_22_
+    var _296_22_
 
     ;(window.filebrowser != null ? window.filebrowser.resized() : undefined)
     terminal.resized()
@@ -416,7 +422,7 @@ toggleTabPinned = function ()
 
 setFontSize = function (s)
 {
-    var _339_25_
+    var _341_25_
 
     if (!(_k_.isNum(s)))
     {

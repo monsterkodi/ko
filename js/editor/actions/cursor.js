@@ -1,8 +1,8 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
-var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, first: function (o) {return o != null ? o.length ? o[0] : undefined : o}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}}
 
-var first, last, reversed, _
+var reversed, _
 
 _ = require('kxk')._
 first = require('kxk').first
@@ -245,10 +245,10 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
         switch (dir)
         {
             case 'up':
-                return first(newCursors)[0]
+                return _k_.first(newCursors)[0]
 
             case 'down':
-                return last(newCursors)[0]
+                return _k_.last(newCursors)[0]
 
             case 'left':
                 return _.min((function () { var _233__48_ = []; var list = _k_.list(newCursors); for (var _233_48_ = 0; _233_48_ < list.length; _233_48_++)  { c = list[_233_48_];_233__48_.push(c[0])  } return _233__48_ }).bind(this)())

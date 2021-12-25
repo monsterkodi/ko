@@ -1,8 +1,8 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
-var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var $, elem, event, Indexer, jsClass, kerror, kxk, last, matchr, req, stopEvent, _
+var $, elem, event, Indexer, jsClass, kerror, kxk, matchr, req, stopEvent, _
 
 kxk = require('kxk')
 $ = kxk.$
@@ -139,7 +139,7 @@ class Autocomplete extends event
     {
         var lst, mcnt, mthds, obj
 
-        lst = last(info.before.split(' '))
+        lst = _k_.last(info.before.split(' '))
         obj = lst.slice(0,-1)
         if (!this.mthdinfo[obj])
         {

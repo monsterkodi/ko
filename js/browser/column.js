@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
 var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
@@ -1164,6 +1164,10 @@ Column = (function ()
 
     Column.prototype["makeRoot"] = function ()
     {
+        if (!this.parent)
+        {
+            return
+        }
         this.browser.shiftColumnsTo(this.index)
         if (this.browser.columns[0].items[0].name !== '..')
         {
@@ -1231,7 +1235,7 @@ Column = (function ()
 
     Column.prototype["pastePaths"] = function ()
     {
-        var action, paths, target, text, _885_23_
+        var action, paths, target, text, _887_23_
 
         text = electron.clipboard.readText()
         paths = text.split('\n')
@@ -1253,7 +1257,7 @@ Column = (function ()
 
     Column.prototype["onKey"] = function (event)
     {
-        var char, combo, key, mod, _922_93_
+        var char, combo, key, mod, _924_93_
 
         mod = keyinfo.forEvent(event).mod
         key = keyinfo.forEvent(event).key

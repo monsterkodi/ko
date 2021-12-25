@@ -1,8 +1,6 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
-var _k_ = {isObj: function (o) {return !(o == null || typeof o != 'object' || o.constructor.name !== 'Object')}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
-
-var last
+var _k_ = {isObj: function (o) {return !(o == null || typeof o != 'object' || o.constructor.name !== 'Object')}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
 last = require('kxk').last
 
@@ -21,7 +19,7 @@ module.exports = {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['e
     if (this.salterMode)
     {
         this.endSalter()
-        this.singleCursorAtPos(last(this.cursors()))
+        this.singleCursorAtPos(_k_.last(this.cursors()))
         this.newlineAtEnd()
         return
     }

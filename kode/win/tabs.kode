@@ -49,7 +49,7 @@ class Tabs
         t = ''
         for tab in @tabs
             t += tab.div.innerHTML
-        post.toWin winID, 'winTabs' window.winID, t
+        post.toOtherWins 'winTabs' window.winID, t
 
     onFileLineChanges: (file, lineChanges) =>
 

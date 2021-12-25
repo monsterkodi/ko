@@ -6,7 +6,7 @@
 000   000  00000000  000   000   0000000
 ###
 
-{ filelist, klog, os, post, slash, win } = require 'kxk'
+{ filelist, klog, os, slash } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 Transform = require '../editor/actions/transform'
@@ -41,7 +41,7 @@ menu = (template) ->
                     submenu[menuName] ?= []
                 for k,v of value
                     if v.name and v.combo
-                        menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction' c
+                        # menuAction = (c) -> (i,win) -> post.toWin win.id, 'menuAction' c
                         combo = v.combo
                         if os.platform() != 'darwin' and v.accel
                             combo = v.accel

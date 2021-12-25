@@ -66,19 +66,19 @@ class Diffbar
     lineIndicesForBlockAtLine: (li) ->
 
         lines = []
-        if not empty metas = @gitMetasAtLineIndex li
+        if not empty(metas = @gitMetasAtLineIndex li)
 
             toggled = metas[0][2].toggled
             lines.push li
 
             bi = li-1
-            while not empty metas = @gitMetasAtLineIndex bi
+            while not empty(metas = @gitMetasAtLineIndex bi)
                 break if metas[0][2].toggled != toggled
                 lines.unshift bi
                 bi--
 
             ai = li+1
-            while not empty metas = @gitMetasAtLineIndex ai
+            while not empty(metas = @gitMetasAtLineIndex ai)
                 break if metas[0][2].toggled != toggled
                 lines.push ai
                 ai++
@@ -217,7 +217,6 @@ class Diffbar
     updateScroll: =>
 
         w  = 2
-        #h  = @editor.view.clientHeight
         h  = @editor.scroll.viewHeight
         lh = h / @editor.numLines()
 

@@ -25,8 +25,6 @@ main          = undefined
 openFiles     = []
 WIN_SNAP_DIST = 150
 
-# process.env.NODE_ENV = 'production' # ???
-    
 mostRecentFile = -> first state.get 'recentFiles'
 
 # 000   000  000  000   000   0000000
@@ -43,7 +41,7 @@ visibleWins = ->
         ws.push w if w?.isVisible() and not w?.isMinimized()
     ws
 
-winWithID   = (winID) ->
+winWithID = (winID) ->
 
     wid = parseInt winID
     for w in wins()
@@ -66,6 +64,7 @@ post.on 'newWindowWithFile'  (file)  -> main.createWindowWithFile file:file
 post.on 'activateWindow'     (winID) -> main.activateWindowWithID winID
 post.on 'activateNextWindow' (winID) -> main.activateNextWindow winID
 post.on 'activatePrevWindow' (winID) -> main.activatePrevWindow winID
+post.on 'arrangeWindows'             -> main.arrangeWindows()
 
 post.on 'menuAction'   (action, arg) -> main?.onMenuAction action, arg
 post.on 'ping' (winID, argA, argB) -> post.toWin winID, 'pong' 'main' argA, argB
@@ -189,20 +188,7 @@ function Main extends app
     onUDP: (file) =>
         @activateOneWindow (win) ->
             post.toWin win.id, 'openFiles' [file] 
-                
-    #  0000000    0000000  000000000  000   0000000   000   000  
-    # 000   000  000          000     000  000   000  0000  000  
-    # 000000000  000          000     000  000   000  000 0 000  
-    # 000   000  000          000     000  000   000  000  0000  
-    # 000   000   0000000     000     000   0000000   000   000  
-    
-    onMenuAction_OLD: (action, arg) =>
-
-        switch action
-            when 'Cycle Windows'    then @activateNextWindow arg
-            when 'Arrange Windows'  then @arrangeWindows()
-            when 'New Window'       then @createWindow()
-            
+                            
     # 000   000  000  000   000  0000000     0000000   000   000   0000000
     # 000 0 000  000  0000  000  000   000  000   000  000 0 000  000
     # 000000000  000  000 0 000  000   000  000   000  000000000  0000000
@@ -310,14 +296,14 @@ function Main extends app
 
     stackWindows: ->
         
-        {width, height} = @screenSize()
+        { x, y, width, height } = electron.screen.getDisplayMatching(@activeWin().getBounds()).workArea
         ww = height + 122
         wl = visibleWins()
         for w in wl
             w.showInactive()
             w.setBounds
-                x:      parseInt (width-ww)/2
-                y:      parseInt 0
+                x:      x+parseInt (width-ww)/2
+                y:      y
                 width:  parseInt ww
                 height: parseInt height
         activeWin().show()
@@ -332,8 +318,10 @@ function Main extends app
                 w.setFullScreen false 
         
         bounds = wl[0].getBounds()
-                
-        return false if wl.length == 1 and bounds.width == @screenSize().width
+        
+        { width, height } = electron.screen.getDisplayMatching(bounds).workAreaSize
+        
+        return false if wl.length == 1 and bounds.width == width
         
         for wi in [1...wl.length]
             if not _.isEqual wl[wi].getBounds(), bounds
@@ -351,7 +339,8 @@ function Main extends app
         disableSnap = true
         frameSize = 6
         wl = visibleWins()
-        { width, height } = @screenSize()
+        display = electron.screen.getDisplayMatching(@activeWin().getBounds())
+        { x, y, width, height } = display.workArea
 
         if not @windowsAreStacked()
             @stackWindows()
@@ -360,19 +349,15 @@ function Main extends app
 
         if wl.length == 1
             wl[0].showInactive()
-            wl[0].setBounds
-                x:      0
-                y:      0
-                width:  width
-                height: height
+            wl[0].setBounds display.workArea
         else if wl.length == 2 or wl.length == 3
             w = width/wl.length
             for i in [0...wl.length]
                 wl[i].showInactive()
                 wl[i].setBounds
-                    x:      parseInt i * w - (i > 0 and frameSize/2 or 0)
+                    x:      x+parseInt i * w - (i > 0 and frameSize/2 or 0)
                     width:  parseInt w + ((i == 0 or i == wl.length-1) and frameSize/2 or frameSize)
-                    y:      parseInt 0
+                    y:      y+parseInt 0
                     height: parseInt height
         else if wl.length
             w2 = parseInt wl.length/2
@@ -381,22 +366,20 @@ function Main extends app
                 w = width/w2
                 wl[i].showInactive()
                 wl[i].setBounds
-                    x:      parseInt i * w - (i > 0 and frameSize/2 or 0)
+                    x:      x+parseInt i * w - (i > 0 and frameSize/2 or 0)
                     width:  parseInt w + ((i == 0 or i == w2-1) and frameSize/2 or frameSize)
-                    y:      parseInt 0
+                    y:      y+parseInt 0
                     height: parseInt rh/2
             for i in [w2...wl.length]
                 w = width/(wl.length-w2)
                 wl[i].showInactive()
                 wl[i].setBounds
-                    x:      parseInt (i-w2) * w - (i-w2 > 0 and frameSize/2 or 0)
+                    x:      x+parseInt (i-w2) * w - (i-w2 > 0 and frameSize/2 or 0)
                     y:      parseInt rh/2+23
-                    width:  parseInt w + ((i-w2 == 0 or i == wl.length-1) and frameSize/2 or frameSize)
+                    width:  y+parseInt w + ((i-w2 == 0 or i == wl.length-1) and frameSize/2 or frameSize)
                     height: parseInt rh/2
         disableSnap = false
         
-        throw new Error 'test'
-
     # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
     # 000   000  000       000          000     000   000  000   000  000
     # 0000000    0000000   0000000      000     000   000  0000000    0000000

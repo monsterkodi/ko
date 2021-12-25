@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
@@ -74,15 +74,15 @@ class Diffbar
 
     lineIndicesForBlockAtLine (li)
     {
-        var ai, bi, lines, toggled
+        var ai, bi, lines, metas, toggled
 
         lines = []
-        if (!(_k_.empty(metas) = this.gitMetasAtLineIndex(li)))
+        if (!_k_.empty((metas = this.gitMetasAtLineIndex(li))))
         {
             toggled = metas[0][2].toggled
             lines.push(li)
             bi = li - 1
-            while (!(_k_.empty(metas) = this.gitMetasAtLineIndex(bi)))
+            while (!_k_.empty((metas = this.gitMetasAtLineIndex(bi))))
             {
                 if (metas[0][2].toggled !== toggled)
                 {
@@ -92,7 +92,7 @@ class Diffbar
                 bi--
             }
             ai = li + 1
-            while (!(_k_.empty(metas) = this.gitMetasAtLineIndex(ai)))
+            while (!_k_.empty((metas = this.gitMetasAtLineIndex(ai))))
             {
                 if (metas[0][2].toggled !== toggled)
                 {
@@ -230,7 +230,7 @@ class Diffbar
 
     updateScroll ()
     {
-        var alpha, boring, ctx, h, length, lh, li, meta, w, _234_45_
+        var alpha, boring, ctx, h, length, lh, li, meta, w, _233_45_
 
         w = 2
         h = this.editor.scroll.viewHeight
@@ -245,9 +245,9 @@ class Diffbar
         if (this.changes)
         {
             var list = _k_.list(this.editor.meta.metas)
-            for (var _232_21_ = 0; _232_21_ < list.length; _232_21_++)
+            for (var _231_21_ = 0; _231_21_ < list.length; _231_21_++)
             {
-                meta = list[_232_21_]
+                meta = list[_231_21_]
                 if (!((meta != null ? meta[2] != null ? meta[2].git : undefined : undefined) != null))
                 {
                     continue

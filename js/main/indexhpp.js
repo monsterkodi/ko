@@ -1,8 +1,8 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-var kxk, last
+var kxk
 
 kxk = require('kxk')
 last = kxk.last
@@ -28,7 +28,7 @@ class IndexHpp
             this.lastWord = this.currentWord
         }
         this.currentWord = ''
-        if ((last(this.tokenStack) != null ? last(this.tokenStack).classType : undefined) && !last(this.tokenStack).name)
+        if ((_k_.last(this.tokenStack) != null ? _k_.last(this.tokenStack).classType : undefined) && !_k_.last(this.tokenStack).name)
         {
             if (this.lastWord.startsWith('>'))
             {
@@ -36,7 +36,7 @@ class IndexHpp
             }
             else
             {
-                last(this.tokenStack).name = this.lastWord
+                _k_.last(this.tokenStack).name = this.lastWord
             }
         }
         p = -1
@@ -65,7 +65,7 @@ class IndexHpp
             {
                 this.currentWord += ch
             }
-            topToken = last(this.tokenStack)
+            topToken = _k_.last(this.tokenStack)
             if ((topToken != null ? topToken.classType : undefined))
             {
                 if (!topToken.name)
@@ -91,9 +91,9 @@ class IndexHpp
                     this.tokenStack.pop()
                 }
             }
-            if (_k_.empty((this.regionStack)) || last(this.regionStack).region === 'codeBlock')
+            if (_k_.empty((this.regionStack)) || _k_.last(this.regionStack).region === 'codeBlock')
             {
-                if (_k_.empty((this.tokenStack)) || last(this.tokenStack).classType)
+                if (_k_.empty((this.tokenStack)) || _k_.last(this.tokenStack).classType)
                 {
                     if (p === 0 && (match = lineText.match(this.classRegExp)))
                     {
@@ -124,22 +124,22 @@ class IndexHpp
                         }
                     }
                 }
-                else if (last(this.tokenStack).classType)
+                else if (_k_.last(this.tokenStack).classType)
                 {
                     if (match = rest.match(this.methodRegExp))
                     {
-                        this.tokenStack.push({line:lineIndex,col:p,method:match[2],depth:this.regionStack.length,class:last(this.tokenStack).name})
+                        this.tokenStack.push({line:lineIndex,col:p,method:match[2],depth:this.regionStack.length,class:_k_.last(this.tokenStack).name})
                     }
                     else if (match = rest.match(this.constrRegExp))
                     {
-                        if (match[1] === last(this.tokenStack).name || match[1] === '~' + last(this.tokenStack).name)
+                        if (match[1] === _k_.last(this.tokenStack).name || match[1] === '~' + _k_.last(this.tokenStack).name)
                         {
-                            this.tokenStack.push({line:lineIndex,col:p,method:match[1],depth:this.regionStack.length,class:last(this.tokenStack).name})
+                            this.tokenStack.push({line:lineIndex,col:p,method:match[1],depth:this.regionStack.length,class:_k_.last(this.tokenStack).name})
                         }
                     }
                 }
             }
-            topRegion = last(this.regionStack)
+            topRegion = _k_.last(this.regionStack)
             if (_k_.in((topRegion != null ? topRegion.region : undefined),['blockComment','string','character']))
             {
                 if (_k_.in(topRegion.region,['string','character']))

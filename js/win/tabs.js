@@ -1,8 +1,8 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
-var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}, first: function (o) {return o != null ? o.length ? o[0] : undefined : o}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}}
 
-var $, drag, elem, filter, first, kerror, klog, kpos, kxk, last, popup, post, prefs, slash, stopEvent, Tab, _
+var $, drag, elem, filter, kerror, klog, kpos, kxk, popup, post, prefs, slash, stopEvent, Tab, _
 
 kxk = require('kxk')
 $ = kxk.$
@@ -76,7 +76,7 @@ class Tabs
             tab = list[_50_16_]
             t += tab.div.innerHTML
         }
-        return post.toWin(winID,'winTabs',window.winID,t)
+        return post.toOtherWins('winTabs',window.winID,t)
     }
 
     onFileLineChanges (file, lineChanges)
@@ -215,7 +215,7 @@ class Tabs
         })
         if (!tab && create)
         {
-            tab = first(this.tabs)
+            tab = _k_.first(this.tabs)
             tab.setActive()
         }
         return tab
@@ -321,7 +321,7 @@ class Tabs
             }
         }
         this.tabs.push(new Tab(this,file))
-        return last(this.tabs)
+        return _k_.last(this.tabs)
     }
 
     getTmpTab ()

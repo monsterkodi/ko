@@ -755,6 +755,8 @@ function Column
         
     makeRoot: => 
         
+        return if not @parent
+        
         @browser.shiftColumnsTo @index
         
         if @browser.columns[0].items[0].name != '..'

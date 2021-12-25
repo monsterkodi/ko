@@ -1,8 +1,8 @@
-// monsterkodi/kode 0.228.0
+// monsterkodi/kode 0.229.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-var elem, fs, kerror, klor, kstr, kxk, last, matchr, slash, _
+var elem, fs, kerror, klor, kstr, kxk, matchr, slash, _
 
 kxk = require('kxk')
 _ = kxk._
@@ -128,7 +128,7 @@ class Syntax
 
     static spanForTextAndSyntax (text, n)
     {
-        var clrzd, clss, d, di, diss, l, sp, spc, style, _122_30_, _127_30_
+        var clrzd, clss, d, di, diss, l, last, sp, spc, style, _122_30_, _127_30_
 
         l = ""
         diss = this.dissForTextAndSyntax(text,n)
