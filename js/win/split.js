@@ -2,11 +2,12 @@
 
 var _k_
 
-var $, Flex, kerror, post
+var $, Flex, kerror, kxk, post
 
-$ = require('kxk').$
-kerror = require('kxk').kerror
-post = require('kxk').post
+kxk = require('kxk')
+$ = kxk.$
+kerror = kxk.kerror
+post = kxk.post
 
 Flex = require('./flex/flex')
 class Split
@@ -35,7 +36,7 @@ class Split
 
     onDrag ()
     {
-        var _54_23_
+        var _55_23_
 
         if ((this.flex != null))
         {
@@ -291,7 +292,7 @@ class Split
 
     focus (n)
     {
-        var e, _226_31_, _230_22_
+        var e, _227_31_, _231_22_
 
         if (n === 'commandline')
         {

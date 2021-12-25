@@ -6,7 +6,8 @@
 0000000   000        0000000  000     000   
 ###
 
-{ $, kerror, post } = require 'kxk'
+kxk = require 'kxk'
+{ $, kerror, post } = kxk
 
 Flex = require './flex/flex'
 
@@ -91,36 +92,36 @@ class Split
         action = words[0]
         what   = words[1]
         switch action
-            when 'show'     then return @show  what
-            when 'focus'    then return @focus what
-            when 'half'     then pos   =  @flex.size()/2
-            when 'third'    then pos   =  @flex.size()/3
-            when 'quart'    then pos   =  @flex.size()/4
-            when 'maximize' 
+            'show'     ➜ return @show  what
+            'focus'    ➜ return @focus what
+            'half'     ➜ pos   =  @flex.size()/2
+            'third'    ➜ pos   =  @flex.size()/3
+            'quart'    ➜ pos   =  @flex.size()/4
+            'maximize' 
                 if what == 'editor' then return @maximizeEditor()
                 delta =  @flex.size()
-            when 'minimize' 
+            'minimize' 
                 if what == 'editor' then return @minimizeEditor()
                 delta = -@flex.size()
-            when 'enlarge'
+            'enlarge'
                 if words[2] == 'by'
                     delta = parseInt words[3]
                 else
                     delta = parseInt 0.25 * @termEditHeight()
-            when 'reduce'
+            'reduce'
                 if words[2] == 'by'
                     delta = - parseInt words[3]
                 else
                     delta = - parseInt 0.25 * @termEditHeight()
-            else return error "Split.do -- unknown action '#{action}'"
+            ➜ return error "Split.do -- unknown action '#{action}'"
                     
         switch what
-            when 'editor' then return @moveCommandLineBy -delta
-            when 'terminal' 'browser' 'commandline'
+            'editor' ➜ return @moveCommandLineBy -delta
+            'terminal' 'browser' 'commandline'
                 @raise what if what != 'commandline'
                 if delta? then @moveCommandLineBy delta
                 if pos? then @flex.moveHandleToPos @flex.handles[0], pos
-                return 
+                return
                 
         error "Split.do -- unhandled do command? #{sentence}?"
 
@@ -146,8 +147,8 @@ class Split
     show: (n) ->
 
         switch n
-            when 'terminal' 'browser' then @raise n
-            when 'editor'     
+            'terminal' 'browser' ➜ @raise n
+            'editor'     
                 
                 @flex.expand 'editor'
                 if @editorHeight() < @flex.size()/3
@@ -156,8 +157,8 @@ class Split
                     if @flex.handles[2]?.pos() < 2*@flex.size()/3
                         @flex.moveHandleToPos @flex.handles[2], 2*@flex.size()/3
                         
-            when 'command' then @flex.expand 'commandline'
-            else error "split.show -- unhandled: #{n}!"
+            'command' then @flex.expand 'commandline'
+            ➜ error "split.show -- unhandled: #{n}!"
 
     hideEditor:     => @flex.collapse 'editor'
     hideTerminal:   => @flex.collapse 'terminal'
@@ -179,8 +180,8 @@ class Split
     raise: (n) ->
 
         switch n
-            when 'terminal' then @swap @browser, @terminal
-            when 'browser'  then @swap @terminal, @browser
+            'terminal' ➜ @swap @browser, @terminal
+            'browser'  ➜ @swap @terminal, @browser
             
         @flex.calculate()
 

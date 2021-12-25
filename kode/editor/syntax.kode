@@ -15,7 +15,7 @@ class Syntax
     
     @: (@name, @getLine, @getLines) ->
 
-        log 'Syntax' @name
+        # log 'Syntax' @name
         @diss   = []
         @colors = {}
 
