@@ -6,7 +6,8 @@
    000     000     000     0000000  00000000  0000000    000   000  000   000
 ###
 
-{ $, elem, post, stopEvent } = require 'kxk'
+kxk = require 'kxk'
+{ $, elem, post, stopEvent } = kxk
 
 class Titlebar
     
@@ -126,8 +127,8 @@ class Titlebar
         return if not @list
         @list.children[@selected]?.classList.remove 'selected'
         @selected += switch dir
-            when 'up'   then -1
-            when 'down' then +1
+            'up'   ➜ -1
+            'down' ➜ +1
         @selected = @list.children.length-1 if @selected < -1
         @selected = -1 if @selected >= @list.children.length
         @list.children[@selected].classList.add 'selected' if @selected > -1
@@ -141,15 +142,14 @@ class Titlebar
     globalModKeyComboEvent: (mod, key, combo, event) ->
 
         switch combo
-            when 'command+alt+left' 'command+alt+right' then return winow.tabs.navigate key
-            when 'command+alt+shift+left' 'command+alt+shift+right' then return window.tabs.move key
+            'command+alt+left' 'command+alt+right'              ➜ return winow.tabs.navigate key
+            'command+alt+shift+left' 'command+alt+shift+right'  ➜ return window.tabs.move key
 
         if @list?
             switch combo
-                when 'esc' 'alt+`'    then return @closeList()
-                when 'up' 'down'      then return @navigate key
-                when 'enter'
-                    return @loadSelected()
+                'esc' 'alt+`'   ➜ return @closeList()
+                'up' 'down'     ➜ return @navigate key
+                'enter'         ➜ return @loadSelected()
         'unhandled'
         
 module.exports = Titlebar

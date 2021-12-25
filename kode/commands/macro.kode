@@ -206,7 +206,7 @@ function Macro extends Command
                 clss = cmds.length and cmds[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
                 dir = editor.currentFile? and slash.dir(editor.currentFile) or process.cwd()
-                file = slash.join dir, clss.toLowerCase() + '.coffee' # fixme for kode!
+                file = slash.join dir, clss.toLowerCase() + '.kode'
                 if slash.fileExists file
                     return text: "file #{file} exists!"
                 text = "###\n"
@@ -214,7 +214,7 @@ function Macro extends Command
                 text += "\n###\n"
                 text += """
 
-                class #{clss}
+                function #{clss}
 
                     @: () ->
 

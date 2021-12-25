@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.218.0
+// monsterkodi/kode 0.223.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, valid: undefined}
 
@@ -377,7 +377,7 @@ FileEditor = (function ()
 
     FileEditor.prototype["jumpToCounterpart"] = function ()
     {
-        var col, counter, counterparts, cp, currext, ext, file, line, _342_41_, _347_41_
+        var col, counter, counterparts, cp, currext, ext, file, line, _344_41_, _349_41_
 
         cp = this.cursorPos()
         currext = slash.ext(this.currentFile)
@@ -389,8 +389,13 @@ FileEditor = (function ()
 
                 break
             case 'js':
-                var _321_32_ = srcmap.toCoffee(this.currentFile,cp[1] + 1,cp[0]); file = _321_32_[0]; line = _321_32_[1]; col = _321_32_[2]
+                var _321_32_ = srcmap.toKode(this.currentFile,cp[1] + 1,cp[0]); file = _321_32_[0]; line = _321_32_[1]; col = _321_32_[2]
 
+                if (!slash.fileExists(file))
+                {
+                    var _323_36_ = srcmap.toCoffee(this.currentFile,cp[1] + 1,cp[0]); file = _323_36_[0]; line = _323_36_[1]; col = _323_36_[2]
+
+                }
                 break
         }
 
@@ -401,20 +406,20 @@ FileEditor = (function ()
             return true
         }
         counterparts = {cpp:['hpp','h'],cc:['hpp','h'],h:['cpp','c'],hpp:['cpp','c'],coffee:['js'],kode:['js'],js:['coffee','kode'],pug:['html'],html:['pug'],css:['styl'],styl:['css']}
-        var list = ((_342_41_=counterparts[currext]) != null ? _342_41_ : [])
-        for (var _342_16_ = 0; _342_16_ < list.length; _342_16_++)
+        var list = ((_344_41_=counterparts[currext]) != null ? _344_41_ : [])
+        for (var _344_16_ = 0; _344_16_ < list.length; _344_16_++)
         {
-            ext = list[_342_16_]
+            ext = list[_344_16_]
             if (slash.fileExists(slash.swapExt(this.currentFile,ext)))
             {
                 post.emit('loadFile',slash.swapExt(this.currentFile,ext))
                 return true
             }
         }
-        var list1 = ((_347_41_=counterparts[currext]) != null ? _347_41_ : [])
-        for (var _347_16_ = 0; _347_16_ < list1.length; _347_16_++)
+        var list1 = ((_349_41_=counterparts[currext]) != null ? _349_41_ : [])
+        for (var _349_16_ = 0; _349_16_ < list1.length; _349_16_++)
         {
-            ext = list1[_347_16_]
+            ext = list1[_349_16_]
             counter = slash.swapExt(this.currentFile,ext)
             counter = this.swapLastDir(counter,currext,ext)
             if (slash.fileExists(counter))
@@ -468,15 +473,15 @@ FileEditor = (function ()
                 var l, t
 
                 var list = _k_.list(layers)
-                for (var _392_81_ = 0; _392_81_ < list.length; _392_81_++)
+                for (var _394_81_ = 0; _394_81_ < list.length; _394_81_++)
                 {
-                    l = list[_392_81_]
+                    l = list[_394_81_]
                     setStyle('.editor .layers ' + l,'transform',"translateX(0)")
                 }
                 var list1 = _k_.list(transi)
-                for (var _393_76_ = 0; _393_76_ < list1.length; _393_76_++)
+                for (var _395_76_ = 0; _395_76_ < list1.length; _395_76_++)
                 {
-                    t = list1[_393_76_]
+                    t = list1[_395_76_]
                     setStyle('.editor .layers ' + t,'transition',"initial")
                 }
                 return this.updateLayers()
@@ -492,15 +497,15 @@ FileEditor = (function ()
                 offsetX *= -1
             }
             var list = _k_.list(layers)
-            for (var _403_88_ = 0; _403_88_ < list.length; _403_88_++)
+            for (var _405_88_ = 0; _405_88_ < list.length; _405_88_++)
             {
-                l = list[_403_88_]
+                l = list[_405_88_]
                 setStyle('.editor .layers ' + l,'transform',`translateX(${offsetX}px)`)
             }
             var list1 = _k_.list(transi)
-            for (var _404_85_ = 0; _404_85_ < list1.length; _404_85_++)
+            for (var _406_85_ = 0; _406_85_ < list1.length; _406_85_++)
             {
-                t = list1[_404_85_]
+                t = list1[_406_85_]
                 setStyle('.editor .layers ' + t,'transition',`all ${animate / 1000}s`)
             }
             return setTimeout(resetTrans,animate)
@@ -518,7 +523,7 @@ FileEditor = (function ()
 
     FileEditor.prototype["showContextMenu"] = function (absPos)
     {
-        var f, fileMenu, fileSpan, getMenu, opt, recent, RecentMenu, _452_29_
+        var f, fileMenu, fileSpan, getMenu, opt, recent, RecentMenu, _454_29_
 
         if (!(absPos != null))
         {
@@ -550,9 +555,9 @@ FileEditor = (function ()
         recent = (window.state != null ? window.state.get('recentFiles',[]) : undefined)
         recent = (recent != null ? recent : [])
         var list = _k_.list(recent)
-        for (var _454_14_ = 0; _454_14_ < list.length; _454_14_++)
+        for (var _456_14_ = 0; _456_14_ < list.length; _456_14_++)
         {
-            f = list[_454_14_]
+            f = list[_456_14_]
             if (fs.existsSync(f))
             {
                 RecentMenu.unshift({html:fileSpan(f),arg:f,cb:function (arg)
@@ -566,9 +571,9 @@ FileEditor = (function ()
             var item
 
             var list1 = _k_.list(template)
-            for (var _462_21_ = 0; _462_21_ < list1.length; _462_21_++)
+            for (var _464_21_ = 0; _464_21_ < list1.length; _464_21_++)
             {
-                item = list1[_462_21_]
+                item = list1[_464_21_]
                 if (item.text === name)
                 {
                     return item

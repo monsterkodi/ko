@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.218.0
+// monsterkodi/kode 0.223.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
 
@@ -195,7 +195,7 @@ Macro = (function ()
                 clss = cmds.length && cmds[0] || _.last(editor.textsInRanges(editor.selections()))
                 clss = (clss != null ? clss : 'Class')
                 dir = (editor.currentFile != null) && slash.dir(editor.currentFile) || process.cwd()
-                file = slash.join(dir,clss.toLowerCase() + '.coffee')
+                file = slash.join(dir,clss.toLowerCase() + '.kode')
                 if (slash.fileExists(file))
                 {
                     return {text:`file ${file} exists!`}
@@ -204,7 +204,7 @@ Macro = (function ()
                 text += (function () { var _213__33_ = []; var list2 = _k_.list(salt(clss).split('\n')); for (var _213_33_ = 0; _213_33_ < list2.length; _213_33_++)  { s = list2[_213_33_];_213__33_.push(s)  } return _213__33_ }).bind(this)().join('\n')
                 text += "\n###\n"
                 text += `
-class ${clss}
+function ${clss}
 
     @: () ->
 

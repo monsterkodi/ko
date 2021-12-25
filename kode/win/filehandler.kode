@@ -222,11 +222,11 @@ class FileHandler
         catch err
             kerror "macro req failed #{err}"
             
-        dbg 'File.save' file
+        # dbg 'File.save' file
         
         File.save file, editor.text(), (err, saved) ->
             
-            dbg 'File.saved' err, file
+            # dbg 'File.saved' err, file
             
             editor.saveScrollCursorsAndSelections()
             

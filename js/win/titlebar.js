@@ -1,13 +1,14 @@
-// monsterkodi/kode 0.218.0
+// monsterkodi/kode 0.223.0
 
 var _k_ = {list: function (l) {return (l != null ? typeof l.length === 'number' ? l : [] : [])}}
 
-var $, elem, post, stopEvent
+var $, elem, kxk, post, stopEvent
 
-$ = require('kxk').$
-elem = require('kxk').elem
-post = require('kxk').post
-stopEvent = require('kxk').stopEvent
+kxk = require('kxk')
+$ = kxk.$
+elem = kxk.elem
+post = kxk.post
+stopEvent = kxk.stopEvent
 
 class Titlebar
 {
@@ -57,7 +58,7 @@ class Titlebar
 
     showList (event)
     {
-        var winInfos, _55_23_
+        var winInfos, _56_23_
 
         if ((this.list != null))
         {
@@ -78,7 +79,7 @@ class Titlebar
 
     closeList ()
     {
-        var _67_16_, _70_17_
+        var _68_16_, _71_17_
 
         if ((this.list != null))
         {
@@ -95,9 +96,9 @@ class Titlebar
 
         this.list.innerHTML = ""
         var list = _k_.list(winInfos)
-        for (var _83_17_ = 0; _83_17_ < list.length; _83_17_++)
+        for (var _84_17_ = 0; _84_17_ < list.length; _84_17_++)
         {
-            info = list[_83_17_]
+            info = list[_84_17_]
             if (info.id === window.winID)
             {
                 continue
@@ -122,7 +123,7 @@ class Titlebar
 
     onWinTabs (winID, tabs)
     {
-        var div, w, width, _105_27_
+        var div, w, width, _106_27_
 
         if (!(this.list != null))
         {
@@ -133,9 +134,9 @@ class Titlebar
             return
         }
         var list = _k_.list(this.list.children)
-        for (var _107_16_ = 0; _107_16_ < list.length; _107_16_++)
+        for (var _108_16_ = 0; _108_16_ < list.length; _108_16_++)
         {
-            div = list[_107_16_]
+            div = list[_108_16_]
             if (div.winID === winID)
             {
                 if (w = $('.wintabs',div))
@@ -199,7 +200,7 @@ class Titlebar
 
     globalModKeyComboEvent (mod, key, combo, event)
     {
-        var _147_16_
+        var _148_16_
 
         switch (combo)
         {

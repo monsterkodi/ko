@@ -347,13 +347,13 @@ function Shelf extends Column
         kerror "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
         
         index = switch key
-            when 'up'        then index-1
-            when 'down'      then index+1
-            when 'home'      then 0
-            when 'end'       then @items.length
-            when 'page up'   then index-@numVisible()
-            when 'page down' then clamp 0, @items.length, index+@numVisible()
-            else index
+            'up'        ➜ index-1
+            'down'      ➜ index+1
+            'home'      ➜ 0
+            'end'       ➜ @items.length
+            'page up'   ➜ index-@numVisible()
+            'page down' ➜ clamp 0, @items.length, index+@numVisible()
+                        ➜ index
             
         kerror "no index #{index}? #{@numVisible()}" if not index? or Number.isNaN index        
         index = clamp 0, @numRows()-1, index

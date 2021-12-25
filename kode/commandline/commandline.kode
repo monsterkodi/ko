@@ -6,7 +6,8 @@
  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
 ###
 
-{ $, elem, filelist, kerror, noon, post, slash, stopEvent } = require 'kxk'
+kxk = require 'kxk'
+{ $, elem, filelist, kerror, noon, post, slash, stopEvent } = kxk
 
 TextEditor = require '../editor/texteditor'
 
@@ -325,21 +326,21 @@ function Commandline extends TextEditor
 
         split = window.split
         switch combo
-            when 'enter'                then return @execute()
-            when 'command+enter'        then return @execute() + window.split.do "focus #{@command?.focus}"
-            when 'command+shift+enter'  then return @focusTerminal()
-            when 'up'                   then return @command?.selectListItem 'up'
-            when 'down'                 then return @command?.selectListItem 'down'
-            when 'esc'                  then return @cancel()
-            when 'command+k'            then return @clear()
-            when 'shift+tab'            then return
-            when 'home' 'command+up'    then return split.do 'maximize editor'
-            when 'end' 'command+down'   then return split.do 'minimize editor'
-            when 'alt+up'               then return split.do 'enlarge editor'
-            when 'ctrl+up'              then return split.do 'enlarge editor by 20'
-            when 'alt+down'             then return split.do 'reduce editor'
-            when 'ctrl+down'            then return split.do 'reduce editor by 20'
-            when 'right' 'tab'          then return if @command?.onTabCompletion combo
+            'enter'                ➜ return @execute()
+            'command+enter'        ➜ return @execute() + window.split.do "focus #{@command?.focus}"
+            'command+shift+enter'  ➜ return @focusTerminal()
+            'up'                   ➜ return @command?.selectListItem 'up'
+            'down'                 ➜ return @command?.selectListItem 'down'
+            'esc'                  ➜ return @cancel()
+            'command+k'            ➜ return @clear()
+            'shift+tab'            ➜ return
+            'home' 'command+up'    ➜ return split.do 'maximize editor'
+            'end' 'command+down'   ➜ return split.do 'minimize editor'
+            'alt+up'               ➜ return split.do 'enlarge editor'
+            'ctrl+up'              ➜ return split.do 'enlarge editor by 20'
+            'alt+down'             ➜ return split.do 'reduce editor'
+            'ctrl+down'            ➜ return split.do 'reduce editor by 20'
+            'right' 'tab'          ➜ return if @command?.onTabCompletion combo
 
         return super mod, key, combo, char, event
 

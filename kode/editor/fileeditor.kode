@@ -318,7 +318,9 @@ function FileEditor extends TextEditor
             when 'coffee' 'kode'
                 [file,line,col] = srcmap.toJs @currentFile, cp[1]+1, cp[0]
             when 'js'
-                [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
+                [file,line,col] = srcmap.toKode @currentFile, cp[1]+1, cp[0]
+                if not slash.fileExists file
+                    [file,line,col] = srcmap.toCoffee @currentFile, cp[1]+1, cp[0]
 
         log 'counterpart' @currentFile, file, line, col
                 
