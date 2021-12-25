@@ -146,6 +146,7 @@ body {
   text-align: center;
   padding-top: 1vw;
   padding-bottom: 1vw;
+  transform: scale(1.1);
 }
 .fileInfoIcon:before {
   font-size: 6vw;
