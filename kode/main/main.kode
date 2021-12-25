@@ -131,8 +131,6 @@ function Main extends app
 
         global.state = new store 'state' separator: '|'
 
-        alias = new store 'alias'
-                
         if args.state
             log kolor.yellow kolor.bold 'state'
             log kolor.green kolor.bold 'state file:' global.state.file

@@ -149,8 +149,6 @@ Main = (function ()
     _k_.extend(Main, app)
     function Main (openFiles)
     {
-        var alias
-
         this["quit"] = this["quit"].bind(this)
         this["reloadWin"] = this["reloadWin"].bind(this)
         this["onOtherInstance"] = this["onOtherInstance"].bind(this)
@@ -193,7 +191,6 @@ Main = (function ()
             console.log('')
         }
         global.state = new store('state',{separator:'|'})
-        alias = new store('alias')
         if (args.state)
         {
             console.log(kolor.yellow(kolor.bold('state')))
@@ -212,7 +209,7 @@ Main = (function ()
 
     Main.prototype["onShow"] = function ()
     {
-        var file, height, recent, width, _167_50_, _168_42_
+        var file, height, recent, width, _165_50_, _166_42_
 
         width = this.screenSize().width
         height = this.screenSize().height
@@ -228,9 +225,9 @@ Main = (function ()
         if (!_k_.empty(this.openFiles))
         {
             var list = _k_.list(this.openFiles)
-            for (var _171_21_ = 0; _171_21_ < list.length; _171_21_++)
+            for (var _169_21_ = 0; _169_21_ < list.length; _169_21_++)
             {
-                file = list[_171_21_]
+                file = list[_169_21_]
                 this.createWindowWithFile({file:file})
             }
             delete this.openFiles
@@ -351,9 +348,9 @@ Main = (function ()
         var w
 
         var list = _k_.list(wins())
-        for (var _250_14_ = 0; _250_14_ < list.length; _250_14_++)
+        for (var _248_14_ = 0; _248_14_ < list.length; _248_14_++)
         {
-            w = list[_250_14_]
+            w = list[_248_14_]
             w.hide()
             this.hideDock()
         }
@@ -365,9 +362,9 @@ Main = (function ()
         var w
 
         var list = _k_.list(wins())
-        for (var _257_14_ = 0; _257_14_ < list.length; _257_14_++)
+        for (var _255_14_ = 0; _255_14_ < list.length; _255_14_++)
         {
-            w = list[_257_14_]
+            w = list[_255_14_]
             w.show()
             this.showDock()
         }
@@ -381,9 +378,9 @@ Main = (function ()
         if (!_k_.empty(visibleWins()))
         {
             var list = _k_.list(visibleWins())
-            for (var _265_18_ = 0; _265_18_ < list.length; _265_18_++)
+            for (var _263_18_ = 0; _263_18_ < list.length; _263_18_++)
             {
-                w = list[_265_18_]
+                w = list[_263_18_]
                 w.showInactive()
             }
             visibleWins()[0].showInactive()
@@ -402,9 +399,9 @@ Main = (function ()
         }
         allWindows = wins()
         var list = _k_.list(allWindows)
-        for (var _275_14_ = 0; _275_14_ < list.length; _275_14_++)
+        for (var _273_14_ = 0; _273_14_ < list.length; _273_14_++)
         {
-            w = list[_275_14_]
+            w = list[_273_14_]
             if (w === win)
             {
                 i = 1 + allWindows.indexOf(w)
@@ -429,9 +426,9 @@ Main = (function ()
         }
         allWindows = wins()
         var list = _k_.list(allWindows)
-        for (var _287_14_ = 0; _287_14_ < list.length; _287_14_++)
+        for (var _285_14_ = 0; _285_14_ < list.length; _285_14_++)
         {
-            w = list[_287_14_]
+            w = list[_285_14_]
             if (w === win)
             {
                 i = -1 + allWindows.indexOf(w)
@@ -481,9 +478,9 @@ Main = (function ()
         ww = height + 122
         wl = visibleWins()
         var list = _k_.list(wl)
-        for (var _318_14_ = 0; _318_14_ < list.length; _318_14_++)
+        for (var _316_14_ = 0; _316_14_ < list.length; _316_14_++)
         {
-            w = list[_318_14_]
+            w = list[_316_14_]
             w.showInactive()
             w.setBounds({x:parseInt((width - ww) / 2),y:parseInt(0),width:parseInt(ww),height:parseInt(height)})
         }
@@ -500,9 +497,9 @@ Main = (function ()
             return false
         }
         var list = _k_.list(wl)
-        for (var _332_14_ = 0; _332_14_ < list.length; _332_14_++)
+        for (var _330_14_ = 0; _330_14_ < list.length; _330_14_++)
         {
-            w = list[_332_14_]
+            w = list[_330_14_]
             if (w.isFullScreen())
             {
                 w.setFullScreen(false)
@@ -513,7 +510,7 @@ Main = (function ()
         {
             return false
         }
-        for (var _340_19_ = wi = 1, _340_23_ = wl.length; (_340_19_ <= _340_23_ ? wi < wl.length : wi > wl.length); (_340_19_ <= _340_23_ ? ++wi : --wi))
+        for (var _338_19_ = wi = 1, _338_23_ = wl.length; (_338_19_ <= _338_23_ ? wi < wl.length : wi > wl.length); (_338_19_ <= _338_23_ ? ++wi : --wi))
         {
             if (!_.isEqual(wl[wi].getBounds(),bounds))
             {
@@ -547,7 +544,7 @@ Main = (function ()
         else if (wl.length === 2 || wl.length === 3)
         {
             w = width / wl.length
-            for (var _372_22_ = i = 0, _372_26_ = wl.length; (_372_22_ <= _372_26_ ? i < wl.length : i > wl.length); (_372_22_ <= _372_26_ ? ++i : --i))
+            for (var _370_22_ = i = 0, _370_26_ = wl.length; (_370_22_ <= _370_26_ ? i < wl.length : i > wl.length); (_370_22_ <= _370_26_ ? ++i : --i))
             {
                 wl[i].showInactive()
                 wl[i].setBounds({x:parseInt(i * w - (i > 0 && frameSize / 2 || 0)),width:parseInt(w + ((i === 0 || i === wl.length - 1) && frameSize / 2 || frameSize)),y:parseInt(0),height:parseInt(height)})
@@ -557,13 +554,13 @@ Main = (function ()
         {
             w2 = parseInt(wl.length / 2)
             rh = height
-            for (var _382_22_ = i = 0, _382_26_ = w2; (_382_22_ <= _382_26_ ? i < w2 : i > w2); (_382_22_ <= _382_26_ ? ++i : --i))
+            for (var _380_22_ = i = 0, _380_26_ = w2; (_380_22_ <= _380_26_ ? i < w2 : i > w2); (_380_22_ <= _380_26_ ? ++i : --i))
             {
                 w = width / w2
                 wl[i].showInactive()
                 wl[i].setBounds({x:parseInt(i * w - (i > 0 && frameSize / 2 || 0)),width:parseInt(w + ((i === 0 || i === w2 - 1) && frameSize / 2 || frameSize)),y:parseInt(0),height:parseInt(rh / 2)})
             }
-            for (var _390_22_ = i = w2, _390_27_ = wl.length; (_390_22_ <= _390_27_ ? i < wl.length : i > wl.length); (_390_22_ <= _390_27_ ? ++i : --i))
+            for (var _388_22_ = i = w2, _388_27_ = wl.length; (_388_22_ <= _388_27_ ? i < wl.length : i > wl.length); (_388_22_ <= _388_27_ ? ++i : --i))
             {
                 w = width / (wl.length - w2)
                 wl[i].showInactive()
@@ -591,9 +588,9 @@ Main = (function ()
 
         fs.ensureDirSync(this.userData)
         var list = _k_.list(filelist(slash.join(this.userData,'old'),{matchExt:'noon'}))
-        for (var _417_17_ = 0; _417_17_ < list.length; _417_17_++)
+        for (var _415_17_ = 0; _415_17_ < list.length; _415_17_++)
         {
-            file = list[_417_17_]
+            file = list[_415_17_]
             win = this.createWindow()
             newStash = slash.join(this.userData,'win',`${win.id}.noon`)
             fs.copySync(file,newStash)
@@ -605,9 +602,9 @@ Main = (function ()
         if (!_k_.empty(wins()))
         {
             var list = _k_.list(wins())
-            for (var _425_20_ = 0; _425_20_ < list.length; _425_20_++)
+            for (var _423_20_ = 0; _423_20_ < list.length; _423_20_++)
             {
-                win = list[_425_20_]
+                win = list[_423_20_]
                 win.show()
             }
         }
@@ -630,9 +627,9 @@ Main = (function ()
         wb = event.sender.getBounds()
         klog('ko.main.onResizeWin')
         var list = _k_.list(wins())
-        for (var _445_14_ = 0; _445_14_ < list.length; _445_14_++)
+        for (var _443_14_ = 0; _443_14_ < list.length; _443_14_++)
         {
-            w = list[_445_14_]
+            w = list[_443_14_]
             if (w === event.sender)
             {
                 continue
@@ -701,7 +698,7 @@ Main = (function ()
     {
         return this.activateOneWindow(function (win)
         {
-            var arg, file, fileargs, files, fpath, pos, _501_26_
+            var arg, file, fileargs, files, fpath, pos, _499_26_
 
             files = []
             if ((first(args) != null ? first(args).endsWith(`${pkg.name}.exe`) : undefined))
@@ -713,9 +710,9 @@ Main = (function ()
                 fileargs = args.slice(2)
             }
             var list = _k_.list(fileargs)
-            for (var _506_20_ = 0; _506_20_ < list.length; _506_20_++)
+            for (var _504_20_ = 0; _504_20_ < list.length; _504_20_++)
             {
-                arg = list[_506_20_]
+                arg = list[_504_20_]
                 if (arg.startsWith('-'))
                 {
                     continue
@@ -725,7 +722,7 @@ Main = (function ()
                 {
                     file = slash.join(slash.resolve(dir),arg)
                 }
-                var _511_29_ = slash.splitFilePos(file); fpath = _511_29_[0]; pos = _511_29_[1]
+                var _509_29_ = slash.splitFilePos(file); fpath = _509_29_[0]; pos = _509_29_[1]
 
                 if (slash.exists(fpath))
                 {
