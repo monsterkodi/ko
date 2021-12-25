@@ -7,7 +7,7 @@
 ###
 
 kxk = require 'kxk'
-{ $, _, clamp, elem, first, kerror, keyinfo, klog, kpos, popup, post, slash, stopEvent } = kxk
+{ $, _, elem, first, kerror, keyinfo, klog, kpos, popup, post, slash, stopEvent } = kxk
 
 Row      = require './row'
 Scroller = require './scroller'

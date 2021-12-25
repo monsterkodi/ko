@@ -7,7 +7,7 @@
 ###
 
 kxk = require 'kxk'
-{ $, clamp, kerror, post, slash } = kxk
+{ $, kerror, post, slash } = kxk
 
 Command     = require '../commandline/command'
 FileBrowser = require '../browser/filebrowser'

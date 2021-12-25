@@ -1,10 +1,8 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_
+var _k_ = {clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var clamp, events
-
-clamp = require('kxk').clamp
+var events
 
 events = require('events')
 class MapScroll extends events
@@ -13,7 +11,7 @@ class MapScroll extends events
     {
         super()
     
-        var _18_37_, _19_37_, _20_36_, _21_33_
+        var _16_37_, _17_37_, _18_36_, _19_33_
 
         this.setLineHeight = this.setLineHeight.bind(this)
         this.setNumLines = this.setNumLines.bind(this)
@@ -24,10 +22,10 @@ class MapScroll extends events
         this.by = this.by.bind(this)
         this.to = this.to.bind(this)
         this.reset = this.reset.bind(this)
-        this.lineHeight = ((_18_37_=cfg.lineHeight) != null ? _18_37_ : 0)
-        this.viewHeight = ((_19_37_=cfg.viewHeight) != null ? _19_37_ : 0)
-        this.exposeMax = ((_20_36_=cfg.exposeMax) != null ? _20_36_ : -4)
-        this.smooth = ((_21_33_=cfg.smooth) != null ? _21_33_ : true)
+        this.lineHeight = ((_16_37_=cfg.lineHeight) != null ? _16_37_ : 0)
+        this.viewHeight = ((_17_37_=cfg.viewHeight) != null ? _17_37_ : 0)
+        this.exposeMax = ((_18_36_=cfg.exposeMax) != null ? _18_36_ : -4)
+        this.smooth = ((_19_33_=cfg.smooth) != null ? _19_33_ : true)
         this.init()
     }
 
@@ -89,7 +87,7 @@ class MapScroll extends events
         {
             delta = 0
         }
-        this.scroll = parseInt(clamp(0,this.scrollMax,this.scroll + delta))
+        this.scroll = parseInt(_k_.clamp(0,this.scrollMax,this.scroll + delta))
         top = parseInt(this.scroll / this.lineHeight)
         this.offsetSmooth = this.scroll - top * this.lineHeight
         this.setTop(top)
@@ -155,13 +153,13 @@ class MapScroll extends events
             num = this.exposeBot - this.exposeTop + 1 - this.exposeNum
             if (this.top > oldTop)
             {
-                n = clamp(0,this.top - this.exposeTop,num)
+                n = _k_.clamp(0,this.top - this.exposeTop,num)
                 this.exposeTop += n
                 return this.emit('vanishLines',{top:n})
             }
             else
             {
-                n = clamp(0,this.exposeBot - this.bot,num)
+                n = _k_.clamp(0,this.exposeBot - this.bot,num)
                 this.exposeBot -= n
                 return this.emit('vanishLines',{bot:n})
             }

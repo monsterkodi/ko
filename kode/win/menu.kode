@@ -20,7 +20,7 @@ getMenu = (template, name) ->
 
 menu = (template) ->
 
-    if template is Array
+    if template is arr
         template = clone template
     else
         klog 'no array?' typeof(template), template

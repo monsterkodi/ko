@@ -1,12 +1,11 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, valid: undefined}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, valid: undefined, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var Buffer, clamp, endOf, event, fuzzy, kerror, kxk, matchr, startOf, State, _
+var Buffer, endOf, event, fuzzy, kerror, kxk, matchr, startOf, State, _
 
 kxk = require('kxk')
 _ = kxk._
-clamp = kxk.clamp
 kerror = kxk.kerror
 matchr = kxk.matchr
 
@@ -493,8 +492,8 @@ Buffer = (function ()
         {
             return [0,-1]
         }
-        l = clamp(0,this.numLines() - 1,p[1])
-        c = clamp(0,this.line(l).length,p[0])
+        l = _k_.clamp(0,this.numLines() - 1,p[1])
+        c = _k_.clamp(0,this.line(l).length,p[0])
         return [c,l]
     }
 

@@ -7,7 +7,7 @@
 ###
 
 kxk = require 'kxk'
-{ _, clamp, kerror, matchr } = kxk
+{ _, kerror, matchr } = kxk
 
 State   = require './state'
 fuzzy   = require 'fuzzy'

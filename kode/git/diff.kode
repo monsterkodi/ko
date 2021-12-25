@@ -16,7 +16,7 @@ diff = (file, cb) ->
 
     file = slash.resolve file
 
-    if cb is 'function'
+    if cb is func
         slash.isFile file, (stat) ->
             cb({}) if empty stat
             childp.exec gitCmd(file), gitOpt(slash.unslash slash.dir file), (err,r) ->

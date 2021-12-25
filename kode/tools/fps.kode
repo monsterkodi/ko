@@ -6,7 +6,8 @@
 000       000        0000000 
 ###
 
-{ $, clamp, elem, post } = require 'kxk'
+kxk = require 'kxk'
+{ $, elem, post } = kxk
 
 now = require('perf_hooks').performance.now
 

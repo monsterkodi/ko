@@ -1,13 +1,13 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_
+var _k_ = {clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var $, clamp, elem, now, post
+var $, elem, kxk, now, post
 
-$ = require('kxk').$
-clamp = require('kxk').clamp
-elem = require('kxk').elem
-post = require('kxk').post
+kxk = require('kxk')
+$ = kxk.$
+elem = kxk.elem
+post = kxk.post
 
 now = require('perf_hooks').performance.now
 class FPS
@@ -45,11 +45,11 @@ class FPS
         }
         this.canvas.height = this.canvas.height
         ctx = this.canvas.getContext('2d')
-        for (var _48_18_ = i = 0, _48_22_ = this.history.length; (_48_18_ <= _48_22_ ? i < this.history.length : i > this.history.length); (_48_18_ <= _48_22_ ? ++i : --i))
+        for (var _49_18_ = i = 0, _49_22_ = this.history.length; (_49_18_ <= _49_22_ ? i < this.history.length : i > this.history.length); (_49_18_ <= _49_22_ ? ++i : --i))
         {
             ms = Math.max(0,this.history[i] - 17)
-            red = parseInt(32 + 223 * clamp(0,1,(ms - 16) / 16))
-            green = parseInt(32 + 223 * clamp(0,1,(ms - 32) / 32))
+            red = parseInt(32 + 223 * _k_.clamp(0,1,(ms - 16) / 16))
+            green = parseInt(32 + 223 * _k_.clamp(0,1,(ms - 32) / 32))
             ctx.fillStyle = `rgb(${red}, ${green}, 32)`
             h = Math.min(ms,60)
             ctx.fillRect(260 - this.history.length + i,60 - h,2,h)

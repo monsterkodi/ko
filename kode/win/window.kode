@@ -6,7 +6,8 @@
 00     00  000  000   000  0000000     0000000   00     00
 ###
 
-{ clamp, klog, post, prefs, scheme, stash, stopEvent, store, win } = require 'kxk'
+kxk = require 'kxk'
+{ klog, post, prefs, scheme, stash, stopEvent, store, win } = kxk
 
 Split       = require './split'
 Terminal    = require './terminal'
@@ -109,7 +110,7 @@ function Window extends win
     onMenuAction: (name, opts) =>
     
         if action = Editor.actionWithName name
-            if action.key? and window.focusEditor[action.key] is 'function'
+            if action.key? and window.focusEditor[action.key] is func
                 window.focusEditor[action.key] opts.actarg
                 return 
     

@@ -7,7 +7,7 @@
 ###
 
 kxk = require 'kxk'
-{ $, _, clamp, drag, elem, kerror, keyinfo, klog, os, post, prefs, stopEvent } = kxk
+{ $, _, drag, elem, kerror, keyinfo, klog, os, post, prefs, stopEvent } = kxk
   
 render       = require './render'
 EditorScroll = require './editorscroll'
@@ -742,7 +742,7 @@ function TextEditor extends Editor
             if action.accels? and os.platform() != 'darwin'
                 for actionCombo in action.accels
                     if combo == actionCombo
-                        if action.key? and @[action.key] is 'function'
+                        if action.key? and @[action.key] is func
                             @[action.key](key, combo: combo, mod: mod, event: event)
                             return
                 
@@ -752,7 +752,7 @@ function TextEditor extends Editor
                 # klog 'texteditor actionCombo' action.key, actionCombo
                 if combo == actionCombo
                     # klog 'combo match' combo, action.key, _.isFunction @[action.key]
-                    if action.key? and @[action.key] is 'function'
+                    if action.key? and @[action.key] is func
                         # klog 'texteditor action.key' action.key
                         @[action.key](key, combo: combo, mod: mod, event: event)
                         return

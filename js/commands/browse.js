@@ -1,12 +1,11 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var $, Browse, clamp, Command, FileBrowser, kerror, kxk, post, slash
+var $, Browse, Command, FileBrowser, kerror, kxk, post, slash
 
 kxk = require('kxk')
 $ = kxk.$
-clamp = kxk.clamp
 kerror = kxk.kerror
 post = kxk.post
 slash = kxk.slash
@@ -319,7 +318,7 @@ Browse = (function ()
     {
         var l, s, text, _259_42_, _265_20_, _266_20_
 
-        this.selected = clamp(-1,(this.commandList != null ? this.commandList.numLines() : undefined) - 1,i)
+        this.selected = _k_.clamp(-1,(this.commandList != null ? this.commandList.numLines() : undefined) - 1,i)
         if (this.selected < 0)
         {
             this.hideList()

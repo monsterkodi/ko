@@ -1,21 +1,21 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var clamp, filter, post, prefs, slash, _
+var filter, kxk, post, prefs, slash, _
 
-_ = require('kxk')._
-clamp = require('kxk').clamp
-filter = require('kxk').filter
-post = require('kxk').post
-prefs = require('kxk').prefs
-slash = require('kxk').slash
+kxk = require('kxk')
+_ = kxk._
+filter = kxk.filter
+post = kxk.post
+prefs = kxk.prefs
+slash = kxk.slash
 
 class Navigate
 {
     constructor (main)
     {
-        var _15_27_
+        var _16_27_
 
         this.main = main
     
@@ -52,7 +52,7 @@ class Navigate
         pos = (pos != null ? pos : [0,0])
         if (!pos[0] && !pos[1] && this.filePositions.length)
         {
-            for (var _39_22_ = i = this.filePositions.length - 1, _39_47_ = 0; (_39_22_ <= _39_47_ ? i <= 0 : i >= 0); (_39_22_ <= _39_47_ ? ++i : --i))
+            for (var _40_22_ = i = this.filePositions.length - 1, _40_47_ = 0; (_40_22_ <= _40_47_ ? i <= 0 : i >= 0); (_40_22_ <= _40_47_ ? ++i : --i))
             {
                 fp = this.filePositions[i]
                 if (slash.samePath(fp.file,file))
@@ -81,7 +81,7 @@ class Navigate
 
     navigate (opt)
     {
-        var hasFile, _88_30_, _88_45_, _96_39_
+        var hasFile, _89_30_, _89_45_, _97_39_
 
         switch (opt.action)
         {
@@ -94,7 +94,7 @@ class Navigate
                 {
                     return
                 }
-                this.currentIndex = clamp(0,Math.max(0,this.filePositions.length - 2),this.currentIndex - 1)
+                this.currentIndex = _k_.clamp(0,Math.max(0,this.filePositions.length - 2),this.currentIndex - 1)
                 this.navigating = true
                 return this.loadFilePos(this.filePositions[this.currentIndex],opt)
 
@@ -103,21 +103,21 @@ class Navigate
                 {
                     return
                 }
-                this.currentIndex = clamp(0,this.filePositions.length - 1,this.currentIndex + 1)
+                this.currentIndex = _k_.clamp(0,this.filePositions.length - 1,this.currentIndex + 1)
                 this.navigating = true
                 return this.loadFilePos(this.filePositions[this.currentIndex],opt)
 
             case 'delFilePos':
-                opt.item.line = ((_88_30_=opt.item.line) != null ? _88_30_ : (opt.item.pos != null ? opt.item.pos[1] : undefined) + 1)
+                opt.item.line = ((_89_30_=opt.item.line) != null ? _89_30_ : (opt.item.pos != null ? opt.item.pos[1] : undefined) + 1)
                 this.filePositions = filter(this.filePositions,function (f)
                 {
                     return f.file !== opt.item.file || f.line !== opt.item.line
                 })
-                this.currentIndex = clamp(0,this.filePositions.length - 1,this.currentIndex)
+                this.currentIndex = _k_.clamp(0,this.filePositions.length - 1,this.currentIndex)
                 return post.toWins('navigateHistoryChanged',this.filePositions,this.currentIndex)
 
             case 'addFilePos':
-                if (!(opt != null ? (_96_39_=opt.file) != null ? _96_39_.length : undefined : undefined))
+                if (!(opt != null ? (_97_39_=opt.file) != null ? _97_39_.length : undefined : undefined))
                 {
                     return
                 }
@@ -152,7 +152,7 @@ class Navigate
 
     loadFilePos (filePos, opt)
     {
-        var _122_47_
+        var _123_47_
 
         if ((opt != null ? opt.newWindow : undefined))
         {

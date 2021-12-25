@@ -1,12 +1,11 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isArr: function (o) {return o instanceof Array}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var clamp, Command, CommandList, elem, fuzzy, history, kerror, kxk, reversed, syntax, _
+var Command, CommandList, elem, fuzzy, history, kerror, kxk, reversed, syntax, _
 
 kxk = require('kxk')
 _ = kxk._
-clamp = kxk.clamp
 elem = kxk.elem
 history = kxk.history
 kerror = kxk.kerror
@@ -243,7 +242,7 @@ Command = (function ()
         {
             return
         }
-        this.selected = clamp(-1,this.commandList.numLines() - 1,i)
+        this.selected = _k_.clamp(-1,this.commandList.numLines() - 1,i)
         if (this.selected >= 0)
         {
             this.commandList.selectSingleRange(this.commandList.rangeForLineAtIndex(this.selected),{before:true})
@@ -275,7 +274,7 @@ Command = (function ()
 
         if ((this.commandList != null))
         {
-            this.select(clamp(-1,this.commandList.numLines() - 1,this.selected - 1))
+            this.select(_k_.clamp(-1,this.commandList.numLines() - 1,this.selected - 1))
             if (this.selected < 0)
             {
                 this.hideList()
@@ -311,12 +310,12 @@ Command = (function ()
         }
         if ((this.commandList != null))
         {
-            this.select(clamp(0,this.commandList.numLines() - 1,this.selected + 1))
+            this.select(_k_.clamp(0,this.commandList.numLines() - 1,this.selected + 1))
             return this.commandList.line(this.selected)
         }
         else if (this.history.length)
         {
-            this.selected = clamp(0,this.history.length - 1,this.selected + 1)
+            this.selected = _k_.clamp(0,this.history.length - 1,this.selected + 1)
             return new this.history[this.selected]
         }
         else
@@ -380,7 +379,7 @@ Command = (function ()
         {
             this.loadState()
         }
-        if (!(this.history instanceof Array))
+        if (!(_k_.isArr(this.history)))
         {
             kerror(`Command.setCurrent -- ${this.historyKey()} : history not an array?`,typeof(this.history))
             this.history = []
@@ -544,7 +543,7 @@ Command = (function ()
             case 'page down':
                 if ((this.commandList != null))
                 {
-                    return this.select(clamp(0,this.commandList.numLines() - 1,this.selected + (this.commandList.numFullLines() - 1) * (combo === 'page up' && -1 || 1)))
+                    return this.select(_k_.clamp(0,this.commandList.numLines() - 1,this.selected + (this.commandList.numFullLines() - 1) * (combo === 'page up' && -1 || 1)))
                 }
                 break
         }

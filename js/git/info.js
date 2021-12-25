@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
+var _k_ = {isFunc: function (o) {return typeof o === 'function'}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
 var diff, dir, info, kxk, slash, status, _
 
@@ -15,7 +15,7 @@ info = function (gitDir, cb)
 {
     var stts
 
-    if (typeof(cb) === 'function')
+    if (_k_.isFunc(cb))
     {
         return status(gitDir,function (stts)
         {

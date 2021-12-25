@@ -1,18 +1,18 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && isFinite(o)}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, isFunc: function (o) {return typeof o === 'function'}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }}
 
-var addToShelf, changeFontSize, changeZoom, clamp, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, mainmenu, Navigate, onClose, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window
+var addToShelf, changeFontSize, changeZoom, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, kxk, mainmenu, Navigate, onClose, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window
 
-clamp = require('kxk').clamp
-klog = require('kxk').klog
-post = require('kxk').post
-prefs = require('kxk').prefs
-scheme = require('kxk').scheme
-stash = require('kxk').stash
-stopEvent = require('kxk').stopEvent
-store = require('kxk').store
-win = require('kxk').win
+kxk = require('kxk')
+klog = kxk.klog
+post = kxk.post
+prefs = kxk.prefs
+scheme = kxk.scheme
+stash = kxk.stash
+stopEvent = kxk.stopEvent
+store = kxk.store
+win = kxk.win
 
 Split = require('./split')
 Terminal = require('./terminal')
@@ -112,11 +112,11 @@ Window = (function ()
 
     Window.prototype["onMenuAction"] = function (name, opts)
     {
-        var action, _112_25_
+        var action, _113_25_
 
         if (action = Editor.actionWithName(name))
         {
-            if ((action.key != null) && typeof(window.focusEditor[action.key]) === 'function')
+            if ((action.key != null) && _k_.isFunc(window.focusEditor[action.key]))
             {
                 window.focusEditor[action.key](opts.actarg)
                 return
@@ -371,7 +371,7 @@ window.onresize = function ()
 }
 post.on('split',function (s)
 {
-    var _293_22_
+    var _294_22_
 
     ;(window.filebrowser != null ? window.filebrowser.resized() : undefined)
     terminal.resized()
@@ -416,13 +416,13 @@ toggleTabPinned = function ()
 
 setFontSize = function (s)
 {
-    var _338_25_
+    var _339_25_
 
     if (!(_k_.isNum(s)))
     {
         s = prefs.get('editorFontSize',19)
     }
-    s = clamp(8,100,s)
+    s = _k_.clamp(8,100,s)
     window.stash.set("fontSize",s)
     editor.setFontSize(s)
     if ((editor.currentFile != null))
@@ -495,7 +495,7 @@ changeZoom = function (d)
 
     z = webframe.getZoomFactor()
     z *= 1 + d / 20
-    z = clamp(0.36,5.23,z)
+    z = _k_.clamp(0.36,5.23,z)
     webframe.setZoomFactor(z)
     return editor.resized()
 }

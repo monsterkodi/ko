@@ -1,13 +1,12 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isFunc: function (o) {return typeof o === 'function'}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var $, clamp, drag, Editor, EditorScroll, elem, kerror, keyinfo, klog, kxk, os, post, prefs, render, stopEvent, TextEditor, _
+var $, drag, Editor, EditorScroll, elem, kerror, keyinfo, klog, kxk, os, post, prefs, render, stopEvent, TextEditor, _
 
 kxk = require('kxk')
 $ = kxk.$
 _ = kxk._
-clamp = kxk.clamp
 drag = kxk.drag
 elem = kxk.elem
 kerror = kxk.kerror
@@ -672,8 +671,8 @@ TextEditor = (function ()
         sl = this.layerScroll.scrollLeft
         st = this.scroll.offsetTop
         br = this.view.getBoundingClientRect()
-        lx = clamp(0,this.layers.offsetWidth,x - br.left - this.size.offsetX + this.size.charWidth / 3)
-        ly = clamp(0,this.layers.offsetHeight,y - br.top)
+        lx = _k_.clamp(0,this.layers.offsetWidth,x - br.left - this.size.offsetX + this.size.charWidth / 3)
+        ly = _k_.clamp(0,this.layers.offsetHeight,y - br.top)
         px = parseInt(Math.floor((Math.max(0,sl + lx)) / this.size.charWidth))
         py = parseInt(Math.floor((Math.max(0,st + ly)) / this.size.lineHeight)) + this.scroll.top
         p = [px,Math.min(this.numLines() - 1,py)]
@@ -939,7 +938,7 @@ TextEditor = (function ()
                     actionCombo = list1[_743_32_]
                     if (combo === actionCombo)
                     {
-                        if ((action.key != null) && typeof(this[action.key]) === 'function')
+                        if ((action.key != null) && _k_.isFunc(this[action.key]))
                         {
                             this[action.key](key,{combo:combo,mod:mod,event:event})
                             return
@@ -957,7 +956,7 @@ TextEditor = (function ()
                 actionCombo = list2[_751_28_]
                 if (combo === actionCombo)
                 {
-                    if ((action.key != null) && typeof(this[action.key]) === 'function')
+                    if ((action.key != null) && _k_.isFunc(this[action.key]))
                     {
                         this[action.key](key,{combo:combo,mod:mod,event:event})
                         return

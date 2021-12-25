@@ -1,12 +1,11 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var clamp, kerror, kxk, last, post, State, _
+var kerror, kxk, last, post, State, _
 
 kxk = require('kxk')
 _ = kxk._
-clamp = kxk.clamp
 kerror = kxk.kerror
 last = kxk.last
 post = kxk.post
@@ -390,7 +389,7 @@ class Do
         {
             p = list[_356_14_]
             p[0] = Math.max(p[0],0)
-            p[1] = clamp(0,this.state.numLines() - 1,p[1])
+            p[1] = _k_.clamp(0,this.state.numLines() - 1,p[1])
         }
         sortPositions(cs)
         if (cs.length > 1)

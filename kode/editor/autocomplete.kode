@@ -7,7 +7,7 @@
 ###
 
 kxk = require 'kxk'
-{ $, _, clamp, elem, kerror, last, matchr, stopEvent } = kxk
+{ $, _, elem, kerror, last, matchr, stopEvent } = kxk
 
 Indexer = require '../main/indexer'
 event   = require 'events'

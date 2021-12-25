@@ -1,13 +1,13 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_
+var _k_ = {clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var clamp, drag, elem, scheme
+var drag, elem, kxk, scheme
 
-clamp = require('kxk').clamp
-drag = require('kxk').drag
-elem = require('kxk').elem
-scheme = require('kxk').scheme
+kxk = require('kxk')
+drag = kxk.drag
+elem = kxk.elem
+scheme = kxk.scheme
 
 scheme = require('../tools/scheme')
 class Scroller
@@ -56,7 +56,7 @@ class Scroller
         var br, ln, ly, sy
 
         br = this.elem.getBoundingClientRect()
-        sy = clamp(0,this.height(),event.clientY - br.top)
+        sy = _k_.clamp(0,this.height(),event.clientY - br.top)
         ln = parseInt(this.numRows() * sy / this.height())
         ly = (ln - this.visRows() / 2) * this.rowHeight()
         return this.target.scrollTop = ly
@@ -132,7 +132,7 @@ class Scroller
             this.handle.style.width = "2px"
             longColor = scheme.colorForClass('scroller long')
             shortColor = scheme.colorForClass('scroller short')
-            cf = 1 - clamp(0,1,(scrollHeight - 10) / 200)
+            cf = 1 - _k_.clamp(0,1,(scrollHeight - 10) / 200)
             cs = scheme.fadeColor(longColor,shortColor,cf)
             this.handle.style.backgroundColor = cs
         }

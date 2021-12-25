@@ -7,7 +7,7 @@
 ###
 
 kxk = require 'kxk'
-{ $, clamp, drag, elem, filelist, klog, post, prefs, slash } = kxk
+{ $, drag, elem, filelist, klog, post, prefs, slash } = kxk
 
 Browser  = require './browser'
 Shelf    = require './shelf'

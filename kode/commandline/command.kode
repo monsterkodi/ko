@@ -7,7 +7,7 @@
 ###
 
 kxk = require 'kxk'
-{ _, clamp, elem, history, kerror, reversed } = kxk
+{ _, elem, history, kerror, reversed } = kxk
 
 syntax      = require '../editor/syntax'
 CommandList = require './commandlist'
@@ -276,7 +276,7 @@ function Command
     setCurrent: (command) ->
         
         @loadState() if not @history?
-        if not @history is Array
+        if not @history is arr
             kerror "Command.setCurrent -- #{@historyKey()} : history not an array?" typeof @history 
             @history = []
         _.pull @history, command

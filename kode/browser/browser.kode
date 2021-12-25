@@ -6,7 +6,8 @@
 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-{ childp, clamp, elem, fs, kerror, kpos, os, setStyle, slash } = require 'kxk'
+kxk = require 'kxk'
+{ childp, elem, fs, kerror, kpos, os, setStyle, slash } = kxk
 
 Column = require './column'
 flex   = require '../win/flex/flex'
@@ -90,8 +91,8 @@ function Browser extends event
         else        
             index = @focusColumn()?.index ? 0
             nuidx = index + switch key
-                when 'left''up' then -1
-                when 'right'    then +1
+                'left''up' ➜ -1
+                'right'    ➜ +1
                                 
             nuidx = clamp 0, @numCols()-1, nuidx
             return if nuidx == index

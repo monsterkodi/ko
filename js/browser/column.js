@@ -1,13 +1,12 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
+var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var $, clamp, Column, Crumb, DirWatch, drag, electron, elem, File, fs, fuzzy, kerror, keyinfo, klog, kpos, kxk, open, popup, post, prefs, Row, Scroller, setStyle, slash, stopEvent, wxw, _
+var $, Column, Crumb, DirWatch, drag, electron, elem, File, fs, fuzzy, kerror, keyinfo, klog, kpos, kxk, open, popup, post, prefs, Row, Scroller, setStyle, slash, stopEvent, wxw, _
 
 kxk = require('kxk')
 $ = kxk.$
 _ = kxk._
-clamp = kxk.clamp
 drag = kxk.drag
 elem = kxk.elem
 fs = kxk.fs
@@ -774,7 +773,7 @@ Column = (function ()
         {
             console.error(`no index ${newIndex}? ${this.numVisible()}`)
         }
-        newIndex = clamp(0,this.numRows() - 1,newIndex)
+        newIndex = _k_.clamp(0,this.numRows() - 1,newIndex)
         if (newIndex !== index)
         {
             return this.rows[newIndex].activate(null,this.parent.type === 'file')

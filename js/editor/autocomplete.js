@@ -1,13 +1,12 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var $, clamp, elem, event, Indexer, jsClass, kerror, kxk, last, matchr, req, stopEvent, _
+var $, elem, event, Indexer, jsClass, kerror, kxk, last, matchr, req, stopEvent, _
 
 kxk = require('kxk')
 $ = kxk.$
 _ = kxk._
-clamp = kxk.clamp
 elem = kxk.elem
 kerror = kxk.kerror
 last = kxk.last
@@ -380,7 +379,7 @@ class Autocomplete extends event
         {
             return
         }
-        return this.select(clamp(-1,this.matchList.length - 1,this.selected + delta))
+        return this.select(_k_.clamp(-1,this.matchList.length - 1,this.selected + delta))
     }
 
     select (index)

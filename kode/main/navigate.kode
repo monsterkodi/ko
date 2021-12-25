@@ -6,7 +6,8 @@
 000   000  000   000      0      000   0000000   000   000     000     00000000
 ###
 
-{ _, clamp, filter, post, prefs, slash } = require 'kxk'
+kxk = require 'kxk'
+{ _, filter, post, prefs, slash } = kxk
 
 class Navigate
 

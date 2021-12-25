@@ -1,10 +1,8 @@
-// monsterkodi/kode 0.227.0
+// monsterkodi/kode 0.228.0
 
-var _k_
+var _k_ = {clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var clamp, events
-
-clamp = require('kxk').clamp
+var events
 
 events = require('events')
 class EditorScroll extends events
@@ -13,7 +11,7 @@ class EditorScroll extends events
     {
         super()
     
-        var _18_46_
+        var _16_46_
 
         this.editor = editor
     
@@ -25,7 +23,7 @@ class EditorScroll extends events
         this.by = this.by.bind(this)
         this.to = this.to.bind(this)
         this.start = this.start.bind(this)
-        this.lineHeight = ((_18_46_=this.editor.size.lineHeight) != null ? _18_46_ : 0)
+        this.lineHeight = ((_16_46_=this.editor.size.lineHeight) != null ? _16_46_ : 0)
         this.viewHeight = -1
         this.init()
     }
@@ -94,7 +92,7 @@ class EditorScroll extends events
         {
             delta = 0
         }
-        this.scroll = parseInt(clamp(0,this.scrollMax,this.scroll + delta))
+        this.scroll = parseInt(_k_.clamp(0,this.scrollMax,this.scroll + delta))
         top = parseInt(this.scroll / this.lineHeight)
         this.offsetSmooth = this.scroll - top * this.lineHeight
         this.setTop(top)
@@ -231,11 +229,11 @@ class EditorScroll extends events
 
     deltaToEnsureMainCursorIsVisible ()
     {
-        var cl, maindelta, offset, _234_31_, _234_46_
+        var cl, maindelta, offset, _232_31_, _232_46_
 
         maindelta = 0
         cl = this.editor.mainCursor()[1]
-        offset = ((_234_46_=(this.editor.config != null ? this.editor.config.scrollOffset : undefined)) != null ? _234_46_ : 2)
+        offset = ((_232_46_=(this.editor.config != null ? this.editor.config.scrollOffset : undefined)) != null ? _232_46_ : 2)
         if (cl < this.top + offset + this.offsetTop / this.lineHeight)
         {
             maindelta = cl - (this.top + offset + this.offsetTop / this.lineHeight)
