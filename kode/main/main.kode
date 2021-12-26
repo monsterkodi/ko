@@ -482,9 +482,6 @@ function Main extends app
             
     onOtherInstance: (args, dir) =>
 
-        # log 'onOtherInstance dir:'  dir
-        # log 'onOtherInstance args:' args
-        
         @activateOneWindow (win) ->
 
             files = []
@@ -524,7 +521,6 @@ function Main extends app
         if toSave
             post.on 'stashSaved' =>
                 toSave -= 1
-                # klog 'ko.quit stashSaved' toSave 
                 if toSave == 0
                     global.state.save()
                     @exitApp()

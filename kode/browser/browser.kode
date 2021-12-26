@@ -92,12 +92,12 @@ function Browser extends event
             index = @focusColumn()?.index ? 0
             nuidx = index + switch key
                 'left''up' ➜ -1
-                'right'    ➜ +1
+                'right'    ➜  1
+                           ➜  0
                                 
             nuidx = clamp 0, @numCols()-1, nuidx
             return if nuidx == index
             if @columns[nuidx].numRows()
-                # klog 'browser.navigate focus' @columns[nuidx].name() 
                 @columns[nuidx].focus()?.activeRow()?.activate()
             
         @updateColumnScrolls()

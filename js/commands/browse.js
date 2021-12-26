@@ -390,11 +390,11 @@ Browse = (function ()
 
     Browse.prototype["onBrowserItemActivated"] = function (item)
     {
-        var pth, _325_32_, _325_56_, _332_64_, _332_72_, _334_61_, _334_69_
+        var pth, _323_32_, _323_56_, _330_64_, _330_72_, _332_61_, _332_69_
 
         if (!this.isActive())
         {
-            ;((_325_32_=this.commandline.command) != null ? typeof (_325_56_=_325_32_.onBrowserItemActivated) === "function" ? _325_56_(item) : undefined : undefined)
+            ;((_323_32_=this.commandline.command) != null ? typeof (_323_56_=_323_32_.onBrowserItemActivated) === "function" ? _323_56_(item) : undefined : undefined)
             return
         }
         if (item.file)
@@ -403,9 +403,9 @@ Browse = (function ()
             if (item.type === 'dir')
             {
                 pth += '/'
-                if (item.name === '..' && ((_332_64_=this.browser.activeColumn()) != null ? (_332_72_=_332_64_.parent) != null ? _332_72_.file : undefined : undefined))
+                if (item.name === '..' && ((_330_64_=this.browser.activeColumn()) != null ? (_330_72_=_330_64_.parent) != null ? _330_72_.file : undefined : undefined))
                 {
-                    pth = slash.tilde(((_334_61_=this.browser.activeColumn()) != null ? (_334_69_=_334_61_.parent) != null ? _334_69_.file : undefined : undefined))
+                    pth = slash.tilde(((_332_61_=this.browser.activeColumn()) != null ? (_332_69_=_332_61_.parent) != null ? _332_69_.file : undefined : undefined))
                 }
             }
             return this.commandline.setText(pth)

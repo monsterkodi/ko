@@ -128,7 +128,8 @@ class Titlebar
         @list.children[@selected]?.classList.remove 'selected'
         @selected += switch dir
             'up'   ➜ -1
-            'down' ➜ +1
+            'down' ➜  1
+                   ➜  0
         @selected = @list.children.length-1 if @selected < -1
         @selected = -1 if @selected >= @list.children.length
         @list.children[@selected].classList.add 'selected' if @selected > -1

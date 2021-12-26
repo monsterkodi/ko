@@ -33,10 +33,10 @@ class Do
                 kerror "Do.foreignChanges -- no after? #{change}"
                 continue
             switch change.change
-                when 'changed'  then @change change.doIndex, change.after
-                when 'inserted' then @insert change.doIndex, change.after
-                when 'deleted'  then @delete change.doIndex
-                else
+                'changed'  ➜ @change change.doIndex, change.after
+                'inserted' ➜ @insert change.doIndex, change.after
+                'deleted'  ➜ @delete change.doIndex
+                 ➜
                     kerror "Do.foreignChanges -- unknown change #{change.change}"
         @end foreign: true
 
@@ -204,13 +204,12 @@ class Do
 
         if opt?.main
             switch opt.main
-                when 'first' then mainIndex = 0
-                when 'last'  then mainIndex = newCursors.length-1
-                when 'closest'
-                    mainIndex = newCursors.indexOf posClosestToPosInPositions @editor.mainCursor(), newCursors
-                else
-                    mainIndex = newCursors.indexOf opt.main
-                    mainIndex = parseInt opt.main if mainIndex < 0
+                'first'   ➜ mainIndex = 0
+                'last'    ➜ mainIndex = newCursors.length-1
+                'closest' ➜ mainIndex = newCursors.indexOf posClosestToPosInPositions @editor.mainCursor(), newCursors
+                          ➜
+                            mainIndex = newCursors.indexOf opt.main
+                            mainIndex = parseInt opt.main if mainIndex < 0
         else
             mainIndex = newCursors.length-1
 

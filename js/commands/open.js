@@ -336,7 +336,7 @@ Open = (function ()
 
     Open.prototype["start"] = function (name)
     {
-        var dir, item, _276_40_, _290_41_
+        var dir, item, _272_40_, _286_41_
 
         this.setName(name)
         if ((this.commandline.lastFocus === 'commandline-editor' && 'commandline-editor' === window.lastFocus))
@@ -348,7 +348,7 @@ Open = (function ()
             }
             else
             {
-                this.dir = ((_276_40_=slash.dir(this.file)) != null ? _276_40_ : process.cwd())
+                this.dir = ((_272_40_=slash.dir(this.file)) != null ? _272_40_ : process.cwd())
             }
         }
         else if (this.commandline.lastFocus === 'shelf' || this.commandline.lastFocus.startsWith('FileBrowser'))
@@ -388,7 +388,7 @@ Open = (function ()
 
     Open.prototype["execute"] = function (command)
     {
-        var file, path, pos, _321_27_
+        var file, path, pos, _317_27_
 
         if (this.selected < 0)
         {
@@ -398,7 +398,7 @@ Open = (function ()
         this.hideList()
         if (!_k_.empty(path))
         {
-            var _329_24_ = slash.splitFilePos(command); file = _329_24_[0]; pos = _329_24_[1]
+            var _323_24_ = slash.splitFilePos(command); file = _323_24_[0]; pos = _323_24_[1]
 
             file = this.resolvedPath(path)
             file = slash.joinFilePos(file,pos)

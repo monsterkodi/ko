@@ -15,7 +15,6 @@ class Syntax
     
     @: (@name, @getLine, @getLines) ->
 
-        # log 'Syntax' @name
         @diss   = []
         @colors = {}
 
@@ -60,9 +59,9 @@ class Syntax
             [di,li,ch] = [change.doIndex, change.newIndex, change.change]
 
             switch ch
-                when 'changed'  then @diss[di] = @newDiss di
-                when 'deleted'  then @diss.splice di, 1
-                when 'inserted' then @diss.splice di, 0, @newDiss di
+                'changed'  ➜ @diss[di] = @newDiss di
+                'deleted'  ➜ @diss.splice di, 1
+                'inserted' ➜ @diss.splice di, 0, @newDiss di
 
     #  0000000   0000000   000       0000000   00000000
     # 000       000   000  000      000   000  000   000
@@ -162,12 +161,10 @@ class Syntax
         if line.startsWith "#!"
             lastWord = _.last line.split /[\s\/]/
             switch lastWord
-                when 'python' then return 'py'
-                when 'node'   then return 'js'
-                when 'bash'   then return 'sh'
-                else
-                    if lastWord in @syntaxNames
-                        return lastWord
+                'python' ➜ return 'py'
+                'node'   ➜ return 'js'
+                'bash'   ➜ return 'sh'
+                         ➜ return lastWord if lastWord in @syntaxNames
         'txt'
 
     # 000  000   000  000  000000000
@@ -200,7 +197,6 @@ class Syntax
                 @syntaxNames.push syntaxName
                 @matchrConfigs[syntaxName] = matchr.config patterns
 
-        # klor.init()
         @syntaxNames = @syntaxNames.concat klor.exts
 
 Syntax.init()

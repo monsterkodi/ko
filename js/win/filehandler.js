@@ -311,7 +311,7 @@ class FileHandler
 
     saveChanges ()
     {
-        var _273_29_
+        var _267_29_
 
         if ((editor.currentFile != null) && editor.do.hasChanges() && slash.fileExists(editor.currentFile))
         {
@@ -327,7 +327,7 @@ class FileHandler
 
     openFile (opt)
     {
-        var cb, dir, _289_18_
+        var cb, dir, _283_18_
 
         cb = function (files)
         {
@@ -343,7 +343,7 @@ class FileHandler
 
     saveFileAs ()
     {
-        var cb, _309_18_
+        var cb, _303_18_
 
         cb = (function (file)
         {

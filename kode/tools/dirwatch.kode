@@ -15,12 +15,10 @@ class DirWatch
     @watch: (dir) ->
         
         return if DirWatch.watches[dir]
-        # klog "watch #{dir}" Object.keys DirWatch.watches
         
         watcher = watch.dir dir, skipSave:true
         watcher.on 'change' (info) ->
             if info.change != 'change'
-                # klog 'DirWatch' info.change, info.path, info.dir
                 post.emit 'dirChanged' info
         watcher.on 'error' (err) -> error "watch.error #{err}"
         DirWatch.watches[dir] = watcher
@@ -29,6 +27,5 @@ class DirWatch
         
         DirWatch.watches[dir]?.close()
         delete DirWatch.watches[dir]
-        # klog "unwatch #{dir}" Object.keys DirWatch.watches
 
 module.exports = DirWatch

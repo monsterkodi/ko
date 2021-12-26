@@ -426,16 +426,12 @@ class Autocomplete extends event
             
         if @list? 
             switch combo
-                when 'down'
+                'down'
                     @next()
                     return
-                when 'up'
-                    if @selected >= 0
-                        @prev()
-                        return
-                    else 
-                        @last()
-                        return
+                'up'
+                    if @selected >= 0 then @prev() else @last()
+                    return
         @close()   
         'unhandled'
         

@@ -443,8 +443,6 @@ function Shelf extends Column
         
         { mod, key, combo, char } = keyinfo.forEvent event
         
-        # klog 'combo:' combo
-        
         switch combo
             when 'command+enter' 'ctrl+enter' then return @openFileInNewWindow()
             when 'backspace' 'delete' then return stopEvent event, @clearSearch().removeObject()

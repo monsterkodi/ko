@@ -129,7 +129,7 @@ class Tab
 
     restoreState ()
     {
-        var _92_62_, _92_68_
+        var _91_62_, _91_68_
 
         if (!((this.state != null ? this.state.file : undefined) != null))
         {
@@ -141,7 +141,7 @@ class Tab
 
     update ()
     {
-        var diss, html, name, sep, _138_16_
+        var diss, html, name, sep, _137_16_
 
         this.div.innerHTML = ''
         this.div.classList.toggle('dirty',this.dirty)
@@ -210,14 +210,14 @@ class Tab
 
     nextOrPrev ()
     {
-        var _149_27_
+        var _148_27_
 
-        return ((_149_27_=this.next()) != null ? _149_27_ : this.prev())
+        return ((_148_27_=this.next()) != null ? _148_27_ : this.prev())
     }
 
     close ()
     {
-        var _159_16_
+        var _158_16_
 
         post.emit('unwatch',this.file)
         if (this.dirty)
@@ -286,7 +286,7 @@ class Tab
 
     finishActivation ()
     {
-        var changes, _217_17_, _220_19_
+        var changes, _216_17_, _219_19_
 
         this.setActive()
         if ((this.state != null))
@@ -296,9 +296,9 @@ class Tab
         if ((this.foreign != null ? this.foreign.length : undefined))
         {
             var list = _k_.list(this.foreign)
-            for (var _221_24_ = 0; _221_24_ < list.length; _221_24_++)
+            for (var _220_24_ = 0; _220_24_ < list.length; _220_24_++)
             {
-                changes = list[_221_24_]
+                changes = list[_220_24_]
                 window.editor.do.foreignChanges(changes)
             }
             delete this.foreign

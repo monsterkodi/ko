@@ -91,18 +91,15 @@ class GitInfo
     # 000       000  000      000       
     # 000       000  0000000  00000000  
     
-    logFile: (change, file) -> 
+    logFile: (change, file) ->
         
-        text = switch change
-            when 'changed' then '  ● '
-            when 'added'   then '  ◼ '
-            when 'deleted' then '  ✘ '
-            
         symbol = switch change
 
-            when 'changed' then '●'
-            when 'added'   then '◼'
-            when 'deleted' then '✘'
+            'changed' ➜ '●'
+            'added'   ➜ '◼'
+            'deleted' ➜ '✘'
+            
+        text = "  #{symbol} "
             
         terminal = window.terminal
         meta = 

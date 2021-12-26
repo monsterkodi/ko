@@ -222,11 +222,7 @@ class FileHandler
         catch err
             kerror "macro req failed #{err}"
             
-        # dbg 'File.save' file
-        
         File.save file, editor.text(), (err, saved) ->
-            
-            # dbg 'File.saved' err, file
             
             editor.saveScrollCursorsAndSelections()
             
@@ -237,7 +233,6 @@ class FileHandler
                 editor.do.history   = tabState.history
                 editor.do.saveIndex = tabState.history.length
                 post.toOtherWins 'fileSaved' saved, window.winID
-                # post.toMain 'fileSaved' saved, window.winID
                 post.emit     'saved'     saved
                 post.emit     'watch'     saved
 
@@ -259,7 +254,6 @@ class FileHandler
             recent.pop()
     
         window.state.set 'recentFiles' recent
-        # window.titlebar.refreshMenu()
         commandline.commands.open.setHistory reversed recent
                 
     #  0000000   0000000   000   000  00000000         0000000  000   000   0000000   000   000   0000000   00000000   0000000  

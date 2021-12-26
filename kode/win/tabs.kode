@@ -105,11 +105,11 @@ class Tabs
         @dragTab.div.style.opacity = '0'
         br = @dragTab.div.getBoundingClientRect()
         @dragDiv.style.position = 'absolute'
-        @dragDiv.style.top  = "#{br.top}px"
-        @dragDiv.style.left = "#{br.left}px"
-        @dragDiv.style.width = "#{br.width}px"
-        @dragDiv.style.height = "#{br.height}px"
-        @dragDiv.style.flex = 'unset'
+        @dragDiv.style.top      = "#{br.top}px"
+        @dragDiv.style.left     = "#{br.left}px"
+        @dragDiv.style.width    = "#{br.width}px"
+        @dragDiv.style.height   = "#{br.height}px"
+        @dragDiv.style.flex     = 'unset'
         @dragDiv.style.pointerEvents = 'none'
         document.body.appendChild @dragDiv
 
@@ -210,8 +210,6 @@ class Tabs
 
     addTab: (file) ->
 
-        # klog 'addTab' file
-        
         if @tabs.length >= prefs.get 'maximalNumberOfTabs' 8
             for index in [0...@tabs.length]
                 if not @tabs[index].dirty and not @tabs[index].pinned
@@ -244,13 +242,11 @@ class Tabs
 
     onNewTabWithFile: (file) =>
 
-        klog 'onNewTabWithFile' file
         [file, line, col] = slash.splitFileLine file
 
         if tab = @tab file
             tab.activate()
         else
-            klog 'onNewTabWithFile' file
             @addTab(file).activate()
 
         @update()

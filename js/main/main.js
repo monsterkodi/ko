@@ -706,7 +706,7 @@ Main = (function ()
     {
         return this.activateOneWindow(function (win)
         {
-            var arg, file, fileargs, files, fpath, pos, _491_26_
+            var arg, file, fileargs, files, fpath, pos, _488_26_
 
             files = []
             if ((_k_.first(args) != null ? _k_.first(args).endsWith(`${pkg.name}.exe`) : undefined))
@@ -718,9 +718,9 @@ Main = (function ()
                 fileargs = args.slice(2)
             }
             var list = _k_.list(fileargs)
-            for (var _496_20_ = 0; _496_20_ < list.length; _496_20_++)
+            for (var _493_20_ = 0; _493_20_ < list.length; _493_20_++)
             {
-                arg = list[_496_20_]
+                arg = list[_493_20_]
                 if (arg.startsWith('-'))
                 {
                     continue
@@ -730,7 +730,7 @@ Main = (function ()
                 {
                     file = slash.join(slash.resolve(dir),arg)
                 }
-                var _501_29_ = slash.splitFilePos(file); fpath = _501_29_[0]; pos = _501_29_[1]
+                var _498_29_ = slash.splitFilePos(file); fpath = _498_29_[0]; pos = _498_29_[1]
 
                 if (slash.exists(fpath))
                 {

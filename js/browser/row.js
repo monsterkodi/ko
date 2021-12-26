@@ -221,7 +221,7 @@ Row = (function ()
 
     Row.prototype["editName"] = function ()
     {
-        var _163_24_
+        var _158_24_
 
         if ((this.input != null))
         {
@@ -274,7 +274,7 @@ Row = (function ()
 
     Row.prototype["removeInput"] = function ()
     {
-        var _196_28_, _203_37_
+        var _191_28_, _198_37_
 
         if (!(this.input != null))
         {

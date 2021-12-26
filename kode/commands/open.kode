@@ -129,12 +129,12 @@ function Open extends Command
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
         extensionBonus = switch slash.ext b
-            when 'coffee' 'kode'    then 1000
-            when 'cpp' 'hpp' 'h'    then 90
-            when 'md' 'styl' 'pug'  then 50
-            when 'noon'             then 25
-            when 'js' 'json' 'html' then -10
-            else 0 
+            'coffee' 'kode'    ➜ 1000
+            'cpp' 'hpp' 'h'    ➜ 90
+            'md' 'styl' 'pug'  ➜ 50
+            'noon'             ➜ 25
+            'js' 'json' 'html' ➜ -10
+                               ➜ 0 
         
         if @file and slash.ext(@file) == slash.ext b
             extensionBonus += 1000
@@ -263,10 +263,6 @@ function Open extends Command
         
         @setName name
         
-        # klog 'open.start' name
-        # klog 'open.start @commandline.lastFocus' @commandline.lastFocus
-        # klog 'open.start window.lastFocus' window.lastFocus
-        
         if @commandline.lastFocus == 'commandline-editor' == window.lastFocus
             
             @file = window.editor.currentFile
@@ -319,8 +315,6 @@ function Open extends Command
         if @selected < 0 then return status:'failed'
             
         path = @commandList?.line @selected
-        
-        # klog 'open.execute' command, path
         
         @hideList()
 

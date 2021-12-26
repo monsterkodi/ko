@@ -181,6 +181,8 @@ class Titlebar
                 case 'down':
                     return 1
 
+                default:
+                    return 0
             }
 
         }).bind(this))()
@@ -200,7 +202,7 @@ class Titlebar
 
     globalModKeyComboEvent (mod, key, combo, event)
     {
-        var _148_16_
+        var _149_16_
 
         switch (combo)
         {

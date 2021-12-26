@@ -713,31 +713,23 @@ function TextEditor extends Editor
             return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
 
         switch combo
-            
-            when 'backspace' then return 'unhandled' # has char set on windows?
-            
-            when 'esc'
+            'backspace' ➜ return 'unhandled' # has char set on windows?
+            'esc'
                 @setSalterMode false
                 @clearHighlights()
                 @clearCursors()
                 @endStickySelection()
                 @selectNone()
                 return
-            
-            when 'command+enter' 'ctrl+enter' 'f12' 
+            'command+enter' 'ctrl+enter' 'f12' 
                 if @name == 'editor' then return @jumpToWord()
 
-        # klog 'texteditor' mod, key, combo, char                
-            
         for action in Editor.actions
-            
-            # klog 'action' action
             
             if action.combo == combo or action.accel == combo and os.platform() != 'darwin'
                 switch combo
-                    when 'ctrl+a' 'command+a' then return @selectAll()
-                # return unhandled here because the action will be triggered via menuAction
-                return 'unhandled'
+                    'ctrl+a' 'command+a' then return @selectAll()
+                return 'unhandled' # action will be triggered via menuAction
                 
             if action.accels? and os.platform() != 'darwin'
                 for actionCombo in action.accels
@@ -749,11 +741,8 @@ function TextEditor extends Editor
             continue if not action.combos?
             
             for actionCombo in action.combos
-                # klog 'texteditor actionCombo' action.key, actionCombo
                 if combo == actionCombo
-                    # klog 'combo match' combo, action.key, _.isFunction @[action.key]
                     if action.key? and @[action.key] is func
-                        # klog 'texteditor action.key' action.key
                         @[action.key](key, combo: combo, mod: mod, event: event)
                         return
 

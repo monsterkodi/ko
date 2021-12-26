@@ -96,19 +96,19 @@ function Find extends Command
         
         switch combo
             
-            when 'shift+enter' 'command+shift+g'
+            'shift+enter' 'command+shift+g'
                 
                 window.textEditor.highlightText @getText(),
                     type: @type
                     select: 'before'
                 return
                     
-            when 'command+g' 
+            'command+g' 
                 
                 @execute @getText()    
                 return
                     
-            when 'tab'
+            'tab'
                 
                 window.textEditor.focus()
                 return

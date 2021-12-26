@@ -84,7 +84,6 @@ function Window extends win
             return if changeInfo.foreign
             if changeInfo.changes.length
                 post.toOtherWins 'fileLineChanges' editor.currentFile, changeInfo.changes
-                # klog 'window.editor.on.changed' changeInfo
                 if changeInfo.deletes == 1
                     navigate.delFilePos file: editor.currentFile, pos: [0 changeInfo.changes[0].oldIndex]
                 else
@@ -152,7 +151,6 @@ function Window extends win
             'Save All'              ➜ return post.emit 'saveAll'
             'Save As ...'           ➜ return post.emit 'saveFileAs'
             'Revert'                ➜ return post.emit 'reloadFile'
-            # 'Reload'                then return reloadWin()
             'Close Tab or Window'   ➜ return post.emit 'closeTabOrWindow'
             'Close Other Tabs'      ➜ return post.emit 'closeOtherTabs'
             'Close Other Windows'   ➜ return post.toOtherWins 'closeWindow'
@@ -162,8 +160,6 @@ function Window extends win
                 return 
             'Preferences'           ➜ return post.emit 'openFiles' [prefs.store.file], newTab:true
             'Cycle Windows'         ➜ opts = @id
-    
-        # log "unhandled menu action! posting to main '#{name}' opts:", opts
     
         super name, opts
             
@@ -180,18 +176,17 @@ post.setMaxListeners 20
 
 saveStash = ->
 
-    klog 'window.saveStash'
+    post.emit 'saveChanges' 
     post.emit 'stash'
     editor.saveScrollCursorsAndSelections()
     window.stash.save()
     
 clearStash = ->
-    # post.emit 'saveChanges'
+    post.emit 'saveChanges'
     window.stash.clear()
 
 restoreWin = ->
 
-    # klog 'ko.window.restoreWin'
     if bounds = window.stash.get 'bounds'
         window.win.setBounds bounds
 
@@ -217,8 +212,6 @@ post.on 'editorFocus' (editor) ->
     window.focusEditor = editor
     window.textEditor = editor if editor.name != 'commandline-editor'
 
-# post.on 'devTools' (open) -> klog "ko.window.post.on devTools #{open}"
-
 post.on 'mainlog' -> klog.apply klog, arguments
 
 post.on 'ping' (wID, argA, argB) -> post.toWin wID, 'pong' window.winID, argA, argB
@@ -239,10 +232,11 @@ post.on 'postEditorState' ->
 window.editorWithName = (n) ->
 
     switch n
-        when 'editor'   then editor
-        when 'command' 'commandline' then commandline
-        when 'terminal' then terminal
-        else editor
+        'command' 
+        'commandline' ➜ commandline
+        'terminal'    ➜ terminal
+        'editor'      ➜ editor
+                      ➜ editor
 
 #  0000000   000   000  000       0000000    0000000   0000000
 # 000   000  0000  000  000      000   000  000   000  000   000
@@ -275,7 +269,6 @@ reloadWin = ->
 
 window.onresize = ->
 
-    # klog 'ko.window.onresize'
     split.resized()
     window.win.onMoved window.win.getBounds()
     if window.stash.get 'centerText' false
@@ -333,14 +326,11 @@ setFontSize = (s) ->
 
 changeFontSize = (d) ->
 
-    if      editor.size.fontSize >= 30
-        f = 4
-    else if editor.size.fontSize >= 50
-        f = 10
-    else if editor.size.fontSize >= 20
-        f = 2
-    else
-        f = 1
+    if  editor.size.fontSize >= 20 ➜ f = 2
+        editor.size.fontSize >= 30 ➜ f = 4
+        editor.size.fontSize >= 50 ➜ f = 10
+                                   ➜ f = 1
+                                   
     setFontSize editor.size.fontSize + f*d
 
 resetFontSize = ->
@@ -393,9 +383,7 @@ window.onfocus = (event) ->
         else
             split.focus 'commandline-editor'
 
-window.setLastFocus = (name) -> 
-    # klog 'setLastFocus' name
-    window.lastFocus = name
+window.setLastFocus = (name) -> window.lastFocus = name
 
 # 000   000  00000000  000   000
 # 000  000   000        000 000
@@ -405,8 +393,6 @@ window.setLastFocus = (name) ->
 
 onCombo = (combo, info) ->
 
-    # dbg combo, info
-    
     return if not combo
 
     { mod, key, combo, char, event } = info
@@ -419,11 +405,11 @@ onCombo = (combo, info) ->
             return stopEvent event, post.toMain 'activateWindow' i
 
     switch combo
-        when 'f3'                 then return stopEvent event, screenShot()
-        when 'command+shift+='    then return stopEvent event, changeZoom +1
-        when 'command+shift+-'    then return stopEvent event, changeZoom -1
-        when 'command+shift+0'    then return stopEvent event, resetZoom()
-        when 'command+alt+y'      then return stopEvent event, split.do 'minimize editor'
+        'f3'              ➜ return stopEvent event, screenShot()
+        'command+shift+=' ➜ return stopEvent event, changeZoom +1
+        'command+shift+-' ➜ return stopEvent event, changeZoom -1
+        'command+shift+0' ➜ return stopEvent event, resetZoom()
+        'command+alt+y'   ➜ return stopEvent event, split.do 'minimize editor'
 
 post.on 'combo' onCombo
 

@@ -35,7 +35,7 @@ class Ranges
     {
         if (!(y != null) && x.length >= 2)
         {
-            var _25_14_ = x; x = _25_14_[0]; y = _25_14_[1]
+            var _24_14_ = x; x = _24_14_[0]; y = _24_14_[1]
 
         }
         c[0] = x
@@ -136,14 +136,14 @@ class Ranges
 
     isPosInRanges (p, rgs)
     {
-        var _66_58_
+        var _65_58_
 
         return (rangeAtPosInRanges(p,rgs) != null)
     }
 
     isPosInPositions (p, ps)
     {
-        var _67_52_
+        var _66_52_
 
         return (posInPositions(p,ps) != null)
     }
@@ -217,7 +217,7 @@ class Ranges
     {
         var a, b
 
-        var _87_14_ = sortPositions([p1,p2]); a = _87_14_[0]; b = _87_14_[1]
+        var _86_14_ = sortPositions([p1,p2]); a = _86_14_[0]; b = _86_14_[1]
 
         return pl.filter(function (r)
         {
@@ -231,9 +231,9 @@ class Ranges
 
         cp = pl[0]
         var list = _k_.list(pl.slice(1))
-        for (var _93_14_ = 0; _93_14_ < list.length; _93_14_++)
+        for (var _92_14_ = 0; _92_14_ < list.length; _92_14_++)
         {
-            c = list[_93_14_]
+            c = list[_92_14_]
             if (c[0] !== cp[0])
             {
                 return false
@@ -257,9 +257,9 @@ class Ranges
         var c
 
         var list = _k_.list(pl)
-        for (var _102_14_ = 0; _102_14_ < list.length; _102_14_++)
+        for (var _101_14_ = 0; _101_14_ < list.length; _101_14_++)
         {
-            c = list[_102_14_]
+            c = list[_101_14_]
             if (isSamePos(p,c))
             {
                 return c
@@ -273,9 +273,9 @@ class Ranges
 
         minDist = 999999
         var list = _k_.list(pl)
-        for (var _107_15_ = 0; _107_15_ < list.length; _107_15_++)
+        for (var _106_15_ = 0; _106_15_ < list.length; _106_15_++)
         {
-            ps = list[_107_15_]
+            ps = list[_106_15_]
             mDist = manhattanDistance(ps,p)
             if (mDist < minDist)
             {
@@ -292,9 +292,9 @@ class Ranges
 
         indices = []
         var list = _k_.list(pl)
-        for (var _116_14_ = 0; _116_14_ < list.length; _116_14_++)
+        for (var _115_14_ = 0; _115_14_ < list.length; _115_14_++)
         {
-            p = list[_116_14_]
+            p = list[_115_14_]
             indices.push(p[1])
         }
         return _.uniq(indices).sort()
@@ -304,21 +304,21 @@ class Ranges
     {
         var r
 
-        return (function () { var _120__64_ = []; var list = _k_.list(ranges); for (var _120_64_ = 0; _120_64_ < list.length; _120_64_++)  { r = list[_120_64_];_120__64_.push(rangeEndPos(r))  } return _120__64_ }).bind(this)()
+        return (function () { var _119__64_ = []; var list = _k_.list(ranges); for (var _119_64_ = 0; _119_64_ < list.length; _119_64_++)  { r = list[_119_64_];_119__64_.push(rangeEndPos(r))  } return _119__64_ }).bind(this)()
     }
 
     startPositionsFromRanges (ranges)
     {
         var r
 
-        return (function () { var _121__66_ = []; var list = _k_.list(ranges); for (var _121_66_ = 0; _121_66_ < list.length; _121_66_++)  { r = list[_121_66_];_121__66_.push(rangeStartPos(r))  } return _121__66_ }).bind(this)()
+        return (function () { var _120__66_ = []; var list = _k_.list(ranges); for (var _120_66_ = 0; _120_66_ < list.length; _120_66_++)  { r = list[_120_66_];_120__66_.push(rangeStartPos(r))  } return _120__66_ }).bind(this)()
     }
 
     rangesFromPositions (pl)
     {
         var p
 
-        return (function () { var _129__61_ = []; var list = _k_.list(pl); for (var _129_61_ = 0; _129_61_ < list.length; _129_61_++)  { p = list[_129_61_];_129__61_.push([p[1],[p[0],p[0]]])  } return _129__61_ }).bind(this)()
+        return (function () { var _128__61_ = []; var list = _k_.list(pl); for (var _128_61_ = 0; _128_61_ < list.length; _128_61_++)  { p = list[_128_61_];_128__61_.push([p[1],[p[0],p[0]]])  } return _128__61_ }).bind(this)()
     }
 
     rangesAtLineIndexInRanges (li, ranges)
@@ -353,7 +353,7 @@ class Ranges
         {
             return
         }
-        for (var _136_19_ = ri = ranges.length - 1, _136_36_ = 0; (_136_19_ <= _136_36_ ? ri <= 0 : ri >= 0); (_136_19_ <= _136_36_ ? ++ri : --ri))
+        for (var _135_19_ = ri = ranges.length - 1, _135_36_ = 0; (_135_19_ <= _135_36_ ? ri <= 0 : ri >= 0); (_135_19_ <= _135_36_ ? ++ri : --ri))
         {
             r = ranges[ri]
             if ((r[0] === pos[1]) && ((r[1][0] <= pos[0] && pos[0] <= r[1][1])))
@@ -373,9 +373,9 @@ class Ranges
         }
         rs = []
         var list = _k_.list(ranges)
-        for (var _144_14_ = 0; _144_14_ < list.length; _144_14_++)
+        for (var _143_14_ = 0; _143_14_ < list.length; _143_14_++)
         {
-            r = list[_144_14_]
+            r = list[_143_14_]
             if ((r[0] > pos[1]) || ((r[0] === pos[1]) && (r[1][0] > pos[0])))
             {
                 return rs
@@ -394,7 +394,7 @@ class Ranges
             return []
         }
         rs = []
-        for (var _153_19_ = ri = ranges.length - 1, _153_36_ = 0; (_153_19_ <= _153_36_ ? ri <= 0 : ri >= 0); (_153_19_ <= _153_36_ ? ++ri : --ri))
+        for (var _152_19_ = ri = ranges.length - 1, _152_36_ = 0; (_152_19_ <= _152_36_ ? ri <= 0 : ri >= 0); (_152_19_ <= _152_36_ ? ++ri : --ri))
         {
             r = ranges[ri]
             if ((r[0] < pos[1]) || ((r[0] === pos[1]) && (r[1][1] < pos[0])))
@@ -414,9 +414,9 @@ class Ranges
         {
             return [[],null,[]]
         }
-        var _162_21_ = [[],null,[]]; bef = _162_21_[0]; at = _162_21_[1]; aft = _162_21_[2]
+        var _161_21_ = [[],null,[]]; bef = _161_21_[0]; at = _161_21_[1]; aft = _161_21_[2]
 
-        for (var _163_19_ = ri = 0, _163_23_ = ranges.length; (_163_19_ <= _163_23_ ? ri < ranges.length : ri > ranges.length); (_163_19_ <= _163_23_ ? ++ri : --ri))
+        for (var _162_19_ = ri = 0, _162_23_ = ranges.length; (_162_19_ <= _162_23_ ? ri < ranges.length : ri > ranges.length); (_162_19_ <= _162_23_ ? ++ri : --ri))
         {
             r = ranges[ri]
             if ((r[0] === pos[1]) && ((r[1][0] <= pos[0] && pos[0] <= r[1][1])))
@@ -438,7 +438,7 @@ class Ranges
         {
             return
         }
-        for (var _174_19_ = ri = ranges.length - 1, _174_36_ = 0; (_174_19_ <= _174_36_ ? ri <= 0 : ri >= 0); (_174_19_ <= _174_36_ ? ++ri : --ri))
+        for (var _173_19_ = ri = ranges.length - 1, _173_36_ = 0; (_173_19_ <= _173_36_ ? ri <= 0 : ri >= 0); (_173_19_ <= _173_36_ ? ++ri : --ri))
         {
             r = ranges[ri]
             if ((r[0] < pos[1]) || ((r[0] === pos[1]) && (r[1][1] < pos[0])))
@@ -453,9 +453,9 @@ class Ranges
         var r
 
         var list = _k_.list(ranges)
-        for (var _180_14_ = 0; _180_14_ < list.length; _180_14_++)
+        for (var _179_14_ = 0; _179_14_ < list.length; _179_14_++)
         {
-            r = list[_180_14_]
+            r = list[_179_14_]
             if ((r[0] > pos[1]) || ((r[0] === pos[1]) && (r[1][0] > pos[0])))
             {
                 return r
@@ -471,7 +471,7 @@ class Ranges
         {
             return
         }
-        for (var _186_19_ = ri = ranges.length - 1, _186_36_ = 0; (_186_19_ <= _186_36_ ? ri <= 0 : ri >= 0); (_186_19_ <= _186_36_ ? ++ri : --ri))
+        for (var _185_19_ = ri = ranges.length - 1, _185_36_ = 0; (_185_19_ <= _185_36_ ? ri <= 0 : ri >= 0); (_185_19_ <= _185_36_ ? ++ri : --ri))
         {
             r = ranges[ri]
             if (r[0] === p[1])
@@ -530,7 +530,7 @@ class Ranges
 
         if (ra.length === rb.length)
         {
-            for (var _206_22_ = i = 0, _206_26_ = ra.length; (_206_22_ <= _206_26_ ? i < ra.length : i > ra.length); (_206_22_ <= _206_26_ ? ++i : --i))
+            for (var _205_22_ = i = 0, _205_26_ = ra.length; (_205_22_ <= _205_26_ ? i < ra.length : i > ra.length); (_205_22_ <= _205_26_ ? ++i : --i))
             {
                 if (!isSameRange(ra[i],rb[i]))
                 {
@@ -549,7 +549,7 @@ class Ranges
         sortRanges(ranges)
         if (ranges.length > 1)
         {
-            for (var _220_23_ = ri = ranges.length - 1, _220_41_ = 0; (_220_23_ <= _220_41_ ? ri < 0 : ri > 0); (_220_23_ <= _220_41_ ? ++ri : --ri))
+            for (var _219_23_ = ri = ranges.length - 1, _219_41_ = 0; (_219_23_ <= _219_41_ ? ri < 0 : ri > 0); (_219_23_ <= _219_41_ ? ++ri : --ri))
             {
                 r = ranges[ri]
                 p = ranges[ri - 1]

@@ -356,7 +356,7 @@ class Do
                 c = this.history[this.history.length - 3]
                 if ((a.numLines() === b.numLines() && b.numLines() === c.numLines()))
                 {
-                    for (var _338_31_ = li = 0, _338_35_ = a.numLines(); (_338_31_ <= _338_35_ ? li < a.numLines() : li > a.numLines()); (_338_31_ <= _338_35_ ? ++li : --li))
+                    for (var _337_31_ = li = 0, _337_35_ = a.numLines(); (_337_31_ <= _337_35_ ? li < a.numLines() : li > a.numLines()); (_337_31_ <= _337_35_ ? ++li : --li))
                     {
                         la = a.s.lines[li]
                         lb = b.s.lines[li]
@@ -385,16 +385,16 @@ class Do
         var c, ci, p
 
         var list = _k_.list(cs)
-        for (var _356_14_ = 0; _356_14_ < list.length; _356_14_++)
+        for (var _355_14_ = 0; _355_14_ < list.length; _355_14_++)
         {
-            p = list[_356_14_]
+            p = list[_355_14_]
             p[0] = Math.max(p[0],0)
             p[1] = _k_.clamp(0,this.state.numLines() - 1,p[1])
         }
         sortPositions(cs)
         if (cs.length > 1)
         {
-            for (var _363_23_ = ci = cs.length - 1, _363_37_ = 0; (_363_23_ <= _363_37_ ? ci < 0 : ci > 0); (_363_23_ <= _363_37_ ? ++ci : --ci))
+            for (var _362_23_ = ci = cs.length - 1, _362_37_ = 0; (_362_23_ <= _362_37_ ? ci < 0 : ci > 0); (_362_23_ <= _362_37_ ? ++ci : --ci))
             {
                 c = cs[ci]
                 p = cs[ci - 1]
@@ -474,7 +474,7 @@ class Do
 
     textInRange (r)
     {
-        var _392_41_
+        var _391_41_
 
         return (this.state.line(r[0]) != null ? this.state.line(r[0]).slice(r[1][0],r[1][1]) : undefined)
     }

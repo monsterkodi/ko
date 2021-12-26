@@ -77,7 +77,6 @@ function FileEditor extends TextEditor
 
     setCurrentFile: (file, restoreState) ->
 
-        # klog 'setCurrentFile' file
         @clear()
         
         @currentFile = file
@@ -142,7 +141,7 @@ function FileEditor extends TextEditor
     onCommandline: (e) =>
 
         switch e
-            when 'hidden' 'shown'
+            'hidden' 'shown'
                 d = window.split.commandlineHeight + window.split.handleHeight
                 d = Math.min d, @scroll.scrollMax - @scroll.scroll
                 d *= -1 if e == 'hidden'
@@ -500,10 +499,10 @@ function FileEditor extends TextEditor
 
         return if 'unhandled' != super mod, key, combo, char, event
         switch combo
-            when 'alt+ctrl+enter'       then return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
-            when 'alt+ctrl+shift+enter' then return window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()
-            when 'command+alt+up' 'alt+o' then return @jumpToCounterpart()
-            when 'esc'
+            'alt+ctrl+enter'         ➜ return window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
+            'alt+ctrl+shift+enter'   ➜ return window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()
+            'command+alt+up' 'alt+o' ➜ return @jumpToCounterpart()
+            'esc'
                 split = window.split
                 if split.terminalVisible()
                     split.hideTerminal()

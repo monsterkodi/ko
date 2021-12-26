@@ -53,7 +53,7 @@ Terminal = (function ()
 
     Terminal.prototype["appendMeta"] = function (meta)
     {
-        var l, _58_20_, _73_25_
+        var l, _59_21_, _74_21_
 
         if (!(meta != null))
         {
@@ -68,9 +68,9 @@ Terminal = (function ()
         {
             this.appendMeta({clss:'spacer'})
             var list = _k_.list(salt(meta.text).split('\n'))
-            for (var _65_18_ = 0; _65_18_ < list.length; _65_18_++)
+            for (var _66_22_ = 0; _66_22_ < list.length; _66_22_++)
             {
-                l = list[_65_18_]
+                l = list[_66_22_]
                 this.appendMeta({clss:'spacer',text:'# ' + l})
             }
             return this.appendMeta({clss:'spacer'})

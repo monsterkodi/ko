@@ -882,7 +882,7 @@ TextEditor = (function ()
 
     TextEditor.prototype["handleModKeyComboCharEvent"] = function (mod, key, combo, char, event)
     {
-        var action, actionCombo, _712_24_, _742_28_, _745_37_, _749_41_, _755_33_
+        var action, actionCombo, _712_24_, _734_28_, _737_37_, _741_41_, _745_33_
 
         if ((this.autocomplete != null))
         {
@@ -915,9 +915,9 @@ TextEditor = (function ()
         }
 
         var list = _k_.list(Editor.actions)
-        for (var _732_19_ = 0; _732_19_ < list.length; _732_19_++)
+        for (var _727_19_ = 0; _727_19_ < list.length; _727_19_++)
         {
-            action = list[_732_19_]
+            action = list[_727_19_]
             if (action.combo === combo || action.accel === combo && os.platform() !== 'darwin')
             {
                 switch (combo)
@@ -933,9 +933,9 @@ TextEditor = (function ()
             if ((action.accels != null) && os.platform() !== 'darwin')
             {
                 var list1 = _k_.list(action.accels)
-                for (var _743_32_ = 0; _743_32_ < list1.length; _743_32_++)
+                for (var _735_32_ = 0; _735_32_ < list1.length; _735_32_++)
                 {
-                    actionCombo = list1[_743_32_]
+                    actionCombo = list1[_735_32_]
                     if (combo === actionCombo)
                     {
                         if ((action.key != null) && _k_.isFunc(this[action.key]))
@@ -951,9 +951,9 @@ TextEditor = (function ()
                 continue
             }
             var list2 = _k_.list(action.combos)
-            for (var _751_28_ = 0; _751_28_ < list2.length; _751_28_++)
+            for (var _743_28_ = 0; _743_28_ < list2.length; _743_28_++)
             {
-                actionCombo = list2[_751_28_]
+                actionCombo = list2[_743_28_]
                 if (combo === actionCombo)
                 {
                     if ((action.key != null) && _k_.isFunc(this[action.key]))

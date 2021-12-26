@@ -141,6 +141,8 @@ Browser = (function ()
                     case 'right':
                         return 1
 
+                    default:
+                        return 0
                 }
 
             }).bind(this))()

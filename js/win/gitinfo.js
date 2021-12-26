@@ -97,22 +97,6 @@ class GitInfo
     {
         var meta, symbol, terminal, text
 
-        text = ((function ()
-        {
-            switch (change)
-            {
-                case 'changed':
-                    return '  ● '
-
-                case 'added':
-                    return '  ◼ '
-
-                case 'deleted':
-                    return '  ✘ '
-
-            }
-
-        }).bind(this))()
         symbol = ((function ()
         {
             switch (change)
@@ -129,6 +113,7 @@ class GitInfo
             }
 
         }).bind(this))()
+        text = `  ${symbol} `
         terminal = window.terminal
         meta = {diss:Syntax.dissForTextAndSyntax(`${slash.tilde(file)}`,'ko'),href:file,clss:'gitInfoFile',click:this.onMetaClick,line:symbol,lineClss:'gitInfoLine ' + change}
         terminal.appendMeta(meta)
@@ -137,9 +122,9 @@ class GitInfo
 
     start ()
     {
-        var dirOrFile, terminal, _127_35_
+        var dirOrFile, terminal, _124_35_
 
-        dirOrFile = ((_127_35_=window.cwd.cwd) != null ? _127_35_ : window.editor.currentFile)
+        dirOrFile = ((_124_35_=window.cwd.cwd) != null ? _124_35_ : window.editor.currentFile)
         window.split.raise('terminal')
         terminal = window.terminal
         terminal.clear()
@@ -155,15 +140,15 @@ class GitInfo
             terminal.appendMeta({clss:'salt',text:slash.tilde(info.gitDir)})
             terminal.appendMeta({clss:'spacer'})
             var list = _k_.list(info.deleted)
-            for (var _141_21_ = 0; _141_21_ < list.length; _141_21_++)
+            for (var _138_21_ = 0; _138_21_ < list.length; _138_21_++)
             {
-                file = list[_141_21_]
+                file = list[_138_21_]
                 this.logFile('deleted',file)
             }
             var list1 = _k_.list(info.added)
-            for (var _145_21_ = 0; _145_21_ < list1.length; _145_21_++)
+            for (var _142_21_ = 0; _142_21_ < list1.length; _142_21_++)
             {
-                file = list1[_145_21_]
+                file = list1[_142_21_]
                 this.logFile('added',file)
                 if (slash.isText(file))
                 {
@@ -175,14 +160,14 @@ class GitInfo
                 terminal.appendMeta({clss:'spacer'})
             }
             var list2 = _k_.list(info.changed)
-            for (var _158_27_ = 0; _158_27_ < list2.length; _158_27_++)
+            for (var _155_27_ = 0; _155_27_ < list2.length; _155_27_++)
             {
-                changeInfo = list2[_158_27_]
+                changeInfo = list2[_155_27_]
                 this.logFile('changed',changeInfo.file)
                 var list3 = _k_.list(changeInfo.changes)
-                for (var _162_27_ = 0; _162_27_ < list3.length; _162_27_++)
+                for (var _159_27_ = 0; _159_27_ < list3.length; _159_27_++)
                 {
-                    change = list3[_162_27_]
+                    change = list3[_159_27_]
                     line = change.line
                     if (!_k_.empty(change.mod))
                     {

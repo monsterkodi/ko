@@ -64,7 +64,6 @@ function Column
     
     loadItems: (items, parent) ->
         
-        # klog @parent?.file, parent.file, items.length
         @clear()
 
         @parent = parent
@@ -86,7 +85,6 @@ function Column
         @crumb.show()
         
         if @parent.type == 'dir'
-            # klog 'loadItems' @parent.file
             DirWatch.watch @parent.file
             @crumb.setFile @parent.file
         else
@@ -125,8 +123,6 @@ function Column
     onDragStart: (d, e) => 
     
         @dragStartRow = @row e.target
-        
-        # @browser.skipOnDblClick = false
         
         delete @toggle
         
@@ -349,7 +345,6 @@ function Column
     isEmpty: -> empty @parent
     clear:   ->
         if @parent?.file and @parent?.type == 'dir'
-            # klog 'column.clear unwatch?' @parent.file
             DirWatch.unwatch @parent.file
         delete @parent
         @clearSearch()
@@ -414,8 +409,7 @@ function Column
     focus: (opt) ->
         
         opt ?= {}
-        # klog 'focus name' @name(), 'last' window.lastFocus, opt
-                
+
         return @ if not opt.force and not window.lastFocus.startsWith @browser.name
         
         if not @activeRow() and @numRows() and opt.activate != false
@@ -460,13 +454,13 @@ function Column
         error "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
             
         toIndex = switch key
-            when 'up'        then index-1
-            when 'down'      then index+1
-            when 'home'      then 0
-            when 'end'       then @numRows()-1
-            when 'page up'   then Math.max 0, index-@numVisible()
-            when 'page down' then Math.min @numRows()-1, index+@numVisible()
-            else index
+            'up'        ➜ index-1
+            'down'      ➜ index+1
+            'home'      ➜ 0
+            'end'       ➜ @numRows()-1
+            'page up'   ➜ Math.max 0, index-@numVisible()
+            'page down' ➜ Math.min @numRows()-1, index+@numVisible()
+                        ➜ index
     
         @browser.select.to @row(toIndex), true
     
@@ -483,13 +477,13 @@ function Column
         error "no index from activeRow? #{index}?" @activeRow() if not index? or Number.isNaN index
         
         newIndex = switch key
-            when 'up'        then index-1
-            when 'down'      then index+1
-            when 'home'      then 0
-            when 'end'       then @numRows()-1
-            when 'page up'   then index-@numVisible()
-            when 'page down' then index+@numVisible()
-            else index
+            'up'        ➜ index-1
+            'down'      ➜ index+1
+            'home'      ➜ 0
+            'end'       ➜ @numRows()-1
+            'page up'   ➜ index-@numVisible()
+            'page down' ➜ index+@numVisible()
+                        ➜ index
             
         if not newIndex? or Number.isNaN newIndex        
             error "no index #{newIndex}? #{@numVisible()}"
@@ -502,10 +496,10 @@ function Column
     navigateCols: (key) -> # move to file browser?
         
         switch key
-            when 'up'    then @browser.navigate 'up'
-            when 'left'  then @browser.navigate 'left'
-            when 'right' then @browser.navigate 'right'
-            when 'enter'
+            'up'    ➜ @browser.navigate 'up'
+            'left'  ➜ @browser.navigate 'left'
+            'right' ➜ @browser.navigate 'right'
+            'enter'
                 if item = @activeRow()?.item
                     type = item.type
                     if type == 'dir'
@@ -632,13 +626,11 @@ function Column
     
     toggleDotFiles: =>
 
-        # klog 'toggleDotFiles'
         if @parent.type == undefined
             @parent.type = slash.isDir(@parent.file) and 'dir' or 'file'
             
         if @parent.type == 'dir'            
             stateKey = "browser▸showHidden▸#{@parent.file}"
-            klog 'toggleDotFiles' stateKey
             if prefs.get stateKey
                 prefs.del stateKey
             else
@@ -899,39 +891,39 @@ function Column
         { mod, key, combo, char } = keyinfo.forEvent event
 
         switch combo
-            when 'shift+`' '~'                      then return stopEvent event, @browser.browse '~'
-            when '/'                                then return stopEvent event, @browser.browse '/'
-            when 'backspace'                        then return stopEvent event, @browser.onBackspaceInColumn @
-            when 'delete'                           then return stopEvent event, @browser.onDeleteInColumn @
-            when 'alt+left'                         then return stopEvent event, window.split.focus 'shelf'
-            when 'alt+shift+.'                      then return stopEvent event, @addToShelf()
-            when 'alt+e'                            then return stopEvent event, @explorer()
-            when 'alt+n'                            then return stopEvent event, @newFolder()
-            when 'ctrl+x' 'command+x'               then return stopEvent event, @cutPaths()
-            when 'ctrl+c' 'command+c'               then return stopEvent event, @copyPaths()
-            when 'ctrl+v' 'command+v'               then return stopEvent event, @pastePaths()
-            when 'page up' 'page down' 'home' 'end' then return stopEvent event, @navigateRows key
-            when 'enter''alt+up'                    then return stopEvent event, @navigateCols key
-            when 'command+up' 'ctrl+up'             then return stopEvent event, @navigateRows 'home'
-            when 'command+down' 'ctrl+down'         then return stopEvent event, @navigateRows 'end'
-            when 'ctrl+t'                           then return stopEvent event, @sortByType()
-            when 'ctrl+n'                           then return stopEvent event, @sortByName()
-            when 'ctrl+a'                           then return stopEvent event, @sortByDateAdded()
-            when 'ctrl+e'                           then return stopEvent event, @toggleExtensions()
-            when 'command+i' 'ctrl+i'               then return stopEvent event, @toggleDotFiles()
-            when 'command+d' 'ctrl+d'               then return stopEvent event, @duplicateFile()
-            when 'command+k' 'ctrl+k'               then return stopEvent event if @browser.cleanUp() # needed?
-            when 'f2'                               then return stopEvent event, @activeRow()?.editName()
-            when 'shift+up' 'shift+down' 'shift+home' 'shift+end' 'shift+page up' 'shift+page down' 
+            'shift+`' '~'                      ➜ return stopEvent event, @browser.browse '~'
+            '/'                                ➜ return stopEvent event, @browser.browse '/'
+            'backspace'                        ➜ return stopEvent event, @browser.onBackspaceInColumn @
+            'delete'                           ➜ return stopEvent event, @browser.onDeleteInColumn @
+            'alt+left'                         ➜ return stopEvent event, window.split.focus 'shelf'
+            'alt+shift+.'                      ➜ return stopEvent event, @addToShelf()
+            'alt+e'                            ➜ return stopEvent event, @explorer()
+            'alt+n'                            ➜ return stopEvent event, @newFolder()
+            'ctrl+x' 'command+x'               ➜ return stopEvent event, @cutPaths()
+            'ctrl+c' 'command+c'               ➜ return stopEvent event, @copyPaths()
+            'ctrl+v' 'command+v'               ➜ return stopEvent event, @pastePaths()
+            'page up' 'page down' 'home' 'end' ➜ return stopEvent event, @navigateRows key
+            'enter''alt+up'                    ➜ return stopEvent event, @navigateCols key
+            'command+up' 'ctrl+up'             ➜ return stopEvent event, @navigateRows 'home'
+            'command+down' 'ctrl+down'         ➜ return stopEvent event, @navigateRows 'end'
+            'ctrl+t'                           ➜ return stopEvent event, @sortByType()
+            'ctrl+n'                           ➜ return stopEvent event, @sortByName()
+            'ctrl+a'                           ➜ return stopEvent event, @sortByDateAdded()
+            'ctrl+e'                           ➜ return stopEvent event, @toggleExtensions()
+            'command+i' 'ctrl+i'               ➜ return stopEvent event, @toggleDotFiles()
+            'command+d' 'ctrl+d'               ➜ return stopEvent event, @duplicateFile()
+            'command+k' 'ctrl+k'               ➜ return stopEvent event if @browser.cleanUp() # needed?
+            'f2'                               ➜ return stopEvent event, @activeRow()?.editName()
+            'shift+up' 'shift+down' 'shift+home' 'shift+end' 'shift+page up' 'shift+page down' 
                 return stopEvent event, @extendSelection key
-            when 'command+left' 'command+right' 'ctrl+left' 'ctrl+right'
+            'command+left' 'command+right' 'ctrl+left' 'ctrl+right'
                 return stopEvent event, @navigateRoot key
-            when 'command+backspace' 'ctrl+backspace' 'command+delete' 'ctrl+delete' 
+            'command+backspace' 'ctrl+backspace' 'command+delete' 'ctrl+delete' 
                 return stopEvent event, @moveToTrash()
-            when 'tab'    
+            'tab'    
                 if @search.length then @doSearch ''
                 return stopEvent event
-            when 'esc'
+            'esc'
                 if @dragDiv
                     @dragDiv.drag.dragStop()
                     @dragDiv.remove()
@@ -941,8 +933,8 @@ function Column
                 else if @search.length then @clearSearch()
                 return stopEvent event
 
-        if combo in ['up'   'down']  then return stopEvent event, @navigateRows key              
-        if combo in ['left' 'right'] then return stopEvent event, @navigateCols key
+        if combo in ['up'   'down']  ➜ return stopEvent event, @navigateRows key              
+        if combo in ['left' 'right'] ➜ return stopEvent event, @navigateCols key
             
         if mod in ['shift' ''] and char then @doSearch char
         

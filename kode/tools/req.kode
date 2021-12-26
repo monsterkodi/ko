@@ -81,7 +81,6 @@ req = (file, lines, editor) ->
                 requires[m[2]] = index:li, value:m[1].trim(), module:m[2], indent:indent
                 
                 if requires[m[2]].value.startsWith '{'
-                    # klog 'requires[m[2]].value.startsWith {' requires[m[2]]
                     if not keys[m[2]]
                         try
                             moduleName = kstr.strip m[2], '"\''

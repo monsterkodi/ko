@@ -112,7 +112,7 @@ class EditorScroll extends events
         return if oldTop == @top and oldBot == @bot
             
         if (@top > oldBot) or (@bot < oldTop) or (oldBot < oldTop) 
-            # new range outside, start from scratch
+            
             num = @bot - @top + 1
             
             if num > 0

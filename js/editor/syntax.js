@@ -35,9 +35,9 @@ class Syntax
 
     getDiss (li)
     {
-        var _34_18_
+        var _33_18_
 
-        return this.diss[li] = ((_34_18_=this.diss[li]) != null ? _34_18_ : this.newDiss(li))
+        return this.diss[li] = ((_33_18_=this.diss[li]) != null ? _33_18_ : this.newDiss(li))
     }
 
     setDiss (li, dss)
@@ -55,10 +55,10 @@ class Syntax
         var ch, change, di, li
 
         var list = _k_.list(changeInfo.changes)
-        for (var _58_19_ = 0; _58_19_ < list.length; _58_19_++)
+        for (var _57_19_ = 0; _57_19_ < list.length; _57_19_++)
         {
-            change = list[_58_19_]
-            var _60_23_ = [change.doIndex,change.newIndex,change.change]; di = _60_23_[0]; li = _60_23_[1]; ch = _60_23_[2]
+            change = list[_57_19_]
+            var _59_23_ = [change.doIndex,change.newIndex,change.change]; di = _59_23_[0]; li = _59_23_[1]; ch = _59_23_[2]
 
             switch (ch)
             {
@@ -128,19 +128,19 @@ class Syntax
 
     static spanForTextAndSyntax (text, n)
     {
-        var clrzd, clss, d, di, diss, l, last, sp, spc, style, _122_30_, _127_30_
+        var clrzd, clss, d, di, diss, l, last, sp, spc, style, _121_30_, _126_30_
 
         l = ""
         diss = this.dissForTextAndSyntax(text,n)
         if ((diss != null ? diss.length : undefined))
         {
             last = 0
-            for (var _120_23_ = di = 0, _120_27_ = diss.length; (_120_23_ <= _120_27_ ? di < diss.length : di > diss.length); (_120_23_ <= _120_27_ ? ++di : --di))
+            for (var _119_23_ = di = 0, _119_27_ = diss.length; (_119_23_ <= _119_27_ ? di < diss.length : di > diss.length); (_119_23_ <= _119_27_ ? ++di : --di))
             {
                 d = diss[di]
                 style = (d.styl != null) && d.styl.length && ` style=\"${d.styl}\"` || ''
                 spc = ''
-                for (var _124_27_ = sp = last, _124_34_ = d.start; (_124_27_ <= _124_34_ ? sp < d.start : sp > d.start); (_124_27_ <= _124_34_ ? ++sp : --sp))
+                for (var _123_27_ = sp = last, _123_34_ = d.start; (_123_27_ <= _123_34_ ? sp < d.start : sp > d.start); (_123_27_ <= _123_34_ ? ++sp : --sp))
                 {
                     spc += '&nbsp;'
                 }
@@ -183,9 +183,9 @@ class Syntax
 
         l = ""
         var list = _k_.list(dss)
-        for (var _149_14_ = 0; _149_14_ < list.length; _149_14_++)
+        for (var _148_14_ = 0; _148_14_ < list.length; _148_14_++)
         {
-            d = list[_149_14_]
+            d = list[_148_14_]
             l = _.padEnd(l,d.start)
             l += d.match
         }
@@ -223,13 +223,13 @@ class Syntax
 
     static init ()
     {
-        var config, extnames, patterns, syntaxDir, syntaxFile, syntaxName, _191_26_, _191_36_
+        var config, extnames, patterns, syntaxDir, syntaxFile, syntaxName, _188_26_, _188_36_
 
         syntaxDir = `${__dirname}/../../syntax/`
         var list = _k_.list(fs.readdirSync(syntaxDir))
-        for (var _183_23_ = 0; _183_23_ < list.length; _183_23_++)
+        for (var _180_23_ = 0; _180_23_ < list.length; _180_23_++)
         {
-            syntaxFile = list[_183_23_]
+            syntaxFile = list[_180_23_]
             syntaxName = slash.basename(syntaxFile,'.noon')
             patterns = noon.load(slash.join(syntaxDir,syntaxFile))
             patterns['\\w+'] = 'text'
@@ -240,9 +240,9 @@ class Syntax
                 delete patterns.ko
                 config = matchr.config(patterns)
                 var list1 = _k_.list(extnames)
-                for (var _196_31_ = 0; _196_31_ < list1.length; _196_31_++)
+                for (var _193_31_ = 0; _193_31_ < list1.length; _193_31_++)
                 {
-                    syntaxName = list1[_196_31_]
+                    syntaxName = list1[_193_31_]
                     this.syntaxNames.push(syntaxName)
                     this.matchrConfigs[syntaxName] = config
                 }

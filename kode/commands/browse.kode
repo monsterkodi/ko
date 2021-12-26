@@ -319,8 +319,6 @@ function Browse extends Command
 
     onBrowserItemActivated: (item) =>
 
-        # klog 'onBrowserItemActivated' item.type, item.file
-        
         if not @isActive()
             @commandline.command?.onBrowserItemActivated? item
             return

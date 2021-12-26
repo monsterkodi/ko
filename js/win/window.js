@@ -112,7 +112,7 @@ Window = (function ()
 
     Window.prototype["onMenuAction"] = function (name, opts)
     {
-        var action, _113_25_
+        var action, _112_25_
 
         if (action = Editor.actionWithName(name))
         {
@@ -261,7 +261,7 @@ post.setMaxListeners(20)
 
 saveStash = function ()
 {
-    klog('window.saveStash')
+    post.emit('saveChanges')
     post.emit('stash')
     editor.saveScrollCursorsAndSelections()
     return window.stash.save()
@@ -269,6 +269,7 @@ saveStash = function ()
 
 clearStash = function ()
 {
+    post.emit('saveChanges')
     return window.stash.clear()
 }
 
@@ -336,15 +337,15 @@ window.editorWithName = function (n)
 {
     switch (n)
     {
-        case 'editor':
-            return editor
-
         case 'command':
         case 'commandline':
             return commandline
 
         case 'terminal':
             return terminal
+
+        case 'editor':
+            return editor
 
         default:
             return editor
@@ -376,7 +377,7 @@ window.onresize = function ()
 }
 post.on('split',function (s)
 {
-    var _286_22_
+    var _279_22_
 
     ;(window.filebrowser != null ? window.filebrowser.resized() : undefined)
     terminal.resized()
@@ -421,7 +422,7 @@ toggleTabPinned = function ()
 
 setFontSize = function (s)
 {
-    var _331_25_
+    var _324_25_
 
     if (!(_k_.isNum(s)))
     {
@@ -440,17 +441,17 @@ changeFontSize = function (d)
 {
     var f
 
-    if (editor.size.fontSize >= 30)
+    if (editor.size.fontSize >= 20)
+    {
+        f = 2
+    }
+    else if (editor.size.fontSize >= 30)
     {
         f = 4
     }
     else if (editor.size.fontSize >= 50)
     {
         f = 10
-    }
-    else if (editor.size.fontSize >= 20)
-    {
-        f = 2
     }
     else
     {

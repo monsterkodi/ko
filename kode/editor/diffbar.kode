@@ -238,15 +238,15 @@ class Diffbar
 
                 ctx.fillStyle = switch meta[2].git
 
-                    when 'mod'
+                    'mod'
                         if boring then "rgba(50, 50,50,#{alpha length})"
                         else           "rgba( 0,255, 0,#{alpha length})"
 
-                    when 'del'
+                    'del'
                         if boring then "rgba(50,50,50,#{alpha length})"
                         else           "rgba(255,0,0,#{alpha length})"
 
-                    when 'add'
+                    'add'
                         if boring then "rgba(50,50,50,#{alpha length})"
                         else           "rgba(160,160,255,#{alpha length})"
 

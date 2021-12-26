@@ -88,7 +88,7 @@ function Macro extends Command
             # 000  000  0000     000
             # 000  000   000      0
 
-            when 'inv'
+            'inv'
                 window.textEditor.toggleInvisibles()
 
             # 0000000    000      000  000   000  000   000
@@ -97,7 +97,7 @@ function Macro extends Command
             # 000   000  000      000  000  0000  000  000
             # 0000000    0000000  000  000   000  000   000
 
-            when 'blink'
+            'blink'
                 editor.toggleBlink()
                 if prefs.get 'blink'
                     @commandline.startBlink()
@@ -110,7 +110,7 @@ function Macro extends Command
             # 000       000   000  000      000   000  000   000
             #  0000000   0000000   0000000   0000000   000   000
 
-            when 'color' 'colors' then editor.togglePigments()
+            'color' 'colors' ➜ editor.togglePigments()
 
             # 00000000  00000000    0000000         0000000  000   000  0000000           0000000   000  000000000
             # 000       000   000  000             000       000 0 000  000   000        000        000     000
@@ -118,10 +118,10 @@ function Macro extends Command
             # 000       000             000        000       000   000  000   000        000   000  000     000
             # 000       000        0000000          0000000  00     00  0000000           0000000   000     000
 
-            when 'fps'   then window.fps?.toggle()
-            when 'cwd'   then window.cwd?.toggle()
-            when 'git'   then GitInfo.start()
-            when 'err'
+            'fps'   ➜ window.fps?.toggle()
+            'cwd'   ➜ window.cwd?.toggle()
+            'git'   ➜ GitInfo.start()
+            'err'
                 post.toMain 'throwError'
                 throw new Error 'err'
 
@@ -131,7 +131,7 @@ function Macro extends Command
             # 000   000  000       000      000
             # 000   000  00000000  0000000  000
 
-            when 'help'
+            'help'
 
                 terminal = window.terminal
                 text = fs.readFileSync "#{__dirname}/../../bin/cheet.noon" encoding:'utf8'
@@ -148,7 +148,7 @@ function Macro extends Command
             # 000   000  000       000 0000
             # 000   000  00000000   00000 00
 
-            when 'req'
+            'req'
 
                 return if slash.ext(editor.currentFile) not in ['coffee' 'kode']
                 lines = req editor.currentFile, editor.lines(), editor
@@ -170,7 +170,7 @@ function Macro extends Command
             # 000   000  000   000  000   000
             # 0000000    0000000     0000000
 
-            when 'dbg'
+            'dbg'
 
                 li = cp[1]
                 indent = editor.indentStringForLineAtIndex li
@@ -201,7 +201,7 @@ function Macro extends Command
             # 000       000      000   000       000       000
             #  0000000  0000000  000   000  0000000   0000000
 
-            when 'class'
+            'class'
 
                 clss = cmds.length and cmds[0] or _.last editor.textsInRanges(editor.selections())
                 clss ?= 'Class'
@@ -235,7 +235,7 @@ function Macro extends Command
             # 000       000      000       000   000  000  0000
             #  0000000  0000000  00000000  000   000  000   000
 
-            when 'clean'
+            'clean'
 
                 editor.do.start()
                 for li in [0...editor.numLines()]
@@ -245,7 +245,7 @@ function Macro extends Command
                         editor.do.change li, cleaned
                 editor.do.end()
 
-            when 'unix'
+            'unix'
 
                 editor.newlineCharacters = '\n'
                 post.emit 'saveFile'
@@ -256,23 +256,23 @@ function Macro extends Command
             # 000   000  000       000   000  000   000  000       000   000
             # 000   000  00000000  000   000  0000000    00000000  000   000
 
-            when 'header'
+            'header'
 
                 editor.toggleHeader()
 
-            when 'col'
+            'col'
 
                 num  = cmds.length > 0 and parseInt(cmds[0]) or 10
                 step = cmds.length > 1 and parseInt(cmds[1]) or 1
                 editor.cursorColumns num, step
 
-            when 'line'
+            'line'
 
                 num  = cmds.length > 0 and parseInt(cmds[0]) or 10
                 step = cmds.length > 1 and parseInt(cmds[1]) or 1
                 editor.cursorLines num, step
 
-            else
+            ➜
 
                 # 000000000  00000000    0000000   000   000   0000000  00000000   0000000   00000000   00     00
                 #    000     000   000  000   000  0000  000  000       000       000   000  000   000  000   000

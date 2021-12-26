@@ -126,20 +126,13 @@ function FileBrowser extends Browser
         reuses shared columns of current and new path
         ###
         
-        # klog 'navigateToFile' file
-        
         lastPath = @lastDirColumn()?.path()
         
         file = slash.path file
 
         if file == lastPath or file == @lastColumnPath() or slash.isRelative file
-            # klog 'navigateToFile SKIP already loaded' lastPath, @lastColumnPath()
             return
 
-        # klog 'navigateToFile' file
-        # klog 'navigateToFile' @lastColumnPath()
-        # klog 'navigateToFile' @lastDirColumn()?.path()
-            
         col = @sharedColumnIndex file
         
         filelist = slash.pathlist file
@@ -218,8 +211,6 @@ function FileBrowser extends Browser
         clears all columns, loads the dir in column 0 and the file in column 1, if any
         ###
 
-        # klog 'loadItem' item, opt
-        
         opt ?= active:'..' focus:true
         item.name ?= slash.file item.file
 
@@ -233,7 +224,6 @@ function FileBrowser extends Browser
                 @loadDirItem @fileItem(slash.dir(item.file)), 0, opt
 
         if opt.focus
-            # klog 'loadItem focus columns[0]' 
             @columns[0]?.focus()
             
     #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000
@@ -249,8 +239,6 @@ function FileBrowser extends Browser
         loads item in the column to the right of col while keeping the other columns
         ###
 
-        # klog 'activateItem' item.type, item.file, col
-        
         @clearColumnsFrom col+2 pop:true
 
         switch item.type
@@ -321,8 +309,6 @@ function FileBrowser extends Browser
 
     onFileIndexed: (file, info) =>
  
-        # klog 'onFileIndexed' file
-        
         @srcCache[file] = info
  
         if file == @lastUsedColumn()?.parent?.file
@@ -370,7 +356,6 @@ function FileBrowser extends Browser
 
     onDirChanged: (info) =>
  
-        # klog 'onDirChanged' info.change, info.dir, info.path
         for column in @columns
             if column.path() == info.dir
                 @loadDirItem {file:info.dir, type:'dir'}, column.index, active:column.activePath(), focus:false
@@ -382,13 +367,7 @@ function FileBrowser extends Browser
         return if col > 0 and item.name == '/'
 
         dir = item.file
-
-        # if @skipOnDblClick
-            # klog 'loadDirItem skip' col, dir
-            # delete @skipOnDblClick
-            # return 
         
-        # opt.ignoreHidden = not window.state.get "browser|showHidden|#{dir}"
         opt.ignoreHidden = not prefs.get "browser▸showHidden▸#{dir}"
         slash.list dir, opt, (items) =>
             post.toMain 'dirLoaded' dir
@@ -399,7 +378,6 @@ function FileBrowser extends Browser
         
         @updateColumnScrolls()
                             
-        # klog 'loadDirItems' col, dir
         if @skipOnDblClick and col > 0
             delete @skipOnDblClick
             return
@@ -422,7 +400,6 @@ function FileBrowser extends Browser
         
         if opt.focus != false and empty(document.activeElement) and empty($('.popup')?.outerHTML)
             if lastColumn = @lastDirColumn()
-                # klog 'loadDirItems lastColumn.focus'
                 lastColumn.focus()
                 
         opt.cb? column:col, item:item

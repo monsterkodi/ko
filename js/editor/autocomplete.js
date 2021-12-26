@@ -604,17 +604,9 @@ class Autocomplete extends event
                     return
 
                 case 'up':
-                    if (this.selected >= 0)
-                    {
-                        this.prev()
-                        return
-                    }
-                    else
-                    {
-                        this.last()
-                        return
-                    }
-                    break
+                    this.selected >= 0 ? this.prev() : this.last()
+                    return
+
             }
 
         }

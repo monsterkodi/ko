@@ -55,7 +55,6 @@ class Crumb
         
     setFile: (file) ->
         
-        # klog 'setFile' file
         if @column.index == 0
             @elem.innerHTML = File.crumbSpan slash.tilde file
         else

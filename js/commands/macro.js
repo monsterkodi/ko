@@ -58,7 +58,7 @@ Macro = (function ()
 
     Macro.prototype["execute"] = function (command)
     {
-        var cleaned, clss, cmds, cmmd, cp, dir, editor, file, indent, insert, l, li, line, lines, lst, num, s, step, t, terminal, text, ti, words, wordsInArgsOrCursorsOrSelection, _121_40_, _122_40_, _208_40_
+        var cleaned, clss, cmds, cmmd, cp, dir, editor, file, indent, insert, l, li, line, lines, lst, num, s, step, t, terminal, text, ti, words, wordsInArgsOrCursorsOrSelection, _121_35_, _122_35_, _208_40_
 
         if (_k_.empty(command))
         {

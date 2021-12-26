@@ -55,28 +55,29 @@ function Terminal extends TextEditor
             
         @meta.append meta
         
-        if meta.diss?
+        if 
+            meta.diss?
             
-            @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
+                @appendLineDiss syntax.lineForDiss(meta.diss), meta.diss 
                         
-        else if meta.clss == 'salt'
+            meta.clss == 'salt'
             
-            @appendMeta clss: 'spacer'
-            for l in salt(meta.text).split '\n'
-                @appendMeta clss:'spacer' text:'# '+l
-            @appendMeta clss: 'spacer'
+                @appendMeta clss: 'spacer'
+                for l in salt(meta.text).split '\n'
+                    @appendMeta clss:'spacer' text:'# '+l
+                @appendMeta clss: 'spacer'
             
-        else if meta.clss == 'termCommand'
+            meta.clss == 'termCommand'
             
-            @appendLineDiss meta.command, syntax.dissForTextAndSyntax meta.command, 'term'
+                @appendLineDiss meta.command, syntax.dissForTextAndSyntax meta.command, 'term'
 
-        else if meta.text?
+            meta.text?
             
-            @appendLineDiss meta.text
+                @appendLineDiss meta.text
             
-        else
-            
-            @appendLineDiss ''
+            else
+                
+                @appendLineDiss ''
         
     queueMeta: (meta) ->
         
@@ -143,18 +144,28 @@ function Terminal extends TextEditor
         return if 'unhandled' != super mod, key, combo, char, event
         
         switch combo
-            when 'enter'
+            
+            'enter'
+                
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
                     post.emit 'loadFile' "#{href}" 
                 return
-            when 'ctrl+enter' 'command+enter'
+                
+            'ctrl+enter' 
+            'command+enter'
+                
                 if href = @meta.hrefAtLineIndex @cursorPos()[1]
                     post.emit 'loadFile' "#{href}" 
                     window.editor.focus()
                 return
-            when 'ctrl+s' 'command+s'
+                
+            'ctrl+s' 
+            'command+s'
+                
                 return if @meta.saveChanges()
-            when 'esc'
+                
+            'esc'
+                
                 split = window.split
                 split.focus 'commandline-editor'
                 split.do    'enlarge editor'

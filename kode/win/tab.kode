@@ -55,9 +55,9 @@ class Tab
                 for changes in @foreign
                     for change in changes
                         switch change.change
-                            when 'changed'  then @state.state = @state.state.changeLine change.doIndex, change.after
-                            when 'inserted' then @state.state = @state.state.insertLine change.doIndex, change.after
-                            when 'deleted'  then @state.state = @state.state.deleteLine change.doIndex
+                            'changed'  ➜ @state.state = @state.state.changeLine change.doIndex, change.after
+                            'inserted' ➜ @state.state = @state.state.insertLine change.doIndex, change.after
+                            'deleted'  ➜ @state.state = @state.state.deleteLine change.doIndex
 
             if @state.state
                 File.save @state.file, @state.state.text(), (err) =>
@@ -71,7 +71,6 @@ class Tab
     setFile: (newFile) ->
         
         if not slash.samePath @file, newFile
-            # klog 'tab.setFile' slash.path newFile
             @file = slash.path newFile
             post.emit 'watch' @file
             @update()

@@ -116,11 +116,6 @@ function Row
             
         @div.classList.add 'active'
         
-        # klog 'setActive setLastFocus? ' @browser.name, window.lastFocus 
-        # if window.lastFocus.startsWith @browser.name
-            # klog 'setActive setLastFocus! ' @column.name()
-            # window.setLastFocus @column.name()
-        
         if opt?.scroll != false
             @column.scroll.toIndex @index()            
             
@@ -230,6 +225,5 @@ function Row
         return if slash.samePath @item.file, targetFile
                 
         File.rename @item.file, targetFile, (source, target) =>
-            # klog 'row.rename' source, target
     
 module.exports = Row
