@@ -168,7 +168,7 @@ Main = (function ()
         },onOtherInstance:function (args, dir)
         {
             return main.onOtherInstance(args,dir)
-        },width:1000,height:1000,minWidth:240,minHeight:230,args:`ko2
+        },width:1000,height:1000,minWidth:240,minHeight:230,args:`ko
     filelist    files to open               **
     prefs       show preferences            = false
     noprefs     don't load preferences      = false

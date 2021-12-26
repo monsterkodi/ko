@@ -102,7 +102,7 @@ function Main extends app
             minWidth:   240
             minHeight:  230
             args: """
-                ko2
+                ko
                     filelist    files to open               **
                     prefs       show preferences            = false
                     noprefs     don't load preferences      = false

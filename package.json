@@ -1,5 +1,5 @@
 {
-  "name": "ko2",
+  "name": "ko",
   "version": "0.343.0",
   "description": "text editor",
   "keywords": [
@@ -10,9 +10,12 @@
   "author": "monsterkodi",
   "license": "Unlicense",
   "bin": {
-    "ko2": "./bin/ko2"
+    "ko": "./bin/ko"
   },
   "main": "js/main/main.js",
+  "scripts": {
+    "build": "./node_modules/.bin/konrad -r"
+  },
   "repository": "github:monsterkodi/ko",
   "build": {
     "asar": false,
@@ -38,7 +41,7 @@
     "walkdir": "^0.4.1"
   },
   "devDependencies": {
-    "kode": "monsterkodi/kode",
+    "konrad": "monsterkodi/konrad",
     "electron": "^16.0.3",
     "electron-builder": "^22.14.5",
     "sds": "^4.4.0"
