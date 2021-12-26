@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
@@ -24,7 +24,7 @@ class Strings
     {
         var a, p
 
-        return this.config = (function () { var _21__63_ = []; for (var p in this.editor.stringCharacters)  { var a = this.editor.stringCharacters[p];_21__63_.push([new RegExp(_.escapeRegExp(p)),a])  } return _21__63_ }).bind(this)()
+        return this.config = (function () { var r_21_63_ = []; for (var p in this.editor.stringCharacters)  { var a = this.editor.stringCharacters[p];r_21_63_.push([new RegExp(_.escapeRegExp(p)),a])  } return r_21_63_ }).bind(this)()
     }
 
     onCursor ()

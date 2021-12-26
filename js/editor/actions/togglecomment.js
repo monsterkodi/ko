@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
@@ -19,7 +19,7 @@ module.exports = {actions:{menu:'Line',toggleComment:{name:'Toggle Comment',comb
     {
         return
     }
-    il = _.min((function () { var _37__59_ = []; var list = _k_.list(rgs); for (var _37_59_ = 0; _37_59_ < list.length; _37_59_++)  { r = list[_37_59_];_37__59_.push(this.indentationAtLineIndex(r[0]))  } return _37__59_ }).bind(this)())
+    il = _.min((function () { var r_37_59_ = []; var list = _k_.list(rgs); for (var _37_59_ = 0; _37_59_ < list.length; _37_59_++)  { r = list[_37_59_];r_37_59_.push(this.indentationAtLineIndex(r[0]))  } return r_37_59_ }).bind(this)())
     indent = _.padStart("",il)
     this.do.start()
     if (!this.do.line(rgs[0][0]).slice(il).startsWith(this.lineComment))

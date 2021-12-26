@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isFunc: function (o) {return typeof o === 'function'}}
 
@@ -51,7 +51,7 @@ class Transform
         }
 
         pad = Number(step * (cs.length - 1) + offset).toString(base).length
-        numbers = (function () { var _60__83_ = []; for (var _60_87_ = i = 0, _60_91_ = cs.length; (_60_87_ <= _60_91_ ? i < cs.length : i > cs.length); (_60_87_ <= _60_91_ ? ++i : --i))  { _60__83_.push(_.padStart(Number(step * i + offset).toString(base),pad,'0'))  } return _60__83_ }).bind(this)()
+        numbers = (function () { var r_60_83_ = []; for (var _60_87_ = i = 0, _60_91_ = cs.length; (_60_87_ <= _60_91_ ? i < cs.length : i > cs.length); (_60_87_ <= _60_91_ ? ++i : --i))  { r_60_83_.push(_.padStart(Number(step * i + offset).toString(base),pad,'0'))  } return r_60_83_ }).bind(this)()
         this.editor.replaceSelectedText(numbers)
         this.editor.do.end()
         return 'count'

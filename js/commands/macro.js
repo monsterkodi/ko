@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
 
@@ -53,7 +53,7 @@ Macro = (function ()
         var i, items
 
         items = _.uniq(_.concat(reversed(this.history),this.macros))
-        return (function () { var _56__74_ = []; var list = _k_.list(items); for (var _56_74_ = 0; _56_74_ < list.length; _56_74_++)  { i = list[_56_74_];_56__74_.push({text:i,line:_k_.in(i,this.macros) && '◼' || '◆',type:'macro'})  } return _56__74_ }).bind(this)()
+        return (function () { var r_56_74_ = []; var list = _k_.list(items); for (var _56_74_ = 0; _56_74_ < list.length; _56_74_++)  { i = list[_56_74_];r_56_74_.push({text:i,line:_k_.in(i,this.macros) && '◼' || '◆',type:'macro'})  } return r_56_74_ }).bind(this)()
     }
 
     Macro.prototype["execute"] = function (command)
@@ -183,7 +183,7 @@ Macro = (function ()
                 insert += '"'
                 if (lst)
                 {
-                    insert += (function () { var _189__61_ = []; for (var _189_65_ = ti = words.length - lst, _189_86_ = words.length; (_189_65_ <= _189_86_ ? ti < words.length : ti > words.length); (_189_65_ <= _189_86_ ? ++ti : --ti))  { _189__61_.push(`, kstr(${words[ti]})`)  } return _189__61_ }).bind(this)().join('')
+                    insert += (function () { var r_189_61_ = []; for (var _189_65_ = ti = words.length - lst, _189_86_ = words.length; (_189_65_ <= _189_86_ ? ti < words.length : ti > words.length); (_189_65_ <= _189_86_ ? ++ti : --ti))  { r_189_61_.push(`, kstr(${words[ti]})`)  } return r_189_61_ }).bind(this)().join('')
                 }
                 editor.do.start()
                 editor.do.insert(li,insert)
@@ -201,7 +201,7 @@ Macro = (function ()
                     return {text:`file ${file} exists!`}
                 }
                 text = "###\n"
-                text += (function () { var _213__33_ = []; var list2 = _k_.list(salt(clss).split('\n')); for (var _213_33_ = 0; _213_33_ < list2.length; _213_33_++)  { s = list2[_213_33_];_213__33_.push(s)  } return _213__33_ }).bind(this)().join('\n')
+                text += (function () { var r_213_33_ = []; var list2 = _k_.list(salt(clss).split('\n')); for (var _213_33_ = 0; _213_33_ < list2.length; _213_33_++)  { s = list2[_213_33_];r_213_33_.push(s)  } return r_213_33_ }).bind(this)().join('\n')
                 text += "\n###\n"
                 text += `
 function ${clss}

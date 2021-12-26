@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, valid: undefined, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -82,7 +82,7 @@ Open = (function ()
             {
                 return o.text
             }})
-            items = (function () { var _71__38_ = []; var list = _k_.list(fuzzied); for (var _71_38_ = 0; _71_38_ < list.length; _71_38_++)  { f = list[_71_38_];_71__38_.push(f.original)  } return _71__38_ }).bind(this)()
+            items = (function () { var r_71_38_ = []; var list = _k_.list(fuzzied); for (var _71_38_ = 0; _71_38_ < list.length; _71_38_++)  { f = list[_71_38_];r_71_38_.push(f.original)  } return r_71_38_ }).bind(this)()
             items.sort(function (a, b)
             {
                 return b.weight - a.weight

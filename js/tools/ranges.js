@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
@@ -304,21 +304,21 @@ class Ranges
     {
         var r
 
-        return (function () { var _119__64_ = []; var list = _k_.list(ranges); for (var _119_64_ = 0; _119_64_ < list.length; _119_64_++)  { r = list[_119_64_];_119__64_.push(rangeEndPos(r))  } return _119__64_ }).bind(this)()
+        return (function () { var r_119_64_ = []; var list = _k_.list(ranges); for (var _119_64_ = 0; _119_64_ < list.length; _119_64_++)  { r = list[_119_64_];r_119_64_.push(rangeEndPos(r))  } return r_119_64_ }).bind(this)()
     }
 
     startPositionsFromRanges (ranges)
     {
         var r
 
-        return (function () { var _120__66_ = []; var list = _k_.list(ranges); for (var _120_66_ = 0; _120_66_ < list.length; _120_66_++)  { r = list[_120_66_];_120__66_.push(rangeStartPos(r))  } return _120__66_ }).bind(this)()
+        return (function () { var r_120_66_ = []; var list = _k_.list(ranges); for (var _120_66_ = 0; _120_66_ < list.length; _120_66_++)  { r = list[_120_66_];r_120_66_.push(rangeStartPos(r))  } return r_120_66_ }).bind(this)()
     }
 
     rangesFromPositions (pl)
     {
         var p
 
-        return (function () { var _128__61_ = []; var list = _k_.list(pl); for (var _128_61_ = 0; _128_61_ < list.length; _128_61_++)  { p = list[_128_61_];_128__61_.push([p[1],[p[0],p[0]]])  } return _128__61_ }).bind(this)()
+        return (function () { var r_128_61_ = []; var list = _k_.list(pl); for (var _128_61_ = 0; _128_61_ < list.length; _128_61_++)  { p = list[_128_61_];r_128_61_.push([p[1],[p[0],p[0]]])  } return r_128_61_ }).bind(this)()
     }
 
     rangesAtLineIndexInRanges (li, ranges)

@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
@@ -84,7 +84,7 @@ module.exports = {actions:{cutCopyPaste:{combos:['command+x','ctrl+x','command+c
     newCursors = this.do.cursors()
     if (newCursors.length > 1 && lines.length === 1)
     {
-        lines = (function () { var _89__36_ = []; var list = _k_.list(newCursors); for (var _89_36_ = 0; _89_36_ < list.length; _89_36_++)  { c = list[_89_36_];_89__36_.push(lines[0])  } return _89__36_ }).bind(this)()
+        lines = (function () { var r_89_36_ = []; var list = _k_.list(newCursors); for (var _89_36_ = 0; _89_36_ < list.length; _89_36_++)  { c = list[_89_36_];r_89_36_.push(lines[0])  } return r_89_36_ }).bind(this)()
     }
     if (newCursors.length > 1 || (lines.length === 1))
     {

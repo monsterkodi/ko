@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -234,7 +234,7 @@ select text between highlighted brackets or quotes otherwise.`,combo:'alt+b',acc
         this.do.select(surr)
         if (this.do.numSelections())
         {
-            this.do.setCursors((function () { var _255__53_ = []; var list = _k_.list(this.do.selections()); for (var _255_53_ = 0; _255_53_ < list.length; _255_53_++)  { r = list[_255_53_];_255__53_.push(rangeEndPos(r))  } return _255__53_ }).bind(this)(),{main:'closest'})
+            this.do.setCursors((function () { var r_255_53_ = []; var list = _k_.list(this.do.selections()); for (var _255_53_ = 0; _255_53_ < list.length; _255_53_++)  { r = list[_255_53_];r_255_53_.push(rangeEndPos(r))  } return r_255_53_ }).bind(this)(),{main:'closest'})
         }
         return this.do.end()
     }

@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {isFunc: function (o) {return typeof o === 'function'}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
@@ -60,7 +60,7 @@ parseResult = function (file, result)
     var after, afterSplit, before, change, i, info, l, line, lines, newLines, numNew, numOld, oldLines, x, _49_51_, _50_44_
 
     info = {file:file,changes:[]}
-    lines = (function () { var _41__36_ = []; var list = _k_.list(result.split('\n')); for (var _41_36_ = 0; _41_36_ < list.length; _41_36_++)  { l = list[_41_36_];_41__36_.push(kstr.stripAnsi(l))  } return _41__36_ }).bind(this)()
+    lines = (function () { var r_41_36_ = []; var list = _k_.list(result.split('\n')); for (var _41_36_ = 0; _41_36_ < list.length; _41_36_++)  { l = list[_41_36_];r_41_36_.push(kstr.stripAnsi(l))  } return r_41_36_ }).bind(this)()
     while (line = lines.shift())
     {
         if (line.startsWith('@@'))

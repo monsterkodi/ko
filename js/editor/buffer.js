@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, valid: undefined, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
@@ -202,14 +202,14 @@ Buffer = (function ()
     {
         var r
 
-        return (function () { var _88__66_ = []; var list = _k_.list(this.rangesForWordsAtCursors(cs,opt)); for (var _88_66_ = 0; _88_66_ < list.length; _88_66_++)  { r = list[_88_66_];_88__66_.push(this.textInRange(r))  } return _88__66_ }).bind(this)()
+        return (function () { var r_88_66_ = []; var list = _k_.list(this.rangesForWordsAtCursors(cs,opt)); for (var _88_66_ = 0; _88_66_ < list.length; _88_66_++)  { r = list[_88_66_];r_88_66_.push(this.textInRange(r))  } return r_88_66_ }).bind(this)()
     }
 
     Buffer.prototype["rangesForWordsAtCursors"] = function (cs = this.cursors(), opt)
     {
         var c, rngs
 
-        rngs = (function () { var _91__49_ = []; var list = _k_.list(cs); for (var _91_49_ = 0; _91_49_ < list.length; _91_49_++)  { c = list[_91_49_];_91__49_.push(this.rangeForWordAtPos(c,opt))  } return _91__49_ }).bind(this)()
+        rngs = (function () { var r_91_49_ = []; var list = _k_.list(cs); for (var _91_49_ = 0; _91_49_ < list.length; _91_49_++)  { c = list[_91_49_];r_91_49_.push(this.rangeForWordAtPos(c,opt))  } return r_91_49_ }).bind(this)()
         return rngs = cleanRanges(rngs)
     }
 
@@ -329,7 +329,7 @@ Buffer = (function ()
         hl = this.highlightsInLineIndexRange(lineIndexRange)
         if (hl)
         {
-            return (function () { var _166__61_ = []; var list = _k_.list(hl); for (var _166_61_ = 0; _166_61_ < list.length; _166_61_++)  { s = list[_166_61_];_166__61_.push([s[0] - relIndex,[s[1][0],s[1][1]],s[2]])  } return _166__61_ }).bind(this)()
+            return (function () { var r_166_61_ = []; var list = _k_.list(hl); for (var _166_61_ = 0; _166_61_ < list.length; _166_61_++)  { s = list[_166_61_];r_166_61_.push([s[0] - relIndex,[s[1][0],s[1][1]],s[2]])  } return r_166_61_ }).bind(this)()
         }
     }
 
@@ -348,7 +348,7 @@ Buffer = (function ()
         sl = this.selectionsInLineIndexRange(lineIndexRange)
         if (sl)
         {
-            return (function () { var _182__55_ = []; var list = _k_.list(sl); for (var _182_55_ = 0; _182_55_ < list.length; _182_55_++)  { s = list[_182_55_];_182__55_.push([s[0] - relIndex,[s[1][0],s[1][1]]])  } return _182__55_ }).bind(this)()
+            return (function () { var r_182_55_ = []; var list = _k_.list(sl); for (var _182_55_ = 0; _182_55_ < list.length; _182_55_++)  { s = list[_182_55_];r_182_55_.push([s[0] - relIndex,[s[1][0],s[1][1]]])  } return r_182_55_ }).bind(this)()
         }
     }
 
@@ -364,14 +364,14 @@ Buffer = (function ()
     {
         var s
 
-        return _.uniq((function () { var _188__47_ = []; var list = _k_.list(this.selections()); for (var _188_47_ = 0; _188_47_ < list.length; _188_47_++)  { s = list[_188_47_];_188__47_.push(s[0])  } return _188__47_ }).bind(this)())
+        return _.uniq((function () { var r_188_47_ = []; var list = _k_.list(this.selections()); for (var _188_47_ = 0; _188_47_ < list.length; _188_47_++)  { s = list[_188_47_];r_188_47_.push(s[0])  } return r_188_47_ }).bind(this)())
     }
 
     Buffer.prototype["cursorLineIndices"] = function ()
     {
         var c
 
-        return _.uniq((function () { var _189__47_ = []; var list = _k_.list(this.cursors()); for (var _189_47_ = 0; _189_47_ < list.length; _189_47_++)  { c = list[_189_47_];_189__47_.push(c[1])  } return _189__47_ }).bind(this)())
+        return _.uniq((function () { var r_189_47_ = []; var list = _k_.list(this.cursors()); for (var _189_47_ = 0; _189_47_ < list.length; _189_47_++)  { c = list[_189_47_];r_189_47_.push(c[1])  } return r_189_47_ }).bind(this)())
     }
 
     Buffer.prototype["selectedAndCursorLineIndices"] = function ()
@@ -436,7 +436,7 @@ Buffer = (function ()
     {
         var r
 
-        return (function () { var _224__51_ = []; var list = _k_.list(rgs); for (var _224_51_ = 0; _224_51_ < list.length; _224_51_++)  { r = list[_224_51_];_224__51_.push(this.textInRange(r))  } return _224__51_ }).bind(this)()
+        return (function () { var r_224_51_ = []; var list = _k_.list(rgs); for (var _224_51_ = 0; _224_51_ < list.length; _224_51_++)  { r = list[_224_51_];r_224_51_.push(this.textInRange(r))  } return r_224_51_ }).bind(this)()
     }
 
     Buffer.prototype["textInRanges"] = function (rgs)
@@ -594,7 +594,7 @@ Buffer = (function ()
     {
         var c
 
-        return (function () { var _330__78_ = []; var list = _k_.list(cs); for (var _330_78_ = 0; _330_78_ < list.length; _330_78_++)  { c = list[_330_78_];_330__78_.push(this.rangeForLineAtIndex(c[1]))  } return _330__78_ }).bind(this)()
+        return (function () { var r_330_78_ = []; var list = _k_.list(cs); for (var _330_78_ = 0; _330_78_ < list.length; _330_78_++)  { c = list[_330_78_];r_330_78_.push(this.rangeForLineAtIndex(c[1]))  } return r_330_78_ }).bind(this)()
     }
 
     Buffer.prototype["rangesForAllLines"] = function ()

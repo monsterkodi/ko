@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
@@ -274,7 +274,7 @@ keeps current main cursor position in cursors if shift is pressed.`,combos:['ctr
 
     if (e && this.numSelections() === 0)
     {
-        if (0 === _.max((function () { var _211__38_ = []; var list = _k_.list(this.cursors()); for (var _211_38_ = 0; _211_38_ < list.length; _211_38_++)  { c = list[_211_38_];_211__38_.push(c[0])  } return _211__38_ }).bind(this)()))
+        if (0 === _.max((function () { var r_211_38_ = []; var list = _k_.list(this.cursors()); for (var _211_38_ = 0; _211_38_ < list.length; _211_38_++)  { c = list[_211_38_];r_211_38_.push(c[0])  } return r_211_38_ }).bind(this)()))
         {
             this.do.start()
             this.do.select(this.rangesForCursorLines())

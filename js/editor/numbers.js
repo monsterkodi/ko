@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -160,9 +160,9 @@ class Numbers extends event
         {
             return
         }
-        si = (function () { var _162__25_ = []; var list = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.selections())); for (var _162_25_ = 0; _162_25_ < list.length; _162_25_++)  { s = list[_162_25_];_162__25_.push(s[0])  } return _162__25_ }).bind(this)()
-        hi = (function () { var _163__25_ = []; var list1 = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.highlights())); for (var _163_25_ = 0; _163_25_ < list1.length; _163_25_++)  { s = list1[_163_25_];_163__25_.push(s[0])  } return _163__25_ }).bind(this)()
-        ci = (function () { var _164__25_ = []; var list2 = _k_.list(rangesFromTopToBotInRanges(li,li,rangesFromPositions(this.editor.cursors()))); for (var _164_25_ = 0; _164_25_ < list2.length; _164_25_++)  { s = list2[_164_25_];_164__25_.push(s[0])  } return _164__25_ }).bind(this)()
+        si = (function () { var r_162_25_ = []; var list = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.selections())); for (var _162_25_ = 0; _162_25_ < list.length; _162_25_++)  { s = list[_162_25_];r_162_25_.push(s[0])  } return r_162_25_ }).bind(this)()
+        hi = (function () { var r_163_25_ = []; var list1 = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.highlights())); for (var _163_25_ = 0; _163_25_ < list1.length; _163_25_++)  { s = list1[_163_25_];r_163_25_.push(s[0])  } return r_163_25_ }).bind(this)()
+        ci = (function () { var r_164_25_ = []; var list2 = _k_.list(rangesFromTopToBotInRanges(li,li,rangesFromPositions(this.editor.cursors()))); for (var _164_25_ = 0; _164_25_ < list2.length; _164_25_++)  { s = list2[_164_25_];r_164_25_.push(s[0])  } return r_164_25_ }).bind(this)()
         cls = ''
         if (_k_.in(li,ci))
         {

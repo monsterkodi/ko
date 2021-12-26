@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}, first: function (o) {return o != null ? o.length ? o[0] : undefined : o}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}}
 
@@ -441,8 +441,8 @@ class Tabs
     {
         var files, pinned, t, _304_41_
 
-        files = (function () { var _297__32_ = []; var list = _k_.list(this.tabs); for (var _297_32_ = 0; _297_32_ < list.length; _297_32_++)  { t = list[_297_32_];_297__32_.push(t.file)  } return _297__32_ }).bind(this)()
-        pinned = (function () { var _298__34_ = []; var list1 = _k_.list(this.tabs); for (var _298_34_ = 0; _298_34_ < list1.length; _298_34_++)  { t = list1[_298_34_];_298__34_.push(t.pinned)  } return _298__34_ }).bind(this)()
+        files = (function () { var r_297_32_ = []; var list = _k_.list(this.tabs); for (var _297_32_ = 0; _297_32_ < list.length; _297_32_++)  { t = list[_297_32_];r_297_32_.push(t.file)  } return r_297_32_ }).bind(this)()
+        pinned = (function () { var r_298_34_ = []; var list1 = _k_.list(this.tabs); for (var _298_34_ = 0; _298_34_ < list1.length; _298_34_++)  { t = list1[_298_34_];r_298_34_.push(t.pinned)  } return r_298_34_ }).bind(this)()
         files = files.filter(function (file)
         {
             return !file.startsWith('untitled')

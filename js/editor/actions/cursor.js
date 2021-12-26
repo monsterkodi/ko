@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, first: function (o) {return o != null ? o.length ? o[0] : undefined : o}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}}
 
@@ -180,7 +180,7 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
     var i
 
     this.do.start()
-    this.do.setCursors((function () { var _186__36_ = []; for (var _186_40_ = i = 0, _186_44_ = this.numLines(); (_186_40_ <= _186_44_ ? i < this.numLines() : i > this.numLines()); (_186_40_ <= _186_44_ ? ++i : --i))  { _186__36_.push([0,i])  } return _186__36_ }).bind(this)(),{main:'closest'})
+    this.do.setCursors((function () { var r_186_36_ = []; for (var _186_40_ = i = 0, _186_44_ = this.numLines(); (_186_40_ <= _186_44_ ? i < this.numLines() : i > this.numLines()); (_186_40_ <= _186_44_ ? ++i : --i))  { r_186_36_.push([0,i])  } return r_186_36_ }).bind(this)(),{main:'closest'})
     return this.do.end()
 },cursorColumns:function (num, step = 1)
 {
@@ -188,7 +188,7 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
 
     cp = this.cursorPos()
     this.do.start()
-    this.do.setCursors((function () { var _192__51_ = []; for (var _192_55_ = i = 0, _192_59_ = num; (_192_55_ <= _192_59_ ? i < num : i > num); (_192_55_ <= _192_59_ ? ++i : --i))  { _192__51_.push([cp[0] + i * step,cp[1]])  } return _192__51_ }).bind(this)(),{main:'closest'})
+    this.do.setCursors((function () { var r_192_51_ = []; for (var _192_55_ = i = 0, _192_59_ = num; (_192_55_ <= _192_59_ ? i < num : i > num); (_192_55_ <= _192_59_ ? ++i : --i))  { r_192_51_.push([cp[0] + i * step,cp[1]])  } return r_192_51_ }).bind(this)(),{main:'closest'})
     return this.do.end()
 },cursorLines:function (num, step = 1)
 {
@@ -196,7 +196,7 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
 
     cp = this.cursorPos()
     this.do.start()
-    this.do.setCursors((function () { var _198__51_ = []; for (var _198_55_ = i = 0, _198_59_ = num; (_198_55_ <= _198_59_ ? i < num : i > num); (_198_55_ <= _198_59_ ? ++i : --i))  { _198__51_.push([cp[0],cp[1] + i * step])  } return _198__51_ }).bind(this)(),{main:'closest'})
+    this.do.setCursors((function () { var r_198_51_ = []; for (var _198_55_ = i = 0, _198_59_ = num; (_198_55_ <= _198_59_ ? i < num : i > num); (_198_55_ <= _198_59_ ? ++i : --i))  { r_198_51_.push([cp[0],cp[1] + i * step])  } return r_198_51_ }).bind(this)(),{main:'closest'})
     return this.do.end()
 },alignCursorsAndText:function ()
 {
@@ -204,7 +204,7 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
 
     this.do.start()
     newCursors = this.do.cursors()
-    newX = _.max((function () { var _211__33_ = []; var list = _k_.list(newCursors); for (var _211_33_ = 0; _211_33_ < list.length; _211_33_++)  { c = list[_211_33_];_211__33_.push(c[0])  } return _211__33_ }).bind(this)())
+    newX = _.max((function () { var r_211_33_ = []; var list = _k_.list(newCursors); for (var _211_33_ = 0; _211_33_ < list.length; _211_33_++)  { c = list[_211_33_];r_211_33_.push(c[0])  } return r_211_33_ }).bind(this)())
     lines = {}
     var list1 = _k_.list(newCursors)
     for (var _213_15_ = 0; _213_15_ < list1.length; _213_15_++)
@@ -251,10 +251,10 @@ select brackets or quotes otherwise.`,combo:'command+alt+b',accel:'alt+ctrl+b'},
                 return _k_.last(newCursors)[0]
 
             case 'left':
-                return _.min((function () { var _233__48_ = []; var list = _k_.list(newCursors); for (var _233_48_ = 0; _233_48_ < list.length; _233_48_++)  { c = list[_233_48_];_233__48_.push(c[0])  } return _233__48_ }).bind(this)())
+                return _.min((function () { var r_233_48_ = []; var list = _k_.list(newCursors); for (var _233_48_ = 0; _233_48_ < list.length; _233_48_++)  { c = list[_233_48_];r_233_48_.push(c[0])  } return r_233_48_ }).bind(this)())
 
             case 'right':
-                return _.max((function () { var _234__48_ = []; var list1 = _k_.list(newCursors); for (var _234_48_ = 0; _234_48_ < list1.length; _234_48_++)  { c = list1[_234_48_];_234__48_.push(c[0])  } return _234__48_ }).bind(this)())
+                return _.max((function () { var r_234_48_ = []; var list1 = _k_.list(newCursors); for (var _234_48_ = 0; _234_48_ < list1.length; _234_48_++)  { c = list1[_234_48_];r_234_48_.push(c[0])  } return r_234_48_ }).bind(this)())
 
         }
 

@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.230.0
+// monsterkodi/kode 0.234.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -16,7 +16,7 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
     cp = this.cursorPos()
     if (!(opt != null ? opt.word : undefined) && (rgs = this.salterRangesAtPos(cp)))
     {
-        cols = this.columnsInSalt((function () { var _38__56_ = []; var list = _k_.list(rgs); for (var _38_56_ = 0; _38_56_ < list.length; _38_56_++)  { r = list[_38_56_];_38__56_.push(this.textInRange(r))  } return _38__56_ }).bind(this)())
+        cols = this.columnsInSalt((function () { var r_38_56_ = []; var list = _k_.list(rgs); for (var _38_56_ = 0; _38_56_ < list.length; _38_56_++)  { r = list[_38_56_];r_38_56_.push(this.textInRange(r))  } return r_38_56_ }).bind(this)())
         ci = 0
         while (ci < cols.length && cp[0] > cols[ci])
         {
@@ -24,7 +24,7 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
         }
         col = cols[ci]
         this.do.start()
-        newCursors = (function () { var _44__44_ = []; var list1 = _k_.list(rgs); for (var _44_44_ = 0; _44_44_ < list1.length; _44_44_++)  { r = list1[_44_44_];_44__44_.push([col,r[0]])  } return _44__44_ }).bind(this)()
+        newCursors = (function () { var r_44_44_ = []; var list1 = _k_.list(rgs); for (var _44_44_ = 0; _44_44_ < list1.length; _44_44_++)  { r = list1[_44_44_];r_44_44_.push([col,r[0]])  } return r_44_44_ }).bind(this)()
         this.do.setCursors(newCursors,{main:'last'})
         this.do.select([])
         this.do.end()
@@ -41,7 +41,7 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
             indt = this.indentStringForLineAtIndex(cp[1])
         }
         stxt = word.length && salt(word).split('\n') || ['','','','','']
-        stxt = (function () { var _58__58_ = []; var list2 = _k_.list(stxt); for (var _58_58_ = 0; _58_58_ < list2.length; _58_58_++)  { s = list2[_58_58_];_58__58_.push(`${indt}${this.lineComment} ${s}  `)  } return _58__58_ }).bind(this)()
+        stxt = (function () { var r_58_58_ = []; var list2 = _k_.list(stxt); for (var _58_58_ = 0; _58_58_ < list2.length; _58_58_++)  { s = list2[_58_58_];r_58_58_.push(`${indt}${this.lineComment} ${s}  `)  } return r_58_58_ }).bind(this)()
         this.do.start()
         newCursors = []
         li = cp[1]
@@ -88,7 +88,7 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
     }
     if (char.length === 5)
     {
-        salted = (function () { var _93__37_ = []; var list = _k_.list(char); for (var _93_37_ = 0; _93_37_ < list.length; _93_37_++)  { s = list[_93_37_];_93__37_.push(`${s}  `)  } return _93__37_ }).bind(this)().join('\n')
+        salted = (function () { var r_93_37_ = []; var list = _k_.list(char); for (var _93_37_ = 0; _93_37_ < list.length; _93_37_++)  { s = list[_93_37_];r_93_37_.push(`${s}  `)  } return r_93_37_ }).bind(this)().join('\n')
         this.pasteText(salted)
     }
     else
@@ -108,7 +108,7 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
     cp = this.do.mainCursor()
     if (rgs = this.salterRangesAtPos(cp))
     {
-        slt = (function () { var _113__43_ = []; var list = _k_.list(rgs); for (var _113_43_ = 0; _113_43_ < list.length; _113_43_++)  { r = list[_113_43_];_113__43_.push(this.do.textInRange(r))  } return _113__43_ }).bind(this)()
+        slt = (function () { var r_113_43_ = []; var list = _k_.list(rgs); for (var _113_43_ = 0; _113_43_ < list.length; _113_43_++)  { r = list[_113_43_];r_113_43_.push(this.do.textInRange(r))  } return r_113_43_ }).bind(this)()
         cols = this.columnsInSalt(slt)
         ci = cols.length - 1
         while (ci > 0 && cols[ci - 1] >= cp[0])
@@ -124,7 +124,7 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
                 r = list1[_120_22_]
                 this.do.change(r[0],this.do.line(r[0]).splice(cols[ci - 1],length))
             }
-            this.do.setCursors((function () { var _122__57_ = []; var list2 = _k_.list(rgs); for (var _122_57_ = 0; _122_57_ < list2.length; _122_57_++)  { r = list2[_122_57_];_122__57_.push([cols[ci - 1],r[0]])  } return _122__57_ }).bind(this)())
+            this.do.setCursors((function () { var r_122_57_ = []; var list2 = _k_.list(rgs); for (var _122_57_ = 0; _122_57_ < list2.length; _122_57_++)  { r = list2[_122_57_];r_122_57_.push([cols[ci - 1],r[0]])  } return r_122_57_ }).bind(this)())
         }
     }
     return this.do.end()
@@ -143,7 +143,7 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
             {
                 return
             }
-            cols = this.columnsInSalt((function () { var _141__64_ = []; var list = _k_.list(rgs); for (var _141_64_ = 0; _141_64_ < list.length; _141_64_++)  { r = list[_141_64_];_141__64_.push(this.do.textInRange(r))  } return _141__64_ }).bind(this)())
+            cols = this.columnsInSalt((function () { var r_141_64_ = []; var list = _k_.list(rgs); for (var _141_64_ = 0; _141_64_ < list.length; _141_64_++)  { r = list[_141_64_];r_141_64_.push(this.do.textInRange(r))  } return r_141_64_ }).bind(this)())
             if (cs[0][0] < cols[0])
             {
                 return
@@ -181,13 +181,13 @@ module.exports = {actions:{startSalter:{name:'ASCII Header Mode',text:`if cursor
 {
     var col, cols, i, max, min, s
 
-    min = _.min((function () { var _174__40_ = []; var list = _k_.list(slt); for (var _174_40_ = 0; _174_40_ < list.length; _174_40_++)  { s = list[_174_40_];_174__40_.push(s.search(/0/))  } return _174__40_ }).bind(this)())
+    min = _.min((function () { var r_174_40_ = []; var list = _k_.list(slt); for (var _174_40_ = 0; _174_40_ < list.length; _174_40_++)  { s = list[_174_40_];r_174_40_.push(s.search(/0/))  } return r_174_40_ }).bind(this)())
     if (min < 0)
     {
-        min = _.min((function () { var _176__47_ = []; var list1 = _k_.list(slt); for (var _176_47_ = 0; _176_47_ < list1.length; _176_47_++)  { s = list1[_176_47_];_176__47_.push(s.search(/#/) + 1)  } return _176__47_ }).bind(this)())
+        min = _.min((function () { var r_176_47_ = []; var list1 = _k_.list(slt); for (var _176_47_ = 0; _176_47_ < list1.length; _176_47_++)  { s = list1[_176_47_];r_176_47_.push(s.search(/#/) + 1)  } return r_176_47_ }).bind(this)())
         return [min]
     }
-    max = _.max((function () { var _178__36_ = []; var list2 = _k_.list(slt); for (var _178_36_ = 0; _178_36_ < list2.length; _178_36_++)  { s = list2[_178_36_];_178__36_.push(s.length)  } return _178__36_ }).bind(this)())
+    max = _.max((function () { var r_178_36_ = []; var list2 = _k_.list(slt); for (var _178_36_ = 0; _178_36_ < list2.length; _178_36_++)  { s = list2[_178_36_];r_178_36_.push(s.length)  } return r_178_36_ }).bind(this)())
     cols = [min,max]
     for (var _180_20_ = col = min, _180_25_ = max; (_180_20_ <= _180_25_ ? col <= max : col >= max); (_180_20_ <= _180_25_ ? ++col : --col))
     {
