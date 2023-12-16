@@ -6,8 +6,7 @@
 000   000  00000000   00000 00
 ###
 
-kxk = require 'kxk'
-{ _, kerror, klog, kstr, slash } = kxk
+{ _, kstr, slash } = require 'kxk'
 requireLike = require 'require-like'
 
 requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
@@ -43,7 +42,12 @@ moduleKeys = (moduleName, file) ->
         else if _.isObject required
             keys = Object.keys required
             
-    if moduleName.endsWith 'kxk' then keys.push 'app' # omg! what an ugly hack :-)
+    if moduleName.endsWith 'kxk' 
+        keys.push 'app' # omg! what an ugly hack :-)
+        if slash.ext(file) == 'kode'
+            for kw in [ 'valid' 'empty' 'clamp' ]
+                index = keys.indexOf kw
+                if index >= 0 ➜ keys.splice index, 1
     keys
     
 req = (file, lines, editor) ->
@@ -51,8 +55,7 @@ req = (file, lines, editor) ->
     requires  = {}
     exports   = {}
     reqValues = {}
-    # regexes   = '$': /[^*\)\'\"\\]?\$[\s\(]/
-    regexes   = '$': new RegExp """/[^*\\)\\'\\"\\\\]?\\$[\\s\\(]/"""
+    regexes   = '$': /\$[\s\(]/
     firstIndex = null
     
     keys = Math: [
@@ -90,7 +93,7 @@ req = (file, lines, editor) ->
                                 regexes[k] ?= new RegExp "(^|[\\:\\(\\{]|\\s+)#{k}(\\s+[^:]|\\s*$|[\\.\\,\\(])"
                             
                         catch err
-                            kerror "ko can't require #{m[2]} for #{file}: #{err} \nmodule.paths:" module.paths
+                            error "ko can't require #{m[2]} for #{file}: #{err} \nmodule.paths:" module.paths
                 
                 firstIndex ?= li
             continue
@@ -99,7 +102,7 @@ req = (file, lines, editor) ->
             name = lines[li].trim().split('=')[1]?.trim()
             if name and /\w+/.test name
                 exports[name.toLowerCase()] = true
-                         
+                    
         for mod,values of keys
 
             for k in values

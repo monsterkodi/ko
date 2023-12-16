@@ -6,8 +6,7 @@
  0000000   0000000   0000000   0000000   000   000  000   000
 ###
 
-kxk = require 'kxk'
-{ $, _, drag, elem, fs, kerror, keyinfo, klog, kpos, open, popup, post, prefs, setStyle, slash, stopEvent} = kxk
+{ $, _, drag, elem, fs, kerror, keyinfo, klog, kpos, open, popup, post, prefs, setStyle, slash, stopEvent } = require 'kxk'
 
 Row      = require './row'
 Crumb    = require './crumb'

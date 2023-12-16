@@ -1,15 +1,12 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
-var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
-var kerror, klog, kstr, kxk, mathRegExp, moduleKeys, req, requireLike, requireRegExp, slash, _
+var kstr, mathRegExp, moduleKeys, req, requireLike, requireRegExp, slash, _
 
-kxk = require('kxk')
-_ = kxk._
-kerror = kxk.kerror
-klog = kxk.klog
-kstr = kxk.kstr
-slash = kxk.slash
+_ = require('kxk')._
+kstr = require('kxk').kstr
+slash = require('kxk').slash
 
 requireLike = require('require-like')
 requireRegExp = /^(\s*\{.+\})\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
@@ -17,7 +14,7 @@ mathRegExp = /^(\s*\{.+\})\s*=\s*(Math)\s*$/
 
 moduleKeys = function (moduleName, file)
 {
-    var keys, required
+    var index, keys, kw, required
 
     try
     {
@@ -59,21 +56,34 @@ moduleKeys = function (moduleName, file)
     if (moduleName.endsWith('kxk'))
     {
         keys.push('app')
+        if (slash.ext(file) === 'kode')
+        {
+            var list = ['valid','empty','clamp']
+            for (var _48_19_ = 0; _48_19_ < list.length; _48_19_++)
+            {
+                kw = list[_48_19_]
+                index = keys.indexOf(kw)
+                if (index >= 0)
+                {
+                    keys.splice(index,1)
+                }
+            }
+        }
     }
     return keys
 }
 
 req = function (file, lines, editor)
 {
-    var ci, diss, exports, firstIndex, indent, k, keys, li, m, mod, moduleName, name, newKeys, operations, regexes, requires, reqValues, text, values, _107_31_, _112_27_, _90_43_
+    var ci, diss, exports, firstIndex, indent, k, keys, li, m, mod, moduleName, name, newKeys, operations, regexes, requires, reqValues, text, values, _110_31_, _115_27_, _93_43_
 
     requires = {}
     exports = {}
     reqValues = {}
-    regexes = {'$':new RegExp(`/[^*\\)\\'\\"\\\\]?\\$[\\s\\(]/`)}
+    regexes = {'$':/\$[\s\(]/}
     firstIndex = null
     keys = {Math:['E','LN2','LN10','LOG2E','LOG10E','PI','SQRT1_2','SQRT2','abs','acos','acosh','asin','asinh','atan','atanh','atan2','cbrt','ceil','clz32','cos','cosh','exp','expm1','floor','fround','hypot','imul','log1p','log10','log2','max','min','pow','random','round','sign','sin','sinh','sqrt','tan','tanh','trunc']}
-    for (var _66_15_ = li = 0, _66_19_ = lines.length; (_66_15_ <= _66_19_ ? li < lines.length : li > lines.length); (_66_15_ <= _66_19_ ? ++li : --li))
+    for (var _69_15_ = li = 0, _69_19_ = lines.length; (_69_15_ <= _69_19_ ? li < lines.length : li > lines.length); (_69_15_ <= _69_19_ ? ++li : --li))
     {
         m = lines[li].match(requireRegExp)
         if (!((m != null ? m[1] : undefined) != null))
@@ -102,15 +112,15 @@ req = function (file, lines, editor)
                             newKeys = moduleKeys(moduleName,file)
                             keys[m[2]] = newKeys
                             var list = _k_.list(newKeys)
-                            for (var _89_34_ = 0; _89_34_ < list.length; _89_34_++)
+                            for (var _92_34_ = 0; _92_34_ < list.length; _92_34_++)
                             {
-                                k = list[_89_34_]
-                                regexes[k] = ((_90_43_=regexes[k]) != null ? _90_43_ : new RegExp(`(^|[\\:\\(\\{]|\\s+)${k}(\\s+[^:]|\\s*$|[\\.\\,\\(])`))
+                                k = list[_92_34_]
+                                regexes[k] = ((_93_43_=regexes[k]) != null ? _93_43_ : new RegExp(`(^|[\\:\\(\\{]|\\s+)${k}(\\s+[^:]|\\s*$|[\\.\\,\\(])`))
                             }
                         }
                         catch (err)
                         {
-                            kerror(`ko can't require ${m[2]} for ${file}: ${err} \nmodule.paths:`,module.paths)
+                            console.error(`ko can't require ${m[2]} for ${file}: ${err} \nmodule.paths:`,module.paths)
                         }
                     }
                 }
@@ -130,15 +140,15 @@ req = function (file, lines, editor)
         {
             values = keys[mod]
             var list1 = _k_.list(values)
-            for (var _105_18_ = 0; _105_18_ < list1.length; _105_18_++)
+            for (var _108_18_ = 0; _108_18_ < list1.length; _108_18_++)
             {
-                k = list1[_105_18_]
-                reqValues[mod] = ((_107_31_=reqValues[mod]) != null ? _107_31_ : [])
+                k = list1[_108_18_]
+                reqValues[mod] = ((_110_31_=reqValues[mod]) != null ? _110_31_ : [])
                 if (_k_.in(k,reqValues[mod]))
                 {
                     continue
                 }
-                regexes[k] = ((_112_27_=regexes[k]) != null ? _112_27_ : new RegExp(`(^|[\\,\\:\\(\\[\\{]|\\s+)${k}(\\s+[^:]|\\s*$|[\\.\\,\\(])`))
+                regexes[k] = ((_115_27_=regexes[k]) != null ? _115_27_ : new RegExp(`(^|[\\,\\:\\(\\[\\{]|\\s+)${k}(\\s+[^:]|\\s*$|[\\.\\,\\(])`))
                 if (regexes[k].test(lines[li]))
                 {
                     diss = editor.syntax.getDiss(li)
