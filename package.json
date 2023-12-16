@@ -1,6 +1,6 @@
 {
   "name": "ko",
-  "version": "0.346.0",
+  "version": "0.347.0",
   "description": "text editor",
   "keywords": [
     "editor",
@@ -24,26 +24,26 @@
     }
   },
   "dependencies": {
-    "noon": "monsterkodi/noon",
-    "kslash": "monsterkodi/kslash",
-    "klor": "monsterkodi/klor",
-    "kxk": "monsterkodi/kxk",
-    "wxw": "^1.89.0",
     "fuzzy": "^0.1.3",
-    "ignore": "^5.1.9",
-    "js-beautify": "^1.14.0",
-    "moment": "^2.29.1",
+    "ignore": "^5.3.0",
+    "js-beautify": "^1.14.11",
+    "klor": "github:monsterkodi/klor",
+    "kslash": "github:monsterkodi/kslash",
+    "kxk": "github:monsterkodi/kxk",
+    "moment": "^2.29.4",
+    "noon": "github:monsterkodi/noon",
     "pretty-bytes": "^5.6.0",
     "require-like": "^0.1.2",
     "seamless-immutable": "^7.1.4",
-    "trash": "^8.0.0",
-    "unused-filename": "^4.0.0",
-    "walkdir": "^0.4.1"
+    "trash": "^8.1.1",
+    "unused-filename": "^4.0.1",
+    "walkdir": "^0.4.1",
+    "wxw": "^1.89.0"
   },
   "devDependencies": {
-    "konrad": "monsterkodi/konrad",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
+    "konrad": "github:monsterkodi/konrad",
     "sds": "^4.4.0"
   }
 }
