@@ -1,39 +1,40 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
-var matchr
+var matchr, Pigments
 
 matchr = require('kxk').matchr
 
-class Pigments
+
+Pigments = (function ()
 {
-    constructor (editor)
+    function Pigments (editor)
     {
         var hexa, rgb, rgba, trio
 
         this.editor = editor
     
-        this.onFile = this.onFile.bind(this)
-        this.onLineChanged = this.onLineChanged.bind(this)
-        this.onLineInserted = this.onLineInserted.bind(this)
-        this.test = /#[a-fA-F0-9]{3}|rgba?/
+        this["onFile"] = this["onFile"].bind(this)
+        this["onLineChanged"] = this["onLineChanged"].bind(this)
+        this["onLineInserted"] = this["onLineInserted"].bind(this)
+        this.test = /(#|0x)[a-fA-F0-9]{3}|rgba?/
         trio = /#[a-fA-F0-9]{3}(?![\w\d])/
-        hexa = /#[a-fA-F0-9]{6}(?![\w\d])/
+        hexa = /#[a-fA-F0-9]{6}|0x[a-fA-F0-9]{6}(?![\w\d])/
         rgb = /rgb\s*\(\s*\d+\s*\,\s*\d+\s*\,\s*\d+\s*\)/
         rgba = /rgba\s*\(\s*\d+\s*\,\s*\d+\s*\,\s*\d+\s*\,\s*\d+\.?\d*\s*\)/
         this.regexps = [[trio,'trio'],[hexa,'hexa'],[rgb,'rgb'],[rgba,'rgbaa']]
         this.editor.on('file',this.onFile)
     }
 
-    del ()
+    Pigments.prototype["del"] = function ()
     {
         return this.editor.removeListener('file',this.onFile)
     }
 
-    onLineInserted (li)
+    Pigments.prototype["onLineInserted"] = function (li)
     {
-        var line, ri, rng, rngs
+        var color, line, ri, rng, rngs
 
         line = this.editor.line(li)
         if (this.test.test(line))
@@ -45,12 +46,13 @@ class Pigments
             {
                 rng = list[_38_20_]
                 ri++
-                this.editor.meta.add({line:li,start:line.length + 2 + ri * 3,end:line.length + 2 + ri * 3 + 2,clss:'pigment',style:{backgroundColor:rng.match}})
+                color = (rng.match.startsWith('0x') ? "#" + rng.match.slice(2) : rng.match)
+                this.editor.meta.add({line:li,start:line.length + 2 + ri * 3,end:line.length + 2 + ri * 3 + 2,clss:'pigment',style:{backgroundColor:color}})
             }
         }
     }
 
-    onLineChanged (li)
+    Pigments.prototype["onLineChanged"] = function (li)
     {
         var m, metas
 
@@ -61,16 +63,16 @@ class Pigments
         if (metas.length)
         {
             var list = _k_.list(metas)
-            for (var _58_18_ = 0; _58_18_ < list.length; _58_18_++)
+            for (var _59_18_ = 0; _59_18_ < list.length; _59_18_++)
             {
-                m = list[_58_18_]
+                m = list[_59_18_]
                 this.editor.meta.delMeta(m)
             }
         }
         return this.onLineInserted(li)
     }
 
-    onFile (file)
+    Pigments.prototype["onFile"] = function (file)
     {
         if (window.state.get(`pigments|${file}`))
         {
@@ -78,44 +80,46 @@ class Pigments
         }
     }
 
-    activate ()
+    Pigments.prototype["activate"] = function ()
     {
         window.state.set(`pigments|${this.editor.currentFile}`,true)
         return this.pigmentize()
     }
 
-    deactivate ()
+    Pigments.prototype["deactivate"] = function ()
     {
         window.state.set(`pigments|${this.editor.currentFile}`)
         return this.clear()
     }
 
-    clear ()
+    Pigments.prototype["clear"] = function ()
     {
         this.editor.removeListener('lineChanged',this.onLineChanged)
         this.editor.removeListener('lineInserted',this.onLineInserted)
         return this.editor.meta.delClass('pigment')
     }
 
-    pigmentize ()
+    Pigments.prototype["pigmentize"] = function ()
     {
         var li
 
         this.clear()
         this.editor.on('lineChanged',this.onLineChanged)
         this.editor.on('lineInserted',this.onLineInserted)
-        for (var _103_19_ = li = 0, _103_23_ = this.editor.numLines(); (_103_19_ <= _103_23_ ? li < this.editor.numLines() : li > this.editor.numLines()); (_103_19_ <= _103_23_ ? ++li : --li))
+        for (var _104_19_ = li = 0, _104_23_ = this.editor.numLines(); (_104_19_ <= _104_23_ ? li < this.editor.numLines() : li > this.editor.numLines()); (_104_19_ <= _104_23_ ? ++li : --li))
         {
             this.onLineInserted(li)
         }
     }
-}
+
+    return Pigments
+})()
 
 module.exports = {actions:{togglePigments:{name:'Toggle Pigments',text:'toggle pigments for current file',combo:'command+alt+shift+p',accel:'alt+ctrl+shift+p'}},initPigments:function ()
 {
-    var _116_31_
+    var _117_31_
 
-    return this.pigments = ((_116_31_=this.pigments) != null ? _116_31_ : new Pigments(this))
+    return this.pigments = ((_117_31_=this.pigments) != null ? _117_31_ : new Pigments(this))
 },togglePigments:function ()
 {
     if (window.state.get(`pigments|${this.currentFile}`))

@@ -7,13 +7,13 @@
 
 { matchr } = require 'kxk'
 
-class Pigments
+function Pigments
 
     @: (@editor) ->
-
-        @test = /#[a-fA-F0-9]{3}|rgba?/
+        
+        @test = /(#|0x)[a-fA-F0-9]{3}|rgba?/
         trio  = /#[a-fA-F0-9]{3}(?![\w\d])/
-        hexa  = /#[a-fA-F0-9]{6}(?![\w\d])/
+        hexa  = /#[a-fA-F0-9]{6}|0x[a-fA-F0-9]{6}(?![\w\d])/
         rgb   = /rgb\s*\(\s*\d+\s*\,\s*\d+\s*\,\s*\d+\s*\)/
         rgba  = /rgba\s*\(\s*\d+\s*\,\s*\d+\s*\,\s*\d+\s*\,\s*\d+\.?\d*\s*\)/
 
@@ -37,13 +37,14 @@ class Pigments
             ri = -1
             for rng in rngs
                 ri++
+                color = rng.match.startsWith('0x') ? "#"+rng.match[2..] : rng.match
                 @editor.meta.add
                     line:  li
                     start: line.length + 2 + ri * 3
                     end:   line.length + 2 + ri * 3 + 2
                     clss:  'pigment'
                     style:
-                        backgroundColor: rng.match
+                        backgroundColor: color
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -83,8 +84,8 @@ class Pigments
 
     clear: ->
 
-        @editor.removeListener 'lineChanged',  @onLineChanged
-        @editor.removeListener 'lineInserted', @onLineInserted
+        @editor.removeListener 'lineChanged'  @onLineChanged
+        @editor.removeListener 'lineInserted' @onLineInserted
         @editor.meta.delClass 'pigment'
 
     # 00000000   000   0000000   00     00  00000000  000   000  000000000  000  0000000  00000000
@@ -97,8 +98,8 @@ class Pigments
 
         @clear()
 
-        @editor.on 'lineChanged',  @onLineChanged
-        @editor.on 'lineInserted', @onLineInserted
+        @editor.on 'lineChanged'  @onLineChanged
+        @editor.on 'lineInserted' @onLineInserted
 
         for li in [0...@editor.numLines()]
             @onLineInserted li
