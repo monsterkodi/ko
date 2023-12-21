@@ -1,12 +1,11 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
-var files, kxk, numFiles, post, slash
+var files, numFiles, post, slash
 
-kxk = require('kxk')
-post = kxk.post
-slash = kxk.slash
+post = require('kxk').post
+slash = require('kxk').slash
 
 files = {}
 numFiles = 0
@@ -21,6 +20,7 @@ class Projects
     {
         if (!_k_.empty(info.files))
         {
+            console.log('project indexed',info)
             files[info.dir] = info.files
             return numFiles += info.files.length
         }
@@ -34,20 +34,26 @@ class Projects
         {
             return []
         }
-        for (dir in files)
+        if ((files[file] != null))
         {
-            list = files[dir]
-            if (file.startsWith(dir))
-            {
-                return list
-            }
+            return files[file]
         }
         if (dir = slash.pkg(file))
         {
             if (info = post.get('indexer','project',dir))
             {
                 Projects.onIndexed(info)
+                console.log('got main index',info)
                 return files[info.dir]
+            }
+        }
+        for (dir in files)
+        {
+            list = files[dir]
+            if (file.startsWith(dir))
+            {
+                console.log('fallback index',file,dir,list)
+                return list
             }
         }
         console.log(`no project files for file ${file}`,Object.keys(files))

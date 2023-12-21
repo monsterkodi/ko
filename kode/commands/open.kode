@@ -6,8 +6,7 @@
  0000000   000        00000000  000   000
 ###
 
-kxk = require 'kxk'
-{ _, post, slash } = kxk
+{ _, post, slash } = require 'kxk'
   
 Projects  = require '../tools/projects'
 File      = require '../tools/file'
@@ -115,7 +114,7 @@ function Open extends Command
 
     weight: (item, opt) =>            
                 
-        return item.bonus if item.bonus?
+        # return item.bonus if item.bonus?
         
         f = item.file
         r = item.text
@@ -152,7 +151,8 @@ function Open extends Command
             
     weightedItems: (items, opt) -> 
         
-        items.sort (a,b) => @weight(b, opt) - @weight(a, opt)
+        # items.sort (a,b) => @weight(b, opt) - @weight(a, opt)
+        items.sort (a,b) => b.weight - a.weight
         items
     
     # 000      000   0000000  000000000
@@ -185,11 +185,13 @@ function Open extends Command
             item.text = relative f, @dir
             item.line = iconSpan f
             item.file = f
-            item.bonus = 1048575
+            item.weight = @weight item, opt
+            # item.bonus = 1048575
             items.push item
             @lastFileIndex = 0
                 
         if valid @files
+
             for file in @files
                 
                 rel = relative file, @dir
@@ -199,6 +201,7 @@ function Open extends Command
                     item.line = iconSpan file
                     item.text = rel
                     item.file = file
+                    item.weight = @weight item, opt
                     items.push item
 
         items = @weightedItems items, opt
@@ -216,14 +219,14 @@ function Open extends Command
 
         if @history.length > 1 and @selected <= 0
             items = []
-            bonus = 1048575
+            # bonus = 1048575
             for f in @history
                 item = Object.create null
                 item.text = relative f, @dir
                 item.file = f
-                item.bonus = bonus
+                # item.bonus = bonus
                 items.push item
-                bonus -= 1 
+                # bonus -= 1 
             items.pop()
             @showItems items
             @select items.length-1

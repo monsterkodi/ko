@@ -1,18 +1,17 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, isFunc: function (o) {return typeof o === 'function'}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }}
 
-var addToShelf, changeFontSize, changeZoom, clearStash, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, kxk, mainmenu, Navigate, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window
+var addToShelf, changeFontSize, changeZoom, clearStash, commandline, Commandline, CWD, editor, Editor, electron, FileEditor, filehandler, FileHandler, filewatcher, FileWatcher, FPS, info, Info, klog, mainmenu, Navigate, onCombo, pkg, post, prefs, projects, reloadWin, resetFontSize, resetZoom, restoreWin, saveStash, scheme, setFontSize, split, Split, stash, stopEvent, store, tabs, Tabs, terminal, Terminal, titlebar, Titlebar, toggleCenterText, toggleTabPinned, win, Window
 
-kxk = require('kxk')
-klog = kxk.klog
-post = kxk.post
-prefs = kxk.prefs
-scheme = kxk.scheme
-stash = kxk.stash
-stopEvent = kxk.stopEvent
-store = kxk.store
-win = kxk.win
+klog = require('kxk').klog
+post = require('kxk').post
+prefs = require('kxk').prefs
+scheme = require('kxk').scheme
+stash = require('kxk').stash
+stopEvent = require('kxk').stopEvent
+store = require('kxk').store
+win = require('kxk').win
 
 Split = require('./split')
 Terminal = require('./terminal')
@@ -112,7 +111,7 @@ Window = (function ()
 
     Window.prototype["onMenuAction"] = function (name, opts)
     {
-        var action, _112_25_
+        var action, _111_25_
 
         if (action = Editor.actionWithName(name))
         {
@@ -377,7 +376,7 @@ window.onresize = function ()
 }
 post.on('split',function (s)
 {
-    var _279_22_
+    var _278_22_
 
     ;(window.filebrowser != null ? window.filebrowser.resized() : undefined)
     terminal.resized()
@@ -422,7 +421,7 @@ toggleTabPinned = function ()
 
 setFontSize = function (s)
 {
-    var _324_25_
+    var _323_25_
 
     if (!(_k_.isNum(s)))
     {

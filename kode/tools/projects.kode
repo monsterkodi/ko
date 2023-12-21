@@ -6,8 +6,7 @@
 000        000   000   0000000    0000000   00000000   0000000     000     0000000   
 ###
 
-kxk = require 'kxk'
-{ post, slash } = kxk
+{ post, slash } = require 'kxk'
 
 files    = {}
 numFiles = 0
@@ -21,6 +20,7 @@ class Projects
     @onIndexed: (info) ->
         
         if valid info.files
+            log 'project indexed' info
             files[info.dir] = info.files
             numFiles += info.files.length
         
@@ -29,14 +29,21 @@ class Projects
         if not file
             return []
         
-        for dir,list of files
-            if file.startsWith(dir)
-                return list
+        if files[file]?
+            # log 'local index' file, dir, list
+            return files[file]
             
         if dir = slash.pkg file
+            # log 'request main index' file, dir
             if info = post.get 'indexer' 'project' dir
                 Projects.onIndexed info
+                log 'got main index' info
                 return files[info.dir]
+                
+        for dir,list of files
+            if file.startsWith(dir)
+                log 'fallback index' file, dir, list
+                return list
                 
         log "no project files for file #{file}" Object.keys files
         []

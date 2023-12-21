@@ -329,6 +329,8 @@ class Indexer
     # 000  000   000  0000000    00000000  000   000        000       000  0000000  00000000
 
     indexFile: (file, opt) ->
+        
+        # log 'index ' file
                 
         @removeFile file if opt?.refresh
 
@@ -480,10 +482,15 @@ class Indexer
                                     r.push [m[1], m[2]]
                                     fileInfo.require = r
                                     abspath = slash.resolve slash.join slash.dir(file), m[2]
-                                    abspath += '.coffee' # fixme for kode!
-                                    if (m[2][0] == '.') and (not @files[abspath]?) and (@queue.indexOf(abspath) < 0)
-                                        if slash.isFile abspath
-                                            @queue.push abspath
+                                    if slash.ext(abspath) not in ['json']
+                                        for ext in ['kode''coffee']
+                                            required = "#{abspath}.#{ext}"
+                                            # log '???' required
+                                            if (m[2][0] == '.') and (not @files[required]?) and (@queue.indexOf(required) < 0)
+                                                # log required
+                                                if slash.isFile required
+                                                    log '!!!!' required
+                                                    @queue.push required
                                             
             if funcAdded
 
