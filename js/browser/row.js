@@ -1,17 +1,16 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
 
-var $, electron, elem, File, keyinfo, kxk, post, Row, slash, stopEvent, Syntax, _
+var $, electron, elem, File, keyinfo, post, Row, slash, stopEvent, Syntax, _
 
-kxk = require('kxk')
-$ = kxk.$
-_ = kxk._
-elem = kxk.elem
-keyinfo = kxk.keyinfo
-post = kxk.post
-slash = kxk.slash
-stopEvent = kxk.stopEvent
+$ = require('kxk').$
+_ = require('kxk')._
+elem = require('kxk').elem
+keyinfo = require('kxk').keyinfo
+post = require('kxk').post
+slash = require('kxk').slash
+stopEvent = require('kxk').stopEvent
 
 Syntax = require('../editor/syntax')
 electron = require('electron')
@@ -21,7 +20,7 @@ Row = (function ()
 {
     function Row (column, item)
     {
-        var html, text, _21_26_
+        var html, text, _20_26_
 
         this.column = column
         this.item = item
@@ -35,7 +34,7 @@ Row = (function ()
         this["onMouseOver"] = this["onMouseOver"].bind(this)
         this["onMouseOut"] = this["onMouseOut"].bind(this)
         this.browser = this.column.browser
-        text = ((_21_26_=this.item.text) != null ? _21_26_ : this.item.name)
+        text = ((_20_26_=this.item.text) != null ? _20_26_ : this.item.name)
         if (_k_.empty((text)) || _k_.empty(text.trim()))
         {
             html = '<span> </span>'
@@ -70,21 +69,21 @@ Row = (function ()
 
     Row.prototype["onMouseOut"] = function ()
     {
-        var _36_24_
+        var _35_24_
 
         return (this.div != null ? this.div.classList.remove('hover') : undefined)
     }
 
     Row.prototype["onMouseOver"] = function ()
     {
-        var _37_24_
+        var _36_24_
 
         return (this.div != null ? this.div.classList.add('hover') : undefined)
     }
 
     Row.prototype["path"] = function ()
     {
-        var _40_21_, _42_20_, _42_26_
+        var _39_21_, _41_20_, _41_26_
 
         if ((this.item.file != null) && _k_.isStr(this.item.file))
         {
@@ -98,7 +97,7 @@ Row = (function ()
 
     Row.prototype["setIcon"] = function ()
     {
-        var className, icon, _71_23_
+        var className, icon, _70_23_
 
         if (slash.ext(this.item.file) === 'kode')
         {
@@ -132,7 +131,7 @@ Row = (function ()
 
     Row.prototype["activate"] = function (event, emit = true)
     {
-        var col, opt, _85_19_
+        var col, opt, _84_19_
 
         if (this.column.index < 0)
         {
@@ -170,7 +169,7 @@ Row = (function ()
 
     Row.prototype["setActive"] = function (opt = {})
     {
-        var _115_31_
+        var _114_31_
 
         if (this.column.activeRow() !== this)
         {
@@ -221,7 +220,7 @@ Row = (function ()
 
     Row.prototype["editName"] = function ()
     {
-        var _158_24_
+        var _157_24_
 
         if ((this.input != null))
         {
@@ -274,7 +273,7 @@ Row = (function ()
 
     Row.prototype["removeInput"] = function ()
     {
-        var _191_28_, _198_37_
+        var _190_28_, _197_37_
 
         if (!(this.input != null))
         {

@@ -1,18 +1,17 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var Browser, childp, Column, elem, event, flex, fs, kerror, kpos, kxk, os, setStyle, slash
+var Browser, childp, Column, elem, event, flex, fs, kerror, kpos, os, setStyle, slash
 
-kxk = require('kxk')
-childp = kxk.childp
-elem = kxk.elem
-fs = kxk.fs
-kerror = kxk.kerror
-kpos = kxk.kpos
-os = kxk.os
-setStyle = kxk.setStyle
-slash = kxk.slash
+childp = require('kxk').childp
+elem = require('kxk').elem
+fs = require('kxk').fs
+kerror = require('kxk').kerror
+kpos = require('kxk').kpos
+os = require('kxk').os
+setStyle = require('kxk').setStyle
+slash = require('kxk').slash
 
 Column = require('./column')
 flex = require('../win/flex/flex')
@@ -35,7 +34,7 @@ Browser = (function ()
 
     Browser.prototype["initColumns"] = function ()
     {
-        var _32_23_, _36_16_
+        var _31_23_, _35_16_
 
         if ((this.cols != null) && this.cols.parentNode === this.view)
         {
@@ -58,9 +57,9 @@ Browser = (function ()
         var column
 
         var list = _k_.list(this.columns)
-        for (var _51_19_ = 0; _51_19_ < list.length; _51_19_++)
+        for (var _50_19_ = 0; _50_19_ < list.length; _50_19_++)
         {
-            column = list[_51_19_]
+            column = list[_50_19_]
             if (elem.containsPos(column.div,pos))
             {
                 return column
@@ -74,9 +73,9 @@ Browser = (function ()
         var column, cpos, pos
 
         var list = _k_.list(this.columns)
-        for (var _58_19_ = 0; _58_19_ < list.length; _58_19_++)
+        for (var _57_19_ = 0; _57_19_ < list.length; _57_19_++)
         {
-            column = list[_58_19_]
+            column = list[_57_19_]
             cpos = kpos(column.div.getBoundingClientRect().left,column.div.getBoundingClientRect().top)
             pos = kpos(x,cpos.y)
             if (elem.containsPos(column.div,pos))
@@ -100,7 +99,7 @@ Browser = (function ()
 
     Browser.prototype["navigate"] = function (key)
     {
-        var col, index, nuidx, row, _101_39_, _101_52_, _92_34_, _92_42_
+        var col, index, nuidx, row, _100_39_, _100_52_, _91_34_, _91_42_
 
         this.select.clear()
         if (key === 'up')
@@ -129,7 +128,7 @@ Browser = (function ()
         }
         else
         {
-            index = ((_92_42_=(this.focusColumn() != null ? this.focusColumn().index : undefined)) != null ? _92_42_ : 0)
+            index = ((_91_42_=(this.focusColumn() != null ? this.focusColumn().index : undefined)) != null ? _91_42_ : 0)
             nuidx = index + ((function ()
             {
                 switch (key)
@@ -153,7 +152,7 @@ Browser = (function ()
             }
             if (this.columns[nuidx].numRows())
             {
-                ;((_101_39_=this.columns[nuidx].focus()) != null ? (_101_52_=_101_39_.activeRow()) != null ? _101_52_.activate() : undefined : undefined)
+                ;((_100_39_=this.columns[nuidx].focus()) != null ? (_100_52_=_100_39_.activeRow()) != null ? _100_52_.activate() : undefined : undefined)
             }
         }
         this.updateColumnScrolls()
@@ -162,7 +161,7 @@ Browser = (function ()
 
     Browser.prototype["focus"] = function (opt)
     {
-        var _113_29_
+        var _112_29_
 
         ;(this.lastDirOrSrcColumn() != null ? this.lastDirOrSrcColumn().focus(opt) : undefined)
         return this
@@ -173,9 +172,9 @@ Browser = (function ()
         var c
 
         var list = _k_.list(this.columns)
-        for (var _117_14_ = 0; _117_14_ < list.length; _117_14_++)
+        for (var _116_14_ = 0; _116_14_ < list.length; _116_14_++)
         {
-            c = list[_117_14_]
+            c = list[_116_14_]
             if (c.hasFocus())
             {
                 return c
@@ -189,15 +188,15 @@ Browser = (function ()
 
         if ((colIndex != null))
         {
-            for (var _129_22_ = c = colIndex, _129_33_ = this.numCols(); (_129_22_ <= _129_33_ ? c < this.numCols() : c > this.numCols()); (_129_22_ <= _129_33_ ? ++c : --c))
+            for (var _128_22_ = c = colIndex, _128_33_ = this.numCols(); (_128_22_ <= _128_33_ ? c < this.numCols() : c > this.numCols()); (_128_22_ <= _128_33_ ? ++c : --c))
             {
                 this.clearColumn(c)
             }
         }
         var list = _k_.list(this.columns)
-        for (var _132_16_ = 0; _132_16_ < list.length; _132_16_++)
+        for (var _131_16_ = 0; _131_16_ < list.length; _131_16_++)
         {
-            col = list[_132_16_]
+            col = list[_131_16_]
             if (col.isEmpty())
             {
                 return col
@@ -216,9 +215,9 @@ Browser = (function ()
         var col
 
         var list = _k_.list(this.columns)
-        for (var _146_16_ = 0; _146_16_ < list.length; _146_16_++)
+        for (var _145_16_ = 0; _145_16_ < list.length; _145_16_++)
         {
-            col = list[_146_16_]
+            col = list[_145_16_]
             if (col.hasFocus())
             {
                 return col.index
@@ -233,9 +232,9 @@ Browser = (function ()
 
         used = null
         var list = _k_.list(this.columns)
-        for (var _153_16_ = 0; _153_16_ < list.length; _153_16_++)
+        for (var _152_16_ = 0; _152_16_ < list.length; _152_16_++)
         {
-            col = list[_153_16_]
+            col = list[_152_16_]
             if (!col.isEmpty())
             {
                 used = col
@@ -255,7 +254,7 @@ Browser = (function ()
 
     Browser.prototype["height"] = function ()
     {
-        var _161_20_
+        var _160_20_
 
         return (this.flex != null ? this.flex.height() : undefined)
     }
@@ -310,7 +309,7 @@ Browser = (function ()
         this.clearColumn(0)
         this.flex.shiftPane()
         this.columns.shift()
-        for (var _196_18_ = i = 0, _196_22_ = this.columns.length; (_196_18_ <= _196_22_ ? i < this.columns.length : i > this.columns.length); (_196_18_ <= _196_22_ ? ++i : --i))
+        for (var _195_18_ = i = 0, _195_22_ = this.columns.length; (_195_18_ <= _195_22_ ? i < this.columns.length : i > this.columns.length); (_195_18_ <= _195_22_ ? ++i : --i))
         {
             this.columns[i].setIndex(i)
         }
@@ -329,16 +328,16 @@ Browser = (function ()
 
     Browser.prototype["popEmptyColumns"] = function (opt)
     {
-        var _208_42_, _208_50_
+        var _207_42_, _207_50_
 
-        return this.clearColumnsFrom(((_208_50_=(this.lastDirColumn() != null ? this.lastDirColumn().index : undefined)) != null ? _208_50_ : 0),{pop:true})
+        return this.clearColumnsFrom(((_207_50_=(this.lastDirColumn() != null ? this.lastDirColumn().index : undefined)) != null ? _207_50_ : 0),{pop:true})
     }
 
     Browser.prototype["shiftColumnsTo"] = function (col)
     {
         var i
 
-        for (var _212_18_ = i = 0, _212_22_ = col; (_212_18_ <= _212_22_ ? i < col : i > col); (_212_18_ <= _212_22_ ? ++i : --i))
+        for (var _211_18_ = i = 0, _211_22_ = col; (_211_18_ <= _211_22_ ? i < col : i > col); (_211_18_ <= _211_22_ ? ++i : --i))
         {
             this.shiftColumn()
         }
@@ -352,7 +351,7 @@ Browser = (function ()
 
     Browser.prototype["clearColumnsFrom"] = function (c = 0, opt = {pop:false})
     {
-        var num, _231_24_
+        var num, _230_24_
 
         if (!(c != null) || c < 0)
         {
@@ -392,7 +391,7 @@ Browser = (function ()
 
     Browser.prototype["cleanUp"] = function ()
     {
-        var _252_33_
+        var _251_33_
 
         if (!(this.flex != null))
         {
@@ -417,9 +416,9 @@ Browser = (function ()
         var c
 
         var list = _k_.list(this.columns)
-        for (var _264_14_ = 0; _264_14_ < list.length; _264_14_++)
+        for (var _263_14_ = 0; _263_14_ < list.length; _263_14_++)
         {
-            c = list[_264_14_]
+            c = list[_263_14_]
             c.scroll.update()
         }
     }

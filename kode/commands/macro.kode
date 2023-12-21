@@ -6,8 +6,7 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-kxk = require 'kxk'
-{ _, fs, kerror, post, prefs, reversed, slash } = kxk
+{ _, fs, kerror, post, prefs, reversed, slash } = require 'kxk'
 
 indexer   = require '../main/indexer'
 salt      = require '../tools/salt'

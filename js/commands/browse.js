@@ -1,14 +1,13 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var $, Browse, Command, FileBrowser, kerror, kxk, post, slash
+var $, Browse, Command, FileBrowser, kerror, post, slash
 
-kxk = require('kxk')
-$ = kxk.$
-kerror = kxk.kerror
-post = kxk.post
-slash = kxk.slash
+$ = require('kxk').$
+kerror = require('kxk').kerror
+post = require('kxk').post
+slash = require('kxk').slash
 
 Command = require('../commandline/command')
 FileBrowser = require('../browser/filebrowser')
@@ -52,7 +51,7 @@ Browse = (function ()
 
     Browse.prototype["start"] = function (action)
     {
-        var name, _55_40_
+        var name, _54_40_
 
         this.browser.start()
         if (action !== 'shelf')
@@ -163,7 +162,7 @@ Browse = (function ()
         var i, prefix
 
         prefix = ''
-        for (var _140_18_ = i = 0, _140_22_ = Math.min(strA.length,strB.length); (_140_18_ <= _140_22_ ? i < Math.min(strA.length,strB.length) : i > Math.min(strA.length,strB.length)); (_140_18_ <= _140_22_ ? ++i : --i))
+        for (var _139_18_ = i = 0, _139_22_ = Math.min(strA.length,strB.length); (_139_18_ <= _139_22_ ? i < Math.min(strA.length,strB.length) : i > Math.min(strA.length,strB.length)); (_139_18_ <= _139_22_ ? ++i : --i))
         {
             if (strA[i] !== strB[i])
             {
@@ -181,9 +180,9 @@ Browse = (function ()
         brokenPath = slash.resolve(this.getText())
         longestMatch = ''
         var list = _k_.list(files)
-        for (var _149_17_ = 0; _149_17_ < list.length; _149_17_++)
+        for (var _148_17_ = 0; _148_17_ < list.length; _148_17_++)
         {
-            file = list[_149_17_]
+            file = list[_148_17_]
             file = file.file
             prefix = this.commonPrefix(file,brokenPath)
             if (prefix.length > longestMatch.length)
@@ -256,7 +255,7 @@ Browse = (function ()
 
     Browse.prototype["changed"] = function (command)
     {
-        var text, _209_19_
+        var text, _208_19_
 
         text = this.getText().trim()
         if (!text.endsWith('/'))
@@ -272,7 +271,7 @@ Browse = (function ()
 
     Browse.prototype["handleModKeyComboEvent"] = function (mod, key, combo, event)
     {
-        var focusBrowser, _224_74_
+        var focusBrowser, _223_74_
 
         switch (combo)
         {
@@ -316,7 +315,7 @@ Browse = (function ()
 
     Browse.prototype["select"] = function (i)
     {
-        var l, s, text, _259_42_, _265_20_, _266_20_
+        var l, s, text, _258_42_, _264_20_, _265_20_
 
         this.selected = _k_.clamp(-1,(this.commandList != null ? this.commandList.numLines() : undefined) - 1,i)
         if (this.selected < 0)
@@ -335,7 +334,7 @@ Browse = (function ()
 
     Browse.prototype["selectListItem"] = function (dir)
     {
-        var _276_34_
+        var _275_34_
 
         if (!(this.commandList != null))
         {
@@ -390,11 +389,11 @@ Browse = (function ()
 
     Browse.prototype["onBrowserItemActivated"] = function (item)
     {
-        var pth, _323_32_, _323_56_, _330_64_, _330_72_, _332_61_, _332_69_
+        var pth, _322_32_, _322_56_, _329_64_, _329_72_, _331_61_, _331_69_
 
         if (!this.isActive())
         {
-            ;((_323_32_=this.commandline.command) != null ? typeof (_323_56_=_323_32_.onBrowserItemActivated) === "function" ? _323_56_(item) : undefined : undefined)
+            ;((_322_32_=this.commandline.command) != null ? typeof (_322_56_=_322_32_.onBrowserItemActivated) === "function" ? _322_56_(item) : undefined : undefined)
             return
         }
         if (item.file)
@@ -403,9 +402,9 @@ Browse = (function ()
             if (item.type === 'dir')
             {
                 pth += '/'
-                if (item.name === '..' && ((_330_64_=this.browser.activeColumn()) != null ? (_330_72_=_330_64_.parent) != null ? _330_72_.file : undefined : undefined))
+                if (item.name === '..' && ((_329_64_=this.browser.activeColumn()) != null ? (_329_72_=_329_64_.parent) != null ? _329_72_.file : undefined : undefined))
                 {
-                    pth = slash.tilde(((_332_61_=this.browser.activeColumn()) != null ? (_332_69_=_332_61_.parent) != null ? _332_69_.file : undefined : undefined))
+                    pth = slash.tilde(((_331_61_=this.browser.activeColumn()) != null ? (_331_69_=_331_61_.parent) != null ? _331_69_.file : undefined : undefined))
                 }
             }
             return this.commandline.setText(pth)

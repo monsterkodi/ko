@@ -1,12 +1,11 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
-var diff, diffs, filter, info, kxk, post, root, roots, stati, status, watch, watchers
+var diff, diffs, filter, info, post, root, roots, stati, status, watch, watchers
 
-kxk = require('kxk')
-filter = kxk.filter
-post = kxk.post
+filter = require('kxk').filter
+post = require('kxk').post
 
 watch = require('./watch')
 status = require('./status')
@@ -40,7 +39,7 @@ class Hub
         delete stati[gitDir]
         diffs = filter(diffs,function (v, k)
         {
-            var _47_28_
+            var _46_28_
 
             return !(typeof k.startsWith === "function" ? k.startsWith(gitDir) : undefined)
         })
@@ -116,15 +115,15 @@ class Hub
 
         files = {}
         var list = ['changed','added','dirs']
-        for (var _99_16_ = 0; _99_16_ < list.length; _99_16_++)
+        for (var _98_16_ = 0; _98_16_ < list.length; _98_16_++)
         {
-            key = list[_99_16_]
+            key = list[_98_16_]
             if (!_k_.empty(status[key]))
             {
                 var list1 = _k_.list(status[key])
-                for (var _101_25_ = 0; _101_25_ < list1.length; _101_25_++)
+                for (var _100_25_ = 0; _100_25_ < list1.length; _100_25_++)
                 {
-                    file = list1[_101_25_]
+                    file = list1[_100_25_]
                     files[file] = key
                 }
             }

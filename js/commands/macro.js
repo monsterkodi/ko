@@ -1,17 +1,16 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
-var Command, fs, GitInfo, indexer, kerror, kxk, Macro, post, prefs, req, reversed, salt, slash, syntax, Transform, _
+var Command, fs, GitInfo, indexer, kerror, Macro, post, prefs, req, reversed, salt, slash, syntax, Transform, _
 
-kxk = require('kxk')
-_ = kxk._
-fs = kxk.fs
-kerror = kxk.kerror
-post = kxk.post
-prefs = kxk.prefs
-reversed = kxk.reversed
-slash = kxk.slash
+_ = require('kxk')._
+fs = require('kxk').fs
+kerror = require('kxk').kerror
+post = require('kxk').post
+prefs = require('kxk').prefs
+reversed = require('kxk').reversed
+slash = require('kxk').slash
 
 indexer = require('../main/indexer')
 salt = require('../tools/salt')
@@ -53,12 +52,12 @@ Macro = (function ()
         var i, items
 
         items = _.uniq(_.concat(reversed(this.history),this.macros))
-        return (function () { var r_56_74_ = []; var list = _k_.list(items); for (var _56_74_ = 0; _56_74_ < list.length; _56_74_++)  { i = list[_56_74_];r_56_74_.push({text:i,line:_k_.in(i,this.macros) && '◼' || '◆',type:'macro'})  } return r_56_74_ }).bind(this)()
+        return (function () { var r_55_74_ = []; var list = _k_.list(items); for (var _55_74_ = 0; _55_74_ < list.length; _55_74_++)  { i = list[_55_74_];r_55_74_.push({text:i,line:_k_.in(i,this.macros) && '◼' || '◆',type:'macro'})  } return r_55_74_ }).bind(this)()
     }
 
     Macro.prototype["execute"] = function (command)
     {
-        var cleaned, clss, cmds, cmmd, cp, dir, editor, file, indent, insert, l, li, line, lines, lst, num, s, step, t, terminal, text, ti, words, wordsInArgsOrCursorsOrSelection, _121_35_, _122_35_, _208_40_
+        var cleaned, clss, cmds, cmmd, cp, dir, editor, file, indent, insert, l, li, line, lines, lst, num, s, step, t, terminal, text, ti, words, wordsInArgsOrCursorsOrSelection, _120_35_, _121_35_, _207_40_
 
         if (_k_.empty(command))
         {
@@ -125,9 +124,9 @@ Macro = (function ()
                 text = fs.readFileSync(`${__dirname}/../../bin/cheet.noon`,{encoding:'utf8'})
                 terminal.clear()
                 var list = _k_.list(text.split('\n'))
-                for (var _139_22_ = 0; _139_22_ < list.length; _139_22_++)
+                for (var _138_22_ = 0; _138_22_ < list.length; _138_22_++)
                 {
-                    l = list[_139_22_]
+                    l = list[_138_22_]
                     terminal.appendLineDiss(l,syntax.dissForTextAndSyntax(l,'noon'))
                 }
                 terminal.scroll.cursorToTop(1)
@@ -143,9 +142,9 @@ Macro = (function ()
                 {
                     editor.do.start()
                     var list1 = _k_.list(lines)
-                    for (var _158_29_ = 0; _158_29_ < list1.length; _158_29_++)
+                    for (var _157_29_ = 0; _157_29_ < list1.length; _157_29_++)
                     {
-                        line = list1[_158_29_]
+                        line = list1[_157_29_]
                         if (line.op === 'insert')
                         {
                             editor.do.insert(line.index,line.text)
@@ -174,7 +173,7 @@ Macro = (function ()
                     cmds.shift()
                 }
                 words = wordsInArgsOrCursorsOrSelection(cmds,{include:"#@.-"})
-                for (var _183_27_ = ti = 0, _183_31_ = words.length - lst; (_183_27_ <= _183_31_ ? ti < words.length - lst : ti > words.length - lst); (_183_27_ <= _183_31_ ? ++ti : --ti))
+                for (var _182_27_ = ti = 0, _182_31_ = words.length - lst; (_182_27_ <= _182_31_ ? ti < words.length - lst : ti > words.length - lst); (_182_27_ <= _182_31_ ? ++ti : --ti))
                 {
                     t = words[ti]
                     insert += `${t}:\#{kstr ${t}} `
@@ -183,7 +182,7 @@ Macro = (function ()
                 insert += '"'
                 if (lst)
                 {
-                    insert += (function () { var r_189_61_ = []; for (var _189_65_ = ti = words.length - lst, _189_86_ = words.length; (_189_65_ <= _189_86_ ? ti < words.length : ti > words.length); (_189_65_ <= _189_86_ ? ++ti : --ti))  { r_189_61_.push(`, kstr(${words[ti]})`)  } return r_189_61_ }).bind(this)().join('')
+                    insert += (function () { var r_188_61_ = []; for (var _188_65_ = ti = words.length - lst, _188_86_ = words.length; (_188_65_ <= _188_86_ ? ti < words.length : ti > words.length); (_188_65_ <= _188_86_ ? ++ti : --ti))  { r_188_61_.push(`, kstr(${words[ti]})`)  } return r_188_61_ }).bind(this)().join('')
                 }
                 editor.do.start()
                 editor.do.insert(li,insert)
@@ -201,7 +200,7 @@ Macro = (function ()
                     return {text:`file ${file} exists!`}
                 }
                 text = "###\n"
-                text += (function () { var r_213_33_ = []; var list2 = _k_.list(salt(clss).split('\n')); for (var _213_33_ = 0; _213_33_ < list2.length; _213_33_++)  { s = list2[_213_33_];r_213_33_.push(s)  } return r_213_33_ }).bind(this)().join('\n')
+                text += (function () { var r_212_33_ = []; var list2 = _k_.list(salt(clss).split('\n')); for (var _212_33_ = 0; _212_33_ < list2.length; _212_33_++)  { s = list2[_212_33_];r_212_33_.push(s)  } return r_212_33_ }).bind(this)().join('\n')
                 text += "\n###\n"
                 text += `
 function ${clss}
@@ -224,7 +223,7 @@ module.exports = ${clss}
 
             case 'clean':
                 editor.do.start()
-                for (var _241_27_ = li = 0, _241_31_ = editor.numLines(); (_241_27_ <= _241_31_ ? li < editor.numLines() : li > editor.numLines()); (_241_27_ <= _241_31_ ? ++li : --li))
+                for (var _240_27_ = li = 0, _240_31_ = editor.numLines(); (_240_27_ <= _240_31_ ? li < editor.numLines() : li > editor.numLines()); (_240_27_ <= _240_31_ ? ++li : --li))
                 {
                     line = editor.line(li)
                     cleaned = line.trimRight()

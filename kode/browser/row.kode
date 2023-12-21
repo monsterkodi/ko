@@ -6,8 +6,7 @@
 000   000   0000000   00     00
 ###
 
-kxk = require 'kxk'
-{ $, _, elem, keyinfo, post, slash, stopEvent } = kxk
+{ $, _, elem, keyinfo, post, slash, stopEvent } = require 'kxk'
 
 Syntax    = require '../editor/syntax'
 electron  = require 'electron'

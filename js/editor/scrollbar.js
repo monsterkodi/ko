@@ -1,13 +1,12 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var drag, elem, kxk, scheme
+var drag, elem, scheme
 
-kxk = require('kxk')
-drag = kxk.drag
-elem = kxk.elem
-scheme = kxk.scheme
+drag = require('kxk').drag
+elem = require('kxk').elem
+scheme = require('kxk').scheme
 
 scheme = require('../tools/scheme')
 class Scrollbar

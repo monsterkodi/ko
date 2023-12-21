@@ -6,8 +6,7 @@
    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 ###
 
-kxk = require 'kxk'
-{ $, _, drag, elem, kerror, keyinfo, klog, os, post, prefs, stopEvent } = kxk
+{ $, _, drag, elem, kerror, keyinfo, klog, os, post, prefs, stopEvent } = require 'kxk'
   
 render       = require './render'
 EditorScroll = require './editorscroll'

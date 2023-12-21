@@ -6,8 +6,7 @@
 000  000   000  0000000    00000000  000   000        000   000  000        000
 ###
 
-kxk = require 'kxk'
-{ last } = kxk
+{ last } = require 'kxk'
 
 class IndexHpp
 

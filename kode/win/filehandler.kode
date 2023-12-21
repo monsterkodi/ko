@@ -6,8 +6,7 @@
 000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
 ###
 
-kxk = require 'kxk'
-{ _, filelist, first, kerror, klog, post, prefs, reversed, slash } = kxk
+{ _, filelist, first, kerror, klog, post, prefs, reversed, slash } = require 'kxk'
 
 File     = require '../tools/file'
 electron = require 'electron'

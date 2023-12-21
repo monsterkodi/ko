@@ -6,8 +6,7 @@
 000   000  000  000   000  000  000   000  000   000  000
 ###
 
-kxk = require 'kxk'
-{ drag, elem, getStyle } = kxk
+{ drag, elem, getStyle } = require 'kxk'
 
 MapScroll = require './mapscroll'
 

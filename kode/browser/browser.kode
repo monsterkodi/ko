@@ -6,8 +6,7 @@
 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
 ###
 
-kxk = require 'kxk'
-{ childp, elem, fs, kerror, kpos, os, setStyle, slash } = kxk
+{ childp, elem, fs, kerror, kpos, os, setStyle, slash } = require 'kxk'
 
 Column = require './column'
 flex   = require '../win/flex/flex'

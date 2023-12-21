@@ -6,13 +6,12 @@
 000   000  000   000      0      000   0000000   000   000     000     00000000
 ###
 
-kxk = require 'kxk'
-{ _, filter, post, prefs, slash } = kxk
+{ _, filter, post, prefs, slash } = require 'kxk'
 
 class Navigate
 
     @: (@main) ->
-
+        
         return if not @main? # not very obvious: this is instantiated in main and window processes
 
         post.onGet 'navigate' @onGet

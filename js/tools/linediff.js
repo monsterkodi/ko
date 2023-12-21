@@ -1,11 +1,10 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
-var kxk, lineDiff
+var lineDiff
 
-kxk = require('kxk')
-last = kxk.last
+last = require('kxk').last
 
 
 lineDiff = function (oldLine, newLine)
@@ -87,9 +86,9 @@ lineDiff.isBoring = function (oldLine, newLine)
     inserts = ''
     deletes = ''
     var list = _k_.list(changes)
-    for (var _84_10_ = 0; _84_10_ < list.length; _84_10_++)
+    for (var _83_10_ = 0; _83_10_ < list.length; _83_10_++)
     {
-        c = list[_84_10_]
+        c = list[_83_10_]
         switch (c.change)
         {
             case 'change':

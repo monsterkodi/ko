@@ -6,8 +6,7 @@
 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
 ###
 
-kxk = require 'kxk'
-{ drag, elem, scheme } = kxk
+{ drag, elem, scheme } = require 'kxk'
 
 scheme = require '../tools/scheme'
 

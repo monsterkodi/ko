@@ -6,8 +6,7 @@
 0000000    000  000       000
 ###
 
-kxk = require 'kxk'
-{ _, childp, kstr, slash } = kxk
+{ _, childp, kstr, slash } = require 'kxk'
 
 gitCmd = (file) -> "git --no-pager diff -U0 \"#{slash.file file}\""
 gitOpt = (cwd)  -> cwd:cwd, encoding:'utf8' stdio:['pipe' 'pipe' 'ignore']

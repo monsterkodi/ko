@@ -6,8 +6,7 @@
 0000000  000  000   000  00000000  0000000    000  000       000       
 ###
 
-kxk = require 'kxk'
-{ last } = kxk
+{ last } = require 'kxk'
 
 lineDiff = (oldLine, newLine) ->
     

@@ -6,8 +6,7 @@
 0000000     0000000
 ###
 
-kxk = require 'kxk'
-{ _, kerror, last, post } = kxk
+{ _, kerror, last, post } = require 'kxk'
 
 State = require './state'
 require '../tools/ranges'

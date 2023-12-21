@@ -1,13 +1,12 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
 
-var drag, Handle, kxk, Pane, _
+var drag, Handle, Pane, _
 
-kxk = require('kxk')
-_ = kxk._
-drag = kxk.drag
-last = kxk.last
+_ = require('kxk')._
+drag = require('kxk').drag
+last = require('kxk').last
 
 Pane = require('./pane')
 Handle = require('./handle')
@@ -15,10 +14,10 @@ class Flex
 {
     constructor (opt)
     {
-        var horz, p, _19_38_, _20_37_, _36_34_, _41_25_
+        var horz, p, _18_38_, _19_37_, _35_34_, _40_25_
 
-        this.handleSize = ((_19_38_=opt.handleSize) != null ? _19_38_ : 6)
-        this.direction = ((_20_37_=opt.direction) != null ? _20_37_ : 'horizontal')
+        this.handleSize = ((_18_38_=opt.handleSize) != null ? _18_38_ : 6)
+        this.direction = ((_19_37_=opt.direction) != null ? _19_37_ : 'horizontal')
         this.snapFirst = opt.snapFirst
         this.snapLast = opt.snapLast
         this.onPaneSize = opt.onPaneSize
@@ -33,18 +32,18 @@ class Flex
         this.handleClass = horz && 'split-handle split-handle-horizontal' || 'split-handle split-handle-vertical'
         this.paddingA = horz && 'paddingLeft' || 'paddingTop'
         this.paddingB = horz && 'paddingRight' || 'paddingBottom'
-        this.cursor = ((_36_34_=opt.cursor) != null ? _36_34_ : horz && 'ew-resize' || 'ns-resize')
+        this.cursor = ((_35_34_=opt.cursor) != null ? _35_34_ : horz && 'ew-resize' || 'ns-resize')
         this.panes = []
         this.handles = []
-        this.view = ((_41_25_=opt.view) != null ? _41_25_ : opt.panes[0].div.parentNode)
+        this.view = ((_40_25_=opt.view) != null ? _40_25_ : opt.panes[0].div.parentNode)
         this.view.style.display = 'flex'
         this.view.style.flexDirection = horz && 'row' || 'column'
         if (!_k_.empty(opt.panes))
         {
             var list = _k_.list(opt.panes)
-            for (var _46_29_ = 0; _46_29_ < list.length; _46_29_++)
+            for (var _45_29_ = 0; _45_29_ < list.length; _45_29_++)
             {
-                p = list[_46_29_]
+                p = list[_45_29_]
                 this.addPane(p)
             }
         }
@@ -93,11 +92,11 @@ class Flex
             this.panes.shift().del()
             this.handles.shift().del()
         }
-        for (var _96_18_ = i = 0, _96_22_ = this.panes.length; (_96_18_ <= _96_22_ ? i < this.panes.length : i > this.panes.length); (_96_18_ <= _96_22_ ? ++i : --i))
+        for (var _95_18_ = i = 0, _95_22_ = this.panes.length; (_95_18_ <= _95_22_ ? i < this.panes.length : i > this.panes.length); (_95_18_ <= _95_22_ ? ++i : --i))
         {
             this.panes[i].index = i
         }
-        for (var _99_18_ = i = 0, _99_22_ = this.handles.length; (_99_18_ <= _99_22_ ? i < this.handles.length : i > this.handles.length); (_99_18_ <= _99_22_ ? ++i : --i))
+        for (var _98_18_ = i = 0, _98_22_ = this.handles.length; (_98_18_ <= _98_22_ ? i < this.handles.length : i > this.handles.length); (_98_18_ <= _98_22_ ? ++i : --i))
         {
             this.handles[i].index = i
         }
@@ -110,9 +109,9 @@ class Flex
 
         this.relaxed = true
         var list = _k_.list(this.visiblePanes())
-        for (var _113_14_ = 0; _113_14_ < list.length; _113_14_++)
+        for (var _112_14_ = 0; _112_14_ < list.length; _112_14_++)
         {
-            p = list[_113_14_]
+            p = list[_112_14_]
             if (p.div)
             {
                 p.div.style.flex = "1 1 0"
@@ -127,16 +126,16 @@ class Flex
 
         this.relaxed = false
         var list = _k_.list(this.visiblePanes())
-        for (var _120_14_ = 0; _120_14_ < list.length; _120_14_++)
+        for (var _119_14_ = 0; _119_14_ < list.length; _119_14_++)
         {
-            p = list[_120_14_]
+            p = list[_119_14_]
             p.size = p.actualSize()
         }
     }
 
     calculate ()
     {
-        var avail, diff, flexPanes, h, p, visPanes, _150_19_
+        var avail, diff, flexPanes, h, p, visPanes, _149_19_
 
         visPanes = this.panes.filter(function (p)
         {
@@ -148,9 +147,9 @@ class Flex
         })
         avail = this.size()
         var list = _k_.list(this.handles)
-        for (var _135_14_ = 0; _135_14_ < list.length; _135_14_++)
+        for (var _134_14_ = 0; _134_14_ < list.length; _134_14_++)
         {
-            h = list[_135_14_]
+            h = list[_134_14_]
             h.update()
             if (h.isVisible())
             {
@@ -158,22 +157,22 @@ class Flex
             }
         }
         var list1 = _k_.list(visPanes)
-        for (var _139_14_ = 0; _139_14_ < list1.length; _139_14_++)
+        for (var _138_14_ = 0; _138_14_ < list1.length; _138_14_++)
         {
-            p = list1[_139_14_]
+            p = list1[_138_14_]
             avail -= p.size
         }
         diff = avail / flexPanes.length
         var list2 = _k_.list(flexPanes)
-        for (var _144_14_ = 0; _144_14_ < list2.length; _144_14_++)
+        for (var _143_14_ = 0; _143_14_ < list2.length; _143_14_++)
         {
-            p = list2[_144_14_]
+            p = list2[_143_14_]
             p.size += diff
         }
         var list3 = _k_.list(visPanes)
-        for (var _147_14_ = 0; _147_14_ < list3.length; _147_14_++)
+        for (var _146_14_ = 0; _146_14_ < list3.length; _146_14_++)
         {
-            p = list3[_147_14_]
+            p = list3[_146_14_]
             p.setSize(p.size)
         }
         return (typeof this.onPaneSize === "function" ? this.onPaneSize() : undefined)
@@ -189,7 +188,7 @@ class Flex
 
     moveHandleToPos (handle, pos)
     {
-        var deduct, leftOver, next, nextHandle, nextSize, nextVisFlex, offset, prev, prevHandle, prevSize, prevVisFlex, _172_36_, _172_59_, _173_36_, _173_59_, _181_21_, _200_20_, _222_19_
+        var deduct, leftOver, next, nextHandle, nextSize, nextVisFlex, offset, prev, prevHandle, prevSize, prevVisFlex, _171_36_, _171_59_, _172_36_, _172_59_, _180_21_, _199_20_, _221_19_
 
         pos = parseInt(pos)
         if (this.relaxed)
@@ -201,8 +200,8 @@ class Flex
         {
             return
         }
-        prev = ((_172_36_=this.prevAllInv(handle)) != null ? _172_36_ : ((_172_59_=this.prevVisFlex(handle)) != null ? _172_59_ : this.prevFlex(handle)))
-        next = ((_173_36_=this.nextAllInv(handle)) != null ? _173_36_ : ((_173_59_=this.nextVisFlex(handle)) != null ? _173_59_ : this.nextFlex(handle)))
+        prev = ((_171_36_=this.prevAllInv(handle)) != null ? _171_36_ : ((_171_59_=this.prevVisFlex(handle)) != null ? _171_59_ : this.prevFlex(handle)))
+        next = ((_172_36_=this.nextAllInv(handle)) != null ? _172_36_ : ((_172_59_=this.nextVisFlex(handle)) != null ? _172_59_ : this.nextFlex(handle)))
         delete prev.collapsed
         delete next.collapsed
         prevSize = prev.size + offset
@@ -259,13 +258,13 @@ class Flex
 
     restoreState (state)
     {
-        var pane, s, si, _240_19_
+        var pane, s, si, _239_19_
 
         if (!(state != null ? state.length : undefined))
         {
             return
         }
-        for (var _232_19_ = si = 0, _232_23_ = state.length; (_232_19_ <= _232_23_ ? si < state.length : si > state.length); (_232_19_ <= _232_23_ ? ++si : --si))
+        for (var _231_19_ = si = 0, _231_23_ = state.length; (_231_19_ <= _231_23_ ? si < state.length : si > state.length); (_231_19_ <= _231_23_ ? ++si : --si))
         {
             s = state[si]
             pane = this.pane(si)
@@ -289,9 +288,9 @@ class Flex
 
         state = []
         var list = _k_.list(this.panes)
-        for (var _244_14_ = 0; _244_14_ < list.length; _244_14_++)
+        for (var _243_14_ = 0; _243_14_ < list.length; _243_14_++)
         {
-            p = list[_244_14_]
+            p = list[_243_14_]
             state.push({id:p.id,size:p.size,pos:p.pos()})
         }
         return state
@@ -312,9 +311,9 @@ class Flex
         var p
 
         var list = _k_.list(this.panes)
-        for (var _260_39_ = 0; _260_39_ < list.length; _260_39_++)
+        for (var _259_39_ = 0; _259_39_ < list.length; _259_39_++)
         {
-            p = list[_260_39_]
+            p = list[_259_39_]
             p.update()
         }
         return this
@@ -325,9 +324,9 @@ class Flex
         var h
 
         var list = _k_.list(this.handles)
-        for (var _261_39_ = 0; _261_39_ < list.length; _261_39_++)
+        for (var _260_39_ = 0; _260_39_ < list.length; _260_39_++)
         {
-            h = list[_261_39_]
+            h = list[_260_39_]
             h.update()
         }
         return this
@@ -335,14 +334,14 @@ class Flex
 
     handleStart (handle)
     {
-        var _265_41_
+        var _264_41_
 
         return (typeof this.onDragStart === "function" ? this.onDragStart() : undefined)
     }
 
     handleDrag (handle, drag)
     {
-        var _268_15_
+        var _267_15_
 
         this.moveHandleToPos(handle,drag.pos[this.axis] - this.pos() - 4)
         return (typeof this.onDrag === "function" ? this.onDrag() : undefined)
@@ -350,7 +349,7 @@ class Flex
 
     handleEnd ()
     {
-        var _271_18_
+        var _270_18_
 
         this.update()
         return (typeof this.onDragEnd === "function" ? this.onDragEnd() : undefined)
@@ -373,14 +372,14 @@ class Flex
     {
         var p
 
-        return (function () { var r_281_40_ = []; var list = _k_.list(this.panes); for (var _281_40_ = 0; _281_40_ < list.length; _281_40_++)  { p = list[_281_40_];r_281_40_.push(p.pos())  } return r_281_40_ }).bind(this)()
+        return (function () { var r_280_40_ = []; var list = _k_.list(this.panes); for (var _280_40_ = 0; _280_40_ < list.length; _280_40_++)  { p = list[_280_40_];r_280_40_.push(p.pos())  } return r_280_40_ }).bind(this)()
     }
 
     paneSizes ()
     {
         var p
 
-        return (function () { var r_282_39_ = []; var list = _k_.list(this.panes); for (var _282_39_ = 0; _282_39_ < list.length; _282_39_++)  { p = list[_282_39_];r_282_39_.push(p.size)  } return r_282_39_ }).bind(this)()
+        return (function () { var r_281_39_ = []; var list = _k_.list(this.panes); for (var _281_39_ = 0; _281_39_ < list.length; _281_39_++)  { p = list[_281_39_];r_281_39_.push(p.size)  } return r_281_39_ }).bind(this)()
     }
 
     sizeOfPane (i)
@@ -447,7 +446,7 @@ class Flex
 
     expand (i, factor = 0.5)
     {
-        var flex, pane, use, _314_37_
+        var flex, pane, use, _313_37_
 
         if (pane = this.pane(i))
         {
@@ -456,7 +455,7 @@ class Flex
                 pane.expand()
                 if (flex = this.closestVisFlex(pane))
                 {
-                    use = ((_314_37_=pane.fixed) != null ? _314_37_ : flex.size * factor)
+                    use = ((_313_37_=pane.fixed) != null ? _313_37_ : flex.size * factor)
                     flex.size -= use
                     pane.size = use
                 }

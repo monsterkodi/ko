@@ -1,11 +1,8 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-var kxk
-
-kxk = require('kxk')
-last = kxk.last
+last = require('kxk').last
 
 class IndexHpp
 {
@@ -21,7 +18,7 @@ class IndexHpp
 
     parseLine (lineIndex, lineText)
     {
-        var advance, ch, key, match, p, poppedRegion, region, rest, topRegion, topToken, _184_37_, _184_44_, _184_71_, _42_28_, _70_41_, _75_82_, _75_89_
+        var advance, ch, key, match, p, poppedRegion, region, rest, topRegion, topToken, _183_37_, _183_44_, _183_71_, _41_28_, _69_41_, _74_82_, _74_89_
 
         if (!_k_.empty(this.currentWord))
         {
@@ -192,7 +189,7 @@ class IndexHpp
                             this.result.funcs.push(topToken)
                         }
                     }
-                    if (((topToken != null ? (_184_37_=topToken.args) != null ? _184_37_.start : undefined : undefined) != null) && !(topToken.args.end != null) && key === 'bracketArgs' && this.regionStack.length === (topToken != null ? topToken.depth : undefined))
+                    if (((topToken != null ? (_183_37_=topToken.args) != null ? _183_37_.start : undefined : undefined) != null) && !(topToken.args.end != null) && key === 'bracketArgs' && this.regionStack.length === (topToken != null ? topToken.depth : undefined))
                     {
                         topToken.args.end = {line:lineIndex,col:p}
                     }

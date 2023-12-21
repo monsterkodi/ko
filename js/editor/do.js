@@ -1,14 +1,13 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var kerror, kxk, post, State, _
+var kerror, post, State, _
 
-kxk = require('kxk')
-_ = kxk._
-kerror = kxk.kerror
-last = kxk.last
-post = kxk.post
+_ = require('kxk')._
+kerror = require('kxk').kerror
+last = require('kxk').last
+post = require('kxk').post
 
 State = require('./state')
 require('../tools/ranges')
@@ -38,13 +37,13 @@ class Do
 
     foreignChanges (lineChanges)
     {
-        var change, _32_62_
+        var change, _31_62_
 
         this.start()
         var list = _k_.list(lineChanges)
-        for (var _31_19_ = 0; _31_19_ < list.length; _31_19_++)
+        for (var _30_19_ = 0; _30_19_ < list.length; _30_19_++)
         {
-            change = list[_31_19_]
+            change = list[_30_19_]
             if (change.change !== 'deleted' && !(change.after != null))
             {
                 kerror(`Do.foreignChanges -- no after? ${change}`)
@@ -141,7 +140,7 @@ class Do
 
     end (opt)
     {
-        var changes, _133_27_
+        var changes, _132_27_
 
         this.redos = []
         this.groupCount -= 1
@@ -157,7 +156,7 @@ class Do
 
     undo ()
     {
-        var changes, _153_27_
+        var changes, _152_27_
 
         if (this.history.length)
         {
@@ -176,7 +175,7 @@ class Do
 
     redo ()
     {
-        var changes, _175_27_
+        var changes, _174_27_
 
         if (this.redos.length)
         {
@@ -356,7 +355,7 @@ class Do
                 c = this.history[this.history.length - 3]
                 if ((a.numLines() === b.numLines() && b.numLines() === c.numLines()))
                 {
-                    for (var _337_31_ = li = 0, _337_35_ = a.numLines(); (_337_31_ <= _337_35_ ? li < a.numLines() : li > a.numLines()); (_337_31_ <= _337_35_ ? ++li : --li))
+                    for (var _336_31_ = li = 0, _336_35_ = a.numLines(); (_336_31_ <= _336_35_ ? li < a.numLines() : li > a.numLines()); (_336_31_ <= _336_35_ ? ++li : --li))
                     {
                         la = a.s.lines[li]
                         lb = b.s.lines[li]
@@ -385,16 +384,16 @@ class Do
         var c, ci, p
 
         var list = _k_.list(cs)
-        for (var _355_14_ = 0; _355_14_ < list.length; _355_14_++)
+        for (var _354_14_ = 0; _354_14_ < list.length; _354_14_++)
         {
-            p = list[_355_14_]
+            p = list[_354_14_]
             p[0] = Math.max(p[0],0)
             p[1] = _k_.clamp(0,this.state.numLines() - 1,p[1])
         }
         sortPositions(cs)
         if (cs.length > 1)
         {
-            for (var _362_23_ = ci = cs.length - 1, _362_37_ = 0; (_362_23_ <= _362_37_ ? ci < 0 : ci > 0); (_362_23_ <= _362_37_ ? ++ci : --ci))
+            for (var _361_23_ = ci = cs.length - 1, _361_37_ = 0; (_361_23_ <= _361_37_ ? ci < 0 : ci > 0); (_361_23_ <= _361_37_ ? ++ci : --ci))
             {
                 c = cs[ci]
                 p = cs[ci - 1]
@@ -474,7 +473,7 @@ class Do
 
     textInRange (r)
     {
-        var _391_41_
+        var _390_41_
 
         return (this.state.line(r[0]) != null ? this.state.line(r[0]).slice(r[1][0],r[1][1]) : undefined)
     }

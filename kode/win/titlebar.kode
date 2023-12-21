@@ -6,8 +6,7 @@
    000     000     000     0000000  00000000  0000000    000   000  000   000
 ###
 
-kxk = require 'kxk'
-{ $, elem, post, stopEvent } = kxk
+{ $, elem, post, stopEvent } = require 'kxk'
 
 class Titlebar
     

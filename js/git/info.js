@@ -1,12 +1,11 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
 var _k_ = {isFunc: function (o) {return typeof o === 'function'}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
-var diff, dir, info, kxk, slash, status, _
+var diff, dir, info, slash, status, _
 
-kxk = require('kxk')
-slash = kxk.slash
-_ = kxk._
+slash = require('kxk').slash
+_ = require('kxk')._
 
 status = require('./status')
 diff = require('./diff')
@@ -30,9 +29,9 @@ info = function (gitDir, cb)
                 numFiles = stts.changed.length
                 changed = []
                 var list = _k_.list(stts.changed)
-                for (var _25_25_ = 0; _25_25_ < list.length; _25_25_++)
+                for (var _24_25_ = 0; _24_25_ < list.length; _24_25_++)
                 {
-                    file = list[_25_25_]
+                    file = list[_24_25_]
                     pushFile = function (file)
                     {
                         return function (dsts)

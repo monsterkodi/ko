@@ -6,8 +6,7 @@
 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
 ###
 
-kxk = require 'kxk'
-{ $, _, elem, kerror, last, matchr, stopEvent } = kxk
+{ $, _, elem, kerror, last, matchr, stopEvent } = require 'kxk'
 
 Indexer = require '../main/indexer'
 event   = require 'events'

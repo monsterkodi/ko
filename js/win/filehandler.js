@@ -1,19 +1,18 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.245.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, valid: undefined, first: function (o) {return o != null ? o.length ? o[0] : undefined : o}}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, first: function (o) {return o != null ? o.length ? o[0] : undefined : o}}
 
-var electron, File, filelist, kerror, klog, kxk, post, prefs, reversed, slash, _
+var electron, File, filelist, kerror, klog, post, prefs, reversed, slash, _
 
-kxk = require('kxk')
-_ = kxk._
-filelist = kxk.filelist
-first = kxk.first
-kerror = kxk.kerror
-klog = kxk.klog
-post = kxk.post
-prefs = kxk.prefs
-reversed = kxk.reversed
-slash = kxk.slash
+_ = require('kxk')._
+filelist = require('kxk').filelist
+first = require('kxk').first
+kerror = require('kxk').kerror
+klog = require('kxk').klog
+post = require('kxk').post
+prefs = require('kxk').prefs
+reversed = require('kxk').reversed
+slash = require('kxk').slash
 
 File = require('../tools/file')
 electron = require('electron')
@@ -54,7 +53,7 @@ class FileHandler
         editor.saveScrollCursorsAndSelections()
         if ((file != null))
         {
-            var _43_28_ = slash.splitFilePos(file); file = _43_28_[0]; filePos = _43_28_[1]
+            var _42_28_ = slash.splitFilePos(file); file = _42_28_[0]; filePos = _42_28_[1]
 
             if (!file.startsWith('untitled'))
             {
@@ -144,9 +143,9 @@ class FileHandler
                 this.loadFile(file)
             }
             var list = _k_.list(files)
-            for (var _125_21_ = 0; _125_21_ < list.length; _125_21_++)
+            for (var _124_21_ = 0; _124_21_ < list.length; _124_21_++)
             {
-                file = list[_125_21_]
+                file = list[_124_21_]
                 if (options.newWindow)
                 {
                     post.toMain('newWindowWithFile',file)
@@ -195,7 +194,7 @@ class FileHandler
 
     reloadActiveTab ()
     {
-        var tab, _169_29_
+        var tab, _168_29_
 
         if (tab = tabs.activeTab())
         {
@@ -230,9 +229,9 @@ class FileHandler
         var tab
 
         var list = _k_.list(tabs.tabs)
-        for (var _194_16_ = 0; _194_16_ < list.length; _194_16_++)
+        for (var _193_16_ = 0; _193_16_ < list.length; _193_16_++)
         {
-            tab = list[_194_16_]
+            tab = list[_193_16_]
             if (tab.dirty)
             {
                 if (tab === tabs.activeTab())
@@ -311,7 +310,7 @@ class FileHandler
 
     saveChanges ()
     {
-        var _267_29_
+        var _266_29_
 
         if ((editor.currentFile != null) && editor.do.hasChanges() && slash.fileExists(editor.currentFile))
         {
@@ -327,7 +326,7 @@ class FileHandler
 
     openFile (opt)
     {
-        var cb, dir, _283_18_
+        var cb, dir, _282_18_
 
         cb = function (files)
         {
@@ -343,7 +342,7 @@ class FileHandler
 
     saveFileAs ()
     {
-        var cb, _303_18_
+        var cb, _302_18_
 
         cb = (function (file)
         {
