@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.256.0
 
-var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
 var childp, fs, icons, kerror, klog, kxk, slash
 
@@ -14,11 +14,11 @@ slash = kxk.slash
 icons = require('./icons.json')
 class File
 {
-    static sourceFileExtensions = ['kode','coffee','styl','swift','pug','md','noon','txt','json','sh','py','cpp','cc','c','cs','h','hpp','ts','js','frag','vert']
+    static sourceFileExtensions = ['kode','coffee','styl','swift','pug','md','noon','txt','json','sh','py','cpp','mm','cc','c','cs','h','hpp','ts','js','mjs','frag','vert']
 
     static isCode (file)
     {
-        return _k_.in(slash.ext(file),['coffee','kode','py','cpp','cc','c','cs','ts','js','h','hpp','frag','vert'])
+        return _k_.in(slash.ext(file),['coffee','kode','py','cpp','cc','mm','c','cs','ts','js','mjs','h','hpp','frag','vert'])
     }
 
     static isImage (file)
@@ -45,7 +45,7 @@ class File
             }
             return fs.move(from,to,{overwrite:true},function (err)
             {
-                var _36_39_
+                var _38_39_
 
                 if (err)
                 {
@@ -226,7 +226,7 @@ class File
         }
         spans = []
         split = slash.split(file)
-        for (var _138_18_ = i = 0, _138_22_ = split.length - 1; (_138_18_ <= _138_22_ ? i < split.length - 1 : i > split.length - 1); (_138_18_ <= _138_22_ ? ++i : --i))
+        for (var _140_18_ = i = 0, _140_22_ = split.length - 1; (_140_18_ <= _140_22_ ? i < split.length - 1 : i > split.length - 1); (_140_18_ <= _140_22_ ? ++i : --i))
         {
             s = split[i]
             spans.push(`<div class='inline path' id='${split.slice(0, typeof i === 'number' ? i+1 : Infinity).join('/')}'>${s}</div>`)

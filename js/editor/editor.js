@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.256.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isFunc: function (o) {return typeof o === 'function'}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isFunc: function (o) {return typeof o === 'function'}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
 var Buffer, Do, Editor, filelist, kerror, kxk, slash, Syntax, _
 
@@ -45,14 +45,14 @@ Editor = (function ()
 
     Editor["initActions"] = function ()
     {
-        var actionFile, actions, k, key, v, value, _59_50_
+        var actionFile, actions, k, key, v, value, _62_50_
 
         this.actions = []
         var list = _k_.list(filelist(slash.join(__dirname,'actions')))
-        for (var _50_23_ = 0; _50_23_ < list.length; _50_23_++)
+        for (var _53_23_ = 0; _53_23_ < list.length; _53_23_++)
         {
-            actionFile = list[_50_23_]
-            if (!(_k_.in(slash.ext(actionFile),['js','coffee','kode'])))
+            actionFile = list[_53_23_]
+            if (!(_k_.in(slash.ext(actionFile),['js','mjs','coffee','kode'])))
             {
                 continue
             }
@@ -88,9 +88,9 @@ Editor = (function ()
         var action
 
         var list = _k_.list(Editor.actions)
-        for (var _67_19_ = 0; _67_19_ < list.length; _67_19_++)
+        for (var _70_19_ = 0; _70_19_ < list.length; _70_19_++)
         {
-            action = list[_67_19_]
+            action = list[_70_19_]
             if (action.name === name)
             {
                 return action
@@ -101,9 +101,9 @@ Editor = (function ()
 
     Editor.prototype["shebangFileType"] = function ()
     {
-        var _78_31_, _78_44_
+        var _81_31_, _81_44_
 
-        return ((_78_44_=(this.config != null ? this.config.syntaxName : undefined)) != null ? _78_44_ : 'txt')
+        return ((_81_44_=(this.config != null ? this.config.syntaxName : undefined)) != null ? _81_44_ : 'txt')
     }
 
     Editor.prototype["setupFileType"] = function ()
@@ -155,9 +155,9 @@ Editor = (function ()
         }
         this.bracketCharacters.regexp = []
         var list = ['open','close']
-        for (var _120_16_ = 0; _120_16_ < list.length; _120_16_++)
+        for (var _123_16_ = 0; _123_16_ < list.length; _123_16_++)
         {
-            key = list[_120_16_]
+            key = list[_123_16_]
             cstr = _.keys(this.bracketCharacters[key]).join('')
             reg = new RegExp(`[${_.escapeRegExp(cstr)}]`)
             this.bracketCharacters.regexps.push([reg,key])
@@ -188,12 +188,14 @@ Editor = (function ()
 
                 case 'styl':
                 case 'cpp':
+                case 'mm':
                 case 'c':
                 case 'h':
                 case 'hpp':
                 case 'cxx':
                 case 'cs':
                 case 'js':
+                case 'mjs':
                 case 'scss':
                 case 'ts':
                 case 'swift':
@@ -220,12 +222,14 @@ Editor = (function ()
 
                 case 'styl':
                 case 'cpp':
+                case 'mm':
                 case 'c':
                 case 'h':
                 case 'hpp':
                 case 'cxx':
                 case 'cs':
                 case 'js':
+                case 'mjs':
                 case 'scss':
                 case 'ts':
                 case 'swift':
@@ -313,7 +317,7 @@ Editor = (function ()
 
     Editor.prototype["indentStringForLineAtIndex"] = function (li)
     {
-        var e, il, indentLength, line, thisIndent, _233_33_, _234_50_, _240_52_
+        var e, il, indentLength, line, thisIndent, _240_33_, _241_50_, _247_52_
 
         while (_k_.empty((this.line(li).trim())) && li > 0)
         {
@@ -330,9 +334,9 @@ Editor = (function ()
                 if ((this.indentNewLineMore.lineEndsWith != null ? this.indentNewLineMore.lineEndsWith.length : undefined))
                 {
                     var list = _k_.list(this.indentNewLineMore.lineEndsWith)
-                    for (var _235_26_ = 0; _235_26_ < list.length; _235_26_++)
+                    for (var _242_26_ = 0; _242_26_ < list.length; _242_26_++)
                     {
-                        e = list[_235_26_]
+                        e = list[_242_26_]
                         if (line.trim().endsWith(e))
                         {
                             il = thisIndent + indentLength

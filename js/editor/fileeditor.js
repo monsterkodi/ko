@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.256.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, valid: undefined, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
 var electron, FileEditor, fs, kerror, kpos, kxk, popup, post, setStyle, slash, srcmap, stopEvent, Syntax, TextEditor
 
@@ -376,7 +376,7 @@ FileEditor = (function ()
 
     FileEditor.prototype["jumpToCounterpart"] = function ()
     {
-        var col, counter, counterparts, cp, currext, ext, file, line, _343_41_, _348_41_
+        var col, counter, counterparts, cp, currext, ext, file, line, _347_41_, _352_41_
 
         cp = this.cursorPos()
         currext = slash.ext(this.currentFile)
@@ -404,21 +404,21 @@ FileEditor = (function ()
             post.emit('loadFile',slash.joinFileLine(file,line,col))
             return true
         }
-        counterparts = {cpp:['hpp','h'],cc:['hpp','h'],h:['cpp','c'],hpp:['cpp','c'],coffee:['js'],kode:['js'],js:['coffee','kode'],pug:['html'],html:['pug'],css:['styl'],styl:['css']}
-        var list = ((_343_41_=counterparts[currext]) != null ? _343_41_ : [])
-        for (var _343_16_ = 0; _343_16_ < list.length; _343_16_++)
+        counterparts = {mm:['h'],cpp:['hpp','h'],cc:['hpp','h'],h:['cpp','c','mm'],hpp:['cpp','c'],coffee:['js','mjs'],kode:['js','mjs'],js:['coffee','kode'],mjs:['coffee','kode'],pug:['html'],html:['pug'],css:['styl'],styl:['css']}
+        var list = ((_347_41_=counterparts[currext]) != null ? _347_41_ : [])
+        for (var _347_16_ = 0; _347_16_ < list.length; _347_16_++)
         {
-            ext = list[_343_16_]
+            ext = list[_347_16_]
             if (slash.fileExists(slash.swapExt(this.currentFile,ext)))
             {
                 post.emit('loadFile',slash.swapExt(this.currentFile,ext))
                 return true
             }
         }
-        var list1 = ((_348_41_=counterparts[currext]) != null ? _348_41_ : [])
-        for (var _348_16_ = 0; _348_16_ < list1.length; _348_16_++)
+        var list1 = ((_352_41_=counterparts[currext]) != null ? _352_41_ : [])
+        for (var _352_16_ = 0; _352_16_ < list1.length; _352_16_++)
         {
-            ext = list1[_348_16_]
+            ext = list1[_352_16_]
             counter = slash.swapExt(this.currentFile,ext)
             counter = this.swapLastDir(counter,currext,ext)
             if (slash.fileExists(counter))
@@ -472,15 +472,15 @@ FileEditor = (function ()
                 var l, t
 
                 var list = _k_.list(layers)
-                for (var _393_81_ = 0; _393_81_ < list.length; _393_81_++)
+                for (var _397_81_ = 0; _397_81_ < list.length; _397_81_++)
                 {
-                    l = list[_393_81_]
+                    l = list[_397_81_]
                     setStyle('.editor .layers ' + l,'transform',"translateX(0)")
                 }
                 var list1 = _k_.list(transi)
-                for (var _394_76_ = 0; _394_76_ < list1.length; _394_76_++)
+                for (var _398_76_ = 0; _398_76_ < list1.length; _398_76_++)
                 {
-                    t = list1[_394_76_]
+                    t = list1[_398_76_]
                     setStyle('.editor .layers ' + t,'transition',"initial")
                 }
                 return this.updateLayers()
@@ -496,15 +496,15 @@ FileEditor = (function ()
                 offsetX *= -1
             }
             var list = _k_.list(layers)
-            for (var _404_88_ = 0; _404_88_ < list.length; _404_88_++)
+            for (var _408_88_ = 0; _408_88_ < list.length; _408_88_++)
             {
-                l = list[_404_88_]
+                l = list[_408_88_]
                 setStyle('.editor .layers ' + l,'transform',`translateX(${offsetX}px)`)
             }
             var list1 = _k_.list(transi)
-            for (var _405_85_ = 0; _405_85_ < list1.length; _405_85_++)
+            for (var _409_85_ = 0; _409_85_ < list1.length; _409_85_++)
             {
-                t = list1[_405_85_]
+                t = list1[_409_85_]
                 setStyle('.editor .layers ' + t,'transition',`all ${animate / 1000}s`)
             }
             return setTimeout(resetTrans,animate)
@@ -522,7 +522,7 @@ FileEditor = (function ()
 
     FileEditor.prototype["showContextMenu"] = function (absPos)
     {
-        var f, fileMenu, fileSpan, getMenu, opt, recent, RecentMenu, _453_29_
+        var f, fileMenu, fileSpan, getMenu, opt, recent, RecentMenu, _457_29_
 
         if (!(absPos != null))
         {
@@ -554,9 +554,9 @@ FileEditor = (function ()
         recent = (window.state != null ? window.state.get('recentFiles',[]) : undefined)
         recent = (recent != null ? recent : [])
         var list = _k_.list(recent)
-        for (var _455_14_ = 0; _455_14_ < list.length; _455_14_++)
+        for (var _459_14_ = 0; _459_14_ < list.length; _459_14_++)
         {
-            f = list[_455_14_]
+            f = list[_459_14_]
             if (fs.existsSync(f))
             {
                 RecentMenu.unshift({html:fileSpan(f),arg:f,cb:function (arg)
@@ -570,9 +570,9 @@ FileEditor = (function ()
             var item
 
             var list1 = _k_.list(template)
-            for (var _463_21_ = 0; _463_21_ < list1.length; _463_21_++)
+            for (var _467_21_ = 0; _467_21_ < list1.length; _467_21_++)
             {
-                item = list1[_463_21_]
+                item = list1[_467_21_]
                 if (item.text === name)
                 {
                     return item

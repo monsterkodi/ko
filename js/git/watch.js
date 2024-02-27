@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.256.0
 
-var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, valid: undefined}
+var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
 var kxk, post, slash, watch
 

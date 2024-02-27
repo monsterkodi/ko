@@ -304,7 +304,7 @@ function Main extends app
 
     stackWindows: ->
         
-        { x, y, width, height } = electron.screen.getDisplayMatching(@activeWin().getBounds()).workArea
+        { x, y, width, height } = electron.screen.getDisplayMatching(@activeWin()?.getBounds()).workArea
         ww = height + 122
         wl = visibleWins()
         for w in wl
@@ -325,14 +325,14 @@ function Main extends app
             if w.isFullScreen()
                 w.setFullScreen false 
         
-        bounds = wl[0].getBounds()
+        bounds = wl[0]?.getBounds()
         
         { width, height } = electron.screen.getDisplayMatching(bounds).workAreaSize
         
         return false if wl.length == 1 and bounds.width == width
         
         for wi in [1...wl.length]
-            if not _.isEqual wl[wi].getBounds(), bounds
+            if not _.isEqual wl[wi]?.getBounds(), bounds
                 return false
         true
 
@@ -347,7 +347,7 @@ function Main extends app
         disableSnap = true
         frameSize = 6
         wl = visibleWins()
-        display = electron.screen.getDisplayMatching(@activeWin().getBounds())
+        display = electron.screen.getDisplayMatching(@activeWin()?.getBounds())
         { x, y, width, height } = display.workArea
 
         if not @windowsAreStacked()
@@ -427,13 +427,13 @@ function Main extends app
 
         return if disableSnap
         frameSize = 6
-        wb = event.sender.getBounds()
+        wb = event.sender?.getBounds()
         
         klog 'ko.main.onResizeWin'
         
         for w in wins()
             continue if w == event.sender
-            b = w.getBounds()
+            b = w?.getBounds()
             if b.height == wb.height and b.y == wb.y
                 if b.x < wb.x
                     if Math.abs(b.x+b.width-wb.x) < WIN_SNAP_DIST

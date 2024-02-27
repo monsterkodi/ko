@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.234.0
+// monsterkodi/kode 0.256.0
 
 var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
@@ -12,7 +12,7 @@ shouldIndex = function (path, stat)
 {
     var exts
 
-    exts = ['coffee','kode','styl','pug','md','noon','txt','json','sh','py','cpp','cc','c','cs','h','hpp','js']
+    exts = ['coffee','kode','styl','pug','md','noon','txt','json','sh','py','cpp','cc','mm','c','cs','h','hpp','js','mjs']
     if (_k_.in(slash.ext(path),exts))
     {
         if (stat.size > 654321)
@@ -29,12 +29,12 @@ shouldIndex = function (path, stat)
 
 indexKoFiles = function (kofiles, info)
 {
-    var absDir, cfg, dir, ign, kodata, kofile, noon, opt, _34_37_
+    var absDir, cfg, dir, ign, kodata, kofile, noon, opt, _35_37_
 
     var list = _k_.list(kofiles)
-    for (var _25_15_ = 0; _25_15_ < list.length; _25_15_++)
+    for (var _26_15_ = 0; _26_15_ < list.length; _26_15_++)
     {
-        kofile = list[_25_15_]
+        kofile = list[_26_15_]
         noon = require('noon')
         kodata = noon.load(kofile)
         if (!kodata.index)
@@ -44,7 +44,7 @@ indexKoFiles = function (kofiles, info)
         for (dir in kodata.index)
         {
             cfg = kodata.index[dir]
-            opt = {max_depth:((_34_37_=cfg.depth) != null ? _34_37_ : 4),no_return:true}
+            opt = {max_depth:((_35_37_=cfg.depth) != null ? _35_37_ : 4),no_return:true}
             ign = ignore()
             if (cfg.ignore)
             {
@@ -107,7 +107,7 @@ indexProject = function (file)
             gitign = gitign.split(/\r?\n/)
             gitign = gitign.filter(function (i)
             {
-                var _79_55_
+                var _80_55_
 
                 return ((i != null ? i.startsWith : undefined) != null) && !i.startsWith("#")
             })

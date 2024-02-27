@@ -97,7 +97,7 @@ function Commandline extends TextEditor
 
         files = filelist "#{__dirname}/../commands"
         for file in files
-            continue if slash.ext(file) != 'js'
+            continue if slash.ext(file) not in ['js' 'mjs']
             try
                 commandClass = require file
                 command = new commandClass @

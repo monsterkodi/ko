@@ -297,6 +297,7 @@
     "jpeg": "image",
     "jq": "sql",
     "js": "js",
+    "mjs": "mjs",
     "jsfl": "as",
     "json": "json",
     "json5": "database",

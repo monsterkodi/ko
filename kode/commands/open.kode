@@ -127,13 +127,16 @@ function Open extends Command
             relBonus  = r.startsWith(opt.currentText) and 65535 * (opt.currentText.length/r.length) or 0 
             nameBonus = n.startsWith(opt.currentText) and 2184  * (opt.currentText.length/n.length) or 0
            
+        # TODO: move this stuff to a config.noon file
+        
         extensionBonus = switch slash.ext b
-            'coffee' 'kode'    ➜ 1000
-            'cpp' 'hpp' 'h'    ➜ 90
-            'md' 'styl' 'pug'  ➜ 50
-            'noon'             ➜ 25
-            'js' 'json' 'html' ➜ -10
-                               ➜ 0 
+            'coffee' 'kode'      ➜ 1000
+            'cpp' 'hpp' 'mm' 'h' ➜ 90
+            'md' 'styl' 'pug'    ➜ 50
+            'noon'               ➜ 25
+            'js' 'mjs'           ➜ -5
+            'json' 'html'        ➜ -10
+                                 ➜ 0 
         
         if @file and slash.ext(@file) == slash.ext b
             extensionBonus += 1000

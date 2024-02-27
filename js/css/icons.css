@@ -262,10 +262,14 @@
   content: "\f126";
 }
 .icon.json:before {
+  font-family: file-icons;
+  content: "\e959";
+}
+.icon.js:before {
   font-family: Mfizz;
   content: "\f128";
 }
-.icon.js:before {
+.icon.mjs:before {
   font-family: Mfizz;
   content: "\f129";
 }

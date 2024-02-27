@@ -4,4 +4,5 @@ ignore
     /bin/cheet.noon
     /bin/dmg.json
     /kode/menu.noon
-noon    . ext json . replace .. kode/ js/ 
+noon    . replace .. kode/ js/ 
+kode    . replace .. kode/ js/ 

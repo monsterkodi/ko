@@ -327,14 +327,18 @@ function FileEditor extends TextEditor
             post.emit 'loadFile' slash.joinFileLine file,line,col
             return true
 
+        # TODO: move this stuff to a config.noon file
+        
         counterparts =
+            mm:      ['h']
             cpp:     ['hpp' 'h']
             cc:      ['hpp' 'h']
-            h:       ['cpp' 'c']
+            h:       ['cpp' 'c' 'mm']
             hpp:     ['cpp' 'c']
-            coffee:  ['js']
-            kode:    ['js']
+            coffee:  ['js' 'mjs']
+            kode:    ['js' 'mjs']
             js:      ['coffee' 'kode']
+            mjs:     ['coffee' 'kode']
             pug:     ['html']
             html:    ['pug']
             css:     ['styl']

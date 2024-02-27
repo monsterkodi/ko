@@ -172,7 +172,7 @@ class Indexer
             maxDepth:    3
             root:        slash.resolve '~'
             include:     ['.git']
-            ignore:      ['node_modules' 'img' 'bin' 'js' 'Library']
+            ignore:      ['node_modules' 'img' 'bin' 'js' 'mjs' 'Library']
             skipDir:     (p) -> slash.base(p) == '.git'
             filter:      (p) -> slash.ext(p) not in ['noon' 'json' 'git' '']
             dir:         (p) => if slash.file(p) == '.git'    then @projects[slash.base slash.dir p] = dir: slash.tilde slash.dir p
@@ -252,7 +252,7 @@ class Indexer
                 @shiftQueue
 
         @walker = new Walker wopt
-        @walker.cfg.ignore.push 'js'
+        @walker.cfg.ignore.push 'js' 'mjs' # is this necessary?
         @walker.start()
 
     onWalkerDir: (p, stat) =>
@@ -342,7 +342,7 @@ class Indexer
             @files[file] = {}
             return @shiftQueue()
             
-        isCpp = fileExt in ['cpp' 'cc' 'c' 'frag' 'vert']
+        isCpp = fileExt in ['cpp' 'cc' 'mm' 'c' 'frag' 'vert']
         isHpp = fileExt in ['hpp' 'h' ]
 
         slash.readText file, (text) =>

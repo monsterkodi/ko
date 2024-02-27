@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.245.0
+// monsterkodi/kode 0.256.0
 
 var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
@@ -236,7 +236,7 @@ class Indexer
         var w
 
         this.projects = {}
-        w = new Walker({maxFiles:5000,maxDepth:3,root:slash.resolve('~'),include:['.git'],ignore:['node_modules','img','bin','js','Library'],skipDir:function (p)
+        w = new Walker({maxFiles:5000,maxDepth:3,root:slash.resolve('~'),include:['.git'],ignore:['node_modules','img','bin','js','mjs','Library'],skipDir:function (p)
         {
             return slash.base(p) === '.git'
         },filter:function (p)
@@ -340,7 +340,7 @@ class Indexer
             return this.shiftQueue
         }).bind(this)}
         this.walker = new Walker(wopt)
-        this.walker.cfg.ignore.push('js')
+        this.walker.cfg.ignore.push('js','mjs')
         return this.walker.start()
     }
 
@@ -441,7 +441,7 @@ class Indexer
             this.files[file] = {}
             return this.shiftQueue()
         }
-        isCpp = _k_.in(fileExt,['cpp','cc','c','frag','vert'])
+        isCpp = _k_.in(fileExt,['cpp','cc','mm','c','frag','vert'])
         isHpp = _k_.in(fileExt,['hpp','h'])
         slash.readText(file,(function (text)
         {

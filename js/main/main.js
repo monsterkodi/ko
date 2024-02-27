@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.245.0
+// monsterkodi/kode 0.256.0
 
-var _k_ = {first: function (o) {return o != null ? o.length ? o[0] : undefined : o}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, each_r: function (o) {return Array.isArray(o) ? [] : typeof o == 'string' ? o.split('') : {}}, extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
+var _k_ = {first: function (o) {return o != null ? o.length ? o[0] : undefined : o}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, each_r: function (o) {return Array.isArray(o) ? [] : typeof o == 'string' ? o.split('') : {}}, extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
 var activeWin, app, args, BrowserWindow, disableSnap, electron, filelist, fs, Indexer, klog, kolor, main, Main, mostRecentFile, Navigate, openFiles, pkg, post, prefs, slash, store, udp, visibleWins, win, WIN_SNAP_DIST, wins, winWithID, _
 
@@ -470,12 +470,12 @@ Main = (function ()
 
     Main.prototype["stackWindows"] = function ()
     {
-        var height, w, width, wl, ww, x, y
+        var height, w, width, wl, ww, x, y, _307_81_
 
-        x = electron.screen.getDisplayMatching(this.activeWin().getBounds()).workArea.x
-        y = electron.screen.getDisplayMatching(this.activeWin().getBounds()).workArea.y
-        width = electron.screen.getDisplayMatching(this.activeWin().getBounds()).workArea.width
-        height = electron.screen.getDisplayMatching(this.activeWin().getBounds()).workArea.height
+        x = electron.screen.getDisplayMatching((this.activeWin() != null ? this.activeWin().getBounds() : undefined)).workArea.x
+        y = electron.screen.getDisplayMatching((this.activeWin() != null ? this.activeWin().getBounds() : undefined)).workArea.y
+        width = electron.screen.getDisplayMatching((this.activeWin() != null ? this.activeWin().getBounds() : undefined)).workArea.width
+        height = electron.screen.getDisplayMatching((this.activeWin() != null ? this.activeWin().getBounds() : undefined)).workArea.height
 
         ww = height + 122
         wl = visibleWins()
@@ -507,7 +507,7 @@ Main = (function ()
                 w.setFullScreen(false)
             }
         }
-        bounds = wl[0].getBounds()
+        bounds = (wl[0] != null ? wl[0].getBounds() : undefined)
         width = electron.screen.getDisplayMatching(bounds).workAreaSize.width
         height = electron.screen.getDisplayMatching(bounds).workAreaSize.height
 
@@ -517,7 +517,7 @@ Main = (function ()
         }
         for (var _334_19_ = wi = 1, _334_23_ = wl.length; (_334_19_ <= _334_23_ ? wi < wl.length : wi > wl.length); (_334_19_ <= _334_23_ ? ++wi : --wi))
         {
-            if (!_.isEqual(wl[wi].getBounds(),bounds))
+            if (!_.isEqual((wl[wi] != null ? wl[wi].getBounds() : undefined),bounds))
             {
                 return false
             }
@@ -527,12 +527,12 @@ Main = (function ()
 
     Main.prototype["arrangeWindows"] = function ()
     {
-        var display, frameSize, height, i, rh, w, w2, width, wl, x, y
+        var display, frameSize, height, i, rh, w, w2, width, wl, x, y, _350_65_
 
         disableSnap = true
         frameSize = 6
         wl = visibleWins()
-        display = electron.screen.getDisplayMatching(this.activeWin().getBounds())
+        display = electron.screen.getDisplayMatching((this.activeWin() != null ? this.activeWin().getBounds() : undefined))
         x = display.workArea.x
         y = display.workArea.y
         width = display.workArea.width
@@ -624,14 +624,14 @@ Main = (function ()
 
     Main.prototype["onResizeWin"] = function (event)
     {
-        var b, frameSize, w, wb
+        var b, frameSize, w, wb, _430_25_
 
         if (disableSnap)
         {
             return
         }
         frameSize = 6
-        wb = event.sender.getBounds()
+        wb = (event.sender != null ? event.sender.getBounds() : undefined)
         klog('ko.main.onResizeWin')
         var list = _k_.list(wins())
         for (var _434_14_ = 0; _434_14_ < list.length; _434_14_++)
@@ -641,7 +641,7 @@ Main = (function ()
             {
                 continue
             }
-            b = w.getBounds()
+            b = (w != null ? w.getBounds() : undefined)
             if (b.height === wb.height && b.y === wb.y)
             {
                 if (b.x < wb.x)

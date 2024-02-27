@@ -28,6 +28,7 @@
 ([~\/\.\-\_\ \(\)\w]+)(\.cc)([\d\:]*\b)         . cpp     . cpp.ext       . cpp.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.hp?p?)([\d\:]*\b)      . hpp     . hpp.ext       . hpp.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.js.map)([\d\:]*\b)     . dotfile . dotfile.ext   . dotfile.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.mjs)([\d\:]*\b)        . mjs     . mjs.ext       . mjs.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.js)([\d\:]*\b)         . js      . js.ext        . js.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.py)([\d\:]*\b)         . py      . py.ext        . py.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.sh)([\d\:]*\b)         . sh      . sh.ext        . sh.linepos

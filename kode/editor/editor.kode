@@ -47,8 +47,11 @@ function Editor extends Buffer
     @initActions: ->
 
         @actions = []
+        
+        # TODO: move this stuff to a config.noon file
+        
         for actionFile in filelist(slash.join __dirname, 'actions')
-            continue if slash.ext(actionFile) not in ['js' 'coffee' 'kode']
+            continue if slash.ext(actionFile) not in ['js' 'mjs' 'coffee' 'kode']
             actions = require actionFile
             for key,value of actions
                 if value is func
@@ -138,15 +141,19 @@ function Editor extends Buffer
 
         # _______________________________________________________________ comment
         
+        # TODO: move this stuff tp a config.noon file
+        
         @multiComment = switch @fileType
-            when 'coffee' 'kode'                                                    then open:'###'  close:'###'
-            when 'html' 'md'                                                        then open:'<!--' close:'-->'
-            when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then open:'/*'   close:'*/'
+            'coffee' 'kode'                              ➜ open:'###'  close:'###'
+            'html' 'md'                                  ➜ open:'<!--' close:'-->'
+            'styl' 'cpp' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs' 
+            'js' 'mjs' 'scss' 'ts' 'swift' 'frag' 'vert' ➜ open:'/*'   close:'*/'
         
         @lineComment = switch @fileType
-             when 'coffee' 'kode' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'                then '#'
-             when 'styl' 'cpp' 'c' 'h' 'hpp' 'cxx' 'cs' 'js' 'scss' 'ts' 'swift' 'frag' 'vert' then '//'
-             when 'iss' 'ini'                                                        then ';'
+             'coffee' 'kode' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'    ➜ '#'
+             'styl' 'cpp' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs' 
+             'js' 'mjs' 'scss' 'ts' 'swift' 'frag' 'vert'           ➜ '//'
+             'iss' 'ini'                                            ➜ ';'
              
         if @lineComment
             @headerRegExp = new RegExp("^(\\s*#{_.escapeRegExp @lineComment}\\s*)?(\\s*0[0\\s]+)$")

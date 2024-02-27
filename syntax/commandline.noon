@@ -18,6 +18,7 @@
 ([^\/]+)(\.cc$)         . cpp     . cpp.ext
 ([^\/]+)(\.hp?p?$)      . hpp     . hpp.ext
 ([^\/]+)(\.js.map$)     . dotfile . dotfile.ext
+([^\/]+)(\.mjs$)        . mjs     . mjs.ext
 ([^\/]+)(\.js$)         . js      . js.ext
 ([^\/]+)(\.py$)         . py      . py.ext
 ([^\/]+)(\.sh$)         . sh      . sh.ext

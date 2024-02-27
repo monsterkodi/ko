@@ -1,6 +1,6 @@
-// monsterkodi/kode 0.245.0
+// monsterkodi/kode 0.256.0
 
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.hasOwn(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
 var Command, File, fuzzy, Open, post, Projects, relative, render, slash, syntax, _
 
@@ -167,6 +167,7 @@ Open = (function ()
 
                 case 'cpp':
                 case 'hpp':
+                case 'mm':
                 case 'h':
                     return 90
 
@@ -179,6 +180,9 @@ Open = (function ()
                     return 25
 
                 case 'js':
+                case 'mjs':
+                    return -5
+
                 case 'json':
                 case 'html':
                     return -10
@@ -216,11 +220,11 @@ Open = (function ()
 
     Open.prototype["listItems"] = function (opt)
     {
-        var f, file, iconSpan, item, items, rel, _167_21_, _168_17_, _179_44_, _181_19_
+        var f, file, iconSpan, item, items, rel, _170_21_, _171_17_, _182_44_, _184_19_
 
         opt = (opt != null ? opt : {})
-        opt.maxItems = ((_167_21_=opt.maxItems) != null ? _167_21_ : 200)
-        opt.flat = ((_168_17_=opt.flat) != null ? _168_17_ : true)
+        opt.maxItems = ((_170_21_=opt.maxItems) != null ? _170_21_ : 200)
+        opt.flat = ((_171_17_=opt.flat) != null ? _171_17_ : true)
         iconSpan = function (file)
         {
             var className
@@ -248,9 +252,9 @@ Open = (function ()
         if (!_k_.empty(this.files))
         {
             var list = _k_.list(this.files)
-            for (var _195_21_ = 0; _195_21_ < list.length; _195_21_++)
+            for (var _198_21_ = 0; _198_21_ < list.length; _198_21_++)
             {
-                file = list[_195_21_]
+                file = list[_198_21_]
                 rel = relative(file,this.dir)
                 if (rel.length)
                 {
@@ -279,9 +283,9 @@ Open = (function ()
         {
             items = []
             var list = _k_.list(this.history)
-            for (var _223_18_ = 0; _223_18_ < list.length; _223_18_++)
+            for (var _226_18_ = 0; _226_18_ < list.length; _226_18_++)
             {
-                f = list[_223_18_]
+                f = list[_226_18_]
                 item = Object.create(null)
                 item.text = relative(f,this.dir)
                 item.file = f
@@ -300,9 +304,9 @@ Open = (function ()
 
     Open.prototype["showFirst"] = function ()
     {
-        var _239_58_, _239_65_
+        var _242_58_, _242_65_
 
-        if (this.commandList && this.selected === ((_239_58_=this.commandList.meta) != null ? (_239_65_=_239_58_.metas) != null ? _239_65_.length : undefined : undefined) - 1)
+        if (this.commandList && this.selected === ((_242_58_=this.commandList.meta) != null ? (_242_65_=_242_58_.metas) != null ? _242_65_.length : undefined : undefined) - 1)
         {
             this.showItems(this.listItems())
             return this.select(0)
@@ -315,7 +319,7 @@ Open = (function ()
 
     Open.prototype["cancel"] = function (name)
     {
-        var _254_27_
+        var _257_27_
 
         if (name === this.names[0])
         {
@@ -329,7 +333,7 @@ Open = (function ()
 
     Open.prototype["start"] = function (name)
     {
-        var dir, item, _275_40_, _289_41_
+        var dir, item, _278_40_, _292_41_
 
         this.setName(name)
         if ((this.commandline.lastFocus === 'commandline-editor' && 'commandline-editor' === window.lastFocus))
@@ -341,7 +345,7 @@ Open = (function ()
             }
             else
             {
-                this.dir = ((_275_40_=slash.dir(this.file)) != null ? _275_40_ : process.cwd())
+                this.dir = ((_278_40_=slash.dir(this.file)) != null ? _278_40_ : process.cwd())
             }
         }
         else if (this.commandline.lastFocus === 'shelf' || this.commandline.lastFocus.startsWith('FileBrowser'))
@@ -381,7 +385,7 @@ Open = (function ()
 
     Open.prototype["execute"] = function (command)
     {
-        var file, path, pos, _320_27_
+        var file, path, pos, _323_27_
 
         if (this.selected < 0)
         {
@@ -391,7 +395,7 @@ Open = (function ()
         this.hideList()
         if (!_k_.empty(path))
         {
-            var _326_24_ = slash.splitFilePos(command); file = _326_24_[0]; pos = _326_24_[1]
+            var _329_24_ = slash.splitFilePos(command); file = _329_24_[0]; pos = _329_24_[1]
 
             file = this.resolvedPath(path)
             file = slash.joinFilePos(file,pos)
