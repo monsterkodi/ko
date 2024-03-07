@@ -31,14 +31,14 @@ class Indexer
 
     static splitRegExp = new RegExp("[^\\w\\d\\_]+",'g')
 
-    static classRegExp = /^(\s*\S+\s*=)?\s*class\s+(\w+)/
+    static classRegExp = /^(\s*\S+\s*=)?\s*(class|function)\s+(\w+)/
 
     static classNameInLine (line)
     {
         var m
 
         m = line.match(Indexer.classRegExp)
-        return (m != null ? m[2] : undefined)
+        return (m != null ? m[3] : undefined)
     }
 
     static methodNameInLine (line)
@@ -447,7 +447,7 @@ class Indexer
         isHpp = _k_.in(fileExt,['hpp','h'])
         slash.readText(file,(function (text)
         {
-            var abspath, className, clss, currentClass, ext, fileInfo, func, funcAdded, funcInfo, funcName, funcStack, indent, indexHpp, li, line, lines, m, methodName, parsed, r, required, word, words, _394_43_, _482_57_, _501_35_, _502_35_
+            var abspath, className, clss, currentClass, ext, fileInfo, func, funcAdded, funcInfo, funcName, funcStack, indent, indexHpp, li, line, lines, m, methodName, parsed, r, required, word, words, _394_43_, _483_57_, _502_35_, _503_35_
 
             lines = text.split(/\r?\n/)
             fileInfo = {lines:lines.length,funcs:[],classes:[]}
@@ -541,6 +541,7 @@ class Indexer
                         switch (word)
                         {
                             case 'class':
+                            case 'function':
                                 if (className = Indexer.classNameInLine(line))
                                 {
                                     currentClass = className
@@ -553,16 +554,16 @@ class Indexer
                                 m = line.match(Indexer.requireRegExp)
                                 if (((m != null ? m[1] : undefined) != null) && (m[2] != null))
                                 {
-                                    r = ((_482_57_=fileInfo.require) != null ? _482_57_ : [])
+                                    r = ((_483_57_=fileInfo.require) != null ? _483_57_ : [])
                                     r.push([m[1],m[2]])
                                     fileInfo.require = r
                                     abspath = slash.resolve(slash.join(slash.dir(file),m[2]))
                                     if (!(_k_.in(slash.ext(abspath),['json'])))
                                     {
                                         var list3 = ['kode','coffee']
-                                        for (var _487_48_ = 0; _487_48_ < list3.length; _487_48_++)
+                                        for (var _488_48_ = 0; _488_48_ < list3.length; _488_48_++)
                                         {
-                                            ext = list3[_487_48_]
+                                            ext = list3[_488_48_]
                                             required = `${abspath}.${ext}`
                                             if ((m[2][0] === '.') && (!(this.files[required] != null)) && (this.queue.indexOf(required) < 0))
                                             {
@@ -587,8 +588,8 @@ class Indexer
                 {
                     _.last(funcStack)[1].last = li - 1
                     funcInfo = funcStack.pop()[1]
-                    funcInfo.class = ((_501_35_=funcInfo.class) != null ? _501_35_ : slash.base(funcInfo.file))
-                    funcInfo.class = ((_502_35_=funcInfo.class) != null ? _502_35_ : slash.base(file))
+                    funcInfo.class = ((_502_35_=funcInfo.class) != null ? _502_35_ : slash.base(funcInfo.file))
+                    funcInfo.class = ((_503_35_=funcInfo.class) != null ? _503_35_ : slash.base(file))
                     fileInfo.funcs.push(funcInfo)
                 }
                 if ((opt != null ? opt.post : undefined) !== false)
