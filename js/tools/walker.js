@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.260.0
 
 var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
@@ -14,7 +14,7 @@ class Walker
 {
     constructor (cfg)
     {
-        var _19_25_, _20_25_, _21_25_, _22_25_, _23_25_, _24_25_, _25_25_, _26_25_
+        var _19_25_, _20_25_, _21_25_, _22_25_, _23_25_, _24_25_, _26_25_, _27_25_
 
         this.cfg = cfg
     
@@ -26,8 +26,9 @@ class Walker
         this.cfg.maxFiles = ((_22_25_=this.cfg.maxFiles) != null ? _22_25_ : 500)
         this.cfg.ignore = ((_23_25_=this.cfg.ignore) != null ? _23_25_ : ['node_modules','build','Build','Library','Applications'])
         this.cfg.include = ((_24_25_=this.cfg.include) != null ? _24_25_ : ['.konrad.noon','.gitignore','.npmignore'])
-        this.cfg.ignoreExt = ((_25_25_=this.cfg.ignoreExt) != null ? _25_25_ : ['app','asar'])
-        this.cfg.includeExt = ((_26_25_=this.cfg.includeExt) != null ? _26_25_ : File.sourceFileExtensions)
+        this.cfg.ignoreExt = ((_26_25_=this.cfg.ignoreExt) != null ? _26_25_ : ['asar'])
+        this.cfg.includeExt = ((_27_25_=this.cfg.includeExt) != null ? _27_25_ : File.sourceFileExtensions)
+        console.log('walker',this.cfg)
     }
 
     start ()
@@ -43,7 +44,7 @@ class Walker
             {
                 return function (p, stat)
                 {
-                    var extn, name, sp, _44_29_, _50_38_, _76_24_, _79_31_, _80_34_, _84_32_
+                    var extn, name, sp, _48_29_, _54_38_, _80_24_, _83_31_, _84_34_, _88_32_
 
                     sp = slash.path(p)
                     name = slash.basename(p)
@@ -144,7 +145,7 @@ class Walker
             this.walker.on('path',onWalkerPath(this.cfg))
             return this.walker.on('end',(function ()
             {
-                var _96_25_
+                var _100_25_
 
                 this.running = false
                 return (typeof this.cfg.done === "function" ? this.cfg.done(this) : undefined)
@@ -159,7 +160,7 @@ class Walker
 
     stop ()
     {
-        var _104_15_, _105_15_
+        var _108_15_, _109_15_
 
         ;(this.walker != null ? this.walker.pause() : undefined)
         ;(this.walker != null ? this.walker.end() : undefined)

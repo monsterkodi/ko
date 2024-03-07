@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  000        000   000   0000000     
 ###
 
-ignore  = require 'ignore'
+# ignore  = require 'ignore'
 slash   = require 'kslash'
 walkdir = require 'walkdir'
 
@@ -35,16 +35,19 @@ indexKoFiles = (kofiles, info) ->
                 max_depth: cfg.depth ? 4
                 no_return: true
                 
-            ign = ignore()
-            ign.add cfg.ignore if cfg.ignore
+            # ign = ignore()
+            # ign.add cfg.ignore if cfg.ignore
                         
             absDir = slash.join slash.dir(kofile), dir
             
             walkdir.sync absDir, opt, (path, stat) ->
                   
-                if ign.ignores slash.relative path, dir
-                    @ignore path
-                else if stat.isFile() 
+                if stat.isDirectory()
+                    if slash.basename(path) in ['node_modules' '.git']
+                        @ignore path
+                        return
+                
+                if stat.isFile() 
                     if shouldIndex path, stat
                         info.files.push slash.path path
 
@@ -66,13 +69,15 @@ indexProject = (file) ->
     kofiles = []
     info = dir:dir, files:[]
 
-    ign = ignore()
-    
     opt = 
         max_depth: depth
         no_return: true
-                
+              
+    # log 'walkdir.sync' dir, opt
+    
     walkdir.sync dir, opt, (path, stat) ->
+        
+        # log 'path:' path
         
         addIgnores = (gitignore) -> 
             gitign = slash.readText gitignore
@@ -85,16 +90,16 @@ indexProject = (file) ->
                         '!' + slash.relative(gitdir, dir) + i.slice 1
                     else
                         slash.relative(gitdir, dir) + i
-            ign.add gitign
-        
-        if ign.ignores slash.relative path, dir
-            @ignore path
-            return
+            log gitign
         
         if stat.isDirectory()
             gitignore = slash.join path, '.gitignore'
             if slash.isFile gitignore
                 addIgnores gitignore
+            # log r4(path), slash.basename(path)
+            if slash.basename(path) in ['node_modules' '.git']
+                @ignore path
+                return
         else
             file = slash.file path
             if file == '.gitignore'
@@ -104,7 +109,11 @@ indexProject = (file) ->
             if file == '.ko.noon' # ???
                 kofiles.push path
                 
+            # log 'shouldIndex' path
+                
             if shouldIndex path, stat
+                
+                # log 'index' path
                 info.files.push slash.path path
                 
     indexKoFiles kofiles, info

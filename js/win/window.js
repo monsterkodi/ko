@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.260.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, isFunc: function (o) {return typeof o === 'function'}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }}
 
@@ -367,8 +367,10 @@ reloadWin = function ()
 
 window.onresize = function ()
 {
+    var _272_14_
+
     split.resized()
-    window.win.onMoved(window.win.getBounds())
+    ;(window.win != null ? window.win.onMoved(window.win.getBounds()) : undefined)
     if (window.stash.get('centerText',false))
     {
         return editor.centerText(true,200)

@@ -257,6 +257,15 @@
 .require.variable {
   color: #0f0;
 }
+.require.string {
+  color: #0f0;
+}
+.require.module {
+  color: #0f0;
+}
+.require.keyword {
+  color: #333;
+}
 .test {
   color: #ccf;
 }

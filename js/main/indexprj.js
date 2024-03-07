@@ -1,10 +1,9 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.260.0
 
 var _k_ = {in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}}
 
-var ignore, indexKoFiles, indexProject, info, shouldIndex, slash, walkdir
+var indexKoFiles, indexProject, info, shouldIndex, slash, walkdir
 
-ignore = require('ignore')
 slash = require('kslash')
 walkdir = require('walkdir')
 
@@ -29,7 +28,7 @@ shouldIndex = function (path, stat)
 
 indexKoFiles = function (kofiles, info)
 {
-    var absDir, cfg, dir, ign, kodata, kofile, noon, opt, _35_37_
+    var absDir, cfg, dir, kodata, kofile, noon, opt, _35_37_
 
     var list = _k_.list(kofiles)
     for (var _26_15_ = 0; _26_15_ < list.length; _26_15_++)
@@ -45,19 +44,18 @@ indexKoFiles = function (kofiles, info)
         {
             cfg = kodata.index[dir]
             opt = {max_depth:((_35_37_=cfg.depth) != null ? _35_37_ : 4),no_return:true}
-            ign = ignore()
-            if (cfg.ignore)
-            {
-                ign.add(cfg.ignore)
-            }
             absDir = slash.join(slash.dir(kofile),dir)
             walkdir.sync(absDir,opt,function (path, stat)
             {
-                if (ign.ignores(slash.relative(path,dir)))
+                if (stat.isDirectory())
                 {
-                    return this.ignore(path)
+                    if (_k_.in(slash.basename(path),['node_modules','.git']))
+                    {
+                        this.ignore(path)
+                        return
+                    }
                 }
-                else if (stat.isFile())
+                if (stat.isFile())
                 {
                     if (shouldIndex(path,stat))
                     {
@@ -71,7 +69,7 @@ indexKoFiles = function (kofiles, info)
 
 indexProject = function (file)
 {
-    var depth, dir, ign, info, kofiles, opt
+    var depth, dir, info, kofiles, opt
 
     depth = 20
     dir = slash.pkg(file)
@@ -93,7 +91,6 @@ indexProject = function (file)
     }
     kofiles = []
     info = {dir:dir,files:[]}
-    ign = ignore()
     opt = {max_depth:depth,no_return:true}
     walkdir.sync(dir,opt,function (path, stat)
     {
@@ -107,7 +104,7 @@ indexProject = function (file)
             gitign = gitign.split(/\r?\n/)
             gitign = gitign.filter(function (i)
             {
-                var _80_55_
+                var _85_55_
 
                 return ((i != null ? i.startsWith : undefined) != null) && !i.startsWith("#")
             })
@@ -126,19 +123,19 @@ indexProject = function (file)
                     }
                 })
             }
-            return ign.add(gitign)
-        }
-        if (ign.ignores(slash.relative(path,dir)))
-        {
-            this.ignore(path)
-            return
+            console.log(gitign)
         }
         if (stat.isDirectory())
         {
             gitignore = slash.join(path,'.gitignore')
             if (slash.isFile(gitignore))
             {
-                return addIgnores(gitignore)
+                addIgnores(gitignore)
+            }
+            if (_k_.in(slash.basename(path),['node_modules','.git']))
+            {
+                this.ignore(path)
+                return
             }
         }
         else

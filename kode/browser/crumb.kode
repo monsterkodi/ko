@@ -25,13 +25,13 @@ class Crumb
         
     onMouseDown: (event) =>
         
-        @downPos = kpos window.win.getBounds()
+        @downPos = kpos window.win?.getBounds()
             
     onMouseUp: (event) =>
         
         return if not @downPos
         
-        upPos = kpos window.win.getBounds()
+        upPos = kpos window.win?.getBounds()
         
         if upPos.to(@downPos).length() > 0
             delete @downPos

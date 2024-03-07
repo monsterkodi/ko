@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.260.0
 
 var _k_
 
@@ -36,18 +36,20 @@ class Crumb
 
     onMouseDown (event)
     {
-        return this.downPos = kpos(window.win.getBounds())
+        var _28_34_
+
+        return this.downPos = kpos((window.win != null ? window.win.getBounds() : undefined))
     }
 
     onMouseUp (event)
     {
-        var br, root, upPos
+        var br, root, upPos, _34_31_
 
         if (!this.downPos)
         {
             return
         }
-        upPos = kpos(window.win.getBounds())
+        upPos = kpos((window.win != null ? window.win.getBounds() : undefined))
         if (upPos.to(this.downPos).length() > 0)
         {
             delete this.downPos

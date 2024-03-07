@@ -269,7 +269,7 @@ reloadWin = ->
 window.onresize = ->
 
     split.resized()
-    window.win.onMoved window.win.getBounds()
+    window.win?.onMoved window.win.getBounds()
     if window.stash.get 'centerText' false
         editor.centerText true, 200
 

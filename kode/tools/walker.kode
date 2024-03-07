@@ -22,8 +22,11 @@ class Walker
         @cfg.maxFiles    ?= 500
         @cfg.ignore      ?= ['node_modules' 'build' 'Build' 'Library' 'Applications'] #, 'resources' 'ThirdParty' 'Binaries' 'Intermediate' 'Saved' 'Programs' 'Shaders' 'DerivedDataCache' 'Content' 'Samples']
         @cfg.include     ?= ['.konrad.noon' '.gitignore' '.npmignore']
-        @cfg.ignoreExt   ?= ['app' 'asar']
+        # @cfg.ignoreExt   ?= ['app' 'asar']
+        @cfg.ignoreExt   ?= ['asar']
         @cfg.includeExt  ?= File.sourceFileExtensions
+        
+        log 'walker' @cfg
       
     #  0000000  000000000   0000000   00000000   000000000
     # 000          000     000   000  000   000     000   
@@ -31,7 +34,8 @@ class Walker
     #      000     000     000   000  000   000     000   
     # 0000000      000     000   000  000   000     000   
     
-    start: ->           
+    start: ->
+        
         try
             @running = true
             dir = @cfg.root
@@ -90,8 +94,8 @@ class Walker
                     @pause()
                     setTimeout @resume, 10
                     
-            @walker.on 'path', onWalkerPath @cfg
-            @walker.on 'end', => 
+            @walker.on 'path' onWalkerPath @cfg
+            @walker.on 'end' => 
                 @running = false
                 @cfg.done? @
                 

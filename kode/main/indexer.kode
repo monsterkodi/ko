@@ -76,7 +76,7 @@ class Indexer
     # 000  000  0000  000   000  000        000 000   000       000   000  
     # 000  000   000  0000000    00000000  000   000  00000000  000   000  
     
-    @: () ->
+    @: ->
         
         post.onGet 'indexer' @onGet
         post.on 'sourceInfoForFile' @onSourceInfoForFile
@@ -84,6 +84,7 @@ class Indexer
         post.on 'fileSaved'    (file, winID) => @indexFile file, refresh: true
         post.on 'dirLoaded'    (dir)         => @indexProject dir
         post.on 'fileLoaded'   (file, winID) => 
+            # log file
             @indexFile file
             @indexProject file
         
@@ -215,6 +216,10 @@ class Indexer
             
             if info
                 @indexedProjects.push info 
+                log info.dir
+                # for file in info.files
+                    # log r5('▸ '), y5 file
+                log b5(info.files.length), w5(' files')
                 post.toWins 'projectIndexed' info
             
             doShift = empty @queue
@@ -248,8 +253,7 @@ class Indexer
             file:        @onWalkerFile
             maxDepth:    12
             maxFiles:    100000
-            done:        (w) => 
-                @shiftQueue
+            done:        (w) => @shiftQueue
 
         @walker = new Walker wopt
         @walker.cfg.ignore.push 'js' 'mjs' # is this necessary?
@@ -329,8 +333,6 @@ class Indexer
 
     indexFile: (file, opt) ->
         
-        # log 'index ' file
-                
         @removeFile file if opt?.refresh
 
         if @files[file]?
