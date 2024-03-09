@@ -336,11 +336,17 @@ function FileBrowser extends Browser
             if func.test == 'describe'
                 text = '● '+func.name
             else if func.static
-                text = '  ◆ '+func.name
+                if func.async
+                    text = ' ○◆ '+func.name
+                else
+                    text = '  ◆ '+func.name
             else if func.post
                 text = '  ⬢ '+func.name
             else
-                text = '  ▸ '+func.name
+                if func.async
+                    text = ' ○▸ '+func.name
+                else
+                    text = '  ▸ '+func.name
             items.push name:func.name, text:text, type:'func', file:item.file, line:func.line
 
         if valid items

@@ -64,9 +64,12 @@
                 
     &.async
         opacity             1
-        color               #55f
-        &.bound
-            color           #f80
+        color               #aaf
+        &.punct
+        &.marker
+            color               #55f
+            &.bound
+                color           #f80
         
     &.tail:before
     &.head:before
@@ -135,6 +138,11 @@
             
 .method
     color           #ff0
+    &.static.async
+        color       #fff
+        &.marker
+            opacity 1
+            color   #99f
     &.class
     &.call
         color       #ff8

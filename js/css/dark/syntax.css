@@ -57,10 +57,18 @@
 .func.async,
 .function.async {
   opacity: 1;
+  color: #aaf;
+}
+.func.async.punct,
+.function.async.punct,
+.func.async.marker,
+.function.async.marker {
   color: #55f;
 }
-.func.async.bound,
-.function.async.bound {
+.func.async.punct.bound,
+.function.async.punct.bound,
+.func.async.marker.bound,
+.function.async.marker.bound {
   color: #f80;
 }
 .func.tail:before,
@@ -134,6 +142,13 @@
 }
 .method {
   color: #ff0;
+}
+.method.static.async {
+  color: #fff;
+}
+.method.static.async.marker {
+  opacity: 1;
+  color: #99f;
 }
 .method.class,
 .method.call {

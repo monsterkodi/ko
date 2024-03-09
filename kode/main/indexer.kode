@@ -6,7 +6,7 @@
 000  000   000  0000000    00000000  000   000  00000000  000   000
 ###
 
-{ _, filter, kerror, klog, matchr, post, slash } = require 'kxk'
+{ _, filter, kerror, matchr, post, slash } = require 'kxk'
 
 Walker   = require '../tools/walker'
 forkfunc = require '../tools/forkfunc'
@@ -16,10 +16,11 @@ class Indexer
 
     @requireRegExp   : /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
     @includeRegExp   : /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
-    @methodRegExp    : /^\s+([\@]?\w+|@)\s*\:\s*(\(.*\))?\s*[=-]\>/
-    @funcRegExp      : /^\s*([\w\.]+)\s*[\:\=][^\(\)]*(\(.*\))?\s*[=-]\>/
+    @methodRegExp    : /^\s+([\@]?\w+|@)\s*\:\s*(\(.*\))?\s*○?[=-]\>/
+    @funcRegExp      : /^\s*([\w\.]+)\s*[\:\=][^\(\)]*(\(.*\))?\s*○?[=-]\>/
     @postRegExp      : /^\s*post\.on\s+[\'\"](\w+)[\'\"]\s*\,?\s*(\(.*\))?\s*[=-]\>/
-    @testRegExp      : /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*\,?\s*(\([^\)]*\))?\s*[=-]\>/
+    # @testRegExp      : /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*\,?\s*(\([^\)]*\))?\s*[=-]\>/
+    @testRegExp      : /^\s*(▸\s+.+)/
     @splitRegExp     : new RegExp "[^\\w\\d\\_]+", 'g'
     @classRegExp     : /^(\s*\S+\s*=)?\s*(class|function)\s+(\w+)/
 
@@ -282,7 +283,7 @@ class Indexer
     addFuncInfo: (funcName, funcInfo) ->
         
         if not funcName
-            klog "addFuncInfo #{funcName}" funcInfo
+            log "addFuncInfo #{funcName}" funcInfo
         
         if funcName.length > 1 and funcName.startsWith '@'
             funcName = funcName.slice 1
@@ -296,12 +297,13 @@ class Indexer
         
         funcInfo
 
-    addMethod: (className, funcName, file, li) ->
+    addMethod: (className, funcName, file, li, async) ->
 
         funcInfo = @addFuncInfo funcName,
             line:  li+1
             file:  file
             class: className
+            async: async
 
         _.set @classes, "#{className}.methods.#{funcInfo.name}" funcInfo
 
@@ -403,7 +405,7 @@ class Indexer
                             # 000   000  00000000     000     000   000   0000000   0000000    0000000
     
                             if methodName = Indexer.methodNameInLine line
-                                funcInfo = @addMethod currentClass, methodName, file, li
+                                funcInfo = @addMethod currentClass, methodName, file, li, line.indexOf('○')>=0
                                 funcStack.push [indent, funcInfo]
                                 funcAdded = true
                         else
@@ -420,6 +422,7 @@ class Indexer
                                 funcInfo = @addFuncInfo funcName,
                                     line: li+1
                                     file: file
+                                    async: line.indexOf('○')>=0
     
                                 funcStack.push [indent, funcInfo]
                                 funcAdded = true
@@ -434,11 +437,12 @@ class Indexer
                                 funcAdded = true
                                 
                             m = line.match Indexer.testRegExp
-                            if m?[2]?
-                                funcInfo = @addFuncInfo m[2],
+                            if m?[0]?
+                                log 'test' m
+                                funcInfo = @addFuncInfo m[0],
                                     line: li+1
                                     file: file
-                                    test: m[1]
+                                    test: m[0]
     
                                 funcStack.push [indent, funcInfo]
                                 funcAdded = true

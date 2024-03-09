@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.257.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
@@ -410,7 +410,14 @@ FileBrowser = (function ()
             }
             else if (func.static)
             {
-                text = '  ◆ ' + func.name
+                if (func.async)
+                {
+                    text = ' ○◆ ' + func.name
+                }
+                else
+                {
+                    text = '  ◆ ' + func.name
+                }
             }
             else if (func.post)
             {
@@ -418,7 +425,14 @@ FileBrowser = (function ()
             }
             else
             {
-                text = '  ▸ ' + func.name
+                if (func.async)
+                {
+                    text = ' ○▸ ' + func.name
+                }
+                else
+                {
+                    text = '  ▸ ' + func.name
+                }
             }
             items.push({name:func.name,text:text,type:'func',file:item.file,line:func.line})
         }
@@ -437,9 +451,9 @@ FileBrowser = (function ()
         var column
 
         var list = _k_.list(this.columns)
-        for (var _358_19_ = 0; _358_19_ < list.length; _358_19_++)
+        for (var _364_19_ = 0; _364_19_ < list.length; _364_19_++)
         {
-            column = list[_358_19_]
+            column = list[_364_19_]
             if (column.path() === info.dir)
             {
                 this.loadDirItem({file:info.dir,type:'dir'},column.index,{active:column.activePath(),focus:false})
@@ -471,7 +485,7 @@ FileBrowser = (function ()
 
     FileBrowser.prototype["loadDirItems"] = function (dir, item, items, col, opt)
     {
-        var lastColumn, row, _396_52_, _400_85_, _404_14_
+        var lastColumn, row, _402_52_, _406_85_, _410_14_
 
         this.updateColumnScrolls()
         if (this.skipOnDblClick && col > 0)
@@ -601,16 +615,16 @@ FileBrowser = (function ()
     {
         FileBrowser.__super__.updateColumnScrolls.call(this)
     
-        var _469_14_
+        var _475_14_
 
         return (this.shelf != null ? this.shelf.scroll.update() : undefined)
     }
 
     FileBrowser.prototype["getGitStatus"] = function (item, col)
     {
-        var file, _479_25_, _479_38_
+        var file, _485_25_, _485_38_
 
-        file = ((_479_25_=item.file) != null ? _479_25_ : (item.parent != null ? item.parent.file : undefined))
+        file = ((_485_25_=item.file) != null ? _485_25_ : (item.parent != null ? item.parent.file : undefined))
         if (_k_.empty(file))
         {
             return
@@ -631,7 +645,7 @@ FileBrowser = (function ()
         var col, files
 
         files = hub.statusFiles(status)
-        for (var _491_20_ = col = 0, _491_23_ = this.columns.length; (_491_20_ <= _491_23_ ? col <= this.columns.length : col >= this.columns.length); (_491_20_ <= _491_23_ ? ++col : --col))
+        for (var _497_20_ = col = 0, _497_23_ = this.columns.length; (_497_20_ <= _497_23_ ? col <= this.columns.length : col >= this.columns.length); (_497_20_ <= _497_23_ ? ++col : --col))
         {
             this.applyGitStatusFiles(col,files)
         }
@@ -658,7 +672,7 @@ FileBrowser = (function ()
 
     FileBrowser.prototype["toggleShelf"] = function ()
     {
-        var _519_29_
+        var _525_29_
 
         if (this.shelfSize < 1)
         {
