@@ -54,6 +54,15 @@
   opacity: 1;
   color: #55f;
 }
+.func.async,
+.function.async {
+  opacity: 1;
+  color: #55f;
+}
+.func.async.bound,
+.function.async.bound {
+  color: #f80;
+}
 .func.tail:before,
 .function.tail:before,
 .func.head:before,
