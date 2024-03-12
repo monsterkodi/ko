@@ -1,5 +1,5 @@
 name            ko
-version         0.362.0
+version         0.363.0
 description     text editor
 keywords
                 editor
@@ -18,13 +18,13 @@ build
                 mac
                   icon  img/app.icns
 dependencies
-                fuzzy           ^0.1.3
-                js-beautify     ^1.15.1
                 klor            github:monsterkodi/klor
                 kslash          github:monsterkodi/kslash
                 kxk             github:monsterkodi/kxk
-                moment          ^2.30.1
                 noon            github:monsterkodi/noon
+                fuzzy           ^0.1.3
+                js-beautify     ^1.15.1
+                moment          ^2.30.1
                 pretty-bytes    ^5.6.0
                 require-like    ^0.1.2
                 seamless-immutable  ^7.1.4

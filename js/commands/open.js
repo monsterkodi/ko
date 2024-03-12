@@ -1,19 +1,18 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.257.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}}
 
-var Command, File, fuzzy, Open, post, Projects, relative, render, slash, syntax, _
+var Open, relative
 
-_ = require('kxk')._
-post = require('kxk').post
-slash = require('kxk').slash
+import projects from "../tools/projects.js"
 
-Projects = require('../tools/projects')
-File = require('../tools/file')
-Command = require('../commandline/command')
-render = require('../editor/render')
-syntax = require('../editor/syntax')
-fuzzy = require('fuzzy')
+import render from "../editor/render.js"
+
+import syntax from "../editor/syntax.js"
+
+import command from "../commandline/command.js"
+
+import File from '../tools/file.js'
 
 relative = function (rel, to)
 {
@@ -37,7 +36,7 @@ relative = function (rel, to)
 
 Open = (function ()
 {
-    _k_.extend(Open, Command)
+    _k_.extend(Open, command)
     function Open (commandline)
     {
         this["weight"] = this["weight"].bind(this)
@@ -72,7 +71,7 @@ Open = (function ()
         var f, file, fuzzied, items, pos
 
         command = command.trim()
-        var _63_20_ = slash.splitFilePos((command != null ? command : this.getText().trim())); file = _63_20_[0]; pos = _63_20_[1]
+        var _65_20_ = slash.splitFilePos((command != null ? command : this.getText().trim())); file = _65_20_[0]; pos = _65_20_[1]
 
         items = this.listItems({currentText:command,maxItems:10000})
         if (command.length)
@@ -81,7 +80,7 @@ Open = (function ()
             {
                 return o.text
             }})
-            items = (function () { var r_70_38_ = []; var list = _k_.list(fuzzied); for (var _70_38_ = 0; _70_38_ < list.length; _70_38_++)  { f = list[_70_38_];r_70_38_.push(f.original)  } return r_70_38_ }).bind(this)()
+            items = (function () { var r_72_38_ = []; var list = _k_.list(fuzzied); for (var _72_38_ = 0; _72_38_ < list.length; _72_38_++)  { f = list[_72_38_];r_72_38_.push(f.original)  } return r_72_38_ }).bind(this)()
             items.sort(function (a, b)
             {
                 return b.weight - a.weight
@@ -101,7 +100,7 @@ Open = (function ()
 
     Open.prototype["complete"] = function ()
     {
-        var p, pdir, projects, _88_23_
+        var p, pdir, projs, _90_23_
 
         if ((this.commandList != null) && this.commandList.line(this.selected).startsWith(slash.basename(this.getText())) && !this.getText().trim().endsWith('/'))
         {
@@ -121,14 +120,14 @@ Open = (function ()
         }
         else
         {
-            projects = post.get('indexer','projects')
-            var list = _k_.list(Object.keys(projects).sort())
-            for (var _100_18_ = 0; _100_18_ < list.length; _100_18_++)
+            projs = post.get('indexer','projects')
+            var list = _k_.list(Object.keys(projs).sort())
+            for (var _102_18_ = 0; _102_18_ < list.length; _102_18_++)
             {
-                p = list[_100_18_]
+                p = list[_102_18_]
                 if (p.startsWith(this.getText()))
                 {
-                    pdir = projects[p].dir
+                    pdir = projs[p].dir
                     if (slash.dirExists(slash.join(pdir,'coffee')))
                     {
                         pdir = slash.join(pdir,'coffee')
@@ -144,7 +143,7 @@ Open = (function ()
 
     Open.prototype["weight"] = function (item, opt)
     {
-        var b, extensionBonus, f, lengthPenalty, localBonus, n, nameBonus, r, relBonus, updirPenalty, _126_26_
+        var b, extensionBonus, f, lengthPenalty, localBonus, n, nameBonus, r, relBonus, updirPenalty, _128_26_
 
         f = item.file
         r = item.text
@@ -220,11 +219,11 @@ Open = (function ()
 
     Open.prototype["listItems"] = function (opt)
     {
-        var f, file, iconSpan, item, items, rel, _170_21_, _171_17_, _182_44_, _184_19_
+        var f, file, iconSpan, item, items, rel, _172_21_, _173_17_, _184_44_, _186_19_
 
         opt = (opt != null ? opt : {})
-        opt.maxItems = ((_170_21_=opt.maxItems) != null ? _170_21_ : 200)
-        opt.flat = ((_171_17_=opt.flat) != null ? _171_17_ : true)
+        opt.maxItems = ((_172_21_=opt.maxItems) != null ? _172_21_ : 200)
+        opt.flat = ((_173_17_=opt.flat) != null ? _173_17_ : true)
         iconSpan = function (file)
         {
             var className
@@ -252,9 +251,9 @@ Open = (function ()
         if (!_k_.empty(this.files))
         {
             var list = _k_.list(this.files)
-            for (var _198_21_ = 0; _198_21_ < list.length; _198_21_++)
+            for (var _200_21_ = 0; _200_21_ < list.length; _200_21_++)
             {
-                file = list[_198_21_]
+                file = list[_200_21_]
                 rel = relative(file,this.dir)
                 if (rel.length)
                 {
@@ -283,9 +282,9 @@ Open = (function ()
         {
             items = []
             var list = _k_.list(this.history)
-            for (var _226_18_ = 0; _226_18_ < list.length; _226_18_++)
+            for (var _228_18_ = 0; _228_18_ < list.length; _228_18_++)
             {
-                f = list[_226_18_]
+                f = list[_228_18_]
                 item = Object.create(null)
                 item.text = relative(f,this.dir)
                 item.file = f
@@ -304,9 +303,9 @@ Open = (function ()
 
     Open.prototype["showFirst"] = function ()
     {
-        var _242_58_, _242_65_
+        var _244_58_, _244_65_
 
-        if (this.commandList && this.selected === ((_242_58_=this.commandList.meta) != null ? (_242_65_=_242_58_.metas) != null ? _242_65_.length : undefined : undefined) - 1)
+        if (this.commandList && this.selected === ((_244_58_=this.commandList.meta) != null ? (_244_65_=_244_58_.metas) != null ? _244_65_.length : undefined : undefined) - 1)
         {
             this.showItems(this.listItems())
             return this.select(0)
@@ -319,7 +318,7 @@ Open = (function ()
 
     Open.prototype["cancel"] = function (name)
     {
-        var _257_27_
+        var _259_27_
 
         if (name === this.names[0])
         {
@@ -333,7 +332,7 @@ Open = (function ()
 
     Open.prototype["start"] = function (name)
     {
-        var dir, item, _278_40_, _292_41_
+        var dir, item, _280_40_, _294_41_
 
         this.setName(name)
         if ((this.commandline.lastFocus === 'commandline-editor' && 'commandline-editor' === window.lastFocus))
@@ -345,7 +344,7 @@ Open = (function ()
             }
             else
             {
-                this.dir = ((_278_40_=slash.dir(this.file)) != null ? _278_40_ : process.cwd())
+                this.dir = ((_280_40_=slash.dir(this.file)) != null ? _280_40_ : process.cwd())
             }
         }
         else if (this.commandline.lastFocus === 'shelf' || this.commandline.lastFocus.startsWith('FileBrowser'))
@@ -374,7 +373,7 @@ Open = (function ()
             this.file = null
             this.dir = process.cwd()
         }
-        this.files = Projects.files(this.dir)
+        this.files = projects.files(this.dir)
         this.loadState()
         this.showList()
         this.showItems(this.listItems())
@@ -385,7 +384,7 @@ Open = (function ()
 
     Open.prototype["execute"] = function (command)
     {
-        var file, path, pos, _323_27_
+        var file, path, pos, _325_27_
 
         if (this.selected < 0)
         {
@@ -395,7 +394,7 @@ Open = (function ()
         this.hideList()
         if (!_k_.empty(path))
         {
-            var _329_24_ = slash.splitFilePos(command); file = _329_24_[0]; pos = _329_24_[1]
+            var _331_24_ = slash.splitFilePos(command); file = _331_24_[0]; pos = _331_24_[1]
 
             file = this.resolvedPath(path)
             file = slash.joinFilePos(file,pos)

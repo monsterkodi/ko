@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.257.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
@@ -207,8 +207,7 @@ function ${clss}
 
     @: () ->
 
-
-module.exports = ${clss}
+export ${clss}
 `
                 fs.writeFile(file,text,{encoding:'utf8'},function (err)
                 {
@@ -223,7 +222,7 @@ module.exports = ${clss}
 
             case 'clean':
                 editor.do.start()
-                for (var _240_27_ = li = 0, _240_31_ = editor.numLines(); (_240_27_ <= _240_31_ ? li < editor.numLines() : li > editor.numLines()); (_240_27_ <= _240_31_ ? ++li : --li))
+                for (var _239_27_ = li = 0, _239_31_ = editor.numLines(); (_239_27_ <= _239_31_ ? li < editor.numLines() : li > editor.numLines()); (_239_27_ <= _239_31_ ? ++li : --li))
                 {
                     line = editor.line(li)
                     cleaned = line.trimRight()

@@ -1,17 +1,13 @@
-// monsterkodi/kode 0.256.0
+// monsterkodi/kode 0.257.0
 
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var Buffer, endOf, event, fuzzy, kerror, kxk, matchr, startOf, State, _
+var Buffer, endOf, startOf
 
-kxk = require('kxk')
-_ = kxk._
-kerror = kxk.kerror
-matchr = kxk.matchr
+import state from "./state.js"
 
-State = require('./state')
-fuzzy = require('fuzzy')
-event = require('events')
+import events from "events"
+
 
 startOf = function (r)
 {
@@ -25,7 +21,7 @@ endOf = function (r)
 
 Buffer = (function ()
 {
-    _k_.extend(Buffer, event)
+    _k_.extend(Buffer, events)
     function Buffer ()
     {
         this["startOfWordAtPos"] = this["startOfWordAtPos"].bind(this)
@@ -36,19 +32,19 @@ Buffer = (function ()
         this.newlineCharacters = '\n'
         this.wordRegExp = new RegExp("(\\s+|\\w+|[^\\s])",'g')
         this.realWordRegExp = new RegExp("(\\w+)",'g')
-        this.setState(new State())
+        this.setState(new state())
     }
 
     Buffer.prototype["setLines"] = function (lines)
     {
         this.emit('numLines',0)
-        this.state = new State({lines:lines})
+        this.state = new state({lines:lines})
         return this.emit('numLines',this.numLines())
     }
 
-    Buffer.prototype["setState"] = function (state)
+    Buffer.prototype["setState"] = function (s)
     {
-        return this.state = new State(state.s)
+        return this.state = new state(s.s)
     }
 
     Buffer.prototype["mainCursor"] = function ()

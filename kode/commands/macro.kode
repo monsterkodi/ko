@@ -217,8 +217,7 @@ function Macro extends Command
 
                     @: () ->
 
-
-                module.exports = #{clss}
+                export #{clss}
 
                 """
                 fs.writeFile file, text, encoding:'utf8', (err) ->

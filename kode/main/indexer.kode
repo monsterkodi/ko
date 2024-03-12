@@ -19,7 +19,6 @@ class Indexer
     @methodRegExp    : /^\s+([\@]?\w+|@)\s*\:\s*(\(.*\))?\s*○?[=-]\>/
     @funcRegExp      : /^\s*([\w\.]+)\s*[\:\=][^\(\)]*(\(.*\))?\s*○?[=-]\>/
     @postRegExp      : /^\s*post\.on\s+[\'\"](\w+)[\'\"]\s*\,?\s*(\(.*\))?\s*[=-]\>/
-    # @testRegExp      : /^\s*(describe|it)\s+[\'\"](.+)[\'\"]\s*\,?\s*(\([^\)]*\))?\s*[=-]\>/
     @testRegExp      : /^\s*(▸\s+.+)/
     @splitRegExp     : new RegExp "[^\\w\\d\\_]+", 'g'
     @classRegExp     : /^(\s*\S+\s*=)?\s*(class|function)\s+(\w+)/
@@ -438,11 +437,10 @@ class Indexer
                                 
                             m = line.match Indexer.testRegExp
                             if m?[0]?
-                                log 'test' m
-                                funcInfo = @addFuncInfo m[0],
+                                funcInfo = @addFuncInfo m[0].replaceAll('▸ ' ''),
                                     line: li+1
                                     file: file
-                                    test: m[0]
+                                    test: m[0].replaceAll '▸ ' ''
     
                                 funcStack.push [indent, funcInfo]
                                 funcAdded = true
