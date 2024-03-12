@@ -310,9 +310,9 @@ class Flex
             if pane.collapsed
                 pane.expand()
                 if flex = @closestVisFlex pane
-                    use = pane.fixed ? flex.size * factor
-                    flex.size -= use
-                    pane.size = use
+                    size = pane.fixed ? flex.size * factor
+                    flex.size -= size
+                    pane.size = size
                 @calculate()
 
     # 000   000  000   0000000  00000000  000      00000000  000   000  

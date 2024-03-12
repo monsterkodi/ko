@@ -1,4 +1,4 @@
-// monsterkodi/kode 0.257.0
+// monsterkodi/kode 0.270.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
 
@@ -446,7 +446,7 @@ class Flex
 
     expand (i, factor = 0.5)
     {
-        var flex, pane
+        var flex, pane, size, _313_38_
 
         if (pane = this.pane(i))
         {
@@ -455,14 +455,9 @@ class Flex
                 pane.expand()
                 if (flex = this.closestVisFlex(pane))
                 {
-                    import =pane from "=pane"
-import .fixed from ".fixed.js"
-import ?flex from "?flex"
-import .size from ".size.js"
-import *factor from "*factor"
-
-                    flex.size -= 
-                    pane.size = 
+                    size = ((_313_38_=pane.fixed) != null ? _313_38_ : flex.size * factor)
+                    flex.size -= size
+                    pane.size = size
                 }
                 return this.calculate()
             }
