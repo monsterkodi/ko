@@ -1,13 +1,18 @@
-// monsterkodi/kode 0.257.0
+// monsterkodi/kode 0.270.0
 
 var _k_ = {empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isArr: function (o) {return Array.isArray(o)}, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var Command
+var Command, CommandList, elem, fuzzy, history, kerror, reversed, syntax, _
 
-import syntax from "../editor/syntax.js"
+_ = require('kxk')._
+elem = require('kxk').elem
+history = require('kxk').history
+kerror = require('kxk').kerror
+reversed = require('kxk').reversed
 
-import commandlist from "./commandlist.js"
-
+syntax = require('../editor/syntax')
+CommandList = require('./commandlist')
+fuzzy = require('fuzzy')
 
 Command = (function ()
 {
@@ -156,7 +161,7 @@ Command = (function ()
         {
             listView = elem({class:`commandlist ${this.prefsID}`})
             window.split.elem.appendChild(listView)
-            return this.commandList = new commandlist(this,'.commandlist',{syntaxName:this.syntaxName})
+            return this.commandList = new CommandList(this,'.commandlist',{syntaxName:this.syntaxName})
         }
     }
 
@@ -565,4 +570,4 @@ Command = (function ()
     return Command
 })()
 
-export default Command;
+module.exports = Command
