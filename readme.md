@@ -3,7 +3,7 @@
 
 #### How to build the app on a mac
 
-Install build dependencies node and zig via brew, 
+Install build dependencies [node](https://nodejs.org) and [zig](https://ziglang.org/) via [brew](https://brew.sh/), 
 clone the repository, build and run the app:
 
 ```
