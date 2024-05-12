@@ -1,8 +1,0 @@
-ignore      
-    /syntax/
-    /md/
-    /bin/cheet.noon
-    /bin/dmg.json
-    /kode/menu.noon
-noon    . replace .. kode/ js/ 
-kode    . replace .. kode/ js/ 
