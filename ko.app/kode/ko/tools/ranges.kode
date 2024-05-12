@@ -1,0 +1,252 @@
+###
+00000000    0000000   000   000   0000000   00000000   0000000
+000   000  000   000  0000  000  000        000       000     
+0000000    000000000  000 0 000  000  0000  0000000   0000000 
+000   000  000   000  000  0000  000   000  000            000
+000   000  000   000  000   000   0000000   00000000  0000000 
+###
+
+use ../../kxk ▪ uniq
+
+class Ranges
+    
+    @pollute: ->
+        
+        for member in Object.getOwnPropertyNames Ranges.prototype 
+            continue if member in ['constructor']
+            globalThis[member] = Ranges.prototype[member]
+        Ranges
+
+    cursorDelta: c dx dy=0 ->
+        c[0] += dx
+        c[1] += dy
+        
+    cursorSet: c x y ->    
+        [x,y] = x if not y? and x.length >=2
+        c[0] = x
+        c[1] = y
+
+    indentationInLine: l ->
+        s = 0
+        if l? and l.length > 0
+            l = l.trimRight()
+            s += 1 while l[s] == ' '
+        s
+        
+    lastWordInLine: l -> 
+        l = l.trim()
+        i = l.lastIndexOf ' '
+        l.slice i+1
+
+    numberOfCharsAtEnd: t c ->
+        s = 0
+        i = t.length-1
+        while i >= 0
+            if t[i] == c
+                s++
+                i--
+            else
+                break
+        s
+        
+    rangeForPos:   p   -> [p[1], [p[0], p[0]]]
+    rangeBetween:  a b -> 
+        if isPos(a) and isPos(b) 
+            [Math.min(a[1], b[1]), [Math.min(a[0], b[0]), Math.max(a[0], b[0])]]
+        else if isRange(a) and isRange(b)
+            r = [a,b]
+            sortRanges r
+            rangeBetween rangeEndPos(r[0]), rangeStartPos(r[1])
+            
+    isPos:            p     -> p?.length == 2 and p[0] is num and p[1] is num
+    isRange:          r     -> r?.length >= 2 and r[0] is num and r[1]?.length >= 2 and r[1][0] is num and r[1][1] is num
+    isSameRange:      a b   -> a[0]==b[0] and a[1][0]==b[1][0] and a[1][1]==b[1][1]
+    isSamePos:        a b   -> a[1]==b[1] and a[0]==b[0]
+    isPosInRange:     p r   -> (p[1] == r[0]) and (r[1][0] <= p[0] <= r[1][1])
+    isPosInRanges:    p rgs -> rangeAtPosInRanges(p, rgs)?
+    isPosInPositions: p ps  -> posInPositions(p,ps)?
+
+    rangeEndPos:      r     -> [r[1][1], r[0]]
+    rangeStartPos:    r     -> [r[1][0], r[0]]
+    lengthOfRange:    r     -> r[1][1] - r[1][0]
+    rangeIndexPos:    r i   -> [r[1][i], r[0]]
+    rangeGrownBy:     r d   -> [r[0], [r[1][0]-d, r[1][1]+d]]
+
+    # 00000000    0000000    0000000  000  000000000  000   0000000   000   000   0000000  
+    # 000   000  000   000  000       000     000     000  000   000  0000  000  000       
+    # 00000000   000   000  0000000   000     000     000  000   000  000 0 000  0000000   
+    # 000        000   000       000  000     000     000  000   000  000  0000       000  
+    # 000         0000000   0000000   000     000     000   0000000   000   000  0000000   
+
+    positionsFromPosInPositions:        p  pl      -> pl.filter (r) -> (r[1] > p[1]) or (r[1] == p[1]) and (r[0] >= p[0])
+    positionsAtLineIndexInPositions:    li pl      -> pl.filter (p) -> p[1] == li
+    positionsBelowLineIndexInPositions: li pl      -> pl.filter (p) -> p[1] > li
+    positionsAfterLineColInPositions:   li col pl  -> pl.filter (p) -> p[1] == li and p[0]>col
+    positionsNotInRanges:               pss rgs    -> pss.filter (p) -> not isPosInRanges p, rgs
+    positionsBetweenPosAndPosInPositions: p1 p2 pl -> 
+        [a,b] = sortPositions [p1, p2]
+        pl.filter (r) -> (r[1] > a[1] or (r[1] == a[1]) and (r[0] >= a[0])) and (r[1] < b[1] or (r[1] == b[1]) and (r[0] <= b[0])) 
+
+    positionsInContinuousLine: pl ->
+        
+        cp = pl[0]
+        for c in pl.slice 1
+            return false if c[0] != cp[0]
+            return false if c[1] != cp[1]+1
+            cp = c
+        true
+            
+    manhattanDistance: a b -> Math.abs(a[1]-b[1])+Math.abs(a[0]-b[0])
+        
+    posInPositions: p pl ->
+        for c in pl
+            return c if isSamePos p, c
+
+    posClosestToPosInPositions: p pl -> 
+        minDist = 999999        
+        for ps in pl
+            mDist = manhattanDistance ps, p
+            if mDist < minDist
+                minDist = mDist
+                minPos = ps
+        minPos ? pl[-1]
+    
+    lineIndicesInPositions: pl ->
+        indices = []
+        for p in pl
+            indices.push p[1] 
+        uniq(indices).sort()
+
+    endPositionsFromRanges:   ranges -> (rangeEndPos(r) for r in ranges)
+    startPositionsFromRanges: ranges -> (rangeStartPos(r) for r in ranges)        
+        
+    # 00000000    0000000   000   000   0000000   00000000   0000000  
+    # 000   000  000   000  0000  000  000        000       000       
+    # 0000000    000000000  000 0 000  000  0000  0000000   0000000   
+    # 000   000  000   000  000  0000  000   000  000            000  
+    # 000   000  000   000  000   000   0000000   00000000  0000000   
+    
+    rangesFromPositions:          pl -> ([p[1], [p[0], p[0]]] for p in pl)  
+    rangesAtLineIndexInRanges:    li     ranges -> ranges.filter (r) -> r[0]==li
+    rangesForLineIndicesInRanges: lis    ranges -> ranges.filter (r) -> r[0] in lis
+    rangesAfterLineColInRanges:   li col ranges -> ranges.filter (r) -> r[0]==li and r[1][0] > col
+    
+    rangeAtPosInRanges: pos ranges ->
+        ⮐ if ranges.length == 0
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
+            if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
+                ⮐ r
+
+    rangesBeforePosInRanges: pos ranges ->
+        ⮐ [] if ranges.length == 0
+        rs = []
+        for r in ranges
+            if (r[0] > pos[1]) or ((r[0] == pos[1]) and (r[1][0] > pos[0]))
+                ⮐ rs 
+            rs.push r
+        rs
+
+    rangesAfterPosInRanges: pos ranges ->
+        ⮐ [] if ranges.length == 0
+        rs = []
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
+            if (r[0] < pos[1]) or ((r[0] == pos[1]) and (r[1][1] < pos[0]))
+                ⮐ rs 
+            rs.unshift r
+        rs
+        
+    rangesSplitAtPosInRanges: pos ranges ->
+        ⮐ [[],null,[]] if ranges.length == 0
+        [bef,at,aft] = [[],null,[]]
+        for ri in [0...ranges.length]
+            r = ranges[ri]
+            if (r[0] == pos[1]) and (r[1][0] <= pos[0] <= r[1][1])
+                at = r
+                aft = ranges.slice ri+1
+                break
+            bef.push r
+        [bef,at,aft]
+            
+    rangeBeforePosInRanges: pos ranges ->
+        ⮐ if ranges.length == 0
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
+            if (r[0] < pos[1]) or ((r[0] == pos[1]) and (r[1][1] < pos[0]))
+                ⮐ r 
+    
+    rangeAfterPosInRanges: pos ranges ->
+        for r in ranges
+            if (r[0] > pos[1]) or ((r[0] == pos[1]) and (r[1][0] > pos[0]))
+                ⮐ r
+    
+    rangeStartingOrEndingAtPosInRanges: p ranges ->
+        ⮐ if ranges.length == 0
+        for ri in [ranges.length-1..0]
+            r = ranges[ri]
+            if r[0] == p[1]
+                if r[1][0] == p[0] or r[1][1] == p[0]
+                    ⮐ r
+    
+    rangesFromTopToBotInRanges: top bot ranges ->
+        ranges.filter (r) -> top <= r[0] <= bot
+        
+    rangeContainingRangeInRanges: r ranges ->
+        if cr = rangeAtPosInRanges rangeStartPos(r), ranges
+            ⮐ cr if cr[1][1] >= r[1][1]
+        
+    rangesShrunkenBy: ranges delta ->
+        ranges.filter((r) -> r[1][1]-r[1][0]>=2*delta).map (r) -> [r[0], [r[1][0]+delta, r[1][1]-delta]]
+            
+    rangesNotEmptyInRanges: ranges -> ranges.filter (r) -> r[1][1]-r[1][0]
+
+    areSameRanges: ra rb -> 
+        if ra.length == rb.length
+            for i in [0...ra.length]
+                ⮐ false if not isSameRange ra[i], rb[i]
+            ⮐ true
+        false
+
+    #  0000000  000      00000000   0000000   000   000  
+    # 000       000      000       000   000  0000  000  
+    # 000       000      0000000   000000000  000 0 000  
+    # 000       000      000       000   000  000  0000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
+    cleanRanges: ranges ->
+        sortRanges ranges 
+        if ranges.length > 1
+            for ri in [ranges.length-1...0]
+                r = ranges[ri]
+                p = ranges[ri-1]
+                if r[0] == p[0] # on same line
+                    if r[1][0] <= p[1][1] # starts before previous ends
+                        p[1][1] = Math.max p[1][1], r[1][1] 
+                        ranges.splice ri, 1
+        ranges
+    
+    #  0000000   0000000   00000000   000000000
+    # 000       000   000  000   000     000   
+    # 0000000   000   000  0000000       000   
+    #      000  000   000  000   000     000   
+    # 0000000    0000000   000   000     000   
+                
+    sortRanges: ranges ->
+        ranges.sort (a,b) -> 
+            if a[0]!=b[0]
+                a[0]-b[0]
+            else
+                if a[1][0]!=b[1][0]
+                    a[1][0]-b[1][0]
+                else
+                    a[1][1]-b[1][1]
+                    
+    sortPositions: positions ->
+        positions.sort (a,b) ->
+            if a[1]!=b[1]
+                a[1]-b[1]
+            else
+                a[0]-b[0]
+    
+export Ranges.pollute()

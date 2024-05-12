@@ -1,0 +1,90 @@
+###
+00000000  000  000      00000000  000      000   0000000  000000000
+000       000  000      000       000      000  000          000   
+000000    000  000      0000000   000      000  0000000      000   
+000       000  000      000       000      000       000     000   
+000       000  0000000  00000000  0000000  000  0000000      000   
+###
+
+use ../../kxk ▪ slash drag elem post
+use ../editor ◆ Syntax
+
+function FileList
+
+    @: @editor ->
+        
+        @elem = elem class:'filelist'
+        
+        @editor.view.appendChild @elem
+        
+        @editor.scroll.on 'scroll' @onEditorScrollOrCursor
+        @editor.on 'cursor'        @onEditorScrollOrCursor
+
+        post.on 'list.toggle'     @toggle
+        post.on 'filelist.clear'  @onClear
+        post.on 'filelist.add'    @onAdd
+        
+        @drag = new drag
+            target:  @elem
+            onStart: @onDragMove
+            onMove:  @onDragMove
+            
+        @toggle()
+            
+    onDragMove: drag event => @onClick event
+        
+    toggle: =>
+                
+        filelistActive = prefs.get 'list|active' true
+        @elem.style.display = filelistActive ? 'inherit' : 'none'
+        @onEditorScrollOrCursor()
+        
+    onEditorScrollOrCursor: => 
+        
+        scroll  = @editor.scroll.scroll
+    
+        topLine = parseInt scroll/@editor.scroll.lineHeight
+        botLine = topLine + @editor.numFullLines()
+        mainLine= @editor.mainCursor()[1]+1
+        
+        for child in @elem.children
+             
+            lastLine = child.nextSibling ? child.nextSibling.line : @editor.numLines()
+             
+            visible = lastLine-1 > topLine and child.line <= botLine
+            child.classList.toggle 'visible' visible
+             
+            if visible ➜ child.scrollIntoViewIfNeeded()
+             
+            inside = child.line <= mainLine and lastLine > mainLine
+            child.classList.toggle 'inside' inside
+                        
+    #  0000000   000   000         0000000  000      00000000   0000000   00000000   
+    # 000   000  0000  000        000       000      000       000   000  000   000  
+    # 000   000  000 0 000        000       000      0000000   000000000  0000000    
+    # 000   000  000  0000        000       000      000       000   000  000   000  
+    #  0000000   000   000         0000000  0000000  00000000  000   000  000   000  
+    
+    onClear: => @elem.innerHTML = ''
+    
+    #  0000000   000   000         0000000   0000000    0000000    
+    # 000   000  0000  000        000   000  000   000  000   000  
+    # 000   000  000 0 000        000000000  000   000  000   000  
+    # 000   000  000  0000        000   000  000   000  000   000  
+    #  0000000   000   000        000   000  0000000    0000000    
+    
+    onAdd: path line =>
+
+        file = slash.file path
+        e = elem class:'filelist-item' parent:@elem, click:@onClick, html:Syntax.spanForTextAndSyntax file, 'browser'
+        e.path = path
+        e.line = line
+        
+    onClick: event =>
+        
+        if e = elem.upElem event, prop:'path'
+            window.terminal.singleCursorAtPos [0 e.line-1]
+            window.terminal.scroll.cursorToTop 1
+            window.split.do "focus terminal"
+
+export FileList

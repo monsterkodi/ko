@@ -1,0 +1,150 @@
+
+# 00     00  00000000  000   000  000   000
+# 000   000  000       0000  000  000   000
+# 000000000  0000000   000 0 000  000   000
+# 000 0 000  000       000  0000  000   000
+# 000   000  00000000  000   000   0000000
+
+ko
+    About                   alt+cmdctrl+shift+/
+    -
+    Preferences             cmdctrl+shift+,
+    Calculator              cmdctrl+k
+    --
+    Quit                    cmdctrl+q
+
+# 00000000  000  000      00000000
+# 000       000  000      000
+# 000000    000  000      0000000
+# 000       000  000      000
+# 000       000  0000000  00000000
+
+File
+    New Tab                 cmdctrl+n
+    New Window              cmdctrl+shift+n
+    -
+    Open...                 cmdctrl+o
+    Open In New Window...   cmdctrl+shift+o
+    Open Counterpart        alt+o
+    --
+    Save                    cmdctrl+s
+    Save As ...             cmdctrl+shift+s
+    Save All                alt+cmdctrl+s
+    ---
+    Revert                  cmdctrl+r
+    ----
+    Close Tab               cmdctrl+w
+    Close Other Tabs        cmdctrl+shift+w alt+cmdctrl+w
+    Close Other Windows     cmdctrl+alt+shift+w
+
+Edit
+    Undo                    cmdctrl+z
+    Redo                    cmdctrl+shift+z alt+z
+    -
+    Cut                     cmdctrl+x
+    Copy                    cmdctrl+c
+    Paste                   cmdctrl+v
+    --
+
+#  0000000   0000000   00     00  00     00   0000000   000   000  0000000
+# 000       000   000  000   000  000   000  000   000  0000  000  000   000
+# 000       000   000  000000000  000000000  000000000  000 0 000  000   000
+# 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000
+#  0000000   0000000   000   000  000   000  000   000  000   000  0000000
+
+Command
+
+    Goto                    cmdctrl+;
+
+    # 0000000    00000000    0000000   000   000   0000000  00000000
+    # 000   000  000   000  000   000  000 0 000  000       000
+    # 0000000    0000000    000   000  000000000  0000000   0000000
+    # 000   000  000   000  000   000  000   000       000  000
+    # 0000000    000   000   0000000   00     00  0000000   00000000
+
+    Browse                  cmdctrl+.
+
+    #  0000000   00000000   00000000  000   000
+    # 000   000  000   000  000       0000  000
+    # 000   000  00000000   0000000   000 0 000
+    # 000   000  000        000       000  0000
+    #  0000000   000        00000000  000   000
+
+    Open                    cmdctrl+p
+
+    #  0000000  00000000   0000000   00000000    0000000  000   000
+    # 000       000       000   000  000   000  000       000   000
+    # 0000000   0000000   000000000  0000000    000       000000000
+    #      000  000       000   000  000   000  000       000   000
+    # 0000000   00000000  000   000  000   000   0000000  000   000
+
+    Search
+        Case Insensitive    cmdctrl+shift+f
+        Case Sensitive      alt+shift+f
+        Regexp Case Insensitive
+        Regexp Case Sensitive
+
+    # 00000000  000  000   000  0000000
+    # 000       000  0000  000  000   000
+    # 000000    000  000 0 000  000   000
+    # 000       000  000  0000  000   000
+    # 000       000  000   000  0000000
+
+    Find
+        Case Insensitive    cmdctrl+f
+        Case Sensitive      alt+f
+        Regexp Case Insensitive
+        Regexp Case Sensitive
+
+# 000   000  000  00000000  000   000
+# 000   000  000  000       000 0 000
+#  000 000   000  0000000   000000000
+#    000     000  000       000   000
+#     0      000  00000000  00     00
+
+View
+    Maximize Editor         cmdctrl+y cmdctrl+shift+y cmdctrl+,
+    Toggle Center Text      cmdctrl+\
+    Toggle Func List        cmdctrl+'
+    -
+    Toggle Tab Pinned       alt+cmdctrl+p
+    Toggle Tab Extensions   alt+cmdctrl+t
+    --
+    Navigate Backward       cmdctrl+1
+    Navigate Forward        cmdctrl+2
+    ---
+    Activate Previous Tab   cmdctrl+[
+    Activate Next Tab       cmdctrl+]
+    ----
+    Move Tab Left           alt+cmdctrl+[
+    Move Tab Right          alt+cmdctrl+]
+    -----
+    Font Size
+        Increase            cmdctrl+=
+        Decrease            cmdctrl+-
+        Reset               cmdctrl+0
+
+# 000   000  000  000   000  0000000     0000000   000   000
+# 000 0 000  000  0000  000  000   000  000   000  000 0 000
+# 000000000  000  000 0 000  000   000  000   000  000000000
+# 000   000  000  000  0000  000   000  000   000  000   000
+# 00     00  000  000   000  0000000     0000000   00     00
+
+Window
+    Toggle Menu             alt+m
+    Toggle Scheme           
+    -
+    Minimize                alt+cmdctrl+shift+m
+    Maximize                alt+cmdctrl+m
+    Fullscreen              alt+cmdctrl+f
+    # Hide                    cmdctrl+h
+    --    
+    # Arrange Windows         alt+cmdctrl+`
+    Focus Next              cmdctrl+`
+    Focus Previous          cmdctrl+shift+`
+    ---
+    Screenshot              f3
+    Reload                  alt+cmdctrl+l
+    DevTools                alt+cmdctrl+i
+    ----
+    Close                   alt+w

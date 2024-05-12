@@ -1,0 +1,98 @@
+###
+00000000  000  000      00000000
+000       000  000      000     
+000000    000  000      0000000 
+000       000  000      000     
+000       000  0000000  00000000
+###
+
+use ../../kxk ▪ slash ffs
+
+icons = {}
+
+ffs.read(slash.path ◆dir, 'icons.json').then (t) -> 
+    icons = JSON.parse t
+
+class File
+    
+    # TODO: move this stuff to a config.noon file
+    
+    @sourceFileExtensions: [ 'kode' 'coffee' 'styl' 'swift' 'pug' 'md' 'noon' 'txt' 'json' 'sh' 'py' 'cpp' 'mm' 'cc' 'c' 'cs' 'h' 'hpp' 'ts' 'js' 'mjs' 'frag' 'vert']
+
+    @isCode:  file -> slash.ext(file) in ['coffee' 'kode' 'py' 'cpp' 'cc' 'mm' 'c' 'cs' 'ts' 'js' 'mjs' 'h' 'hpp' 'frag' 'vert']
+    @isImage: file -> slash.ext(file) in ['gif' 'png' 'jpg' 'jpeg' 'svg' 'bmp' 'ico']
+    @isText:  file -> true # slash.ext(file) in File.sourceFileExtensions
+   
+    @rename: from to ○->
+        
+        ○ ffs.mkdir slash.dir to
+            
+        if ○ ffs.isDir to
+            to = slash.path to, slash.file from
+
+        if ○ ffs.move from, to
+                
+            if editor.currentFile == from # this is not right! use kore!
+                editor.currentFile = to
+            
+            [from, to]
+        else 
+            null
+
+    @duplicate: from ○-> 
+
+        ○ ffs.duplicate from
+    
+    @copy: from to ○->
+        
+        if ○ ffs.isDir to
+            to = slash.path to, slash.file from
+        
+        ○ ffs.copy from, to
+    
+    @iconClassName: file ->
+        
+        file = slash.removeLinePos file
+        
+        clss  = icons.ext[slash.ext file]
+        clss ?= icons.base[slash.name(file).toLowerCase()]
+        clss ?= 'file'
+        "icon #{clss}"
+        
+    @save: file text cb ->
+        
+        ffs.write(file, text).then cb
+    
+    @span: text ->
+        
+        base = slash.name text
+        ext  = slash.ext(text).toLowerCase()
+        clss = valid(ext) and ' '+ext or ''
+        
+        if base.startsWith '.' then clss += ' dotfile'
+        
+        span = "<span class='text#{clss}'>"+base+"</span>"
+        
+        if valid ext
+            span += "<span class='ext punct#{clss}'>.</span>" + "<span class='ext text#{clss}'>"+ext+"</span>"
+        span
+                
+    @crumbDirSpan: dir ->
+        
+        ⮐ "<span>/</span>" if dir in ['/' '']
+        
+        spans = []
+        root = ''
+        if slash.isAbsolute dir
+            spans.push ""
+            root = '/'
+        
+        split = slash.split dir
+        
+        for i in [0...split.length-1]
+            s = split[i]
+            spans.push "<div class='inline path' id='#{root}#{split[0..i].join '/'}'>#{s}</div>"
+        spans.push "<div class='inline' id='#{dir}'>#{split[-1]}</div>"
+        spans.join "<span class='punct'>/</span>"
+                        
+export File

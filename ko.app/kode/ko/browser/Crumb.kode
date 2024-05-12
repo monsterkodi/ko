@@ -1,0 +1,66 @@
+###
+ 0000000  00000000   000   000  00     00  0000000
+000       000   000  000   000  000   000  000   000
+000       0000000    000   000  000000000  0000000
+000       000   000  000   000  000 0 000  000   000
+ 0000000  000   000   0000000   000   000  0000000
+###
+
+use ../../kxk ▪ kpos elem slash
+use ../tools  ◆ File
+use ../editor ◆ Syntax
+
+class Crumb
+
+    @: @column ->
+
+        @elem = elem class:'crumb'
+        @elem.columnIndex = @column.index
+        @elem.addEventListener 'mousedown' @onMouseDown
+        @elem.addEventListener 'mouseup'   @onMouseUp
+        @column.div.insertBefore @elem, @column.div.firstChild
+
+    show: -> @elem.style.display = 'block'
+    hide: -> @elem.style.display = 'none'
+
+    onMouseDown: event =>
+
+        @downPos = kpos window.win?.getBounds()
+
+    onMouseUp: event =>
+
+        ⮐ if not @downPos
+
+        upPos = kpos window.win?.getBounds()
+
+        if upPos.to(@downPos).length() > 0
+            delete @downPos
+            @column.focus()
+            ⮐ 
+
+        if @column.index == 0
+
+            if event.target.id
+                @column.browser.browse event.target.id
+            else
+                root = @elem.firstChild
+                br = root.getBoundingClientRect()
+                if kpos(event).x < br.left
+                    @column.browser.browse root.id
+                else
+                    @column.browser.browse @column.parent.path
+        else
+            @column.makeRoot()
+
+        delete @downPos
+
+    setFile: file ->
+
+        if @column.index == 0
+            @elem.innerHTML = File.crumbDirSpan slash.tilde file
+        else
+            @elem.innerHTML = Syntax.spanForTextAndSyntax slash.file(file), 'browser'
+
+    clear: -> @elem.innerHTML = ''
+
+export Crumb

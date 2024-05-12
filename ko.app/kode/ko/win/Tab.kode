@@ -1,0 +1,156 @@
+###
+000000000   0000000   0000000
+   000     000   000  000   000
+   000     000000000  0000000
+   000     000   000  000   000
+   000     000   000  0000000
+###
+
+use ../../kxk ▪ elem slash tooltip
+use ../tools  ◆ Git Projects
+use ../editor ◆ Render Syntax
+
+class Tab
+
+    @: @tabs koreTab ->
+
+        for k,v of koreTab
+            @[k] = v
+
+        @div = elem class: 'tab app-drag-region'
+        @tabs.div.appendChild @div
+
+        @update()
+        
+    isPrj: -> @type == 'prj'
+    index: -> @tabs.tabs.indexOf @
+
+    # 000   000  00000000   0000000     0000000   000000000  00000000
+    # 000   000  000   000  000   000  000   000     000     000
+    # 000   000  00000000   000   000  000000000     000     0000000
+    # 000   000  000        000   000  000   000     000     000
+    #  0000000   000        0000000    000   000     000     00000000
+
+    update: =>
+
+        @div.innerHTML = ''
+        @div.classList.toggle 'dirty'  @dirty?
+        @div.classList.toggle 'active' @active?
+
+        sep = '●'
+        sep = '' if @isPrj()
+        
+        if @dirty?
+            @dot = elem 'span' class:'unsaved-icon'
+        else
+            @dot = elem 'span' class:'dot' text:sep
+        
+        @div.appendChild @dot
+
+        diss = Syntax.dissForTextAndSyntax slash.file(@path), 'ko'
+
+        if not prefs.get 'tabs|extension'
+            if valid slash.ext @path
+                diss.pop()
+                diss.pop()
+
+        name = elem 'span' class:'name app-drag-region' html:Render.line diss, charWidth:0
+        @div.appendChild name
+
+        if @isPrj()
+            @div.classList.add 'prj'
+        else
+            html = ''
+            if @pinned
+                html = """
+                    <span class="tab-lock"><span class="lock-icon"></span></span>
+                    """
+                # html = """
+                # <svg width="100%" height="100%" viewBox="0 0 30 30" fill="transparent">
+                    # <circle cx="15" cy="12" r="4" />
+                    # <line x1="15" y1="16"  x2="15"  y2="22" stroke-linecap="round"></line>
+                # </svg>
+                # """
+            else if @tmp
+                html = """
+                    <span class="tab-temp"><span class="temp-icon"></span></span>
+                    """
+                # html = """
+                # <svg width="100%" height="100%" viewBox="0 0 30 30">
+                    # <circle cx="15" cy="9"  r="2" />
+                    # <circle cx="15" cy="15" r="2" />
+                    # <circle cx="15" cy="21" r="2" />
+                # </svg>
+                # """
+
+            @div.appendChild elem 'span' class:'tabstate app-drag-region' html:html, click:@togglePinned
+
+        @tooltip = new tooltip elem:name, bound:@div, html:@tooltipHtml, x:-2
+
+        if @isPrj()
+            if Git.statusCache[@path]
+                @onGitStatus Git.statusCache[@path]
+
+            if @collapsed
+                tabs = @tabs.fileTabsForPath @path
+                for tab in tabs
+                    dot = elem 'span' class:'prjdot' text:'■'
+                    @div.appendChild dot
+                    if tab.active
+                        dot.classList.add 'activeTab'
+
+        else
+            if prj = @tabs.prjTabForPath @path
+                if prj.collapsed
+                    @div.style.display = 'none'
+        @
+
+    # 000000000   0000000    0000000   000      000000000  000  00000000
+    #    000     000   000  000   000  000         000     000  000   000
+    #    000     000   000  000   000  000         000     000  00000000
+    #    000     000   000  000   000  000         000     000  000
+    #    000      0000000    0000000   0000000     000     000  000
+
+    tooltipHtml: =>
+
+        if @path?
+
+            diss = Syntax.dissForTextAndSyntax slash.tilde(@path), 'ko'
+            html = Render.line diss, wrapSpan:'tooltip-path'
+
+            if @isPrj() and numFiles = Projects.files(@path).length
+                html += Render.line Syntax.dissForTextAndSyntax("#{numFiles} files" 'git'), wrapSpan:'tooltip-line'
+                log 'ttip git status'
+                Git.status @path
+        html
+
+    #  0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000
+    # 000        000     000     000          000     000   000     000     000   000  000
+    # 000  0000  000     000     0000000      000     000000000     000     000   000  0000000
+    # 000   000  000     000          000     000     000   000     000     000   000       000
+    #  0000000   000     000     0000000      000     000   000     000      0000000   0000000
+
+    onGitStatus: (status) =>
+
+        return if status.gitDir != @path
+
+        if @tooltip?.div?
+            if status.deleted.length ➜ @tooltip.div.innerHTML += Render.line Syntax.dissForTextAndSyntax("▲ #{status.deleted.length} deleted" 'git'), wrapSpan:'tooltip-line'
+            if status.added.length   ➜ @tooltip.div.innerHTML += Render.line Syntax.dissForTextAndSyntax("■ #{status.added.length} added"     'git'), wrapSpan:'tooltip-line'
+            if status.changed.length ➜ @tooltip.div.innerHTML += Render.line Syntax.dissForTextAndSyntax("● #{status.changed.length} changed" 'git'), wrapSpan:'tooltip-line'
+
+        t = ''
+        if status.deleted.length ➜ t += '<div class="git-status-icon git-deleted deleted-triangle">▲</div>'
+        if status.added.length   ➜ t += '<div class="git-status-icon git-added       added-square">■</div>'
+        if status.changed.length ➜ t += '<div class="git-status-icon git-changed   changed-circle">●</div>'
+        @dot.innerHTML = t
+
+    # 00000000   000  000   000  000   000  00000000  0000000
+    # 000   000  000  0000  000  0000  000  000       000   000
+    # 00000000   000  000 0 000  000 0 000  0000000   000   000
+    # 000        000  000  0000  000  0000  000       000   000
+    # 000        000  000   000  000   000  00000000  0000000
+
+    togglePinned: => @tabs.togglePinned @path
+
+export Tab

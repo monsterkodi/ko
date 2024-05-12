@@ -1,0 +1,643 @@
+
+.linespans .unicode
+{
+    margin: -10px;
+    padding: 10px;
+    color: #ccf;
+}
+
+.syntax
+{
+    color: #666;
+}
+
+.browserRow.array
+{
+    color: #aaa;
+}
+
+.browserRow .arrayIndex
+{
+    color: #444;
+    font-size: 12px;
+}
+
+.browserRow .arrayDot
+{
+    color: #333;
+}
+
+.invisible
+{
+    color: #181818;
+}
+
+.invisible.invisible-tab
+{
+    color: #333;
+}
+
+.invisible.trailing
+{
+    color: #600;
+}
+
+.array
+{
+    color: #00f;
+}
+
+.type
+{
+    color: #77f;
+}
+
+.await
+{
+    margin-left: -0.05em;
+    margin-top: -0.05em;
+    opacity: 1 !important;
+    color: #55f;
+}
+
+.compare
+{
+    font-family: fontLigature;
+    opacity: 1 !important;
+    color: #66f;
+}
+
+
+.func,
+.function
+{
+    color: #fa0;
+}
+
+.func.post,
+.function.post
+{
+    color: #bbf;
+}
+
+.func.call,
+.function.call
+{
+    color: #f80;
+}
+
+.function.call.class
+{
+    color: #fc0;
+}
+
+.func.marker,
+.function.marker
+{
+    font-family: fontLigature;
+    opacity: 1;
+    color: #33f;
+}
+
+.func.marker.bound,
+.function.marker.bound
+{
+    color: #826;
+}
+
+.func.marker.async,
+.function.marker.async
+{
+    color: #55f;
+}
+
+.func.punct.async,
+.function.punct.async
+{
+    font-family: fontLigature;
+    opacity: 1;
+    color: #55f;
+    padding: 0;
+    margin: 0;
+    margin-left: 0.2em;
+    margin-top: -0.05em;
+}
+
+.func.ligature,
+.function.ligature
+{
+    opacity: 1;
+    color: #55f;
+}
+
+.func.bound.ligature,
+.function.bound.ligature
+{
+    opacity: 1;
+    color: #c48;
+}
+
+.func.bound,
+.function.bound
+{
+    color: #f00;
+}
+
+.func.bound.async,
+.function.bound.async
+{
+    color: #f80;
+}
+
+.func.bracket,
+.function.bracket
+{
+    color: #55f;
+}
+
+.func.argument,
+.function.argument
+{
+    color: #0a4;
+}
+
+.arrow
+{
+}
+
+
+.arrow.tail:before,
+.arrow.head:before
+{
+    color: #555;
+}
+
+
+
+
+
+
+.obj,
+.owner,
+.callee,
+.dictionary,
+.class.object,
+.class
+{
+    color: #ff8;
+}
+
+.range
+{
+    color: #66f;
+}
+
+.require
+{
+    color: #0f0;
+}
+
+.this
+{
+    color: #f88;
+}
+
+
+.marker,
+.punct
+{
+    opacity: 0.4;
+}
+
+.marker.minor,
+.punct.minor
+{
+    opacity: 0.3;
+}
+
+.marker.dictionary,
+.punct.dictionary
+{
+    opacity: 0.3;
+}
+
+.escape
+{
+    opacity: 0.2;
+}
+
+.module
+{
+    color: #ff8;
+}
+
+.property
+{
+    color: #fa8;
+}
+
+
+.elem,
+.namespace
+{
+    color: #48a;
+}
+
+.elem.member,
+.namespace.member
+{
+    color: #f80;
+}
+
+.member
+{
+    color: #ccf;
+}
+
+.method
+{
+    color: #ff0;
+}
+
+
+.method.class,
+.method.call
+{
+    color: #ff8;
+}
+
+
+.method.definition,
+.method.template
+{
+    color: #48a;
+}
+
+
+.method.static,
+.method.static.async
+{
+    color: #ffa;
+}
+
+.method.static.marker,
+.method.static.async.marker
+{
+    opacity: 1;
+    color: #99f;
+}
+
+.method.static.bound
+{
+    color: #ee0;
+}
+
+.method.static.bound.async
+{
+    color: #ff0;
+}
+
+.template
+{
+    color: #48a;
+}
+
+.operator
+{
+    color: #fa0;
+}
+
+.operator.negate
+{
+    color: #ff0;
+}
+
+.regexp
+{
+    color: #f4a;
+}
+
+
+
+.keypath,
+.semver,
+.cssid
+{
+    color: #f80;
+}
+
+
+.syntax.cond,
+.keyword
+{
+    color: #aaf;
+}
+
+.syntax.cond.null,
+.keyword.null
+{
+    color: #a00;
+}
+
+.syntax.cond.function,
+.keyword.function
+{
+    color: #666;
+}
+
+.struct
+{
+    color: #f63;
+}
+
+.macro
+{
+    color: #f0f;
+}
+
+.macro.call
+{
+    color: #f0f;
+}
+
+&.argument
+{
+    color: #0aa;
+}
+
+.define
+{
+    color: #666;
+}
+
+.interpolation.marker
+{
+        color: #f80;
+}
+
+.variable.err
+{
+    color: #f08;
+}
+
+.syntax.exists
+{
+    opacity: 0.7;
+}
+
+.string
+{
+    color: #0a0;
+}
+
+
+.string.double,
+.string.triple
+{
+    color: #0e0;
+}
+
+.string.backtick
+{
+    color: #ccf;
+}
+
+.string.interpolation
+{
+    opacity: 0.5;
+}
+
+.string.dictionary
+{
+    color: #0a0;
+}
+
+
+.bool,
+.true
+{
+    color: #88f;
+}
+
+.nil
+{
+    color: #f04;
+}
+
+
+.number,
+.int
+{
+    color: #88f;
+}
+
+.float
+{
+    color: #f68;
+}
+
+.hex
+{
+    color: #fa8;
+}
+
+
+.keyword.return,
+.keyword.return.function.call
+{
+    color: #c0c;
+}
+
+.punct.keyword.return
+{
+    margin-top: -0.12em;
+    opacity: 1;
+    color: #44a;
+}
+
+
+
+.comment,
+.comment.text.keyword,
+.comment.string.double
+{
+    color: #4f4f4f !important;
+}
+
+.comment.header
+{
+    color: #040 !important;
+    background: #040;
+    border-left-color: #060;
+    border-bottom-color: #020;
+}
+
+.comment.header.minimap
+{
+    color: #0a0 !important;
+    opacity: 1;
+}
+
+.comment.triple.header
+{
+    color: #060 !important;
+    background: #060;
+    border-left-color: #080;
+    border-bottom-color: #040;
+}
+
+.comment.triple.header.minimap
+{
+    color: #0f0 !important;
+}
+
+.header.marker.minimap
+{
+    color: #222 !important;
+}
+
+.require
+{
+    color: #666;
+}
+
+.require.variable
+{
+    color: #0f0;
+}
+
+.require.string
+{
+    color: #0a0;
+}
+
+.require.string.module
+{
+    color: #ff0;
+}
+
+.require.module
+{
+    color: #0f0;
+}
+
+.require.keyword
+{
+    color: #333;
+}
+
+&.h1
+{
+    color: #ff0;
+}
+
+&.h2
+{
+    color: #ff4;
+}
+
+&.h3
+{
+    color: #ff8;
+}
+
+&.h4
+{
+    color: #aaf;
+}
+
+&.h5
+{
+    color: #88f;
+}
+
+&.li1
+{
+    color: #0f0;
+}
+
+&.li1.marker
+{
+    color: transparent;
+}
+
+&.li1.marker:before
+{
+    color: #0f0;
+}
+
+&.li2
+{
+    color: #0a0;
+}
+
+&.li2.marker
+{
+    color: transparent;
+}
+
+&.li2.marker:before
+{
+    color: #0a0;
+}
+
+&.li3
+{
+    color: #080;
+}
+
+&.li3.marker
+{
+    color: transparent;
+}
+
+&.li3.marker:before
+{
+    color: #080;
+}
+
+&.bold
+{
+    color: #ff8;
+    font-weight: bold;
+}
+
+&.bold.marker
+{
+    opacity: 0.3;
+}
+
+&.code
+{
+    color: #ccf;
+}
+
+&.code.punct
+{
+    opacity: 0.2;
+}
+
+&.italic
+{
+    font-style: italic;
+}
+
+.found
+{
+    text-decoration: underline;
+}
+
+.git-deleted
+{
+    opacity: 0.25;
+}
+
+.git-added
+{
+    color: #0a0;
+}
+
+.git-changed
+{
+    color: #aaf;
+}

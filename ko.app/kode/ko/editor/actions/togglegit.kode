@@ -1,0 +1,125 @@
+
+# 000000000   0000000    0000000    0000000   000      00000000         0000000   000  000000000
+#    000     000   000  000        000        000      000             000        000     000
+#    000     000   000  000  0000  000  0000  000      0000000         000  0000  000     000
+#    000     000   000  000   000  000   000  000      000             000   000  000     000
+#    000      0000000    0000000    0000000   0000000  00000000         0000000   000     000
+
+use ../../../kxk ▪ reversed
+
+export
+
+    actions:
+
+        toggleGitChange:
+            name:  'Toggle Git Changes at Cursors'
+            combo: 'command+u'
+
+    toggleGitChange: (key, info) ->
+
+        @toggleGitChangesInLines @selectedAndCursorLineIndices()
+
+    toggleGitChangesInLines: (lineIndices) ->
+
+        metas = []
+        untoggled = false
+
+        @do.start()
+        @do.setCursors [@mainCursor()]
+        @do.select []
+        @do.end()
+        
+        for li in lineIndices
+
+            for lineMeta in @meta.metasAtLineIndex(li)
+
+                if lineMeta[2].clss.startsWith 'git'
+
+                    if not lineMeta[2].toggled
+                        untoggled = true
+
+                    metas.push lineMeta
+
+        for lineMeta in metas
+
+            oi = lineMeta[0]
+            
+            if untoggled
+                if not lineMeta[2].toggled
+                    @reverseGitChange lineMeta
+            else
+                if lineMeta[2].toggled
+                    @applyGitChange lineMeta
+                else
+                    @reverseGitChange lineMeta
+
+            if oi != lineMeta[0]
+                offset = oi - lineMeta[0]
+                if offset < 0
+                    @meta.moveLineMeta lineMeta, offset
+        
+        cursors = []
+        for lineMeta in metas
+            cursors.push [0,lineMeta[0]]
+            if lineMeta not in @meta.metas
+                @meta.addLineMeta lineMeta
+                @meta.addDiv lineMeta
+
+        @do.start()
+        @do.setCursors cursors, main:'closest'
+        @do.select []
+        @do.end()
+        
+    # 00000000   00000000  000   000  00000000  00000000    0000000  00000000
+    # 000   000  000       000   000  000       000   000  000       000
+    # 0000000    0000000    000 000   0000000   0000000    0000000   0000000
+    # 000   000  000          000     000       000   000       000  000
+    # 000   000  00000000      0      00000000  000   000  0000000   00000000
+
+    reverseGitChange: (lineMeta) ->
+
+        meta = lineMeta[2]
+        li   = lineMeta[0]
+
+        @do.start()
+
+        meta.toggled = true
+        meta.div?.classList.add 'toggled'
+
+        switch meta.clss
+
+            'git mod' 'git mod boring' ➜ @do.change li, meta.change.old
+            'git add' 'git add boring' ➜ @do.delete li
+            'git del'
+
+                for line in reversed meta.change
+                    @do.insert li, line.old
+
+        @do.end()
+
+    #  0000000   00000000   00000000   000      000   000
+    # 000   000  000   000  000   000  000       000 000
+    # 000000000  00000000   00000000   000        00000
+    # 000   000  000        000        000         000
+    # 000   000  000        000        0000000     000
+
+    applyGitChange: (lineMeta) ->
+
+        meta = lineMeta[2]
+        li   = lineMeta[0]
+
+        @do.start()
+
+        delete meta.toggled
+        meta.div?.classList.remove 'toggled'
+
+        switch meta.clss
+
+            'git mod' 'git mod boring' ➜ @do.change li, meta.change.new
+            'git add' 'git add boring' ➜ @do.insert li, meta.change.new
+            'git del'
+
+                for line in reversed meta.change
+                    @do.delete li
+
+        @do.end()

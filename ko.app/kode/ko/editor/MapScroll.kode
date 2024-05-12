@@ -1,0 +1,246 @@
+###
+00     00   0000000   00000000          0000000   0000000  00000000    0000000   000      000
+000   000  000   000  000   000        000       000       000   000  000   000  000      000
+000000000  000000000  00000000         0000000   000       0000000    000   000  000      000
+000 0 000  000   000  000                   000  000       000   000  000   000  000      000
+000   000  000   000  000              0000000    0000000  000   000   0000000   0000000  0000000
+###
+
+use ../../kxk ▪ events
+
+class MapScroll extends events
+
+    @: cfg ->
+
+        super()
+        @lineHeight = cfg.lineHeight ? 0
+        @viewHeight = cfg.viewHeight ? 0
+        @exposeMax  = cfg.exposeMax ? -4 # <0: -v * viewLines | 0: unlimited | >0: v * 1
+        @smooth     = cfg.smooth ? true
+        @init()
+
+    # 000  000   000  000  000000000
+    # 000  0000  000  000     000
+    # 000  000 0 000  000     000
+    # 000  000  0000  000     000
+    # 000  000   000  000     000
+
+    init: ->
+        
+        @scroll       =  0 # current scroll value from document start (pixels)
+        @offsetTop    =  0 # height of view above first visible line (pixels)
+        @offsetSmooth =  0 # smooth scrolling offset / part of top line that is hidden (pixels)
+        @fullHeight   =  0 # total height of buffer (pixels)
+        @numLines     =  0 # total number of lines in buffer
+        @top          =  0 # index of first visible line in view
+        @bot          =  0 # index of last  visible line in view
+        @exposed      =  0 # number of currently exposed lines
+        @exposeTop    =  0 # index of topmost line in view (always <= @top)
+        @exposeBot    = -1 # index of bottom line in view (always >= @bot)
+        @calc()
+        @offsetTop    = -1 # hack to emit initial scroll
+
+    #  0000000   0000000   000       0000000  
+    # 000       000   000  000      000       
+    # 000       000000000  000      000       
+    # 000       000   000  000      000       
+    #  0000000  000   000  0000000   0000000  
+    
+    calc: ->
+        
+        @scrollMax   = Math.max(0,@fullHeight - @viewHeight)  # maximum scroll offset (pixels)
+        @fullLines   = Math.floor(@viewHeight / @lineHeight)  # number of lines in view (excluding partials)
+        @viewLines   = Math.ceil(@viewHeight / @lineHeight)   # number of lines in view (including partials)
+        @linesHeight = @viewLines * @lineHeight               # height of visible lines (pixels)
+
+        if @exposeMax < 0
+            @exposeNum = -@exposeMax * @viewLines # maximum size of expose range is viewHeight dependent
+        else
+            @exposeNum = @exposeMax
+
+        @exposeHeight = @exposeNum * @lineHeight
+
+    # 000  000   000  00000000   0000000
+    # 000  0000  000  000       000   000
+    # 000  000 0 000  000000    000   000
+    # 000  000  0000  000       000   000
+    # 000  000   000  000        0000000
+
+    info: ->
+        
+        topbot: "#{@top} .. #{@bot} = #{@bot-@top} / #{@numLines} lines"
+        expose: "#{@exposeTop} .. #{@exposeBot} = #{@exposeBot-@exposeTop} / #{@exposeNum} px #{@exposeHeight}"
+        scroll: "#{@scroll} offsetTop #{@offsetTop} scrollMax #{@scrollMax} fullLines #{@fullLines} viewLines #{@viewLines} viewHeight #{@viewHeight}"
+
+    # 00000000   00000000   0000000  00000000  000000000
+    # 000   000  000       000       000          000
+    # 0000000    0000000   0000000   0000000      000
+    # 000   000  000            000  000          000
+    # 000   000  00000000  0000000   00000000     000
+
+    reset: =>
+        
+        @emit 'clearLines'
+        @init()
+
+    # 000000000   0000000
+    #    000     000   000
+    #    000     000   000
+    #    000     000   000
+    #    000      0000000
+
+    to: p => @by p-@scroll
+
+    # 0000000    000   000
+    # 000   000   000 000
+    # 0000000      00000
+    # 000   000     000
+    # 0000000       000
+
+    by: delta =>
+
+        scroll = @scroll
+        delta = 0 if Number.isNaN delta
+        @scroll = parseInt clamp 0, @scrollMax, @scroll+delta
+        top = parseInt @scroll / @lineHeight
+        @offsetSmooth = @scroll - top * @lineHeight
+
+        @setTop top
+
+        offset = 0
+        offset += @offsetSmooth if @smooth
+        offset += (top - @exposeTop) * @lineHeight
+
+        if offset != @offsetTop or scroll != @scroll
+            @offsetTop = parseInt offset
+            @emit 'scroll', @scroll, @offsetTop
+
+    #  0000000  00000000  000000000  000000000   0000000   00000000
+    # 000       000          000        000     000   000  000   000
+    # 0000000   0000000      000        000     000   000  00000000
+    #      000  000          000        000     000   000  000
+    # 0000000   00000000     000        000      0000000   000
+
+    setTop: top =>
+
+        return if @exposeBot < 0 and @numLines < 1
+
+        oldTop = @top
+        oldBot = @bot
+        @top = top
+        @bot = Math.min @top+@viewLines, @numLines-1
+        return if oldTop == @top and oldBot == @bot and @exposeBot >= @bot
+
+        if (@top >= @exposeBot) or (@bot <= @exposeTop) # new range outside, start from scratch
+            @emit 'clearLines'
+            @exposeTop = @top
+            @exposeBot = @bot
+            num = @bot - @top + 1
+            if num > 0
+                @emit 'exposeLines' top:@top, bot:@bot, num: num
+                @emit 'scroll' @scroll, @offsetTop
+            return
+
+        if @top < @exposeTop
+            oldTop = @exposeTop
+            @exposeTop = Math.max 0, @top - (Math.min @viewLines, @exposeNum - @viewLines)
+            num = oldTop - @exposeTop
+            if num > 0
+                @emit 'exposeLines' top:@exposeTop, bot:oldTop-1, num: num
+
+        while @bot > @exposeBot
+            @exposeBot += 1
+            @emit 'exposeLine' @exposeBot
+
+        if @exposeBot-@exposeTop+1 > @exposeNum
+            num  = @exposeBot-@exposeTop+1 - @exposeNum
+            if @top>oldTop
+                n = clamp 0, @top-@exposeTop, num
+                @exposeTop += n
+                @emit 'vanishLines' top: n
+            else
+                n = clamp 0, @exposeBot-@bot, num
+                @exposeBot -= n
+                @emit 'vanishLines' bot: n
+
+    # 000  000   000   0000000  00000000  00000000   000000000
+    # 000  0000  000  000       000       000   000     000
+    # 000  000 0 000  0000000   0000000   0000000       000
+    # 000  000  0000       000  000       000   000     000
+    # 000  000   000  0000000   00000000  000   000     000
+
+    insertLine: li oi =>
+        
+        @exposeBot += 1 if @lineIndexIsInExpose oi
+        @bot       += 1 if @lineIndexIsInView oi
+        @top       += 1 if oi < @top
+        @numLines  += 1
+        @fullHeight = @numLines * @lineHeight
+        @calc()
+
+    # 0000000    00000000  000      00000000  000000000  00000000
+    # 000   000  000       000      000          000     000
+    # 000   000  0000000   000      0000000      000     0000000
+    # 000   000  000       000      000          000     000
+    # 0000000    00000000  0000000  00000000     000     00000000
+
+    deleteLine: li oi =>
+        
+        @exposeBot -= 1 if @lineIndexIsInExpose(oi) or @numLines < @exposeNum
+        @bot       -= 1 if @lineIndexIsInView oi
+
+    lineIndexIsInView: li ->
+        
+        return true if @top <= li <= @bot
+        return @bot-@top+1 < @fullLines
+
+    lineIndexIsInExpose: li ->
+        
+        return true if @exposeTop <= li <= @exposeBot
+        return @exposeBot-@exposeTop+1 < @exposeNum
+
+    # 000   000  000  00000000  000   000  000   000  00000000  000   0000000   000   000  000000000
+    # 000   000  000  000       000 0 000  000   000  000       000  000        000   000     000
+    #  000 000   000  0000000   000000000  000000000  0000000   000  000  0000  000000000     000
+    #    000     000  000       000   000  000   000  000       000  000   000  000   000     000
+    #     0      000  00000000  00     00  000   000  00000000  000   0000000   000   000     000
+
+    setViewHeight: h =>
+        if @viewHeight != h
+            @viewHeight = h
+            @calc()
+            @by 0
+
+    # 000   000  000   000  00     00  000      000  000   000  00000000   0000000
+    # 0000  000  000   000  000   000  000      000  0000  000  000       000
+    # 000 0 000  000   000  000000000  000      000  000 0 000  0000000   0000000
+    # 000  0000  000   000  000 0 000  000      000  000  0000  000            000
+    # 000   000   0000000   000   000  0000000  000  000   000  00000000  0000000
+
+    setNumLines: n =>
+
+        if @numLines != n
+            @numLines = n
+            @fullHeight = @numLines * @lineHeight
+            if @numLines
+                @calc()
+                @by 0
+            else
+                @init()
+                @emit 'clearLines'
+
+    # 000      000  000   000  00000000  000   000  00000000  000   0000000   000   000  000000000
+    # 000      000  0000  000  000       000   000  000       000  000        000   000     000
+    # 000      000  000 0 000  0000000   000000000  0000000   000  000  0000  000000000     000
+    # 000      000  000  0000  000       000   000  000       000  000   000  000   000     000
+    # 0000000  000  000   000  00000000  000   000  00000000  000   0000000   000   000     000
+
+    setLineHeight: h =>
+
+        if @lineHeight != h
+            @lineHeight = h
+            @fullHeight = @numLines * @lineHeight
+            @calc()
+            @by 0
+
+export MapScroll

@@ -1,0 +1,112 @@
+###
+000  000   000  0000000    00000000  000   000              000   0000000  
+000  0000  000  000   000  000        000 000               000  000       
+000  000 0 000  000   000  0000000     00000                000  0000000   
+000  000  0000  000   000  000        000 000         000   000       000  
+000  000   000  0000000    00000000  000   000         0000000   0000000   
+###
+
+use ../../kxk ▪ kermit
+
+class IndexJS
+
+    @: ->
+
+    # 00000000    0000000   00000000    0000000  00000000       000      000  000   000  00000000
+    # 000   000  000   000  000   000  000       000            000      000  0000  000  000
+    # 00000000   000000000  0000000    0000000   0000000        000      000  000 0 000  0000000
+    # 000        000   000  000   000       000  000            000      000  000  0000  000
+    # 000        000   000  000   000  0000000   00000000       0000000  000  000   000  00000000
+    
+    parseLine: index line ->
+        
+        if not line.startsWith ' '
+            
+            if match = kermit.lineMatch line, 'class ●name'
+                match.type = 'class'
+                match.line = index
+                @result.classes.push match
+                ⮐ 
+    
+            if match = kermit.lineMatch line, '●name = (function ()'
+                match.type = 'function'
+                match.line = index
+                @result.classes.push match
+                ⮐
+
+        validFuncName =  name  -> name not in ['if''for''while''switch''return''catch']
+        validFuncArgs =  args  -> args[0] == '(' and args[-1] == ')'
+        validFuncMatch = match -> match and validFuncArgs(match.args) and validFuncName(match.name)
+                
+        doMatch = ptn -> kermit.lineMatch line, ptn, ['"''.'','"'"]
+        
+        funcMatch = ptn ->
+            
+            match = doMatch ptn
+            match if validFuncMatch match
+        
+        if @result.classes.length
+            
+            className = @result.classes[-1].name
+            classType = @result.classes[-1].type
+                        
+            addMeth = name opt={} =>
+                
+                fnc = method:name, line:index, class:className
+                fnc.static = true if opt.static
+                fnc.async  = true if opt.async
+                fnc.bound  = true if @bound[name] and name != 'constructor'
+                # log fnc
+                @result.funcs.push fnc
+                null
+                                
+            if classType == 'class'
+                
+                if match = funcMatch '●name ○args'              ➜ ⮐ addMeth match.name
+                if match = funcMatch 'async ●name ○args'        ➜ ⮐ addMeth match.name,             async:true
+                if match = funcMatch 'static ●name ○args'       ➜ ⮐ addMeth match.name, static:true
+                if match = funcMatch 'static async ●name ○args' ➜ ⮐ addMeth match.name, static:true async:true
+                    
+                if match = doMatch """this.●name = this.●bound.bind(this)""" ➜ @bound[match.name] = true
+                        
+            if classType == 'function'
+                                
+                if match = funcMatch "function #{className} ○args"                                ➜ ⮐ addMeth className
+                if match = funcMatch """#{className}["●name"] = function ○args"""                 ➜ ⮐ addMeth match.name, static:true
+                if match = funcMatch """#{className}["●name"] = async function ○args"""           ➜ ⮐ addMeth match.name, static:true async:true
+                if match = funcMatch """#{className}.prototype["●name"] = function ○args"""       ➜ ⮐ addMeth match.name, 
+                if match = funcMatch """#{className}.prototype["●name"] = async function ○args""" ➜ ⮐ addMeth match.name, async:true
+                    
+                if match = doMatch """this["●name"] = this["●bound"].bind(this)""" ➜ @bound[match.name] = true
+             
+        if not line.startsWith ' '
+            
+            addFunc = name opt={} =>
+                
+                fnc = name:name, line:index
+                fnc.async  = true if opt.async
+                @result.funcs.push fnc
+                null
+            
+            if match = funcMatch '●name = function ○args'       ➜ addFunc match.name
+            if match = funcMatch '●name = async function ○args' ➜ addFunc match.name, async:true
+                    
+    # 00000000    0000000   00000000    0000000  00000000       000000000  00000000  000   000  000000000
+    # 000   000  000   000  000   000  000       000               000     000        000 000      000
+    # 00000000   000000000  0000000    0000000   0000000           000     0000000     00000       000
+    # 000        000   000  000   000       000  000               000     000        000 000      000
+    # 000        000   000  000   000  0000000   00000000          000     00000000  000   000     000
+
+    parse: text ->
+        
+        lines = text.split '\n'
+
+        @bound = {}
+        @result = classes:[], funcs:[], lines:lines.length
+        
+        for lineText,lineIndex in lines
+            @parseLine lineIndex, lineText
+
+        @result
+
+export IndexJS

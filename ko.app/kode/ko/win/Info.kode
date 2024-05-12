@@ -1,0 +1,171 @@
+###
+000  000   000  00000000   0000000 
+000  0000  000  000       000   000
+000  000 0 000  000000    000   000
+000  000  0000  000       000   000
+000  000   000  000        0000000 
+###
+
+use ../../kxk ▪ pretty post elem tooltip $
+
+class Info
+    
+    @: editor ->
+        
+        post.on 'editorFocus' @setEditor
+        post.on 'split'       @updateEditorButton
+
+        ttip = (e,t) -> new tooltip elem:e, text:t, x:0, y:1, textSize: 11, keep:true
+                
+        @elem =$ 'info' 
+        
+        # 000000000   0000000   00000000 
+        #    000     000   000  000   000
+        #    000     000   000  00000000 
+        #    000     000   000  000      
+        #    000      0000000   000      
+        
+        @topline = elem class: "info-line top"
+        
+        @cursorColumn = elem 'span' class: "info-cursor-column"
+        @cursorColumn.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.cursorPos()[1]]
+        @topline.appendChild @cursorColumn
+        ttip @cursorColumn, 'x'
+
+        @sticky = elem 'span' class: "info-sticky empty"
+        @sticky.innerHTML = '○'
+        @topline.appendChild @sticky
+
+        @cursors = elem 'span' class: "info-cursors"
+        @cursors.onclick = => @editor.focus() + @editor.clearCursors()
+        @topline.appendChild @cursors
+        ttip @cursors, 'cursors'
+        
+        @selecti = elem 'span' class: "info-selections"
+        @selecti.onclick = => @editor.focus() + @editor.selectNone()
+        @topline.appendChild @selecti
+        ttip @selecti, 'selections'
+
+        @highlig = elem 'span' class: "info-highlights"
+        @highlig.onclick = => @editor.focus() + @editor.clearHighlights()
+        @topline.appendChild @highlig
+        ttip @highlig, 'highlights'
+        
+        @elem.appendChild @topline
+
+        # 0000000     0000000   000000000
+        # 000   000  000   000     000   
+        # 0000000    000   000     000   
+        # 000   000  000   000     000   
+        # 0000000     0000000      000   
+        
+        @botline = elem class: "info-line bot"
+        
+        @cursorLine = elem 'span' class: "info-cursor-line"
+        @cursorLine.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, 0]
+        @botline.appendChild @cursorLine
+        ttip @cursorLine, 'y'
+        
+        @lines = elem 'span' class: "info-lines"
+        @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.numLines()]
+        @botline.appendChild @lines
+        ttip @lines, 'lines'
+
+        @elem.appendChild @botline
+        
+        @infoEditor = elem class:'info-editor' click:@changeEditorFocus
+        
+        @elem.appendChild @infoEditor
+        
+        @setEditor editor     
+        
+    # 00000000  0000000    000  000000000   0000000   00000000   
+    # 000       000   000  000     000     000   000  000   000  
+    # 0000000   000   000  000     000     000   000  0000000    
+    # 000       000   000  000     000     000   000  000   000  
+    # 00000000  0000000    000     000      0000000   000   000  
+    
+    changeEditorFocus: =>
+        
+        if not window.split.editorMaximized()
+            window.split.do 'maximize editor'
+            window.split.do 'focus editor'
+        else
+            window.split.do 'half editor'
+            
+    updateEditorButton: =>
+        
+        @infoEditor.classList.toggle 'terminal-icon'     window.split.editorMaximized()
+        @infoEditor.classList.toggle 'editor-icon'   not window.split.editorMaximized()
+
+    #  0000000  00000000  000000000        00000000  0000000    000  000000000   0000000   00000000 
+    # 000       000          000           000       000   000  000     000     000   000  000   000
+    # 0000000   0000000      000           0000000   000   000  000     000     000   000  0000000  
+    #      000  000          000           000       000   000  000     000     000   000  000   000
+    # 0000000   00000000     000           00000000  0000000    000     000      0000000   000   000
+    
+    setEditor: editor =>
+        
+        return if editor.name not in ['editor''terminal']
+        
+        return if editor == @editor
+        
+        if @editor?
+            @editor.removeListener 'numLines'     @onNumLines
+            @editor.removeListener 'lineInserted' @onNumLines
+            @editor.removeListener 'lineDeleted'  @onNumLines
+            @editor.removeListener 'selection'    @onSelection
+            @editor.removeListener 'highlight'    @onHighlight
+            @editor.removeListener 'cursor'       @onCursor
+                
+        @editor = editor
+        
+        @editor.on 'numLines'     @onNumLines
+        @editor.on 'lineInserted' @onNumLines
+        @editor.on 'lineDeleted'  @onNumLines
+        @editor.on 'selection'    @onSelection
+        @editor.on 'highlight'    @onHighlight
+        @editor.on 'cursor'       @onCursor
+        
+        @onNumLines @editor.numLines()
+
+    # 00000000   00000000  000       0000000    0000000   0000000  
+    # 000   000  000       000      000   000  000   000  000   000
+    # 0000000    0000000   000      000   000  000000000  000   000
+    # 000   000  000       000      000   000  000   000  000   000
+    # 000   000  00000000  0000000   0000000   000   000  0000000  
+    
+    reload: =>
+
+    #  0000000   000   000                     
+    # 000   000  0000  000                     
+    # 000   000  000 0 000                     
+    # 000   000  000  0000        000  000  000
+    #  0000000   000   000        000  000  000
+    
+    onNumLines: lc =>
+        
+        @lines.textContent = pretty.shortCount lc ? 0
+            
+    onCursor: => 
+
+        @cursorLine.textContent   = @editor.mainCursor()[1]+1
+        @cursorColumn.textContent = (@editor.mainCursor()[0] > 0) ? @editor.mainCursor()[0] : ''
+        @cursors.textContent      = @editor.numCursors()
+        @cursorColumn.classList.toggle 'virtual' @editor.isCursorVirtual()
+        @cursors.classList.toggle 'empty' @editor.numCursors() == 1
+        @sticky.classList.toggle 'empty' not @editor.stickySelection
+        
+    onSelection: =>
+        
+        @selecti.textContent = @editor.numSelections()
+        @selecti.classList.toggle 'empty' @editor.numSelections() == 0
+        @sticky.classList.toggle 'empty' not @editor.stickySelection
+        
+    onHighlight: =>
+        
+        @highlig.textContent = @editor.numHighlights()
+        @highlig.classList.toggle 'empty' @editor.numHighlights() == 0
+    
+export Info
+

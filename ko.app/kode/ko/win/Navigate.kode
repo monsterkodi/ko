@@ -1,0 +1,175 @@
+###
+000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
+0000  000  000   000  000   000  000  000        000   000     000     000
+000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000
+000  0000  000   000     000     000  000   000  000   000     000     000
+000   000  000   000      0      000   0000000   000   000     000     00000000
+###
+
+use ../../kxk ▪ pullIf keepIf slash prefs post
+
+class Navigate
+
+    @: @main ->
+        
+        post.on 'navigate' @navigate
+        @navlist = stash.get 'navigate' []
+        
+        # log 'history'
+        # for fp in @navlist ➜ log fp
+        
+        @currentIndex = -1
+        @navigating = false
+
+    # 000   000  000   0000000  000000000   0000000   00000000   000   000  
+    # 000   000  000  000          000     000   000  000   000   000 000   
+    # 000000000  000  0000000      000     000   000  0000000      00000    
+    # 000   000  000       000     000     000   000  000   000     000     
+    # 000   000  000  0000000      000      0000000   000   000     000     
+    
+    addToHistory: file pos ->
+
+        ⮐ if not file?
+        
+        # log 'file' file, pos
+        
+        pos ?= [0 0]
+        
+        if not pos[0] and not pos[1] and @navlist.length
+            for i in @navlist.length-1..0
+                fp = @navlist[i]
+                if slash.samePath fp.file, file
+                    pos = fp.pos
+                    break
+
+        pullIf @navlist, (f) -> slash.sameFileLine f, file
+        keepIf @navlist, (f) -> slash.hasFilePos f
+
+        filePos = slash.joinFilePos file, pos
+        
+        if slash.sameFileLine last @navlist, filePos
+            @navlist.pop()
+        
+        @navlist.push filePos
+
+        while @navlist.length > prefs.get 'navigateHistoryLength' 100
+            @navlist.shift()
+            
+        # log 'addToHistory'
+        # for fp in @navlist ➜ log fp
+            
+        stash.set 'navigate' @navlist
+
+    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
+    # 0000  000  000   000  000   000  000  000        000   000     000     000       
+    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000   
+    # 000  0000  000   000     000     000  000   000  000   000     000     000       
+    # 000   000  000   000      0      000   0000000   000   000     000     00000000  
+    
+    navigate: opt =>
+
+        switch opt.action
+
+            'clear'
+                @navlist = []
+                @currentIndex = -1
+
+            'backward'
+                
+                log 'Navigate backward' @navlist
+                ⮐ if not @navlist.length
+                @currentIndex = clamp 0 Math.max(0 @navlist.length-2), @currentIndex-1
+                @navigating = true
+                @loadFilePos @navlist[@currentIndex]
+
+            'forward'
+                
+                ⮐ if not @navlist.length
+                @currentIndex = clamp 0 @navlist.length-1, @currentIndex+1
+                @navigating = true
+                @loadFilePos @navlist[@currentIndex]
+                
+            'delFilePos'
+
+                opt.item.line ?= opt.item.pos?[1]+1
+
+                @navlist = @navlist.filter (f) -> 
+                    splitPos = slash.splitFilePos(f)
+                    splitPos[0] != opt.item.file or splitPos[1][1]+1 != opt.item.line
+                @currentIndex = clamp 0 @navlist.length-1, @currentIndex
+                
+            'addFilePos'
+
+                ⮐ if not opt?.file?.length
+
+                @addToHistory opt.oldFile, opt.oldPos
+
+                hasFile = @navlist.find (f) -> slash.splitFilePos(f)[0] == opt.file
+
+                if not @navigating or not hasFile or opt?.for in ['edit' 'goto']
+
+                    @navigating = false if opt?.for in ['edit' 'goto']
+
+                    @addToHistory opt.file, opt.pos
+
+                    @currentIndex = @navlist.length-1
+
+                    if opt?.for == 'goto'
+                        @loadFilePos @navlist[@currentIndex]
+                    else
+                        @currentIndex = @navlist.length
+
+    # 000       0000000    0000000   0000000    00000000  000  000      00000000  00000000    0000000    0000000  
+    # 000      000   000  000   000  000   000  000       000  000      000       000   000  000   000  000       
+    # 000      000   000  000000000  000   000  000000    000  000      0000000   00000000   000   000  0000000   
+    # 000      000   000  000   000  000   000  000       000  000      000       000        000   000       000  
+    # 0000000   0000000   000   000  0000000    000       000  0000000  00000000  000         0000000   0000000   
+    
+    loadFilePos: filePos ->
+
+        log 'loadFile' filePos
+        post.emit 'loadFile' filePos
+
+        filePos
+
+    # 0000000    00000000  000      
+    # 000   000  000       000      
+    # 000   000  0000000   000      
+    # 000   000  000       000      
+    # 0000000    00000000  0000000  
+    
+    delFilePos: item ->
+        
+        post.emit 'navigate' action:'delFilePos' item:item
+
+    #  0000000   0000000    0000000    
+    # 000   000  000   000  000   000  
+    # 000000000  000   000  000   000  
+    # 000   000  000   000  000   000  
+    # 000   000  0000000    0000000    
+    
+    addFilePos: opt -> # called on editing
+        
+        opt.action = 'addFilePos'
+        opt.for    = 'edit'
+        
+        post.emit 'navigate' opt
+
+    #  0000000    0000000   000000000   0000000   
+    # 000        000   000     000     000   000  
+    # 000  0000  000   000     000     000   000  
+    # 000   000  000   000     000     000   000  
+    #  0000000    0000000      000      0000000   
+    
+    gotoFilePos: opt -> # called on jumpTo
+        
+        opt.action = 'addFilePos'
+        opt.for    = 'goto'
+        
+        post.emit 'navigate' opt
+
+    backward: -> post.emit 'navigate' action:'backward'
+    forward:  -> post.emit 'navigate' action:'forward' 
+    clear:    -> post.emit 'navigate' action:'clear'   
+
+export Navigate

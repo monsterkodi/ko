@@ -1,0 +1,462 @@
+###
+ 0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
+000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000
+000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000
+000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000
+000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
+###
+
+use ../../kxk ▪ elem matchr events stopEvent pickBy toPairs $
+use ../tools/req
+
+jsClass =
+    RegExp: ['test' 'compile' 'exec' 'toString']
+    String: ['endsWith' 'startsWith' 'split' 'slice' 'substring' 'padEnd' 'padStart' 'indexOf' 'match' 'trim' 'trimEnd' 'trimStart']
+
+class AutoComplete extends events
+
+    @: @editor ->
+
+        super()
+        
+        @wordinfo  = {}
+        @mthdinfo  = {}
+        @matchList = []
+        @clones    = []
+        @cloned    = []
+
+        @close()
+
+        specials = "_-@#"
+        @especial = ("\\"+c for c in specials.split '').join ''
+        @headerRegExp      = new RegExp "^[0#{@especial}]+$"
+        @notSpecialRegExp  = new RegExp "[^#{@especial}]"
+        @specialWordRegExp = new RegExp "(\\s+|[\\w#{@especial}]+|[^\\s])" 'g'
+        @splitRegExp       = new RegExp "[^\\w\\d#{@especial}]+" 'g'
+        @methodRegExp      = /([@]?\w+|@)\.(\w+)/
+        @moduleRegExp      = /^\s*(\w+)\s*=\s*require\s+([\'\"][\.\/\w]+[\'\"])/
+        @newRegExp         = /([@]?\w+)\s*=\s*new\s+(\w+)/
+        @baseRegExp        = /\w\s+extends\s+(\w+)/
+
+        @editor.on 'edit'           @onEdit
+        @editor.on 'linesSet'       @onLinesSet
+        @editor.on 'lineInserted'   @onLineInserted
+        @editor.on 'willDeleteLine' @onWillDeleteLine
+        @editor.on 'lineChanged'    @onLineChanged
+        @editor.on 'linesAppended'  @onLinesAppended
+        @editor.on 'cursor'         @close
+        @editor.on 'blur'           @close
+
+    # 00     00   0000000   0000000    000   000  000      00000000
+    # 000   000  000   000  000   000  000   000  000      000
+    # 000000000  000   000  000   000  000   000  000      0000000
+    # 000 0 000  000   000  000   000  000   000  000      000
+    # 000   000   0000000   0000000     0000000   0000000  00000000
+
+    parseModule: line ->
+
+        # if @moduleRegExp.test line
+            # match = line.match @moduleRegExp
+            # moduleName = kstr.strip match[2], "'"
+            # for key in req.moduleKeys moduleName, @editor.currentFile
+                # @mthdinfo[match[1]] ?= {}
+                # @mthdinfo[match[1]][key] ?= 1
+
+        if @newRegExp.test line
+            match = line.match @newRegExp
+
+            try
+                clss = eval match[2]
+            catch err
+                true
+            if clss?.prototype?
+                if jsClass[match[2]]
+                    @mthdinfo[match[1]] ?= {}
+                    for key in jsClass[match[2]]
+                        @mthdinfo[match[1]][key] ?= 1
+            else
+                if @mthdinfo[match[2]]
+                    @mthdinfo[match[1]] ?= {}
+                    for key in Object.keys @mthdinfo[match[2]]
+                        @mthdinfo[match[1]][key] ?= 1
+
+        if @baseRegExp.test line
+            match = line.match @baseRegExp
+            if @mthdinfo[match[1]]
+                for key in Object.keys @mthdinfo[match[1]]
+                    @wordinfo["@#{key}"] ?= count:1
+
+    # 00     00  00000000  000000000  000   000   0000000   0000000
+    # 000   000  000          000     000   000  000   000  000   000
+    # 000000000  0000000      000     000000000  000   000  000   000
+    # 000 0 000  000          000     000   000  000   000  000   000
+    # 000   000  00000000     000     000   000   0000000   0000000
+
+    parseMethod: line ->
+
+        if valid (rgs = matchr.ranges [@methodRegExp, ['obj' 'mth']], line)
+            for i in 0...rgs.length-1
+                if rgs[i].match and rgs[i+1].match
+                    @mthdinfo[rgs[i].match] ?= {}
+                    @mthdinfo[rgs[i].match][rgs[i+1].match] ?= 0
+                    @mthdinfo[rgs[i].match][rgs[i+1].match] += 1
+                i++
+
+    completeMethod: info ->
+
+        lst = last info.before.split ' '
+        obj = lst.slice 0 -1
+        return if not @mthdinfo[obj]
+        mthds = Object.keys @mthdinfo[obj]
+        mcnt = mthds.map (m) => [m,@mthdinfo[obj][m]]
+        mcnt.sort (a,b) -> a[1]!=b[1] and b[1]-a[1] or a[0].localeCompare b[0]
+        @firstMatch = mthds[0]
+        @matchList  = mthds.slice 1
+
+    #  0000000   000   000        00000000  0000000    000  000000000
+    # 000   000  0000  000        000       000   000  000     000
+    # 000   000  000 0 000        0000000   000   000  000     000
+    # 000   000  000  0000        000       000   000  000     000
+    #  0000000   000   000        00000000  0000000    000     000
+
+    onEdit: info =>
+
+        @close()
+        @word = last info.before.split @splitRegExp
+        switch info.action
+
+            'delete' # ever happening?
+                error 'delete!!!!'
+                if @wordinfo[@word]?.temp and @wordinfo[@word]?.count <= 0
+                    delete @wordinfo[@word]
+
+            'insert'
+
+                if not @word?.length
+                    if info.before[-1] == '.'
+                        @completeMethod info
+                else
+                    return if empty @wordinfo
+
+                    matches = pickBy @wordinfo, (w) => w.startsWith(@word) and w.length > @word.length
+                    matches = toPairs matches
+                    for m in matches
+                        d = @editor.distanceOfWord m[0]
+                        m[1].distance = 100 - Math.min d, 100
+
+                    matches.sort (a,b) ->
+                        (b[1].distance+b[1].count+1/b[0].length) - (a[1].distance+a[1].count+1/a[0].length)
+
+                    words = matches.map (m) -> m[0]
+                    for w in words
+                        if not @firstMatch
+                            @firstMatch = w
+                        else
+                            @matchList.push w
+
+                ⮐ if not @firstMatch?
+                
+                if @word == 'r'
+                    @matchList.unshift @firstMatch
+                    @firstMatch = '⮐'
+                    @completion = @firstMatch
+                else if @word == 't'
+                    @matchList.unshift @firstMatch
+                    @firstMatch = '➜'
+                    @completion = @firstMatch
+                else
+                    @completion = @firstMatch.slice @word.length
+
+                @open info
+
+    #  0000000   00000000   00000000  000   000
+    # 000   000  000   000  000       0000  000
+    # 000   000  00000000   0000000   000 0 000
+    # 000   000  000        000       000  0000
+    #  0000000   000        00000000  000   000
+
+    open: info ->
+
+        cursor =$ '.main' @editor.view
+        if not cursor?
+            error "AutoComplete.open --- no cursor?"
+            ⮐ 
+
+        @span = elem 'span' class: 'autocomplete-span'
+        @span.textContent = @completion
+        @span.style.opacity    = 1
+        @span.style.background = "#44a"
+        @span.style.color      = "#fff"
+
+        cr = cursor.getBoundingClientRect()
+        spanInfo = @editor.lineSpanAtXY cr.left, cr.top
+
+        if not spanInfo?
+
+            p = @editor.posAtXY cr.left, cr.top
+            ci = p[1]-@editor.scroll.top
+            ⮐ error "no span for autocomplete? cursor topleft: #{parseInt cr.left} #{parseInt cr.top}", info
+
+        sp = spanInfo.span
+        inner = sp.innerHTML
+        @clones.push sp.cloneNode true
+        @clones.push sp.cloneNode true
+        @cloned.push sp
+
+        ws = @word.slice @word.search /\w/
+        wi = ws.length
+
+        @clones[0].innerHTML = inner.slice 0 spanInfo.offsetChar + 1
+        @clones[1].innerHTML = inner.slice   spanInfo.offsetChar + 1
+
+        sibling = sp
+        while sibling = sibling.nextSibling
+            @clones.push sibling.cloneNode true
+            @cloned.push sibling
+
+        sp.parentElement.appendChild @span
+
+        for c in @cloned
+            c.style.display = 'none'
+
+        for c in @clones
+            @span.insertAdjacentElement 'afterend' c
+
+        @moveClonesBy @completion.length
+
+        if @matchList.length
+
+            @list = elem class: 'autocomplete-list'
+            @list.addEventListener 'wheel'     @onWheel     , passive:true
+            @list.addEventListener 'mousedown' @onMouseDown , passive:true
+
+            index = 0
+            for m in @matchList
+                item = elem class: 'autocomplete-item' index:index++
+                item.textContent = m
+                @list.appendChild item
+            cursor.appendChild @list
+
+    #  0000000  000       0000000    0000000  00000000
+    # 000       000      000   000  000       000
+    # 000       000      000   000  0000000   0000000
+    # 000       000      000   000       000  000
+    #  0000000  0000000   0000000   0000000   00000000
+
+    close: =>
+
+        if @list?
+            @list.removeEventListener 'wheel' @onWheel
+            @list.removeEventListener 'click' @onClick
+            @list.remove()
+            delete @list
+
+        @span?.remove()
+        delete @span
+        
+        @selected   = -1
+        @list       = null
+        @span       = null
+        @completion = null
+        @firstMatch = null
+
+        for c in @clones
+            c.remove()
+
+        for c in @cloned
+            c.style.display = 'initial'
+
+        @clones = []
+        @cloned = []
+        @matchList  = []
+        @
+
+    onWheel: event =>
+
+        @list.scrollTop += event.deltaY
+        stopEvent event
+
+    onMouseDown: event =>
+
+        index = elem.upAttr event.target, 'index'
+        if index
+            @select index
+            @onEnter()
+        stopEvent event
+
+    onEnter: ->
+
+        if @selectedCompletion() in ['⮐''➜']
+            @editor.deleteCharacterBackward singleCharacter:true
+            @editor.pasteText @selectedCompletion()
+
+            c = @editor.mainCursor()
+            if @editor.textInRange([c[1], [c[0], c[0]+1]]) != ' '
+                @editor.insertCharacter ' '
+        else
+            @editor.pasteText @selectedCompletion()
+        @close()
+
+    selectedCompletion: ->
+        
+        if @selected >= 0
+            @matchList[@selected].slice @word.length
+        else
+            @completion
+
+    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
+    # 0000  000  000   000  000   000  000  000        000   000     000     000
+    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000
+    # 000  0000  000   000     000     000  000   000  000   000     000     000
+    # 000   000  000   000      0      000   0000000   000   000     000     00000000
+
+    navigate: delta ->
+
+        ⮐ if not @list
+        @select clamp -1, @matchList.length-1, @selected+delta
+
+    select: index ->
+        
+        @list.children[@selected]?.classList.remove 'selected'
+        @selected = index
+        
+        if @selected >= 0
+            @list.children[@selected]?.classList.add 'selected'
+            @list.children[@selected]?.scrollIntoViewIfNeeded()
+            
+        @span.innerHTML = @selectedCompletion()
+        @moveClonesBy @span.innerHTML.length
+        @span.classList.remove 'selected' if @selected < 0
+        @span.classList.add    'selected' if @selected >= 0
+
+    prev: -> @navigate -1
+    next: -> @navigate 1
+    last: -> @navigate @matchList.length - @selected
+
+    # 00     00   0000000   000   000  00000000   0000000  000       0000000   000   000  00000000   0000000
+    # 000   000  000   000  000   000  000       000       000      000   000  0000  000  000       000
+    # 000000000  000   000   000 000   0000000   000       000      000   000  000 0 000  0000000   0000000
+    # 000 0 000  000   000     000     000       000       000      000   000  000  0000  000            000
+    # 000   000   0000000       0      00000000   0000000  0000000   0000000   000   000  00000000  0000000
+
+    moveClonesBy: numChars ->
+
+        ⮐ if empty @clones
+        
+        beforeLength = @clones[0].innerHTML.length
+        
+        for ci in [1...@clones.length]
+            c = @clones[ci]
+            offset = parseFloat @cloned[ci-1].style.transform.split('translateX(')[1]
+            charOffset = numChars
+            charOffset += beforeLength if ci == 1
+            c.style.transform = "translatex(#{offset+@editor.size.charWidth*charOffset}px)"
+            
+        spanOffset = parseFloat @cloned[0].style.transform.split('translateX(')[1]
+        spanOffset += @editor.size.charWidth*beforeLength
+        @span.style.transform = "translatex(#{spanOffset}px)"
+
+    # 00000000    0000000   00000000    0000000  00000000
+    # 000   000  000   000  000   000  000       000
+    # 00000000   000000000  0000000    0000000   0000000
+    # 000        000   000  000   000       000  000
+    # 000        000   000  000   000  0000000   00000000
+
+    parseLinesDelayed: lines opt ->
+
+        delay = (l, o) => => @parseLines l, o
+        if lines.length > 1
+            setTimeout (delay lines, opt), 200
+
+    parseLines: lines opt ->
+
+        @close()
+
+        ⮐ if not lines?
+
+        cursorWord = @cursorWord()
+        for l in lines
+            if not l?.split?
+                ⮐ error "AutoComplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
+
+            if l.length > 240
+                # if l.startsWith '//# sourceMapping'
+                continue
+
+            @parseMethod l
+            @parseModule l
+
+            words = l.split @splitRegExp
+            words = words.filter (w) =>
+                # return false if not Indexer.testWord w
+                ⮐ false if w == cursorWord
+                ⮐ false if @word == w.slice 0, w.length-1
+                ⮐ false if @headerRegExp.test w
+                true
+
+            for w in words # append words without leading special character
+                i = w.search @notSpecialRegExp
+                if i > 0 and w[0] != "#"
+                    w = w.slice i
+                    words.push w if not /^[\-]?[\d]+$/.test w
+
+            for w in words
+                info  = @wordinfo[w] ? {}
+                count = info.count ? 0
+                count += opt?.count ? 1
+                info.count = count
+                info.temp = true if opt.action == 'change'
+                @wordinfo[w] = info
+
+    #  0000000  000   000  00000000    0000000   0000000   00000000   000   000   0000000   00000000   0000000
+    # 000       000   000  000   000  000       000   000  000   000  000 0 000  000   000  000   000  000   000
+    # 000       000   000  0000000    0000000   000   000  0000000    000000000  000   000  0000000    000   000
+    # 000       000   000  000   000       000  000   000  000   000  000   000  000   000  000   000  000   000
+    #  0000000   0000000   000   000  0000000    0000000   000   000  00     00   0000000   000   000  0000000
+
+    cursorWords: ->
+
+        cp = @editor.cursorPos()
+        words = @editor.wordRangesInLineAtIndex cp[1], regExp: @specialWordRegExp
+        [befor, cursr, after] = rangesSplitAtPosInRanges cp, words
+        [@editor.textsInRanges(befor), @editor.textInRange(cursr), @editor.textsInRanges(after)]
+
+    cursorWord: -> @cursorWords()[1]
+
+    #  0000000   000   000
+    # 000   000  0000  000
+    # 000   000  000 0 000
+    # 000   000  000  0000
+    #  0000000   000   000
+
+    onLinesAppended:  lines  => @parseLines lines, action: 'append'
+    onLineInserted:   li     => @parseLines [@editor.line(li)], action: 'insert'
+    onLineChanged:    li     => @parseLines [@editor.line(li)], action: 'change', count: 0
+    onWillDeleteLine: line   => @parseLines [line], action: 'delete', count: -1
+    onLinesSet:       lines  => @parseLinesDelayed(lines, action:'set') if lines.length
+
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000
+    # 0000000    0000000     00000
+    # 000  000   000          000
+    # 000   000  00000000     000
+
+    handleModKeyComboEvent: mod key combo event ->
+
+        ⮐ 'unhandled' if not @span?
+
+        switch combo
+            'enter' ➜ ⮐ @onEnter()
+
+        if @list?
+            switch combo
+                'down'
+                    @next()
+                    ⮐ 
+                'up'
+                    @selected >= 0 ? @prev() : @last()
+                    ⮐ 
+        @close()
+        'unhandled'
+
+export AutoComplete

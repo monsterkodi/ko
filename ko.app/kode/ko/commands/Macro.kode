@@ -1,0 +1,326 @@
+###
+00     00   0000000    0000000  00000000    0000000
+000   000  000   000  000       000   000  000   000
+000000000  000000000  000       0000000    000   000
+000 0 000  000   000  000       000   000  000   000
+000   000  000   000   0000000  000   000   0000000
+###
+
+use ../../kxk      ▪ reversed uniq slash prefs post ffs
+use ../tools       ◆ salt req GitInfo
+use ../editor      ◆ Syntax Editor
+use ../commandline ◆ Command
+
+function Macro extends Command
+
+    @macroNames: ['clean' 'help' 'class' 'inv' 'blink' 'color' 'fps' 'status' 'diff' 'history' 'count' 'sort' 'case' 'lower' 'upper']
+
+    @: commandline ->
+
+        super commandline
+
+        @macros = Macro.macroNames
+        @macros = @macros.concat Editor.actionModules.transform.Transform.transformNames
+        @names  = ['macro']
+
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000
+    # 0000000      000     000000000  0000000       000
+    #      000     000     000   000  000   000     000
+    # 0000000      000     000   000  000   000     000
+
+    start: name ->
+
+        super name
+        
+        # @initAndShowList()
+        
+        text = @last()
+        text = 'dbg' if not text?.length
+        
+        text:   text
+        select: true
+
+    # 000      000   0000000  000000000
+    # 000      000  000          000
+    # 000      000  0000000      000
+    # 000      000       000     000
+    # 0000000  000  0000000      000
+
+    listItems: ->
+
+        items = uniq reversed(@history).concat @macros
+
+        ({text: i, line: i in @macros and '◼' or '◆', type:'macro'} for i in items)
+
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+    # 000        000 000   000       000       000   000     000     000
+    # 0000000     00000    0000000   000       000   000     000     0000000
+    # 000        000 000   000       000       000   000     000     000
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000
+
+    execute: command trail ->
+
+        return error 'no command!' if empty command
+        
+        # log 'Macro.execute' command#, trail
+
+        command = super command
+        
+        # log 'Macro.execute super' command
+
+        editor  = window.editor
+        cp      = editor.cursorPos()
+        cmds    = command.split /\s+/
+        cmmd    = cmds.shift()
+        
+        # log 'Macro.execute' cmmd, cmds
+
+        wordsInArgsOrCursorsOrSelection = (argl, opt) ->
+            
+            if argl.length
+                argl
+            else
+                cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors(), editor.selections()), opt
+                ws = uniq cw.concat editor.textsInRanges editor.selections()
+                ws.filter (w) -> w.trim().length
+
+        switch cmmd
+
+            # 000  000   000  000   000
+            # 000  0000  000  000   000
+            # 000  000 0 000   000 000
+            # 000  000  0000     000
+            # 000  000   000      0
+
+            'inv'
+                window.textEditor.toggleInvisibles()
+
+            # 0000000    000      000  000   000  000   000
+            # 000   000  000      000  0000  000  000  000
+            # 0000000    000      000  000 0 000  0000000
+            # 000   000  000      000  000  0000  000  000
+            # 0000000    0000000  000  000   000  000   000
+
+            'blink'
+                editor.toggleBlink()
+                if prefs.get 'blink'
+                    @commandline.startBlink()
+                else
+                    @commandline.stopBlink()
+
+            #  0000000   0000000   000       0000000   00000000
+            # 000       000   000  000      000   000  000   000
+            # 000       000   000  000      000   000  0000000
+            # 000       000   000  000      000   000  000   000
+            #  0000000   0000000   0000000   0000000   000   000
+
+            'color' 'colors' ➜ editor.togglePigments()
+
+            # 00000000  00000000    0000000
+            # 000       000   000  000
+            # 000000    00000000   0000000
+            # 000       000             000
+            # 000       000        0000000
+
+            'fps'   ➜ window.fps?.toggle()
+
+            #  0000000   000  000000000
+            # 000        000     000
+            # 000  0000  000     000
+            # 000   000  000     000
+            #  0000000   000     000
+
+            's'
+            'ks'
+            'status'
+            'git'       ➜ post.emit 'git.status'
+            
+            'h'
+            'history'   ➜ post.emit 'git.history'
+
+            'd'
+            'kd'
+            'diff'      ➜ post.emit 'git.diff' cmds
+                
+            'log'       ➜ post.emit 'git.log' cmds
+            
+            'c'
+            'kc'
+            'commit'
+            'ci'        ➜ post.emit 'git.commit' cmds
+            
+            # 000   000  000   000  000   0000000   0000000   0000000    00000000  
+            # 000   000  0000  000  000  000       000   000  000   000  000       
+            # 000   000  000 0 000  000  000       000   000  000   000  0000000   
+            # 000   000  000  0000  000  000       000   000  000   000  000       
+            #  0000000   000   000  000   0000000   0000000   0000000    00000000  
+            
+            'u'
+            'unicode'   ➜ post.emit 'unicode'
+            
+            # 000   000  00000000  000      00000000
+            # 000   000  000       000      000   000
+            # 000000000  0000000   000      00000000
+            # 000   000  000       000      000
+            # 000   000  00000000  0000000  000
+
+            'help'
+
+                helpFile = slash.path kakao.bundle.path, 'kode/ko/help.noon'
+
+                ffs.read(helpFile).then (text) ->
+                    window.terminal.clear()
+                    for l in text.split '\n'
+                        window.terminal.appendLineDiss l, Syntax.dissForTextAndSyntax l, 'noon'
+
+                    window.terminal.scroll.cursorToTop 1
+                    window.split.do 'show terminal'
+
+            # 00000000   00000000   0000000
+            # 000   000  000       000   000
+            # 0000000    0000000   000 00 00
+            # 000   000  000       000 0000
+            # 000   000  00000000   00000 00
+
+            'req'
+
+                return if slash.ext(editor.currentFile) not in ['kode']
+                lines = req editor.currentFile, editor.lines(), editor
+
+                if valid lines
+                    editor.do.start()
+                    for line in lines
+                        if line.op == 'insert'
+                            editor.do.insert line.index, line.text
+                        else
+                            editor.do.change line.index, line.text
+
+                    editor.do.end()
+                    return do: "focus editor"
+
+            # 0000000    0000000     0000000
+            # 000   000  000   000  000
+            # 000   000  0000000    000  0000
+            # 000   000  000   000  000   000
+            # 0000000    0000000     0000000
+
+            'dbg'
+
+                li = cp[1]
+                indent = editor.indentStringForLineAtIndex li
+                li += 1 if not editor.isCursorInIndent() and not editor.isCursorInLastLine()
+                insert = indent + 'log "'
+                insert += editor.funcInfoAtLineIndex li
+                lst = cmds.length and parseInt(cmds[0]) or 0
+                cmds.shift() if lst
+                words = wordsInArgsOrCursorsOrSelection cmds, include: "#@.-"
+                for ti in [0...words.length - lst]
+                    t = words[ti]
+                    insert += "#{t}:\#{kstr #{t}} "
+                insert = insert.trimRight()
+                insert += '"'
+                if lst
+                    insert += (", kstr(#{words[ti]})" for ti in [words.length - lst...words.length]).join ''
+
+                editor.do.start()
+                editor.do.insert li, insert
+                editor.singleCursorAtPos [editor.line(li).length, li]
+                editor.do.end()
+
+                focus: editor.name
+
+            #  0000000  000       0000000    0000000   0000000
+            # 000       000      000   000  000       000
+            # 000       000      000000000  0000000   0000000
+            # 000       000      000   000       000       000
+            #  0000000  0000000  000   000  0000000   0000000
+
+            'class'
+
+                clss  = cmds.length and cmds[0] or last editor.textsInRanges(editor.selections())
+                clss ?= 'Class'
+                
+                dir   = editor.currentFile? and slash.dir(editor.currentFile) or kakao.bundle.app('kode')
+                # file  = slash.path dir, clss.toLowerCase() + '.kode'
+                file  = slash.path dir, clss + '.kode'
+                
+                text  = "###\n"
+                text += (s for s in salt(clss).split '\n').join '\n'
+                text += "\n###\n"
+                text += """
+
+                function #{clss}
+
+                    @: () ->
+
+                export #{clss}
+
+                """
+                ffs.write(file, text).then (file) ->
+                    post.emit 'loadFile' file
+
+                return focus: editor.name
+
+            #  0000000  000      00000000   0000000   000   000
+            # 000       000      000       000   000  0000  000
+            # 000       000      0000000   000000000  000 0 000
+            # 000       000      000       000   000  000  0000
+            #  0000000  0000000  00000000  000   000  000   000
+
+            'clean'
+
+                editor.do.start()
+                for li in [0...editor.numLines()]
+                    line = editor.line li
+                    cleaned = line.trimRight()
+                    if line != cleaned
+                        editor.do.change li, cleaned
+                editor.do.end()
+
+            'unix'
+
+                editor.newlineCharacters = '\n'
+                post.emit 'saveFile'
+
+            # 000   000  00000000   0000000   0000000    00000000  00000000
+            # 000   000  000       000   000  000   000  000       000   000
+            # 000000000  0000000   000000000  000   000  0000000   0000000
+            # 000   000  000       000   000  000   000  000       000   000
+            # 000   000  00000000  000   000  0000000    00000000  000   000
+
+            'header'
+
+                editor.toggleHeader()
+
+            'col'
+
+                num  = cmds.length > 0 and parseInt(cmds[0]) or 10
+                step = cmds.length > 1 and parseInt(cmds[1]) or 1
+                editor.cursorColumns num, step
+
+            'line'
+
+                num  = cmds.length > 0 and parseInt(cmds[0]) or 10
+                step = cmds.length > 1 and parseInt(cmds[1]) or 1
+                editor.cursorLines num, step
+
+            ➜
+
+                # 000000000  00000000    0000000   000   000   0000000  00000000   0000000   00000000   00     00
+                #    000     000   000  000   000  0000  000  000       000       000   000  000   000  000   000
+                #    000     0000000    000000000  000 0 000  0000000   000000    000   000  0000000    000000000
+                #    000     000   000  000   000  000  0000       000  000       000   000  000   000  000 0 000
+                #    000     000   000  000   000  000   000  0000000   000        0000000   000   000  000   000
+
+                transform = Editor.actionModules.transform.Transform
+                if transform.transformNames and cmmd in transform.transformNames
+                    window.textEditor.transform.do.apply window.textEditor.transform, [cmmd].concat cmds
+                else
+                    error 'unhandled macro', cmmd, transform.transformNames
+                    if last(@history) == command.trim()
+                        @history.pop()
+
+        select: true
+
+export Macro

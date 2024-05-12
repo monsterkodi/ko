@@ -1,0 +1,22 @@
+{
+  "(■ )(.+)": [
+    "test.marker",
+    "test"
+  ],
+  "(● )(.+)": [
+    "test-suite.marker",
+    "test-suite"
+  ],
+  "(✔ )(.+)": [
+    "test-pass.marker",
+    "test-pass"
+  ],
+  "(✘ )(.+)": [
+    "test-fail.marker",
+    "test-fail"
+  ],
+  "(▲ )(.+)": [
+    "test-error.marker",
+    "test-error"
+  ]
+}

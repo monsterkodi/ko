@@ -1,0 +1,225 @@
+###
+000000000  00000000  00000000   00     00  000  000   000   0000000   000    
+   000     000       000   000  000   000  000  0000  000  000   000  000    
+   000     0000000   0000000    000000000  000  000 0 000  000000000  000    
+   000     000       000   000  000 0 000  000  000  0000  000   000  000    
+   000     00000000  000   000  000   000  000  000   000  000   000  0000000
+###
+
+use ../../kxk ▪ post kpos popup stopEvent
+
+use ../tools  ◆ salt
+use ../editor ◆ Syntax TextEditor
+
+function Terminal extends TextEditor
+
+    @: viewElem ->
+        
+        super viewElem, features: ['Scrollbar' 'Numbers' 'Minimap' 'Meta' 'FileList'], fontSize:16 lineHeight:1.3
+        
+        @view.addEventListener "contextmenu" @onContextMenu
+        
+        @metaQueue = []
+        
+        @setLines ['']
+        
+        @initInvisibles()
+        
+    onDoChanges: changes =>
+        
+        ⮐ if @metaQueue.length
+    
+        super changes
+                
+    #  0000000   00000000   00000000   00000000  000   000  0000000  
+    # 000   000  000   000  000   000  000       0000  000  000   000
+    # 000000000  00000000   00000000   0000000   000 0 000  000   000
+    # 000   000  000        000        000       000  0000  000   000
+    # 000   000  000        000        00000000  000   000  0000000  
+                
+    appendLineDiss: text diss=[] ->
+        
+        @syntax.setDiss @numLines(), diss if diss?.length
+        @appendText text
+              
+    appendDiss: (diss) -> @appendLineDiss Syntax.lineForDiss(diss), diss        
+    
+    # 00     00  00000000  000000000   0000000 
+    # 000   000  000          000     000   000
+    # 000000000  0000000      000     000000000
+    # 000 0 000  000          000     000   000
+    # 000   000  00000000     000     000   000
+    
+    appendMeta: meta ->
+        
+        ⮐ error 'Terminal.appendMeta -- no meta?' if not meta?
+            
+        @meta.append meta
+                
+        if 
+            meta.diss?
+            
+                text = meta.text ? Syntax.lineForDiss meta.diss
+            
+                @appendLineDiss text, meta.diss 
+                        
+            meta.clss == 'salt'
+            
+                @appendMeta clss: 'spacer'
+                for l in salt(meta.text).split '\n'
+                    @appendMeta clss:'spacer' text:'# '+l
+                @appendMeta clss: 'spacer'
+            
+            meta.clss == 'termCommand'
+            
+                @appendLineDiss meta.command, Syntax.dissForTextAndSyntax meta.command, 'term'
+
+            meta.text?
+            
+                diss = Syntax.dissForTextAndSyntax meta.text, 'txt'
+                diss.font = meta.font if meta.font
+                @appendLineDiss meta.text, diss
+            ➜
+                @appendLineDiss ''
+
+        if meta.list
+            if meta.list is str
+                post.emit 'filelist.add' meta.list, @numLines()
+            else
+                post.emit 'filelist.add' meta.text, @numLines()
+                
+        for mm in meta.metas
+            @meta.appendLineMeta mm
+                
+        meta
+        
+    #  0000000   000   000  00000000  000   000  00000000  
+    # 000   000  000   000  000       000   000  000       
+    # 000 00 00  000   000  0000000   000   000  0000000   
+    # 000 0000   000   000  000       000   000  000       
+    #  00000 00   0000000   00000000   0000000   00000000  
+    
+    clearQueue: ->
+        
+        clearTimeout @metaTimer
+        @metaTimer = null
+        @metaQueue = []
+    
+    queueMeta: meta ->
+        
+        @metaQueue.push meta
+        clearTimeout @metaTimer
+        @metaTimer = setTimeout @dequeueMeta, 0
+        
+    dequeueMeta: =>
+        
+        count = 0
+        while meta = @metaQueue.shift()
+            @appendMeta meta
+            count += 1
+            break if count > 20
+            
+        clearTimeout @metaTimer
+        
+        if @metaQueue.length
+            @metaTimer = setTimeout @dequeueMeta, 0 
+        else
+            @do.resetHistory()
+        
+    isCursorAtEnd: -> @cursorPos()[1] == @numLines()-1 and @numCursors() == 1
+    singleCursorInLastLineAndScrollToBottom: ->
+        
+        @singleCursorAtPos [0, @numLines()-1] 
+        @scroll.to @scroll.fullHeight
+           
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
+    clear: ->
+        
+        post.emit 'filelist.clear'
+        @clearQueue()
+        @meta.clear()
+        @singleCursorAtPos [0,0]
+        super()
+
+    # 00000000    0000000   00000000   000   000  00000000     
+    # 000   000  000   000  000   000  000   000  000   000    
+    # 00000000   000   000  00000000   000   000  00000000     
+    # 000        000   000  000        000   000  000          
+    # 000         0000000   000         0000000   000          
+
+    onContextMenu: event => stopEvent event, @showContextMenu kpos event
+              
+    showContextMenu: absPos =>
+        
+        if not absPos?
+            absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+        
+        opt = items: [
+            text:   'Browse'
+            combo:  'command+.'
+            cb:     -> window.commandline.startCommand 'browse'
+        ,
+            text:   'Clear'
+            combo:  'alt+k' 
+            cb:     @clear
+        ,
+            text:   'Close'
+            combo:  'alt+ctrl+k'
+            cb:     window.split.hideTerminal
+        ,
+            text:   ''
+        ,
+            text:   'DevTools'
+            combo:  'alt+cmdctrl+i'
+        ]
+        
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+    
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000 
+    # 0000000    0000000     00000  
+    # 000  000   000          000   
+    # 000   000  00000000     000   
+    
+    handleModKeyComboCharEvent: mod key combo char event ->
+        
+        ⮐ if 'unhandled' != super mod, key, combo, char, event
+        
+        switch combo
+            
+            'enter'
+                
+                if href = @meta.hrefAtLineIndex @cursorPos()[1]
+                    post.emit 'loadFile' "#{href}" 
+                ⮐ 
+                
+            'ctrl+enter' 
+            'command+enter'
+                
+                if href = @meta.hrefAtLineIndex @cursorPos()[1]
+                    post.emit 'loadFile' "#{href}" 
+                    window.editor.focus()
+                ⮐ 
+                
+            'ctrl+s' 
+            'command+s'
+                
+                ⮐  if @meta.saveChanges()
+                
+            'esc'
+                
+                split = window.split
+                split.focus 'commandline-editor'
+                split.do    'enlarge editor'
+                ⮐ 
+                
+        'unhandled'
+
+export Terminal

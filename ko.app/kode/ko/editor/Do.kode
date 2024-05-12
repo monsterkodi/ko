@@ -1,0 +1,369 @@
+###
+0000000     0000000       
+000   000  000   000      
+000   000  000   000      
+000   000  000   000      
+0000000     0000000       
+###
+
+use ../../kxk ▪ isEqual immutable profile events
+use ../tools  ◆ ranges
+use           ◆ DoState
+
+class Do extends events
+
+    @: lines=[] -> 
+        
+        super()
+        @setLines lines
+        
+    # 000000000   0000000   0000000           0000000  000000000   0000000   000000000  00000000
+    #    000     000   000  000   000        000          000     000   000     000     000
+    #    000     000000000  0000000          0000000      000     000000000     000     0000000
+    #    000     000   000  000   000             000     000     000   000     000     000
+    #    000     000   000  0000000          0000000      000     000   000     000     00000000
+
+    tabState: ->
+
+        # profile.start 'tabState'
+        changes = []
+        
+        for index in 0...@history.length-1-@undos
+            chg = @calculateChanges @history[index], @history[index+1]
+            if valid chg?.changes
+                o = {}
+                for c in chg.changes
+                    switch c.change
+                        'changed'  ➜ o["■ #{c.doIndex}"] = "■#{c.after}■" 
+                        'inserted' ➜ o["● #{c.doIndex}"] = "●#{c.after}●" 
+                        'deleted'  ➜ o["○ #{c.doIndex} #{c.oldIndex}"] = '○'
+                changes.push o
+        
+        if changes.length > 1
+            index = changes.length-1
+            while index > 0
+                prv = changes[index-1]
+                nxt = changes[index]
+                if isEqual Object.keys(prv), Object.keys(nxt)
+                    changes.splice index-1, 1
+                index--
+                
+        # profile.end 'tabState'
+        changes
+
+    setTabState: tabState ->
+        
+        for changes in tabState
+            @start()
+            for key,value of changes
+                [type, index] = key.split ' '
+                switch type
+                    '○' ➜ @delete index
+                    '●' ➜ @insert index, value[1...value.length-1]
+                    '■' ➜ @change index, value[1...value.length-1]
+            @end()
+        @
+    
+    #  0000000  00000000  000000000        000      000  000   000  00000000   0000000  
+    # 000       000          000           000      000  0000  000  000       000       
+    # 0000000   0000000      000           000      000  000 0 000  0000000   0000000   
+    #      000  000          000           000      000  000  0000  000            000  
+    # 0000000   00000000     000           0000000  000  000   000  00000000  0000000   
+    
+    setLines: lines ->
+        
+        @state = new DoState lines
+        @reset()
+        @history.push @state.s
+
+    # 00000000   00000000   0000000  00000000  000000000
+    # 000   000  000       000       000          000
+    # 0000000    0000000   0000000   0000000      000
+    # 000   000  000            000  000          000
+    # 000   000  00000000  0000000   00000000     000
+
+    resetHistory: -> @setLines @lines()
+    
+    reset: ->
+
+        @undos   = 0
+        @doCount = 0
+        @history = []
+
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000
+    # 0000000      000     000000000  0000000       000
+    #      000     000     000   000  000   000     000
+    # 0000000      000     000   000  000   000     000
+
+    start:   -> @doCount += 1
+    isDoing: -> @doCount > 0
+    
+    # 00000000  000   000  0000000
+    # 000       0000  000  000   000
+    # 0000000   000 0 000  000   000
+    # 000       000  0000  000   000
+    # 00000000  000   000  0000000
+
+    end: opt ->
+        @doCount -= 1
+        if @doCount == 0
+            # log 'Do.end' @history, @state.s
+            changes = @calculateChanges @history[-1], @state.s
+            @history.push @state.s
+            @emit 'changes' changes if valid changes
+        null
+
+    # 00     00   0000000   0000000    000  00000000  000   000
+    # 000   000  000   000  000   000  000  000        000 000
+    # 000000000  000   000  000   000  000  000000      00000
+    # 000 0 000  000   000  000   000  000  000          000
+    # 000   000   0000000   0000000    000  000          000
+
+    change: index text -> @state.changeLine index, text
+    insert: index text -> @state.insertLine index, text
+    delete: index      -> @state.deleteLine index
+    append:       text -> @state.appendLine text
+
+    # 000   000  000   000  0000000     0000000
+    # 000   000  0000  000  000   000  000   000
+    # 000   000  000 0 000  000   000  000   000
+    # 000   000  000  0000  000   000  000   000
+    #  0000000   000   000  0000000     0000000
+
+    undo: ->
+
+        if @undos+1 < @history.length
+            @undos += 1
+            changes = @calculateChanges @state.s, @history[@history.length-1-@undos]
+            @state = new DoState @history[@history.length-1-@undos]
+            @emit 'changes' changes if valid changes
+
+    # 00000000   00000000  0000000     0000000
+    # 000   000  000       000   000  000   000
+    # 0000000    0000000   000   000  000   000
+    # 000   000  000       000   000  000   000
+    # 000   000  00000000  0000000     0000000
+
+    redo: ->
+        
+        ⮐ if @undos <= 0
+        
+        if @undos-1 < @history.length
+            @undos -= 1
+            changes = @calculateChanges @state.s, @history[@history.length-1-@undos]
+            @state = new DoState @history[@history.length-1-@undos]
+            @emit 'changes' changes
+
+    #  0000000  00000000  000      00000000   0000000  000000000
+    # 000       000       000      000       000          000
+    # 0000000   0000000   000      0000000   000          000
+    #      000  000       000      000       000          000
+    # 0000000   00000000  0000000  00000000   0000000     000
+
+    select: newSelections ->
+
+        if newSelections.length
+            newSelections = cleanRanges newSelections
+            @state.setSelections newSelections
+        else
+            @state.setSelections []
+
+    #  0000000  000   000  00000000    0000000   0000000   00000000
+    # 000       000   000  000   000  000       000   000  000   000
+    # 000       000   000  0000000    0000000   000   000  0000000
+    # 000       000   000  000   000       000  000   000  000   000
+    #  0000000   0000000   000   000  0000000    0000000   000   000
+
+    setCursors: newCursors opt ->
+
+        if not newCursors? or newCursors.length < 1
+            return error "Do.setCursors -- empty cursors?"
+
+        if opt?.main
+            switch opt.main
+                'first'   ➜ mainIndex = 0
+                'last'    ➜ mainIndex = newCursors.length-1
+                'closest' ➜ mainIndex = newCursors.indexOf posClosestToPosInPositions @state.mainCursor(), newCursors
+                          ➜
+                            mainIndex = newCursors.indexOf opt.main
+                            mainIndex = parseInt opt.main if mainIndex < 0
+        else
+            mainIndex = newCursors.length-1
+
+        mainCursor = newCursors[mainIndex]
+        @cleanCursors newCursors
+        mainIndex = newCursors.indexOf posClosestToPosInPositions mainCursor, newCursors
+
+        @state.setCursors newCursors
+        @state.setMain mainIndex
+
+    setMain: m -> @state.set 'main' m
+            
+    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000   0000000  
+    # 000       000       000      000       000          000     000  000   000  0000  000  000       
+    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  0000000   
+    #      000  000       000      000       000          000     000  000   000  000  0000       000  
+    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  0000000   
+    
+    setSelections: s -> @state.setSelections s
+    
+    # 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000   0000000  
+    # 000   000  000  000        000   000  000      000  000        000   000     000     000       
+    # 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     0000000   
+    # 000   000  000  000   000  000   000  000      000  000   000  000   000     000          000  
+    # 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     0000000   
+    
+    setHighlights: h -> @state.setHighlights h
+    addHighlight:  h -> @state.addHighlight h
+            
+    #  0000000  000      00000000   0000000   000   000
+    # 000       000      000       000   000  0000  000
+    # 000       000      0000000   000000000  000 0 000
+    # 000       000      000       000   000  000  0000
+    #  0000000  0000000  00000000  000   000  000   000
+
+    cleanCursors: cs ->
+
+        for p in cs
+            p[0] = Math.max p[0], 0
+            p[1] = clamp 0, @state.numLines()-1, p[1]
+
+        sortPositions cs
+
+        if cs.length > 1
+            for ci in cs.length-1...0
+                c = cs[ci]
+                p = cs[ci-1]
+                if c[1] == p[1] and c[0] == p[0]
+                    cs.splice ci, 1
+        cs
+        
+    #  0000000   0000000   000       0000000  000   000  000       0000000   000000000  00000000
+    # 000       000   000  000      000       000   000  000      000   000     000     000
+    # 000       000000000  000      000       000   000  000      000000000     000     0000000
+    # 000       000   000  000      000       000   000  000      000   000     000     000
+    #  0000000  000   000  0000000   0000000   0000000   0000000  000   000     000     00000000
+    
+    hasChanges: ->
+        
+        ⮐ false if empty @history
+        
+        changes = @calculateChanges @history[0], @state.s
+        
+        ⮐ false if empty changes
+        
+        changes.changes.length > 0
+
+    calculateChanges: oldState newState ->
+        
+        ⮐ if empty oldState
+        ⮐ if empty newState
+        
+        oi = 0 # index in oldState
+        ni = 0 # index in newState
+        dd = 0 # delta for doIndex
+        changes = []
+
+        oldLines = DoState.lines oldState
+        newLines = DoState.lines newState
+
+        inserts = 0 # number of insertions
+        deletes = 0 # number of deletions
+
+        if oldLines != newLines
+
+            ol = oldLines[oi]
+            nl = newLines[ni]
+
+            while oi < oldLines.length
+
+                if not nl? # new state has not enough lines, mark remaining lines in oldState as deleted
+                    deletes += 1
+                    changes.push change: 'deleted' oldIndex: oi, doIndex: oi+dd
+                    oi += 1
+                    dd -= 1
+
+                else if ol == nl # same lines in old and new
+                    oi += 1
+                    ni += 1
+                    ol = oldLines[oi]
+                    nl = newLines[ni]
+
+                else
+
+                    if nl == oldLines[oi+1] and ol == newLines[ni+1]
+
+                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
+                        oi += 1
+                        ni += 1
+                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: ol
+                        oi += 1
+                        ni += 1
+                        ol = oldLines[oi]
+                        nl = newLines[ni]
+
+                    else if nl == oldLines[oi+1] and oldLines[oi+1] != newLines[ni+1]
+
+                        changes.push change: 'deleted' oldIndex: oi, doIndex: oi+dd
+                        oi += 1
+                        dd -= 1
+                        deletes += 1
+                        ol = oldLines[oi]
+
+                    else if ol == newLines[ni+1] and oldLines[oi+1] != newLines[ni+1]
+
+                        changes.push change: 'inserted' newIndex: ni, doIndex: oi+dd, after: nl
+                        ni += 1
+                        dd += 1
+                        inserts += 1
+                        nl = newLines[ni]
+
+                    else # change
+
+                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
+                        oi += 1
+                        ol = oldLines[oi]
+                        ni += 1
+                        nl = newLines[ni]
+
+            while ni < newLines.length # mark remaining lines in newState as inserted
+
+                inserts += 1
+                changes.push change: 'inserted' newIndex: ni, doIndex: ni, after: nl
+                ni += 1
+                nl = newLines[ni]
+
+        changes: changes
+        inserts: inserts
+        deletes: deletes
+        cursors: oldState.cursors    != newState.cursors
+        selects: oldState.selections != newState.selections
+
+    #  0000000  000000000   0000000   000000000  00000000
+    # 000          000     000   000     000     000
+    # 0000000      000     000000000     000     0000000
+    #      000     000     000   000     000     000
+    # 0000000      000     000   000     000     00000000
+
+    text:          -> @state.text()
+    line:        i -> @state.line i
+    cursor:      i -> @state.cursor i
+    highlight:   i -> @state.highlight i
+    selection:   i -> @state.selection i
+
+    lines:         -> @state.lines()
+    cursors:       -> @state.cursors()
+    highlights:    -> @state.highlights()
+    selections:    -> @state.selections()
+
+    numLines:      -> @state.numLines()
+    numCursors:    -> @state.numCursors()
+    numSelections: -> @state.numSelections()
+    numHighlights: -> @state.numHighlights()
+
+    textInRange: r -> @state.line(r[0])?.slice r[1][0], r[1][1]
+    mainCursor:    -> @state.mainCursor()
+    rangeForLineAtIndex: i -> [i, [0, @line(i).length]]
+
+export Do

@@ -1,0 +1,147 @@
+
+# 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000  
+# 000   000  000  000        000   000  000      000  000        000   000     000     
+# 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000     
+# 000   000  000  000   000  000   000  000      000  000   000  000   000     000     
+# 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000     
+
+use ../../../kxk ▪ post
+
+export
+
+    actions:
+        menu: 'Select'
+        
+        highlightWordAndAddToSelection:
+            name:  'Highlight and Select Word'
+            text:  'highlights all occurrences of text in selection or word at cursor and selects the first|next highlight.'
+            combo: 'command+d'
+            
+        selectAllWords:
+            name:  'Select All Words'
+            combo: 'command+alt+d'
+            
+        removeSelectedHighlight:
+            name: 'Remove Highlighted Word from Selection'
+            text:  "does the inverse of 'highlight and select' word"
+            combo: 'command+shift+d'
+            
+        highlightTextOfSelectionOrWordAtCursor:
+            name:  'Highlight and Select Word'
+            text:  'highlights all occurrences of text in selection or word at cursor and selects it.'
+            combo: 'command+e'
+
+    # 000000000  00000000  000   000  000000000  
+    #    000     000        000 000      000     
+    #    000     0000000     00000       000     
+    #    000     000        000 000      000     
+    #    000     00000000  000   000     000     
+    
+    highlightText: (text, opt) -> # called from find command
+        
+        hls = @rangesForText text, opt
+        if hls.length and opt?.select
+            switch opt.select
+                'after'  ➜ @selectSingleRange rangeAfterPosInRanges(@cursorPos(), hls) ? first hls
+                'before' ➜ @selectSingleRange rangeBeforePosInRanges(@cursorPos(), hls) ? first hls
+                'first'  ➜ @selectSingleRange first hls
+        @setHighlights hls
+        @renderHighlights()
+        @emit 'highlight'
+    
+    # 000   000   0000000   00000000   0000000     0000000  
+    # 000 0 000  000   000  000   000  000   000  000       
+    # 000000000  000   000  0000000    000   000  0000000   
+    # 000   000  000   000  000   000  000   000       000  
+    # 00     00   0000000   000   000  0000000    0000000   
+        
+    wordHighlights: -> @highlights().filter (h) -> not h[2]?.clss?.startsWith('stringmatch') and not h[2]?.clss?.startsWith('bracketmatch')
+
+    selectAllWords: -> # command+alt+d
+        
+        if @name == 'commandline-editor' # hack to forward action to main editor
+            if editor = window.commandline?.command?.receivingEditor()
+                editor.selectAllWords()
+                editor.focus()
+                return
+    
+        @highlightWordAndAddToSelection()
+        @do.start()
+        @do.select @do.highlights()
+        if @do.numSelections()
+            @do.setCursors endPositionsFromRanges(@do.selections()), main: 'closest'
+        @do.end()
+                
+    highlightWordAndAddToSelection: () -> # command+d
+        
+        cp = @cursorPos()
+        wordHighlights = @wordHighlights()
+        cursorInWordHighlight = wordHighlights.length and rangeAtPosInRanges cp, wordHighlights
+        if not cursorInWordHighlight
+            @highlightTextOfSelectionOrWordAtCursor() # this also selects
+        else
+            @do.start()
+            sr = rangeAtPosInRanges cp, @do.selections()
+            if sr # cursor in selection -> select next highlight
+                r = rangeAfterPosInRanges cp, wordHighlights
+            else # select current highlight first
+                r = rangeAtPosInRanges cp, wordHighlights
+            r ?= wordHighlights[0]
+            @addRangeToSelection r
+            @do.end()
+
+    #  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000  
+    # 000       000       000      000       000          000     000  000   000  0000  000  
+    # 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000  
+    #      000  000       000      000       000          000     000  000   000  000  0000  
+    # 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000  
+    
+    highlightTextOfSelectionOrWordAtCursor: -> # command+e       
+            
+        if @numSelections() == 0
+            srange = @rangeForRealWordAtPos @cursorPos()
+            if empty @textInRange(srange).trim()
+                @clearHighlights() # needed?
+                @selectNone()
+                return
+            @selectSingleRange srange
+        
+        sel = @selection 0     
+        text = @textInRange sel
+        if text.length
+                        
+            @setHighlights @rangesForText text, max:9999
+            
+            # this should be done somewhere else (commandline or find/search commands)
+            if @renderHighlights?
+                @renderHighlights()
+                @emit 'highlight'
+                post.emit 'searchText' text
+                @focus()
+
+    #  0000000  000      00000000   0000000   00000000   
+    # 000       000      000       000   000  000   000  
+    # 000       000      0000000   000000000  0000000    
+    # 000       000      000       000   000  000   000  
+    #  0000000  0000000  00000000  000   000  000   000  
+    
+    clearHighlights: ->
+        
+        if @numHighlights()
+            @setHighlights []
+            @emit 'highlight'
+            
+    # 00000000   00000000  00     00   0000000   000   000  00000000  
+    # 000   000  000       000   000  000   000  000   000  000       
+    # 0000000    0000000   000000000  000   000   000 000   0000000   
+    # 000   000  000       000 0 000  000   000     000     000       
+    # 000   000  00000000  000   000   0000000       0      00000000  
+    
+    removeSelectedHighlight: -> # command+shift+d
+        
+        cp = @cursorPos()
+        sel = @selections()
+        sr = rangeAtPosInRanges cp, sel
+        hr = rangeAtPosInRanges cp, @highlights()
+        if sr and hr
+            @removeSelectionAtIndex sel.indexOf sr 

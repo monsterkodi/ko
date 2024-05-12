@@ -1,0 +1,280 @@
+###
+0000000     0000000   
+000   000  000   000  
+000   000  000   000  
+000   000  000   000  
+0000000     0000000   
+###
+
+use ../editor ◆ Do
+
+#class Dummy
+#    
+#    @: ->
+#        
+#    sync: ->
+#    async: ○->
+#    @static: ->
+#    @staticAsync: ○->
+#        
+#    bound: =>
+#    boundAsync: ○=>
+#    @staticBound: =>
+#    @staticBoundAsync: ○=>
+        
+
+▸ Do
+
+    # 000      000  000   000  00000000   0000000  
+    # 000      000  0000  000  000       000       
+    # 000      000  000 0 000  0000000   0000000   
+    # 000      000  000  0000  000            000  
+    # 0000000  000  000   000  00000000  0000000   
+    
+    ▸ setLines
+    
+        text  = "hello\nworld"
+        lines = text.split '\n'
+    
+        doo = new Do
+        doo.setLines lines
+        doo.lines() ▸ lines
+        doo.text()  ▸ text
+
+    # 000  000   000   0000000  00000000  00000000   000000000  
+    # 000  0000  000  000       000       000   000     000     
+    # 000  000 0 000  0000000   0000000   0000000       000     
+    # 000  000  0000       000  000       000   000     000     
+    # 000  000   000  0000000   00000000  000   000     000     
+    
+    ▸ insert
+    
+        doo.insert 1 'beautiful'
+        doo.lines() ▸ ['hello''beautiful''world']
+
+        doo.insert 3 '!'
+        doo.lines() ▸ ['hello''beautiful''world''!']
+
+        doo.insert 666 '?'
+        doo.lines() ▸ ['hello''beautiful''world''!']
+
+        doo.insert -666 '▴'
+        doo.lines() ▸ ['hello''beautiful''world''!']
+        
+    # 0000000    00000000  000      00000000  000000000  00000000  
+    # 000   000  000       000      000          000     000       
+    # 000   000  0000000   000      0000000      000     0000000   
+    # 000   000  000       000      000          000     000       
+    # 0000000    00000000  0000000  00000000     000     00000000  
+    
+    ▸ delete
+    
+        doo = new Do lines
+    
+        doo.delete 0
+        doo.lines() ▸ ['world']
+        
+        doo.delete 1
+        doo.lines() ▸ ['world']
+
+        doo.delete -2
+        doo.lines() ▸ ['world']
+        
+        doo.delete -1
+        doo.lines() ▸ []
+        
+    #  0000000  000   000   0000000   000   000   0000000   00000000  
+    # 000       000   000  000   000  0000  000  000        000       
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   
+    # 000       000   000  000   000  000  0000  000   000  000       
+    #  0000000  000   000  000   000  000   000   0000000   00000000  
+    
+    ▸ change
+
+        doo = new Do ['hello''world''○']
+    
+        doo.change 2 '~'
+        doo.lines() ▸ ['hello''world''~']
+        
+        doo.change -1 '!!'
+        doo.lines() ▸ ['hello''world''!!']
+
+        doo.change -3 'hi'
+        doo.lines() ▸ ['hi''world''!!']
+
+        doo.change -5 'blork'
+        doo.lines() ▸ ['hi''world''!!']
+
+        doo.change 666 'blark'
+        doo.lines() ▸ ['hi''world''!!']
+        
+    # 000   000  000   000  0000000     0000000   
+    # 000   000  0000  000  000   000  000   000  
+    # 000   000  000 0 000  000   000  000   000  
+    # 000   000  000  0000  000   000  000   000  
+    #  0000000   000   000  0000000     0000000   
+    
+    ▸ undo
+    
+        doo = new Do ['a''b''c']
+        
+        doo.start()
+        doo.insert 1 'd'
+        doo.change 2 'C'
+        doo.end()
+        
+        doo.lines() ▸ ['a''d''C''c']
+        doo.undo()
+        doo.lines() ▸ ['a''b''c']
+
+        doo.undo()
+        doo.lines() ▸ ['a''b''c']
+        
+    # 00000000   00000000  0000000     0000000   
+    # 000   000  000       000   000  000   000  
+    # 0000000    0000000   000   000  000   000  
+    # 000   000  000       000   000  000   000  
+    # 000   000  00000000  0000000     0000000   
+    
+    ▸ redo
+    
+        doo.lines() ▸ ['a''b''c']
+        doo.redo()  
+        doo.lines() ▸ ['a''d''C''c']
+        doo.redo()  
+        doo.lines() ▸ ['a''d''C''c']
+        doo.redo()  
+        doo.lines() ▸ ['a''d''C''c']
+        
+    # 000000000   0000000   0000000     0000000  000000000   0000000   000000000  00000000  
+    #    000     000   000  000   000  000          000     000   000     000     000       
+    #    000     000000000  0000000    0000000      000     000000000     000     0000000   
+    #    000     000   000  000   000       000     000     000   000     000     000       
+    #    000     000   000  0000000    0000000      000     000   000     000     00000000  
+    
+    ▸ tabState
+    
+        doo.tabState() ▸ ['■ 1': '■d■', '● 2': '●C●']
+        
+        doo = new Do []
+        
+        doo.tabState() ▸ []
+        
+        doo.start()
+        doo.insert 0 'bla'
+        doo.insert 0 'blub'
+        doo.end()
+        
+        doo.lines() ▸ ['blub''bla']
+        
+        doo.tabState() ▸ [
+                '● 0':'●blub●' 
+                '● 1':'●bla●'
+            ]
+
+        doo.start()
+        doo.insert 1 ''
+        doo.insert 3 ''
+        doo.end()
+        
+        doo.lines() ▸ ['blub''''bla''']
+            
+        doo.tabState() ▸ [
+                '● 0':'●blub●' 
+                '● 1':'●bla●'
+            ,
+                '● 1':'●●' 
+                '● 3':'●●'
+            ]
+            
+        doo.history.length ▸ 3
+        
+        doo.start()
+        doo.change 1 'krep'
+        doo.change 3 'krap'
+        doo.end()
+        
+        doo.lines() ▸ ['blub''krep''bla''krap']
+        
+        doo.tabState() ▸ [
+                '● 0':'●blub●' 
+                '● 1':'●bla●'
+            ,
+                '● 1':'●●' 
+                '● 3':'●●'
+            ,
+                '■ 1':'■krep■' 
+                '■ 3':'■krap■'
+            ]
+            
+        doo.undo()
+        
+        doo.tabState() ▸ [
+                '● 0':'●blub●' 
+                '● 1':'●bla●'
+            ,
+                '● 1':'●●' 
+                '● 3':'●●'
+            ]
+        
+        doo.redo()
+        
+        ts = doo.tabState() 
+        ts ▸ [
+                '● 0':'●blub●' 
+                '● 1':'●bla●'
+            ,
+                '● 1':'●●' 
+                '● 3':'●●'
+            ,
+                '■ 1':'■krep■' 
+                '■ 3':'■krap■'
+            ]
+        
+        d2 = new Do []
+        d2.setTabState ts
+        
+        d2.lines() ▸ ['blub''krep''bla''krap'] 
+        
+        d2.tabState() ▸ ts
+        
+    ▸ tabState delete
+    
+        doo = new Do ['kermit' 'alfred' 'gonzo']
+        
+        doo.start()
+        doo.delete 1
+        doo.end()
+        
+        doo.lines() ▸ ['kermit' 'gonzo']
+        
+        ts = doo.tabState()
+        ts ▸ ['○ 1 1': '○']
+        
+        d2 = new Do ['kermit' 'alfred' 'gonzo']
+        d2.setTabState ts
+        
+        d2.lines() ▸ ['kermit' 'gonzo']
+        
+        d2.tabState() ▸ ts
+        
+        d2.start()
+        d2.delete 0
+        d2.delete 0
+        d2.end()
+        
+        d2.lines() ▸ []
+        
+        ts = d2.tabState()
+        
+        ts ▸ [
+                '○ 1 1': '○'
+            ,
+                '○ 0 0': '○'
+                '○ 0 1': '○'
+            ]
+        
+        d3 = new Do ['kermit' 'alfred' 'gonzo']
+        d3.setTabState ts
+        d3.lines() ▸ []
+        

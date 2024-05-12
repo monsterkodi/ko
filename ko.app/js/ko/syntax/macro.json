@@ -1,0 +1,14 @@
+{
+  "(clean|help|dbg|class|req|inv|blink|color|fps)\\b": [
+    "macro"
+  ],
+  "(basename|filename|dirname|extname|resolve|unresolve)\\b": [
+    "keyword"
+  ],
+  "(sort|up|down|reverse)\\b": [
+    "func.call"
+  ],
+  "(upper|lower|title|case)": [
+    "string"
+  ]
+}

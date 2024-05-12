@@ -1,0 +1,981 @@
+###
+ 0000000   0000000   000      000   000  00     00  000   000
+000       000   000  000      000   000  000   000  0000  000
+000       000   000  000      000   000  000000000  000 0 000
+000       000   000  000      000   000  000 0 000  000  0000
+ 0000000   0000000   0000000   0000000   000   000  000   000
+###
+
+use ../../kxk ▪ krzl ffs kpos elem drag post prefs slash popup keyinfo setStyle stopEvent $
+use ../tools  ◆ DirWatch File
+use           ◆ Crumb Scroller Row
+
+function Column
+
+    @: @browser ->
+
+        @searchTimer = null
+        @search = ''
+        @items  = []
+        @rows   = []
+
+        @div     = elem class: 'browserColumn'        tabIndex:6 id: @name()
+        @content = elem class: 'browserColumnContent' parent: @div
+        @table   = elem class: 'browserColumnTable'   parent: @content
+
+        @browser.cols?.appendChild @div
+
+        @div.addEventListener 'focus'     @onFocus
+        @div.addEventListener 'blur'      @onBlur
+        @div.addEventListener 'keydown'   @onKey
+        @div.addEventListener 'keyup'     @onKeyUp
+
+        @div.addEventListener 'mouseover' @onMouseOver
+        @div.addEventListener 'mouseout'  @onMouseOut
+
+        @div.addEventListener 'dblclick'  @onDblClick
+
+        @div.addEventListener 'contextmenu' @onContextMenu
+
+        @drag = new drag
+            target:  @div
+            onStart: @onDragStart
+            onMove:  @onDragMove
+            onStop:  @onDragStop
+
+        @crumb  = new Crumb @
+        @scroll = new Scroller @, @content
+
+        @setIndex @browser.columns?.length
+
+    # 000       0000000    0000000   0000000    000  000000000  00000000  00     00   0000000
+    # 000      000   000  000   000  000   000  000     000     000       000   000  000
+    # 000      000   000  000000000  000   000  000     000     0000000   000000000  0000000
+    # 000      000   000  000   000  000   000  000     000     000       000 0 000       000
+    # 0000000   0000000   000   000  0000000    000     000     00000000  000   000  0000000
+
+    loadItems: items parent ○->
+
+        # log 'loadItems parent:' parent
+        # log 'loadItems items:' items
+
+        @clear()
+
+        @parent = parent
+
+        if @index == 0 or @index-1 < @browser.numCols() and @browser.columns[@index-1].activeRow()?.item.file == '..'
+            if not slash.isRoot @parent.path
+                if items[0]?.file not in ['..' '/']
+                    dir = @parent.path
+                    updir = slash.dir dir
+                    if updir != dir
+                        # log 'unshift updir' updir, @parent
+                        items.unshift
+                            file: '..'
+                            type: 'dir'
+                            path:  updir
+
+        @items = items
+
+        @div.classList.remove 'browserColumnCode'
+
+        @crumb.show()
+
+        if @parent.type == 'dir'
+            DirWatch.watch @parent.path
+            @crumb.setFile @parent.path
+        else
+            if File.isCode @parent.path
+                @crumb.setFile @parent.path
+                @div.classList.add 'browserColumnCode'
+
+        error "no parent item?" if not @parent?
+        error "loadItems -- no parent type?", @parent if not @parent.type?
+
+        if valid @items
+            for item in @items
+                @rows.push new Row @, item
+
+            @scroll.update()
+
+        @sort()
+        @
+
+    # 0000000    00000000    0000000    0000000
+    # 000   000  000   000  000   000  000
+    # 000   000  0000000    000000000  000  0000
+    # 000   000  000   000  000   000  000   000
+    # 0000000    000   000  000   000   0000000
+
+    updateDragIndicator: event ->
+        
+        if @dragDiv
+            @dragInd?.classList.toggle 'copy' event.shiftKey
+            @dragInd?.classList.toggle 'move' event.ctrlKey or event.metaKey or event.altKey
+
+    onDragStart: d e =>
+
+        @dragStartRow = @row e.target
+
+        delete @toggle
+
+        if @dragStartRow
+
+            if 
+                e.shiftKey
+                    @browser.select.to @dragStartRow
+                    
+                e.metaKey or e.altKey or e.ctrlKey
+                    if not @dragStartRow.isSelected()
+                        @browser.select.toggle @dragStartRow
+                    else
+                        @toggle = true
+                ➜
+                    if @dragStartRow.isSelected()
+                        @deselect = true
+                    else
+                        @activeRow()?.clearActive()
+                        @browser.select.row @dragStartRow, false
+        else
+            if @hasFocus() and @activeRow()
+                @browser.select.row @activeRow()
+
+    # 00     00   0000000   000   000  00000000
+    # 000   000  000   000  000   000  000
+    # 000000000  000   000   000 000   0000000
+    # 000 0 000  000   000     000     000
+    # 000   000   0000000       0      00000000
+
+    onDragMove: d e =>
+
+        if @dragStartRow and not @dragDiv and valid @browser.select.files()
+
+            ⮐ if Math.abs(d.deltaSum.x) < 20 and Math.abs(d.deltaSum.y) < 10
+
+            delete @toggle
+            delete @deselect
+
+            @dragDiv = elem 'div'
+            @dragDiv.drag = d
+            @dragDiv.files = @browser.select.files()
+            pos = kpos e.pageX, e.pageY
+            row = @browser.select.rows[0]
+
+            @dragDiv.style.position      = 'absolute'
+            @dragDiv.style.opacity       = "0.7"
+            @dragDiv.style.top           = "#{pos.y-d.deltaSum.y}px"
+            @dragDiv.style.left          = "#{pos.x-d.deltaSum.x}px"
+            @dragDiv.style.width         = "#{@width()-12}px"
+            @dragDiv.style.pointerEvents = 'none'
+
+            @dragInd = elem class:'dragIndicator'
+            @dragDiv.appendChild @dragInd
+
+            for row in @browser.select.rows
+                rowClone = row.div.cloneNode true
+                rowClone.style.flex          = 'unset'
+                rowClone.style.pointerEvents = 'none'
+                rowClone.style.border        = 'none'
+                rowClone.style.marginBottom  = '-1px'
+                @dragDiv.appendChild rowClone
+
+            document.body.appendChild @dragDiv
+            @focus activate:false
+
+        if @dragDiv
+
+            onSpringLoadTimeout = =>
+                if column = @browser.columnForFile @browser.springLoadTarget
+                    if row = column.row @browser.springLoadTarget
+                        row.activate()
+
+            clearTimeout @browser.springLoadTimer
+            delete @browser.springLoadTarget
+            if row = @browser.rowAtPos d.pos
+                if row.item?.type == 'dir'
+                    @browser.springLoadTimer = setTimeout onSpringLoadTimeout, 1000
+                    @browser.springLoadTarget = row.item.path
+
+            @updateDragIndicator e
+            @dragDiv.style.transform = "translateX(#{d.deltaSum.x}px) translateY(#{d.deltaSum.y}px)"
+
+    #  0000000  000000000   0000000   00000000
+    # 000          000     000   000  000   000
+    # 0000000      000     000   000  00000000
+    #      000     000     000   000  000
+    # 0000000      000      0000000   000
+
+    onDragStop: d e =>
+
+        clearTimeout @browser.springLoadTimer
+        delete @browser.springLoadTarget
+
+        if @dragDiv?
+
+            @dragDiv.remove()
+            files = @dragDiv.files
+            delete @dragDiv
+            delete @dragStartRow
+
+            if 
+                row = @browser.rowAtPos d.pos
+                    column = row.column
+                    target = row.item?.path
+                    
+                column = @browser.columnAtPos d.pos
+                    target = column.parent?.path
+                ➜
+                    log 'no drop target'
+                    ⮐ 
+
+            action = e.shiftKey and 'copy' or 'move'
+
+            if column == @browser.shelf
+                if target and (e.ctrlKey or e.shiftKey or e.metaKey or e.altKey)
+                    log 'drop into shelf item'
+                    @browser.dropAction action, files, target
+                else
+                    log 'add to shelf'
+                    @browser.shelf.addFiles files, pos:d.pos
+            else
+                log 'drop into folder column' target
+                @browser.dropAction action, files, target
+        else
+            if e.button == 0
+                @focus activate:false force:true
+
+            if row = @row e.target
+                if row.isSelected()
+                    if e.metaKey or e.altKey or e.ctrlKey or e.shiftKey
+                        if @toggle
+                            delete @toggle
+                            @browser.select.toggle row
+                    else
+                        if @deselect
+                            delete @deselect
+                            @browser.select.row row
+                        else
+                            row.activate()
+            else
+                @activeRow()?.clearActive()
+
+    # 00000000   00000000  00     00   0000000   000   000  00000000
+    # 000   000  000       000   000  000   000  000   000  000
+    # 0000000    0000000   000000000  000   000   000 000   0000000
+    # 000   000  000       000 0 000  000   000     000     000
+    # 000   000  00000000  000   000   0000000       0      00000000
+
+    removeFile: file =>
+
+        if row = @row slash.file file
+            @removeRow row
+            @scroll.update()
+
+    # 000  000   000   0000000  00000000  00000000   000000000
+    # 000  0000  000  000       000       000   000     000
+    # 000  000 0 000  0000000   0000000   0000000       000
+    # 000  000  0000       000  000       000   000     000
+    # 000  000   000  0000000   00000000  000   000     000
+
+    insertFile: file =>
+
+        item = @browser.fileItem file
+        row = new Row @, item
+        @rows.push row
+        row
+
+    insertDir: dir =>
+
+        item = @browser.dirItem dir
+        row = new Row @, item
+        @rows.push row
+        row
+
+    # 000  000000000  00000000  00     00
+    # 000     000     000       000   000
+    # 000     000     0000000   000000000
+    # 000     000     000       000 0 000
+    # 000     000     00000000  000   000
+
+    unshiftItem: item ->
+
+        @items.unshift item
+        @rows.unshift new Row @, item
+        @table.insertBefore @table.lastChild, @table.firstChild
+        @scroll.update()
+        @rows[0]
+
+    pushItem: item ->
+
+        @items.push item
+        @rows.push new Row @, item
+        @scroll.update()
+        @rows[-1]
+
+    addItem: item ->
+
+        row = @pushItem item
+        @sort()
+        row
+
+    sort: ->
+
+        ⮐ if empty @parent?.path
+        ⮐ if @parent.type == 'file'
+        
+        sortBy = prefs.get 'browser|sort' {}
+        switch sortBy[@parent.path]
+            'type'  ➜ @sortByType()
+            'date'  ➜ @sortByDateAdded()
+                    ➜ @sortByName()
+
+    setItems: @items, opt ->
+
+        @browser.clearColumn @index
+
+        @parent = opt.parent
+
+        error "no parent item?" if not @parent?
+        error "setItems -- no parent type?", @parent if not @parent.type?
+
+        for item in @items
+            @rows.push new Row @, item
+
+        @scroll.update()
+        @
+
+    # 00     00  000   0000000   0000000
+    # 000   000  000  000       000
+    # 000000000  000  0000000   000
+    # 000 0 000  000       000  000
+    # 000   000  000  0000000    0000000
+
+    isDir:  -> @parent?.type == 'dir'
+    isFile: -> @parent?.type == 'file'
+    isSrc:  ->
+        if @parent?.type == 'file'
+            ⮐ true if @items[0]?.type in ['class' 'func']
+        false
+
+    isEmpty: -> empty @parent
+    clear:   ->
+        if @parent?.path and @parent?.type == 'dir'
+            DirWatch.unwatch @parent.path
+        delete @parent
+        @clearSearch()
+        @div.scrollTop = 0
+        @table.innerHTML = ''
+        @crumb.clear()
+        @rows = []
+        @scroll.update()
+
+    setIndex: @index ->
+
+        if @crumb? ➜ @crumb.elem.columnIndex = @index
+
+    width: -> @div.getBoundingClientRect().width
+
+    #  0000000    0000000  000000000  000  000   000  00000000
+    # 000   000  000          000     000  000   000  000
+    # 000000000  000          000     000   000 000   0000000
+    # 000   000  000          000     000     000     000
+    # 000   000   0000000     000     000      0      00000000
+
+    activateRow: row -> @row(row)?.activate()
+
+    activeRow: -> @rows.find (r) -> r.isActive()
+    activePath: -> @activeRow()?.path() ? @parent.path
+    selectedRow: -> @rows.find (r) -> r.isSelected()
+
+    row: row -> # accepts element, index, string or row
+        if
+            Number.isInteger(row)       ➜ ⮐ 0 <= row < @numRows() and @rows[row] or null
+            typeof(row) == 'string'     ➜ ⮐ @rows.find (r) -> r.item.file == row or r.item.path == row
+            row instanceof HTMLElement  ➜ ⮐ @rows.find (r) -> r.div.contains row
+                                        ➜ ⮐ row
+
+    nextColumn: -> @browser.column @index+1
+    prevColumn: -> @browser.column @index-1
+
+    name: -> "#{@browser.name}:#{@index}"
+    path: -> @parent?.path ? ''
+
+    numRows:    -> @rows.length ? 0
+    rowHeight:  -> @parent?.type == 'file' ? 19 : 21
+    numVisible: -> @rowHeight() and parseInt(@browser.height() / @rowHeight()) or 0
+
+    rowAtPos: pos -> @row @rowIndexAtPos pos
+
+    rowIndexAtPos: pos ->
+        dy = pos.y - @content.getBoundingClientRect().top
+        rh = @rowHeight()
+        if dy >= 0 and rh > 0
+            Math.floor dy/rh
+        else
+            -1
+
+    # 00000000   0000000    0000000  000   000   0000000
+    # 000       000   000  000       000   000  000
+    # 000000    000   000  000       000   000  0000000
+    # 000       000   000  000       000   000       000
+    # 000        0000000    0000000   0000000   0000000
+
+    hasFocus: -> @div.classList.contains 'focus'
+
+    focus: opt ->
+
+        opt ?= {}
+
+        ⮐ @ if not opt.force and not window.lastFocus.startsWith @browser.name
+
+        if not @activeRow() and @numRows() and opt.activate != false
+            @rows[0].setActive()
+
+        @div.focus()
+        @div.classList.add 'focus'
+        window.setLastFocus @name()
+        @
+
+    onFocus: => @div.classList.add 'focus'
+    onBlur:  => @div.classList.remove 'focus'
+
+    focusBrowser: ->
+
+        log 'focusBrowser'
+        @browser.focus force:true
+
+    # 00     00   0000000   000   000   0000000  00000000
+    # 000   000  000   000  000   000  000       000
+    # 000000000  000   000  000   000  0000000   0000000
+    # 000 0 000  000   000  000   000       000  000
+    # 000   000   0000000    0000000   0000000   00000000
+
+    onMouseOver: event => @row(event.target)?.onMouseOver?()
+    onMouseOut:  event => @row(event.target)?.onMouseOut?()
+
+    onDblClick:  event =>
+
+        @browser.skipOnDblClick = true
+        item = @activeRow()?.item
+        if item?.type == 'dir'
+            @browser.clearColumnsFrom 1 pop:true
+            @browser.loadDirItem item, 0 activate:false
+        else
+            editor.focus() # test if editor.currentFile == item.path ?
+
+    extendSelection: key ->
+        
+        if @parent.type == 'file'
+            @navigateRows key
+            ⮐ 
+
+        ⮐ error "no rows in column #{@index}?" if not @numRows()
+        
+        index = @activeRow()?.index() ? -1
+        error "no index from activeRow? #{index}?", @activeRow() if not index? or Number.isNaN index
+
+        toIndex = switch key
+            'up'        ➜ index-1
+            'down'      ➜ index+1
+            'home'      ➜ 0
+            'end'       ➜ @numRows()-1
+            'page up'   ➜ Math.max 0, index-@numVisible()
+            'page down' ➜ Math.min @numRows()-1, index+@numVisible()
+                        ➜ index
+
+        @browser.select.to @row(toIndex), true
+
+    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
+    # 0000  000  000   000  000   000  000  000        000   000     000     000
+    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000
+    # 000  0000  000   000     000     000  000   000  000   000     000     000
+    # 000   000  000   000      0      000   0000000   000   000     000     00000000
+
+    navigateRows: key ->
+
+        ⮐ error "no rows in column #{@index}?" if not @numRows()
+        
+        index = @activeRow()?.index() ? -1
+        error "no index from activeRow? #{index}?" @activeRow() if not index? or Number.isNaN index
+
+        newIndex = switch key
+            'up'        ➜ index-1
+            'down'      ➜ index+1
+            'home'      ➜ 0
+            'end'       ➜ @numRows()-1
+            'page up'   ➜ index-@numVisible()
+            'page down' ➜ index+@numVisible()
+                        ➜ index
+
+        if not newIndex? or Number.isNaN newIndex
+            error "no index #{newIndex}? #{@numVisible()}"
+
+        newIndex = clamp 0 @numRows()-1 newIndex
+
+        if newIndex != index
+            @rows[newIndex].activate null @parent.type=='file'
+
+    navigateCols: key -> # move to file browser?
+
+        switch key
+            'up'    ➜ @browser.navigate 'up'
+            'left'  ➜ @browser.navigate 'left'
+            'right' ➜ @browser.navigate 'right'
+            'enter'
+                if item = @activeRow()?.item
+                    type = item.type
+                    if type == 'dir'
+                        @browser.loadItem item
+                    else if item.path
+                        post.emit 'jumpTo' item
+                        post.emit 'focus' 'editor'
+        @
+
+    navigateRoot: key ->
+        
+        switch key
+            'left'  ➜ @browser.browse slash.dir @parent.path
+            'right' ➜ @browser.browse @activeRow().item.path
+        @
+
+    #  0000000  00000000   0000000   00000000    0000000  000   000
+    # 000       000       000   000  000   000  000       000   000
+    # 0000000   0000000   000000000  0000000    000       000000000
+    #      000  000       000   000  000   000  000       000   000
+    # 0000000   00000000  000   000  000   000   0000000  000   000
+
+    doSearch: char ->
+
+        ⮐ if not @numRows()
+
+        if not @searchDiv
+            @searchDiv = elem class: 'browserSearch'
+
+        @setSearch @search + char
+
+    backspaceSearch: ->
+
+        if @searchDiv and @search.length
+            @setSearch @search[0...@search.length-1]
+
+    setSearch: (@search) ->
+        
+        clearTimeout @searchTimer
+        @searchTimer = setTimeout @clearSearch, 700 # should this be a preference?
+
+        @searchDiv.textContent = @search
+
+        activeIndex  = @activeRow()?.index() ? 0
+        activeIndex += 1 if (@search.length == 1) #or (char == '')
+        activeIndex  = 0 if activeIndex >= @numRows()
+
+        for rows in [@rows.slice(activeIndex), @rows.slice(0,activeIndex+1)]
+            
+            k = new krzl values:rows, sortByLength:false extract:(r) -> r.item.file ? r.item.name
+            fuzzied = k.filter @search
+
+            if fuzzied.length
+                row = fuzzied[0]
+                row.div.appendChild @searchDiv
+                row.activate()
+                break
+        @
+
+    clearSearch: =>
+
+        @search = ''
+        @searchDiv?.remove()
+        delete @searchDiv
+        @
+
+    removeObject: =>
+
+        if row = @activeRow()
+            nextOrPrev = row.next() ? row.prev()
+            @removeRow row
+            nextOrPrev?.activate()
+        @
+
+    removeRow: row ->
+
+        if row == @activeRow()
+            if @nextColumn()?.parent?.path == row.item?.path
+                @browser.clearColumnsFrom @index + 1
+
+        row.div.remove()
+        @items.splice row.index(), 1
+        @rows.splice row.index(), 1
+
+    #  0000000   0000000   00000000   000000000
+    # 000       000   000  000   000     000
+    # 0000000   000   000  0000000       000
+    #      000  000   000  000   000     000
+    # 0000000    0000000   000   000     000
+
+    sortByName: =>
+
+        @rows.sort (a,b) ->
+            (a.item.type + a.item.name).localeCompare(b.item.type + b.item.name)
+
+        @table.innerHTML = ''
+        for row in @rows
+            @table.appendChild row.div
+
+        prefs.set "browser|sort|#{@parent.path}"
+        @
+
+    sortByType: =>
+
+        @rows.sort (a,b) ->
+            atype = a.item.type == 'file' and slash.ext(a.item.path) or '___'
+            btype = b.item.type == 'file' and slash.ext(b.item.path) or '___'
+            (a.item.type + atype + a.item.name).localeCompare(b.item.type + btype + b.item.name, undefined, numeric:true)
+
+        @table.innerHTML = ''
+        for row in @rows
+            @table.appendChild row.div
+
+        prefs.set "browser|sort|#{@parent.path}" 'type'
+        @
+
+    sortByDateAdded: =>
+
+        @rows.sort (a,b) -> b.item.stat?.atimeMs - a.item.stat?.atimeMs
+
+        @table.innerHTML = ''
+        for row in @rows
+            @table.appendChild row.div
+
+        prefs.set "browser|sort|#{@parent.path}" 'date'
+        @
+
+    # 000000000   0000000    0000000    0000000   000      00000000
+    #    000     000   000  000        000        000      000
+    #    000     000   000  000  0000  000  0000  000      0000000
+    #    000     000   000  000   000  000   000  000      000
+    #    000      0000000    0000000    0000000   0000000  00000000
+
+    toggleDotFiles: =>
+
+        if @parent.type == 'dir'
+            stateKey = "browser|showHidden|#{@parent.path}"
+            if prefs.get stateKey
+                prefs.del stateKey
+            else
+                prefs.set stateKey, true
+            @browser.loadDirItem @parent, @index, ignoreCache:true
+        @
+
+    toggleExtensions: =>
+
+        stateKey = 'browser|hideExtensions'
+        window.stash.set stateKey, not window.stash.get stateKey, true
+        setStyle '.browserRow .ext' 'display' window.stash.get(stateKey) and 'none' or 'initial'
+        @
+
+    # 000000000  00000000    0000000    0000000  000   000
+    #    000     000   000  000   000  000       000   000
+    #    000     0000000    000000000  0000000   000000000
+    #    000     000   000  000   000       000  000   000
+    #    000     000   000  000   000  0000000   000   000
+
+    moveToTrash: =>
+
+        index = @browser.select.freeIndex()
+        if index >= 0
+            selectRow = @row index
+
+        for row in @browser.select.rows
+            ffs.trash(row.path()).then (d) =>
+                @removeRow row if d
+
+        if selectRow
+            @browser.select.row selectRow
+        else
+            @navigateCols 'left'
+
+    addToShelf: =>
+
+        if pathToShelf = @activePath()
+            post.emit 'addToShelf' pathToShelf
+
+    newFolder: =>
+
+        newDir = slash.path @path(), 'New folder'
+        ffs.mkdir(newDir).then (d) =>
+            if d
+                # log 'new folder' d
+                row = @insertFile d
+                # log 'new row' row
+                @browser.select.row row
+                row.editName()
+
+    # 0000000    000   000  00000000   000      000   0000000   0000000   000000000  00000000
+    # 000   000  000   000  000   000  000      000  000       000   000     000     000
+    # 000   000  000   000  00000000   000      000  000       000000000     000     0000000
+    # 000   000  000   000  000        000      000  000       000   000     000     000
+    # 0000000     0000000   000        0000000  000   0000000  000   000     000     00000000
+
+    duplicateFile: =>
+
+        for item in @browser.select.items()
+            File.duplicate(item.path).then (target) =>
+                if target
+                    log 'duplicated' target
+                    if @parent.type == 'file'
+                        col = @prevColumn()
+                        col.focus()
+                    else col = @
+                    if item.type == 'file'
+                        row = col.insertFile target
+                    else
+                        row = col.insertDir target
+                    @browser.select.row row
+
+    # 00000000  000   000  00000000   000       0000000   00000000   00000000  00000000
+    # 000        000 000   000   000  000      000   000  000   000  000       000   000
+    # 0000000     00000    00000000   000      000   000  0000000    0000000   0000000
+    # 000        000 000   000        000      000   000  000   000  000       000   000
+    # 00000000  000   000  000        0000000   0000000   000   000  00000000  000   000
+
+    explorer: =>
+
+        open slash.dir @activePath()
+
+    open: =>
+
+        open @activePath()
+
+    #  0000000   000  000000000
+    # 000        000     000
+    # 000  0000  000     000
+    # 000   000  000     000
+    #  0000000   000     000
+
+    updateGitFiles: files ->
+
+        for row in @rows
+            ⮐ if row.item.type not in ['dir' 'file']
+            ⮐ if not row.div
+            status = files[row.item.path]
+
+            if icon =$ '.browserStatusIcon' row.div
+                icon.remove()
+
+            if status?
+                row.div.appendChild elem 'span' class:"git-#{status}-icon browserStatusIcon"
+            else if row.item.type == 'dir'
+                for file, status of files
+                    if row.item.file != '..' and file.startsWith row.item.path
+                        row.div.appendChild elem 'span' class:"git-dirs-icon browserStatusIcon"
+                        break
+
+    # 00000000    0000000   00000000   000   000  00000000
+    # 000   000  000   000  000   000  000   000  000   000
+    # 00000000   000   000  00000000   000   000  00000000
+    # 000        000   000  000        000   000  000
+    # 000         0000000   000         0000000   000
+
+    makeRoot: =>
+
+        ⮐ if not @parent
+
+        @browser.shiftColumnsTo @index
+
+        if @browser.columns[0].items[0].path != '..'
+
+            @unshiftItem
+                file: '..'
+                type: 'dir'
+                path:  slash.dir @parent.path
+
+        @crumb.setFile @parent.path
+
+    onContextMenu: event column =>
+
+        stopEvent event
+
+        absPos = kpos event
+
+        if not column
+            @showContextMenu absPos
+        else
+
+            opt = items: [
+                text:   'Root'
+                cb:     @makeRoot
+            ,
+                text:   'Add to Shelf'
+                combo:  'alt+shift+.'
+                cb:     => post.emit 'addToShelf' @parent.path
+            ,
+                text:   'Explorer'
+                combo:  'alt+e'
+                cb:     => open @parent.path
+            ]
+
+            opt.x = absPos.x
+            opt.y = absPos.y
+            popup.menu opt
+
+    showContextMenu: absPos =>
+
+        if not absPos?
+            absPos = kpos @div.getBoundingClientRect().left, @div.getBoundingClientRect().top
+
+        opt = items: [
+            text:   'Toggle Invisible'
+            combo:  'ctrl+i'
+            cb:     @toggleDotFiles
+        ,
+            text:   'Toggle Extensions'
+            combo:  'ctrl+e'
+            cb:     @toggleExtensions
+        ,
+            text:   ''
+        ,
+            text:   'Explorer'
+            combo:  'alt+e'
+            cb:     @explorer
+        ,
+            text:   ''
+        ,
+            text:   'Add to Shelf'
+            combo:  'alt+shift+.'
+            cb:     @addToShelf
+        ,
+            text:   ''
+        ,
+            text:   'Delete'
+            combo:  'ctrl+backspace'
+            cb:     @moveToTrash
+        ,
+            text:   ''
+            hide:   @parent.type == 'file'
+        ,
+            text:   'Duplicate'
+            combo:  'ctrl+d'
+            cb:     @duplicateFile
+            hide:   @parent.type == 'file'
+        ,
+            text:   'New Folder'
+            combo:  'alt+n'
+            cb:     @newFolder
+            hide:   @parent.type == 'file'
+        ]
+
+        if @parent.type != 'file'
+            opt.items = opt.items.concat [
+                text:   ''
+            ,
+                text:   'Sort'
+                menu: [
+                    text: 'By Name' combo:'ctrl+n', cb:@sortByName
+                ,
+                    text: 'By Type' combo:'ctrl+t', cb:@sortByType
+                ,
+                    text: 'By Date' combo:'ctrl+a', cb:@sortByDateAdded
+                ]
+            ]
+
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+
+    #  0000000   0000000   00000000   000   000
+    # 000       000   000  000   000   000 000
+    # 000       000   000  00000000     00000
+    # 000       000   000  000           000
+    #  0000000   0000000   000           000
+
+    copyPaths: ->
+        
+        paths = @browser.select.files().join '\n'
+        kakao 'clipboard.set' paths
+        paths
+
+    cutPaths: ->
+
+        @browser.cutPaths = @copyPaths()
+
+    pastePaths: ○->
+        
+        text  =○ kakao 'clipboard.get'
+        
+        paths = text.split '\n'
+
+        if text == @browser.cutPaths
+            action = 'move'
+        else
+            action = 'copy'
+        target = @parent.path
+        if @activeRow()?.item.type == 'dir'
+            target = @activeRow().item.path
+        @browser.dropAction action, paths, target
+
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000
+    # 0000000    0000000     00000
+    # 000  000   000          000
+    # 000   000  00000000     000
+
+    onKey: event =>
+
+        { mod, key, combo, char } = keyinfo.forEvent event
+
+        switch combo
+            'shift+`' '~'                      ➜ ⮐ stopEvent event, @browser.browse '~'
+            '/'                                ➜ ⮐ stopEvent event, @browser.browse '/'
+            'backspace'                        ➜ ⮐ stopEvent event, @browser.onBackspaceInColumn @
+            'delete'                           ➜ ⮐ stopEvent event, @browser.onDeleteInColumn @
+            'alt+left'                         ➜ ⮐ stopEvent event, window.split.focus 'shelf'
+            'alt+shift+.'                      ➜ ⮐ stopEvent event, @addToShelf()
+            'alt+e'                            ➜ ⮐ stopEvent event, @explorer()
+            'alt+n'                            ➜ ⮐ stopEvent event, @newFolder()
+            'ctrl+x' 'command+x'               ➜ ⮐ stopEvent event, @cutPaths()
+            'ctrl+c' 'command+c'               ➜ ⮐ stopEvent event, @copyPaths()
+            'ctrl+v' 'command+v'               ➜ ⮐ stopEvent event, @pastePaths()
+            'page up' 'page down' 'home' 'end' ➜ ⮐ stopEvent event, @navigateRows key
+            'enter''alt+up'                    ➜ ⮐ stopEvent event, @navigateCols key
+            'command+up' 'ctrl+up'             ➜ ⮐ stopEvent event, @navigateRows 'home'
+            'command+down' 'ctrl+down'         ➜ ⮐ stopEvent event, @navigateRows 'end'
+            'ctrl+t'                           ➜ ⮐ stopEvent event, @sortByType()
+            'ctrl+n'                           ➜ ⮐ stopEvent event, @sortByName()
+            'ctrl+a'                           ➜ ⮐ stopEvent event, @sortByDateAdded()
+            'ctrl+e'                           ➜ ⮐ stopEvent event, @toggleExtensions()
+            'command+i' 'ctrl+i'               ➜ ⮐ stopEvent event, @toggleDotFiles()
+            'command+d' 'ctrl+d'               ➜ ⮐ stopEvent event, @duplicateFile()
+            'command+k' 'ctrl+k'               ➜ ⮐ stopEvent event if @browser.cleanUp() # needed?
+            'f2'                               ➜ ⮐ stopEvent event, @activeRow()?.editName()
+            'shift+up' 'shift+down' 'shift+home' 'shift+end' 'shift+page up' 'shift+page down'
+                ⮐ stopEvent event, @extendSelection key
+            'command+left' 'command+right' 'ctrl+left' 'ctrl+right'
+                ⮐ stopEvent event, @navigateRoot key
+            'command+backspace' 'ctrl+backspace' 'command+delete' 'ctrl+delete'
+                ⮐ stopEvent event, @moveToTrash()
+            'tab'
+                if @search.length then @doSearch ''
+                ⮐ stopEvent event
+            'esc'
+                if @dragDiv
+                    @dragDiv.drag.dragStop()
+                    @dragDiv.remove()
+                    delete @dragDiv
+                else if @browser.select.files().length > 1
+                    @browser.select.row @activeRow()
+                else if @search.length then @clearSearch()
+                ⮐ stopEvent event
+
+        if combo in ['up'   'down']  ➜ ⮐ stopEvent event, @navigateRows key
+        if combo in ['left' 'right'] ➜ ⮐ stopEvent event, @navigateCols key
+
+        if mod in ['shift' ''] and char then @doSearch char
+
+        @updateDragIndicator event
+
+    onKeyUp: event =>
+
+        @updateDragIndicator event
+
+export Column
+

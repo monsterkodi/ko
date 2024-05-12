@@ -1,0 +1,129 @@
+keys
+    ^      control
+    ⌥      option
+    ⌘      command
+    ⌂      shift
+    ▸▴▾◂   cursor keys   
+
+essential shortcuts
+
+    ⌘,          maximize editor
+    ⌘.          open and focus file browser above editor
+
+    ⌘s          save changes to editor file
+    ⌥⌘s         save changes to all files
+
+    ⌘p          start open command with selection popup
+    ⌘f          start find command (find in editor file)
+    ⌘⌂s         start search command (search in project files)
+    ⌘;          start goto command
+    ⌘m          start macro command
+
+    ⌘z          undo
+    ⌘⌂z         redo
+
+    ⌘1          go to previous edit location
+    ⌘2          go to next edit location
+
+selection
+
+    ⌘e          highlight occurences of current word
+    ⌘g          select next highlight
+
+    ⌘d          add next highlighted word to selection
+    ⌥⌘d         select all occurences of current selection
+    ⌘⌂d         deselects last selected word
+
+    ⌘l          select more lines
+    ⌘⌂l         select less lines
+
+    ⌥⌘b         select string or bracket boundary
+    ⌥b          select string or bracket content
+
+    ⌘a          select all
+    ⌘⌂a         select nothing
+    ⌘i          invert selection
+
+navigation
+
+    ⌘[ ⌘]       open file in previous|next tab
+    ⌥⌘[ ⌥⌘]     move tab left|right
+
+    ⌥[          home
+    ⌥]          end
+
+    ⌥-          page up
+    ⌥=          page down
+
+    ⌘▸          move cursor to end of line
+    ⌘◂          move cursor to indentation|start of line
+
+multi-cursors
+
+    ⌘▴ ⌘▾        extend cursors vertically at top|bottom
+    ⌘⌂▴          shrink cursor columns at bottom
+    ⌘⌂▾          shrink cursor columns at top
+    ⌥left-click  add cursor at mouse position
+
+editing
+
+    ⌘/          toggle comment
+    ⌘j          join lines
+
+    ⌥▴ ⌥▾       move lines up|down
+    ⌥⌂▴ ⌥⌂▾     duplicate lines above|below
+    ⌥⌘⌂◂ ⌥⌘⌂▸   outdent|indent cursor lines
+
+    ⌥⌂a         align text after cursors
+    ⌘return     insert line below cursor
+    ⌘3          ascii header mode
+
+display
+
+    ⌘-          decrease editor font size
+    ⌘=          increase editor font size
+    ⌘0          reset editor font size
+
+    ⌘\          toggle centered layout
+
+misc
+
+    ⌘r          discard changes and reload current file
+    ⌥o          jump to counterpart file
+
+macro
+
+    ⌘m              invoke macro command and focus commandline
+    
+    diff            show uncommitted changes
+    history         show commit history
+
+    inv             toggle display of invisibles
+    fps             toggle fps display
+    blink           toggle cursor blinking
+    color    ^⌥⌘p   toggle pigments
+
+    class           create a new file with class template
+    clean           remove trailing spaces
+
+    upper           uppercase selected texts
+    lower           lowercase selected texts
+    title           titlecase selected texts
+    case     ^⌥⌘u   toggle between upper-, lower- and titlecase
+
+    up              sort selected texts ascending
+    down            sort selected texts descending
+    sort     ^⌥⌘s   toggle between up and down
+    reverse  ^⌥⌘r   reverse selected texts
+
+    col num delta                       duplicate main cursor horizontally
+    line num delta                      duplicate main cursor vertically
+    count dec|hex|bin offset delta      insert numbers at cursors
+    add num                             add to selected numbers
+    sub num                             subtract from selected numbers
+
+
+advanced shortcuts
+
+    ^'              toggle sticky selection
+    ^◂ ^▸           remove from selection in sticky mode

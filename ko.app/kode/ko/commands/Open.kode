@@ -1,0 +1,392 @@
+###
+ 0000000   00000000   00000000  000   000
+000   000  000   000  000       0000  000
+000   000  00000000   0000000   000 0 000
+000   000  000        000       000  0000
+ 0000000   000        00000000  000   000
+###
+
+use ../../kxk ▪ krzl post slash uniqBy reversed
+
+use ../tools/File
+use ../tools/Projects
+use ../commandline/Command
+
+relative = rel to ->
+
+    r = slash.relative rel, to
+
+    if r.startsWith '../../'
+        tilde = slash.tilde rel
+        if tilde.length < r.length
+            r = tilde
+    if rel.length < r.length
+        r = rel
+    r
+
+function Open extends Command
+
+    @: commandline ->
+
+        super commandline
+
+        post.on 'file' @onFile
+
+        @names    = ['open']
+        @files    = []
+        @file     = null
+        @dir      = null
+        @pkg      = null
+        @selected = 0
+
+    onFile: file =>
+
+        if @isActive()
+            if empty file
+                @setText ''
+            else if @getText() != slash.file file
+                @setText slash.tilde file
+
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000
+
+    changed: cmmd ->
+
+        cmmd = cmmd.trim()
+
+        [file, pos] = slash.splitFilePos cmmd ? @getText().trim()
+
+        items = @listItems currentText:cmmd, maxItems:10000
+
+        if valid cmmd and valid items
+            
+            @krzl.values  = items
+            @krzl.extract = (o) -> o.text
+
+            items = @krzl.filter slash.file file
+            
+            items.sort (a,b) -> b.weight - a.weight
+
+        if items.length
+            @showItems items.slice 0 300
+            @select 0
+            @positionList()
+        else
+            @hideList()
+
+    #  0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
+    # 000       000   000  000   000  000   000  000      000          000     000
+    # 000       000   000  000000000  00000000   000      0000000      000     0000000
+    # 000       000   000  000 0 000  000        000      000          000     000
+    #  0000000   0000000   000   000  000        0000000  00000000     000     00000000
+
+    complete: ->
+
+        log 'complete not implemented!'
+
+        if @commandList? and @commandList.line(@selected).startsWith(slash.file @getText()) and not @getText().trim().endsWith('/')
+            @setText slash.path(slash.dir(@getText()), @commandList.line(@selected))
+            if slash.dirExists @getText()
+                @setText @getText() + '/'
+                @changed @getText()
+            true
+        else if not @getText().trim().endsWith('/') and slash.dirExists @getText()
+            @setText @getText() + '/'
+            @changed @getText()
+            true
+        else
+            projects = post.get 'indexer', 'projects'
+            for p in Object.keys(projects).sort()
+                if p.startsWith @getText()
+                    pdir = Projects.projects[p].dir
+                    # pdir = slash.path(pdir, 'coffee') if slash.dirExists slash.path pdir, 'coffee'
+                    @setText pdir + '/'
+                    @changed @getText()
+                    return true
+            super()
+
+    # 000   000  00000000  000   0000000   000   000  000000000
+    # 000 0 000  000       000  000        000   000     000
+    # 000000000  0000000   000  000  0000  000000000     000
+    # 000   000  000       000  000   000  000   000     000
+    # 00     00  00000000  000   0000000   000   000     000
+
+    weight: item opt =>
+
+        f = item.file
+        r = item.text
+        b = slash.file f
+        n = slash.name(f).toLowerCase()
+
+        contBonus = 0
+        nameBonus = 0
+        
+        if opt.currentText is str
+            lf = 1 + opt.currentText.length/n.length
+            contBonus = n.indexOf(opt.currentText.toLowerCase()) >= 0 and 10000 * lf or 0
+            nameBonus = n.startsWith(opt.currentText.toLowerCase()) and 10000 * lf or 0
+
+        # TODO: move this stuff to a config.noon file
+
+        extensionBonus = switch slash.ext b
+            'kode'               ➜ 100
+            'coffee'             ➜ 95
+            'cpp' 'hpp' 'mm' 'h' ➜ 60
+            'md' 'styl' 'pug'    ➜ 50
+            'noon'               ➜ 25
+            'js' 'mjs'           ➜ -5
+            'json' 'html'        ➜ -10
+                                 ➜ 0
+
+        if @file and slash.ext(@file) == slash.ext b
+            extensionBonus += 100
+            
+        extensionBonus *= 10+10*contBonus+10*nameBonus # give file types and matching extension more weight
+
+        lengthPenalty = slash.dir(f).length
+
+        updirPenalty  = r.split('../').length * 819
+
+        if f.startsWith @dir
+            localBonus = Math.max 0, (5-r.split('/').length) * 4095
+        else
+            localBonus = Math.max 0, (5-r.split('../').length) * 819
+
+        item.weight = localBonus + contBonus + nameBonus + extensionBonus - lengthPenalty - updirPenalty
+
+    weightedItems: items opt ->
+
+        items.sort (a,b) => b.weight - a.weight
+        items
+
+    # 000      000   0000000  000000000
+    # 000      000  000          000
+    # 000      000  0000000      000
+    # 000      000       000     000
+    # 0000000  000  0000000      000
+
+    listItems: opt ->
+
+        # log 'Open.listItems history:' @history
+        # log 'Open.listItems files:' @files
+
+        opt ?= {}
+        opt.maxItems ?= 200
+        opt.flat ?= true
+
+        iconSpan = (file) ->
+            
+            if slash.ext(file) == 'kode'
+    
+                """<span class='kodeIcon openFileIcon'>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M5.75 7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zm5.25.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5z"></path><path fill-rule="evenodd" d="M6.25 0a.75.75 0 000 1.5H7.5v2H3.75A2.25 2.25 0 001.5 5.75V8H.75a.75.75 0 000 1.5h.75v2.75a2.25 2.25 0 002.25 2.25h8.5a2.25 2.25 0 002.25-2.25V9.5h.75a.75.75 0 000-1.5h-.75V5.75a2.25 2.25 0 00-2.25-2.25H9V.75A.75.75 0 008.25 0h-2zM3 5.75A.75.75 0 013.75 5h8.5a.75.75 0 01.75.75v6.5a.75.75 0 01-.75.75h-8.5a.75.75 0 01-.75-.75v-6.5z"></path></svg>
+                </span>
+                """
+            else
+                "<span class='#{File.iconClassName file} openFileIcon'/>"
+
+        items = []
+
+        @lastFileIndex = 0
+
+        @dir = slash.path '~' if not @dir?
+
+        if @history? and not opt.currentText and @history.length > 1
+
+            f = @history[@history.length-2]
+            item = {}
+            item.text = relative f, @dir
+            item.line = iconSpan f
+            item.file = f
+            item.weight = @weight item, opt
+            # item.bonus = 1048575
+            items.push item
+            @lastFileIndex = 0
+
+        if valid @files
+
+            for file in @files
+
+                rel = relative file, @dir
+
+                if rel.length
+                    item = {}
+                    item.line = iconSpan file
+                    item.text = rel
+                    item.file = file
+                    item.weight = @weight item, opt
+                    items.push item
+
+        items = @weightedItems items, opt
+        items = uniqBy items, 'text'
+
+        items.slice 0, opt.maxItems
+        items
+
+    # 000   000  000   0000000  000000000   0000000   00000000   000   000
+    # 000   000  000  000          000     000   000  000   000   000 000
+    # 000000000  000  0000000      000     000   000  0000000      00000
+    # 000   000  000       000     000     000   000  000   000     000
+    # 000   000  000  0000000      000      0000000   000   000     000
+
+    showHistory: ->
+
+        # log 'Open.showHistory' @history
+
+        if @history.length > 1 and @selected <= 0
+            items = []
+            # bonus = 1048575
+            for f in @history
+                item = {}
+                item.text = relative f, @dir
+                item.file = f
+                # item.bonus = bonus
+                items.push item
+                # bonus -= 1
+            items.pop()
+            @showItems items
+            @select items.length-1
+            @setAndSelectText items[@selected].text
+        else
+            'unhandled'
+
+    showFirst: ->
+
+        if @commandList and @selected == @commandList.meta?.metas?.length - 1
+            @showItems @listItems()
+            @select 0
+        else
+            'unhandled'
+
+    #  0000000   0000000   000   000   0000000  00000000  000
+    # 000       000   000  0000  000  000       000       000
+    # 000       000000000  000 0 000  000       0000000   000
+    # 000       000   000  000  0000  000       000       000
+    #  0000000  000   000  000   000   0000000  00000000  0000000
+
+    cancel: name ->
+
+        if name == @names[0] # command+p command+p to open previous file
+            if @commandList? and @lastFileIndex == @selected
+                return @execute()
+
+        super name
+
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000
+    # 0000000      000     000000000  0000000       000
+    #      000     000     000   000  000   000     000
+    # 0000000      000     000   000  000   000     000
+
+    start: name ->
+
+        @setName name
+
+        if @commandline.lastFocus == 'commandline-editor' == window.lastFocus
+
+            @file = window.editor.currentFile
+            if dir = slash.path @commandline.text()
+                @dir = dir
+            else
+                @dir = slash.dir(@file) ? kakao.bundle.app('kode')
+
+        else if @commandline.lastFocus == 'shelf' or @commandline.lastFocus.startsWith 'FileBrowser'
+
+            item = window.filebrowser.lastUsedColumn().parent
+
+            switch item.type
+                when 'dir'
+                    @file = window.editor.currentFile
+                    @dir  = item.file
+                when 'file'
+                    @file = item.file
+                    @dir  = slash.dir @file
+
+        else if window.editor.currentFile?
+
+            @file = window.editor.currentFile
+            @dir  = slash.dir @file
+
+        else
+
+            @file = null
+            @dir  = kakao.bundle.app('kode')
+
+        @files = Projects.files @dir
+
+        @loadState()
+  
+        @initAndShowList()
+
+        text  = @commandList.line @selected if @commandList
+        text ?= ''
+        
+        text:   text
+        select: true
+
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+    # 000        000 000   000       000       000   000     000     000
+    # 0000000     00000    0000000   000       000   000     000     0000000
+    # 000        000 000   000       000       000   000     000     000
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000
+
+    execute: command ->
+
+        if @selected < 0 then return status:'failed'
+
+        path = @commandList?.line @selected
+
+        @hideList()
+
+        if valid path
+
+            [file, pos] = slash.splitFilePos command
+
+            file = @resolvedPath path
+            file = slash.joinFilePos file, pos
+
+            post.emit 'jumpToFile' type:'file' path:file
+
+            super file
+
+            text:   file
+            focus:  'editor'
+            show:   'editor'
+            status: 'ok'
+        else
+            status: 'failed'
+
+    # 00000000   00000000   0000000   0000000   000      000   000  00000000  0000000
+    # 000   000  000       000       000   000  000      000   000  000       000   000
+    # 0000000    0000000   0000000   000   000  000       000 000   0000000   000   000
+    # 000   000  000            000  000   000  000         000     000       000   000
+    # 000   000  00000000  0000000    0000000   0000000      0      00000000  0000000
+
+    resolvedPath: p parent=@dir ->
+
+        # return (parent ? slash.resolve '~') if not p?
+        return (parent ? slash.path '~') if not p?
+        if p[0] in ['~', '/'] or p[1] == ':'
+            # slash.resolve p
+            slash.path p
+        else
+            # slash.resolve slash.path parent, p
+            slash.path parent, p
+
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000
+    # 0000000    0000000     00000
+    # 000  000   000          000
+    # 000   000  00000000     000
+
+    handleModKeyComboEvent: mod key combo event ->
+
+        switch combo
+            'up'   ➜ return @showHistory()
+            'down' ➜ return @showFirst()
+        super mod, key, combo, event
+
+export Open

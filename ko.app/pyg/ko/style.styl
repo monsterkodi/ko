@@ -1,0 +1,1283 @@
+//  0000000  000000000  000   000  000
+// 000          000      000 000   000
+// 0000000      000       00000    000
+//      000     000        000     000
+// 0000000      000        000     0000000
+
+selectionRadius       = 0.3em
+selectionRadiusCursor = 0.15em
+metaRadius            = 0.15em
+
+minimapWidth          = 130px
+scrollbarWidth        = 12px
+numbersWidth          = 50px
+editorPadding         = 8px + numbersWidth
+bottomCornerRadius    = 4px
+frameWidth            = 4px
+frameBorder           = frameWidth solid
+commandlineHeight     = 30px
+thinBorder            = 1px solid
+
+titlebarHeight        = 30px
+titlebarFontSize      = 15px
+crumbHeight           = 25px
+
+@font-face 
+    font-family     titlebarFont
+    font-weight     normal
+    font-style      normal
+    src             url("../../../Contents/Resources/font/Bahnschrift.woff")
+
+@font-face 
+    font-family     fontMono
+    font-weight     normal
+    font-style      normal
+    src             url("../../../Contents/Resources/font/MesloLGS-NF-Regular.woff2")
+
+@font-face 
+    font-family     fontNerd
+    font-weight     normal
+    font-style      normal
+    src             url("../../../Contents/Resources/font/MesloLGS-NF-Regular.woff2")
+    
+@font-face 
+    font-family     fontLigature
+    font-weight     normal
+    font-style      normal
+    src             url("../../../Contents/Resources/font/Lilex-Bold.woff2")
+    
+fill-abs()
+    position            absolute
+    bottom              0
+    right               0
+    left                0
+    top                 0
+
+center-div()
+    position            absolute
+    left                50%
+    top                 50%
+    transform           translate(-50%, -50%)
+
+center-x()
+    position            absolute
+    left                50%
+    transform           translate(-50%, 0%)
+
+center-y()
+    position            absolute
+    top                 50%
+    transform           translate(0%, -50%)
+    
+pre
+    margin              0
+       
+// 0000000     0000000   0000000    000   000  
+// 000   000  000   000  000   000   000 000   
+// 0000000    000   000  000   000    00000    
+// 000   000  000   000  000   000     000     
+// 0000000     0000000   0000000       000     
+
+body
+    overflow            hidden
+
+@keyframes fadein
+   from
+    opacity 0
+   to
+    opacity 1
+    
+#titlebar .winicon img
+    opacity             0.6
+    padding-top         4px
+    padding-left        20px
+    padding-right       14px
+
+#titlebar .winbutton
+    flex                0 0 44px
+    
+.menu
+    padding-right       10px
+    
+#main
+    overflow            hidden
+    animation           fadein 2.0s
+
+//  0000000  00000000   000      000  000000000
+// 000       000   000  000      000     000
+// 0000000   00000000   000      000     000
+//      000  000        000      000     000
+// 0000000   000        0000000  000     000
+
+#split
+    position            relative
+    overflow            hidden
+    width               100%
+
+// 0000000    00000000    0000000   000   000   0000000  00000000  00000000
+// 000   000  000   000  000   000  000 0 000  000       000       000   000
+// 0000000    0000000    000   000  000000000  0000000   0000000   0000000
+// 000   000  000   000  000   000  000   000       000  000       000   000
+// 0000000    000   000   0000000   00     00  0000000   00000000  000   000
+
+.browser
+    position            absolute
+    bottom              0
+    right               0
+    left                0
+    top                 0
+
+.browserColumn
+    border-top          frameWidth solid
+    position            relative
+
+.browserColumnContent
+    position            absolute
+    width               100%
+    bottom              0px
+    top                 crumbHeight
+    
+.browserColumnCode
+    font-family         fontMono
+    font-size           16px
+    
+.browserColumnTable
+    overflow            hidden
+    position            absolute
+    display             block
+    width               100%
+    height              100%
+    padding-top         3px
+    padding-bottom      1px
+    box-sizing          border-box
+
+.browserRow
+    height              21px
+    padding-left        6px
+    padding-right       6px
+    margin-top         -3px
+    padding-bottom      3px
+    white-space         nowrap
+    cursor              pointer
+
+    & .git-changed-icon
+    & .git-dirs-icon
+        padding-top     1px
+        
+.browserColumnCode
+    & .browserRow
+        height          19px
+
+.rowNameInput
+    font-family         fontMono
+    font-size           15px
+    border              none
+    white-space         nowrap
+    position            absolute
+    left                30px
+    right               30px
+        
+.browserSearch
+    padding-right       12px
+    float               right
+
+.browserFileIcon
+    
+    text-align          left
+    display             inline-block
+    width               24px
+    opacity             0.5
+
+.openFileIcon
+    display             inline-block
+    width               24px
+    margin-top          -3px
+    
+.browserStatusIcon
+    
+    text-align          right
+    display             inline-block
+    width               24px
+    opacity             0.5
+    position            absolute
+    right               6px
+    pointer-events      none
+
+.tabStatusIcon
+    position            absolute
+    right               8px
+    pointer-events      none 
+    
+// 000  00     00   0000000    0000000   00000000       000  000   000  00000000   0000000   
+// 000  000   000  000   000  000        000            000  0000  000  000       000   000  
+// 000  000000000  000000000  000  0000  0000000        000  000 0 000  000000    000   000  
+// 000  000 0 000  000   000  000   000  000            000  000  0000  000       000   000  
+// 000  000   000  000   000   0000000   00000000       000  000   000  000        0000000   
+
+
+.browserImageInfo    
+    fill-abs()
+    display             flex
+    flex-direction      column
+    text-align          center
+    align-items         center
+
+.browserImageContainer
+    position        relative
+    flex                1 1 0px
+    max-width           100%
+    width               100%
+    max-height          100%
+    height              auto
+
+.browserImageDiv 
+    fill-abs()
+
+.browserImage
+    center-div()
+    opacity             0
+    border              1px solid
+    cursor              pointer
+    max-width           100%
+    max-height          100%
+    
+    background-size     12px 12px
+    background-position 0 0, 0 6px, 6px -6px, -6px 0px
+    
+.imageInfoData
+    flex                0 0 100px
+    max-height          100px
+    min-height          100px
+    width               100%
+    margin              auto
+    font-size           16px
+    line-height         0.7
+    border-spacing      0px
+    & th
+        width           50%
+        padding         0px
+        border-collapse collapse
+    & td
+        width           50%
+        padding-left    6px        
+        border-collapse collapse
+        
+.imageInfoSpacer
+    flex                0.1 2 0
+
+.fileRow
+    max-width           90%
+    text-align          center
+    overflow-x          auto
+    
+.dataRow
+    height              18px
+    & th    
+        text-align      right
+    & td    
+        text-align      left
+    
+// 00000000  000  000      00000000        000  000   000  00000000   0000000   
+// 000       000  000      000             000  0000  000  000       000   000  
+// 000000    000  000      0000000         000  000 0 000  000000    000   000  
+// 000       000  000      000             000  000  0000  000       000   000  
+// 000       000  0000000  00000000        000  000   000  000        0000000   
+
+.browserFileInfo    
+    fill-abs()
+    display             flex
+    flex-direction      column
+    padding             frameWidth
+    text-align          center
+    align-items         center
+
+.fileInfoSpacer
+    flex                1 1 0
+    
+.fileInfoIcon
+    flex                0.1 1 13vh
+    &:before
+        font-size       13vh
+
+.fileInfoFile
+    padding-top         8px
+    flex                0 0 50px
+    display             block
+    font-size           28px
+    
+.fileInfoData
+    flex                0 0 0
+    margin              auto
+    font-size           16px
+    border-spacing      0px
+    line-height         0.7
+    & th
+        width           50%
+        text-align      right
+        padding         0px
+        border-collapse collapse
+    & td
+        width           50%
+        padding-left    6px
+        text-align      left
+        border-collapse collapse
+  
+.dragIndicator
+    height              20px
+    &.copy
+        margin-left         10px
+        margin-top         -4px
+        margin-bottom       4px
+        &:before
+            font-size       20px
+            color           #ff0
+            content         '✚'
+    &.move
+        margin-left         2px
+        margin-top         -10px
+        margin-bottom       10px
+        &:before
+            font-size       40px
+            color           #0f0
+            content         '▾'
+        
+// 000   0000000   0000000   000   000  
+// 000  000       000   000  0000  000  
+// 000  000       000   000  000 0 000  
+// 000  000       000   000  000  0000  
+// 000   0000000   0000000   000   000  
+
+octicon(char)
+    font-family         octicons
+    content             char
+
+awesome(char)
+    font-family         FontAwesome
+    content             char
+    
+fasolid(char)
+    font-family         FontAwesomeSolid
+    content             char
+
+faregular(char)
+    font-family         FontAwesomeRegular
+    content             char
+    
+unicode(char)
+    font-family         Sans-Serif
+    content             char
+    
+.git-changed-icon:before
+    fasolid('\f304')
+    
+.git-added-icon:before
+    awesome('\f067')
+    
+.git-dirs-icon:before
+    fasolid('\f14b')
+
+.history-icon:before
+    awesome('\f141')
+    
+.unsaved-icon:before
+    fasolid('\f0c7')
+    
+.terminal-icon:before
+    fasolid('\f107')
+
+.editor-icon:before
+    fasolid('\f106')
+    
+.file-icon:before
+    octicon('\f011')
+    
+.folder-icon:before
+    octicon('\f016')
+    
+.lock-icon:before
+    fasolid('\f023')
+
+.temp-icon:before
+    fasolid('\f039')
+
+.tab-temp
+    padding-left    8px
+    padding-right   8px
+    padding-top     6px
+    display         inline-block
+.tab-lock
+    padding-left    9px
+    padding-right   9px
+    padding-top     6px
+    display         inline-block
+    
+//  0000000  00000000   000   000  00     00  0000000    
+// 000       000   000  000   000  000   000  000   000  
+// 000       0000000    000   000  000000000  0000000    
+// 000       000   000  000   000  000 0 000  000   000  
+//  0000000  000   000   0000000   000   000  0000000    
+
+.inline
+    display         inline-block
+
+.crumb
+    font-size       15px
+    padding-top     2px
+    position        absolute
+    text-align      center
+    cursor          pointer
+    position        absolute
+    overflow-x      scroll
+    overflow-y      hidden
+    left            0
+    right           0
+    top             0  
+    display         block
+    white-space     nowrap
+    height          crumbHeight
+    &::-webkit-scrollbar
+        height          2px
+    & .path    
+        opacity     0.5
+    & .punct    
+        padding     0.2em
+        opacity     0.2
+    
+.crumb .dot
+    padding-left    10px
+    padding-right   10px
+                
+//  0000000  000   000  00000000  000      00000000
+// 000       000   000  000       000      000
+// 0000000   000000000  0000000   000      000000
+//      000  000   000  000       000      000
+// 0000000   000   000  00000000  0000000  000
+
+#shelf
+    overflow            hidden
+    position            absolute
+    left                0
+    top                 0
+    bottom              0
+    border-right        frameWidth solid
+
+#shelfResize
+    background          transparent
+
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+
+#commandline
+    padding             0
+    margin              0
+    white-space         nowrap
+    display             flex
+
+.ko.shortcut
+    opacity             0.5
+.ko.command
+    font-weight         bold
+
+#commandline-span
+    position            relative
+    flex-grow           1
+    white-space         nowrap
+
+#commandline-editor
+    font-family         fontMono
+    height              commandlineHeight
+    fill-abs()
+    overflow-x          auto
+    overflow-y          hidden
+
+//  0000000  000   000  0000000    
+// 000       000 0 000  000   000  
+// 000       000000000  000   000  
+// 000       000   000  000   000  
+//  0000000  00     00  0000000    
+
+.cwd
+    pointer-events      none
+    position            absolute
+    white-space         nowrap
+    font-size           11px
+    font-weight         bold
+    font-family         fontMono
+    right               minimapWidth + 12
+    top                 0
+    height              commandlineHeight
+    
+//  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000   0000000  000000000
+// 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  000          000
+// 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  0000000      000
+// 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000       000     000
+//  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  0000000      000
+
+.commandlist
+    position            absolute
+    left                0
+    overflow            hidden
+    width               800px
+
+    & .linenumber
+        padding-top     0
+        margin-top      -2px
+
+// 0000000    000   000  000000000  000000000   0000000   000   000
+// 000   000  000   000     000        000     000   000  0000  000
+// 0000000    000   000     000        000     000   000  000 0 000
+// 000   000  000   000     000        000     000   000  000  0000
+// 0000000     0000000      000        000      0000000   000   000
+
+#commandline-button
+    font-family         fontMono
+    font-size           24px
+    padding-top         0px
+    padding-left        9px
+    padding-right       9px
+    cursor              pointer
+    min-width           numbersWidth + 1px
+    box-sizing          border-box
+    white-space         nowrap
+    &.empty
+        border-right    thinBorder
+
+//   00000000  00000000    0000000
+//   000       000   000  000
+//   000000    00000000   0000000
+//   000       000             000
+//   000       000        0000000
+
+.fps
+    pointer-events  none
+    position        absolute
+    right           minimapWidth + 1
+    top             0
+    width           minimapWidth
+    height          commandlineHeight
+
+.fpsCanvas
+    background-color transparent
+
+//  0000000  000000000  00000000   000
+// 000          000     000   000  000
+// 000          000     0000000    000
+// 000          000     000   000  000
+//  0000000     000     000   000  0000000
+
+#debugCtrl
+    fill-abs()
+    padding-left        4px
+
+.ctrl
+    display             inline-block
+    font-size           22px
+    padding-top         3px
+    padding-left        10px
+    padding-right       6px
+
+// 000  000   000  00000000   0000000
+// 000  0000  000  000       000   000
+// 000  000 0 000  000000    000   000
+// 000  000  0000  000       000   000
+// 000  000   000  000        0000000
+
+#info
+    overflow            hidden
+    width               minimapWidth
+    position            absolute
+    right               0
+    top                 0
+    bottom              0
+    padding-top         1px
+    border-left         thinBorder
+    font-family         fontMono
+    font-size           12px
+    & .info-line
+        display         block
+
+infoPadding = 6px
+
+.info-words
+.info-lines
+.info-funcs
+.info-files
+.info-sticky
+.info-classes
+.info-cursors
+.info-selections
+.info-highlights
+.info-cursor-line
+.info-cursor-column
+    cursor              pointer
+    padding-left        infoPadding
+    &.empty
+        display         none
+
+.info-editor
+    padding-top         2px
+    font-size           20px
+    position            absolute
+    right               6px
+    center-y()    
+        
+.unsaved-icon
+    display             inline-block
+    padding-left        6px
+    padding-right       8px
+    padding-top         5.5px
+
+.dot
+    display             inline-block
+    padding-left        6px
+    padding-right       6px
+    margin-top          -1px
+
+// 000000000   0000000    0000000   000      000000000  000  00000000
+//    000     000   000  000   000  000         000     000  000   000
+//    000     000   000  000   000  000         000     000  00000000
+//    000     000   000  000   000  000         000     000  000
+//    000      0000000    0000000   0000000     000     000  000
+
+.tooltip
+    white-space         nowrap
+    padding             3px
+    padding-left        frameWidth
+    padding-right       frameWidth
+    border-bottom-left-radius  frameWidth
+    border-bottom-right-radius frameWidth
+    position            absolute
+    top                 titlebarHeight
+    font-size           titlebarFontSize
+    font-family         titlebarFont    
+    opacity             0
+    transform           scaleY(0)
+    transform-origin    top left
+    transition          transform 0.2s ease-in, opacity 0.2s ease-in
+    overflow            hidden
+    // display             grid
+    
+.tooltip-path
+    margin              4px
+.tooltip-line    
+    margin-top          2px
+    margin-left         4px
+    & *    
+        margin-right    6px
+    
+// 000000000   0000000   0000000     0000000
+//    000     000   000  000   000  000
+//    000     000000000  0000000    0000000
+//    000     000   000  000   000       000
+//    000     000   000  0000000    0000000
+
+.tabs
+    flex                10 1 0
+    display             flex
+    flex-direction      row
+    overflow-x          auto
+    overflow-y          hidden
+
+    padding-top         0
+    padding-right       0
+    padding-left        1px
+
+    &::-webkit-scrollbar
+        height          2px
+
+// 000000000   0000000   0000000
+//    000     000   000  000   000
+//    000     000000000  0000000
+//    000     000   000  000   000
+//    000     000   000  0000000
+
+.tab
+    flex                .15 .1 0
+    display             flex
+    position            relative
+    border-top-left-radius  6px
+    border-top-right-radius 6px
+    font-size           titlebarFontSize
+    padding-left        4px
+    cursor              pointer
+    
+    box-sizing          border-box
+    font-size           titlebarFontSize
+    font-family         titlebarFont
+    
+    &:not(.active):not(.prj) .dot
+    &:not(.active) .name
+    &:not(.active) .tabstate
+        opacity         0.5
+        
+.tab.prj
+    flex 0 0 0
+    padding-right       12px
+    & .name
+        padding-right   6px
+
+.tab .name 
+    flex 1 1 0
+.tab .name .dirty
+    position            absolute
+    padding-left        6px
+    transform           translateY(-1px)
+ 
+.tab .name
+.tab .dot
+.tab .prjdot
+    padding-top         5px
+
+.tabstate
+    flex                0 0 titlebarHeight
+    border-top-right-radius       6px
+    stroke-width        2
+    height              titlebarHeight
+    min-width           15px
+    max-width           titlebarHeight
+
+//  0000000   000   000  000   0000000  000   000  00     00  00000000  000   000  000   000  
+// 000   000  000   000  000  000       000  000   000   000  000       0000  000  000   000  
+// 000 00 00  000   000  000  000       0000000    000000000  0000000   000 0 000  000   000  
+// 000 0000   000   000  000  000       000  000   000 0 000  000       000  0000  000   000  
+//  00000 00   0000000   000   0000000  000   000  000   000  00000000  000   000   0000000   
+
+.quickmenu
+
+    flex                0 1
+    display             inline-block
+    box-sizing          border-box
+    font-size           24px
+    font-family         fontNerd
+
+.quickmenu-item
+
+    height              titlebarHeight - 0.5px
+    width               titlebarHeight * 1.25
+    box-sizing          border-box
+    display             inline-block
+    text-align          center
+    vertical-align      top
+    cursor              pointer
+    
+    &:active
+        padding-top     2px
+        
+// 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
+// 000   000  000   000  000   000  000 0 000  000       000       000   000  
+// 0000000    0000000    000   000  000000000  0000000   0000000   0000000    
+// 000   000  000   000  000   000  000   000       000  000       000   000  
+// 0000000    000   000   0000000   00     00  0000000   00000000  000   000  
+
+#browser
+    font-family         titlebarFont
+    font-size           18px
+    position            relative
+    overflow            hidden
+    pointer-events      auto
+
+.kodeIcon
+    padding-right       .35em
+    padding-left        .1em
+    overflow            hidden
+    & svg 
+        transform       translateY(2px)
+    
+// 00000000  0000000    000  000000000   0000000   00000000
+// 000       000   000  000     000     000   000  000   000
+// 0000000   000   000  000     000     000   000  0000000
+// 000       000   000  000     000     000   000  000   000
+// 00000000  0000000    000     000      0000000   000   000
+
+#terminal
+#editor
+    position            relative
+    overflow            hidden
+        
+// 000   000  000  00000000  000   000  00000000  00000000   
+// 000   000  000  000       000 0 000  000       000   000  
+//  000 000   000  0000000   000000000  0000000   0000000    
+//    000     000  000       000   000  000       000   000  
+//     0      000  00000000  00     00  00000000  000   000  
+
+#viewer
+    fill-abs()    
+    pointer-events      none
+    opacity             0
+    &.active
+        pointer-events  auto
+        background      #000
+        opacity         1
+
+    overflow            scroll
+    // position            relative
+    // width               100%
+    // height              100%
+
+// .viewerImage
+    // center-div()
+    
+.viewerEmbed
+    fill-abs()
+    border              10px solid #888
+
+// 000       0000000   000   000  00000000  00000000
+// 000      000   000   000 000   000       000   000
+// 000      000000000    00000    0000000   0000000
+// 000      000   000     000     000       000   000
+// 0000000  000   000     000     00000000  000   000
+
+.layerScroll
+    fill-abs()
+    overflow-x          auto
+    overflow-y          hidden
+    &::-webkit-scrollbar
+        height          2px
+
+.layers
+    position            relative
+    height              10000000px
+
+#commandline-editor .layers
+    min-height          commandlineHeight
+    &::-webkit-scrollbar
+        height          2px
+
+// 000      000  000   000  00000000   0000000
+// 000      000  0000  000  000       000
+// 000      000  000 0 000  0000000   0000000
+// 000      000  000  0000  000            000
+// 0000000  000  000   000  00000000  0000000
+
+.lines
+    cursor              text
+    font-size           inherit
+    pointer-events      none
+
+.line
+    font-size           inherit
+    white-space         nowrap
+    position            absolute
+    & span
+        position        absolute
+        pointer-events  none
+
+//  0000000  000   000  00000000    0000000   0000000   00000000
+// 000       000   000  000   000  000       000   000  000   000
+// 000       000   000  0000000    0000000   000   000  0000000
+// 000       000   000  000   000       000  000   000  000   000
+//  0000000   0000000   000   000  0000000    0000000   000   000
+
+.cursor
+    width                2px
+    margin-right        -1px
+    margin-left         -1px
+    z-index             999999999
+    position            absolute
+    display             inline-block
+    &.main:not(.off)
+        width            4px
+        margin-right    -2px
+        margin-left     -2px
+        border-radius    2px
+
+.cursor-line
+    position             absolute
+    left                 0
+    top                  0
+    right                0
+        
+// 000   000  000   000  00     00  0000000    00000000  00000000    0000000
+// 0000  000  000   000  000   000  000   000  000       000   000  000
+// 000 0 000  000   000  000000000  0000000    0000000   0000000    0000000
+// 000  0000  000   000  000 0 000  000   000  000       000   000       000
+// 000   000   0000000   000   000  0000000    00000000  000   000  0000000
+
+.numbers
+    position            absolute
+    left                0
+    top                 0
+    bottom              0
+    width               numbersWidth
+    pointer-events      none
+    font-size           13px
+    font-family         fontMono
+
+.linenumber
+    width               numbersWidth
+    border-right        thinBorder
+    position            absolute
+
+    & span
+        display         inline-block
+        width           numbersWidth - 8px
+        text-align      right
+        padding-top     2px
+
+        &.gitInfoLine
+            font-size   16px
+        
+// 00     00  00000000  000000000   0000000
+// 000   000  000          000     000   000
+// 000000000  0000000      000     000000000
+// 000 0 000  000          000     000   000
+// 000   000  00000000     000     000   000
+
+.meta
+    position            absolute
+    pointer-events      auto
+
+    &.coffeeResult
+    &.searchResult
+    &.termResult
+    &.termCommand
+    &.coffeeCommand
+        padding-right                metaRadius
+        margin-right               - metaRadius
+        margin-left                - editorPadding
+        padding-left                 editorPadding
+        border-top-right-radius      metaRadius
+        border-bottom-right-radius   metaRadius
+
+    &.gitInfoChange
+    &.gitInfoAdded
+        cursor               pointer
+        border-radius        metaRadius
+        padding-right        metaRadius*3
+        
+    &.gitInfoDelete
+        border-radius        metaRadius
+        padding-right        metaRadius*3
+        margin-left         -4px
+        padding-right        8px
+        
+    &.gitInfoFile
+    &.termCommand
+    &.coffeeCommand
+    &.searchResult
+        cursor              pointer
+        margin-left         -4px
+
+    &.searchResult
+        padding-right       10000px
+        
+    &.coffeeResult
+    &.searchResult
+    &.termResult
+    &.spacer
+        background          transparent
+
+    &.spacer
+        border-top-right-radius    0
+        border-bottom-right-radius 0
+
+    &.git
+        width               numbersWidth
+        &.toggled
+            opacity         1
+
+    &.dbg
+        z-index             1
+        border-radius       6px
+        margin-top          3px
+        margin-left         4px
+        width               12px
+        height              12px
+
+    &.dbg.pointer
+        z-index             2
+        width               0
+        height              0
+        border-radius       0
+        margin-left         10px
+        background          transparent
+        border-top          6px solid transparent
+        border-bottom       6px solid transparent
+        border-left         6px solid
+
+    &.pigment
+        opacity             1
+        border-radius       2px
+        margin-left        -8px
+        padding-left        8px
+        padding-right       8px
+
+.linenumber span .saveButton
+    pointer-events      auto
+    cursor              pointer
+    width               initial
+    padding-top         2px
+    margin-top         -2px
+    padding-left        4px
+    padding-right       4px
+    border-radius       4px
+
+// 00     00  000  000   000  000  00     00   0000000   00000000
+// 000   000  000  0000  000  000  000   000  000   000  000   000
+// 000000000  000  000 0 000  000  000000000  000000000  00000000
+// 000 0 000  000  000  0000  000  000 0 000  000   000  000
+// 000   000  000  000   000  000  000   000  000   000  000
+
+.minimap
+    position            absolute
+    top                 0
+    bottom              0
+    right               0
+    width               minimapWidth
+    overflow            hidden
+    cursor              pointer
+    border-left         thinBorder
+    pointer-events      auto
+
+.minimap canvas
+    pointer-events      none
+    position            absolute
+    top                 0
+    right               0
+    overflow            hidden
+
+.topbot
+    position            absolute
+    right               0
+    width               minimapWidth
+    pointer-events      none
+
+.minimapLines
+    background-color    transparent
+    opacity             0.8
+
+.minimapHighlights
+.minimapSelections
+.minimapCursors
+    background-color    transparent
+    
+// 00000000  000   000  000   000   0000000  000      000   0000000  000000000  
+// 000       000   000  0000  000  000       000      000  000          000     
+// 000000    000   000  000 0 000  000       000      000  0000000      000     
+// 000       000   000  000  0000  000       000      000       000     000     
+// 000        0000000   000   000   0000000  0000000  000  0000000      000     
+
+.filelist
+.funclist
+
+    position            absolute
+    top                 0
+    bottom              0
+    right               minimapWidth
+    min-width           minimapWidth
+    padding-top         6px
+    padding-bottom      6px
+    font-size           16px
+    border-bottom-left-radius 6px
+    overflow            hidden
+    pointer-events      none
+    
+.filelist-item
+.funclist-item
+
+    pointer-events      auto
+    padding-left        10px
+    padding-right       6px
+
+// 000   000  000   0000000   000   000  000      000   0000000   000   000  000000000
+// 000   000  000  000        000   000  000      000  000        000   000     000
+// 000000000  000  000  0000  000000000  000      000  000  0000  000000000     000
+// 000   000  000  000   000  000   000  000      000  000   000  000   000     000
+// 000   000  000   0000000   000   000  0000000  000   0000000   000   000     000
+
+.highlight
+    position            absolute
+    pointer-events      none
+
+.bracketmatch
+    position            absolute
+    pointer-events      none
+    text-decoration     underline
+
+.stringmatch
+    position            absolute
+    pointer-events      none
+    text-decoration     underline
+
+//  0000000  00000000  000      00000000   0000000  000000000  000   0000000   000   000
+// 000       000       000      000       000          000     000  000   000  0000  000
+// 0000000   0000000   000      0000000   000          000     000  000   000  000 0 000
+//      000  000       000      000       000          000     000  000   000  000  0000
+// 0000000   00000000  0000000  00000000   0000000     000     000   0000000   000   000
+
+.selection
+    position            absolute
+    pointer-events      none
+
+    & .empty
+        width            1px
+        margin-right    -1px
+
+.selection
+.highlight
+    padding-right       selectionRadiusCursor
+    margin-right        - selectionRadiusCursor
+    padding-left        selectionRadiusCursor
+    margin-left         - selectionRadiusCursor
+    &.start
+        padding-left    editorPadding
+        margin-left     - editorPadding
+
+.comment.header
+    border-radius       0.3em
+    border-width        0.15em
+    border-left-style   solid
+    border-bottom-style solid
+    border-top-style    hidden
+    border-right-style  hidden
+    height 1.2em
+
+.stringmatch
+.bracketmatch
+.selection
+.highlight
+    &.tl
+        border-top-left-radius selectionRadius
+        &.start
+            border-top-left-radius 0
+
+    &.bl
+        border-bottom-left-radius selectionRadius
+        &.start
+            border-bottom-left-radius 0
+
+    &.tr
+        border-top-right-radius selectionRadius
+    &.br
+        border-bottom-right-radius selectionRadius
+
+.stringmatch
+.bracketmatch
+    padding-right       0
+    margin-right        0
+    padding-left        0
+    margin-left         0
+
+// 000      000   0000000  000000000
+// 000      000  000          000
+// 000      000  0000000      000
+// 000      000       000     000
+// 0000000  000  0000000      000
+
+.list
+    position            absolute
+    left                0
+    overflow-x          hidden
+    overflow-y          auto
+    width               500px
+    max-height          460px
+
+.list.commands
+    width               200px
+    max-height          800px
+
+.list-item
+    width               100%
+    height              20px
+    font-family         fontMono
+    font-size           16px
+    padding-left        5px
+    padding-top         2px
+    padding-bottom      2px
+    overflow-x          auto
+    overflow-y          hidden
+    cursor              pointer
+    white-space         nowrap
+    -webkit-user-select none
+    &::-webkit-scrollbar
+        height          1px
+
+//  0000000   000   000  000000000   0000000    0000000   0000000   00     00  00000000   000      00000000  000000000  00000000
+// 000   000  000   000     000     000   000  000       000   000  000   000  000   000  000      000          000     000
+// 000000000  000   000     000     000   000  000       000   000  000000000  00000000   000      0000000      000     0000000
+// 000   000  000   000     000     000   000  000       000   000  000 0 000  000        000      000          000     000
+// 000   000   0000000      000      0000000    0000000   0000000   000   000  000        0000000  00000000     000     00000000
+
+.autocomplete-span
+    opacity             1
+
+.autocomplete-list
+    pointer-events      auto
+    position            absolute
+    max-height          200px
+    width               auto
+    overflow-x          hidden
+    overflow-y          auto
+    left                0
+    top                 100%
+    &::-webkit-scrollbar
+        width            4px
+    &::-webkit-scrollbar-thumb
+        width            2px
+
+.autocomplete-item
+    pointer-events      auto
+    white-space         nowrap
+    width               100%
+    display             block
+    padding-left        5px
+    padding-right       10px
+    overflow            hidden
+    cursor              pointer
+    -webkit-user-select none
+
+// 00     00   0000000   00000000   000   000  0000000     0000000   000   000  000   000
+// 000   000  000   000  000   000  000  000   000   000  000   000  000 0 000  0000  000
+// 000000000  000000000  0000000    0000000    000   000  000   000  000000000  000 0 000
+// 000 0 000  000   000  000   000  000  000   000   000  000   000  000   000  000  0000
+// 000   000  000   000  000   000  000   000  0000000     0000000   00     00  000   000
+
+.li1.marker:before
+    content             '▸'
+    
+.li2.marker:before    
+    content             '▪'
+    
+.li3.marker:before    
+    content             '◆'
+
+.ligature
+    font-family         fontLigature
+    opacity             1
+    
+//  0000000   0000000  00000000    0000000   000      000      0000000     0000000   00000000
+// 000       000       000   000  000   000  000      000      000   000  000   000  000   000
+// 0000000   000       0000000    000   000  000      000      0000000    000000000  0000000
+//      000  000       000   000  000   000  000      000      000   000  000   000  000   000
+// 0000000    0000000  000   000   0000000   0000000  0000000  0000000    000   000  000   000
+
+.scrollbar
+    position            absolute
+    top                 0
+    cursor              ns-resize
+
+    &.left
+        bottom          0
+        left            0
+        width           scrollbarWidth
+    &.right
+        right           0
+        width           10%
+        height          100%
+
+.scrollhandle
+    
+    position            absolute
+    top                 0
+    &.left
+        left            0
+    &.right
+        right           0
+
+.commandlist::-webkit-scrollbar
+.commandlist .layerScroll::-webkit-scrollbar
+        height          8px
+    

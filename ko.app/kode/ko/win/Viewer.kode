@@ -1,0 +1,36 @@
+###
+000   000  000  00000000  000   000  00000000  00000000 
+000   000  000  000       000 0 000  000       000   000
+ 000 000   000  0000000   000000000  0000000   0000000  
+   000     000  000       000   000  000       000   000
+    0      000  00000000  00     00  00000000  000   000
+###
+
+use ../../kxk ▪ post slash elem $
+
+function Viewer
+
+    @: parent ->
+        
+        @div = elem id:'viewer' parent:$ parent
+        
+        kore.on 'view|file'   @onViewFile
+        kore.on 'editor|file' @close
+        
+    onViewFile: path =>
+        
+        @close()
+        
+        @div.classList.add 'active'
+        
+        if slash.ext(path) in ['html']
+            elem 'embed' type:"text/#{slash.ext path}" class:'viewerEmbed' parent:@div, src:slash.fileUrl path
+        else
+            elem 'img' class:'viewerImage' parent:@div, src:slash.fileUrl path
+        
+    close: => 
+    
+        @div.innerHTML = ''
+        @div.classList.remove 'active'
+
+export Viewer

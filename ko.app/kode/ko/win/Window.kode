@@ -1,0 +1,326 @@
+###
+000   000  000  000   000  0000000     0000000   000   000
+000 0 000  000  0000  000  000   000  000   000  000 0 000
+000000000  000  000 0 000  000   000  000   000  000000000
+000   000  000  000  0000  000   000  000   000  000   000
+00     00  000  000   000  0000000     0000000   00     00
+###
+
+use ../../kakao
+use ../../kxk      ▪ win scheme stash post prefs store stopEvent
+use                ◆ Split Info Tabs Menu QuickMenu Navigate FileHandler Terminal Viewer
+use ../tools       ◆ FileWatch Projects Indexer Git Unicode fps
+use ../editor      ◆ Kore Editor Syntax FileEditor
+use ../commands    ◆ Macro
+use ../commandline ◆ CommandLine 
+
+# 000   000  000  000   000  0000000     0000000   000   000  
+# 000 0 000  000  0000  000  000   000  000   000  000 0 000  
+# 000000000  000  000 0 000  000   000  000   000  000000000  
+# 000   000  000  000  0000  000   000  000   000  000   000  
+# 00     00  000  000   000  0000000     0000000   00     00  
+
+function Window extends win.Delegate
+
+    onWindowWillShow:       win          -> #log "onWindowWillShow"      win.id
+    onWindowAnimationTick:  win tickInfo -> #log 'onWindowAnimationTick' win.id
+    onWindowResize:         win event    -> #log 'onWindowResize'        win.id
+    onWindowFocus:          win          -> #log 'onWindowFocus'         win.id
+    onWindowBlur:           win          -> #log 'onWindowBlur'          win.id
+    onWindowKeyDown:        win keyInfo  -> #log 'onWindowKeyDown'       win.id, keyInfo
+    onWindowKeyUp:          win keyInfo  -> #log 'onWindowKeyUp'         win.id, keyInfo
+    onWindowMenuTemplate:   win template -> kakao.menuTemplate = Menu template
+    
+    @: ->
+        
+        @menuIcon   = kakao.bundle.img 'menu_ko.png'
+        @menuNoon   = kakao.bundle.res 'menu_ko.noon'
+        @aboutImage = kakao.bundle.img 'about_ko.png'
+        
+        post.on 'menuAction' @onMenuAction
+        post.on 'stash' -> window.editor.saveFilePosition()
+        
+    onWindowWithoutStash: ○->
+        
+        log 'onWindowWithoutStash!'
+        
+        if empty window.tabs.tabs ➜ log 'new empty tab!'; post.emit 'newEmptyTab'
+            
+        ○ kakao 'win.setSize' 1000 1000
+        ○ kakao 'win.center' 
+        
+    onWindowCreated: win =>
+        
+        @id = win.id
+        
+        new FileHandler
+        new FileWatch
+        new Projects
+        new Unicode
+        new Git
+        
+        @tabs        = window.tabs        = new Tabs()
+        @quickMenu   = window.quickMenu   = new QuickMenu()
+        @navigate    = window.navigate    = new Navigate()
+        @split       = window.split       = new Split()
+        @terminal    = window.terminal    = new Terminal 'terminal'
+        @editor      = window.editor      = new FileEditor 'editor'
+        @commandline = window.commandline = new CommandLine 'commandline-editor'
+        @info        = window.info        = new Info @editor
+        @fps         = window.fps         = new fps()
+        @indexer     = window.indexer     = new Indexer()
+        @viewer      = window.viewer      = new Viewer 'editor'
+        
+        window.textEditor = window.focusEditor = @editor
+        window.setLastFocus @editor.name
+
+        @editor.on 'changed' (changeInfo) ->
+
+            if changeInfo.changes.length
+                if changeInfo.deletes == 1
+                    window.navigate.delFilePos file: window.editor.currentFile, pos: [0 changeInfo.changes[0].oldIndex]
+                else
+                    window.navigate.addFilePos file: window.editor.currentFile, pos: window.editor.cursorPos()
+
+        post.on 'prefsLoaded' => scheme.set prefs.get 'scheme' 'dark'
+        post.on 'stashLoaded' => 
+
+            @editor.setFontSize window.stash.get 'fontSize' 19
+            @editor.centerText  window.stash.get('centerText'), 0
+            
+            post.emit 'loadFile' kore.get 'editor|file'
+    
+        window.split.resized()
+        window.info.reload()
+        
+        # if empty window.tabs.tabs ➜ log 'not tab! empty tab!'; post.emit 'newEmptyTab'
+        
+        @editor.focus()
+
+    onMoved: bounds => window.stash.set 'bounds' bounds
+                
+    # 00     00  00000000  000   000  000   000      0000000    0000000  000000000  000   0000000   000   000
+    # 000   000  000       0000  000  000   000     000   000  000          000     000  000   000  0000  000
+    # 000000000  0000000   000 0 000  000   000     000000000  000          000     000  000   000  000 0 000
+    # 000 0 000  000       000  0000  000   000     000   000  000          000     000  000   000  000  0000
+    # 000   000  00000000  000   000   0000000      000   000   0000000     000     000   0000000   000   000
+    
+    onMenuAction: name trail =>
+        
+        # log 'ko.Window.onMenuAction' name, trail
+        
+        if action = Editor.actionWithName name
+            
+            # log 'editor.actionWithName' name, action
+            
+            if action.key? and window.focusEditor[action.key] is func
+                window.focusEditor[action.key] name:name, trail:trail
+                ⮐ 
+    
+        if 'unhandled' != window.commandline.handleMenuAction name, trail
+            # log 'commandline handled action' name, trail
+            ⮐ 
+            
+        switch name
+    
+            'Undo'                  ➜ ⮐ focusEditor.do.undo()
+            'Redo'                  ➜ ⮐ focusEditor.do.redo()
+            'Cut'                   ➜ ⮐ focusEditor.cut()
+            'Copy'                  ➜ ⮐ focusEditor.copy()
+            'Paste'                 ➜ ⮐ focusEditor.paste()
+            'New Tab'               ➜ ⮐ post.emit 'newEmptyTab'
+            'New Window'            ➜ ⮐ kakao 'window.new' 'ko.html' @editor.currentFile
+            'Arrange Windows'       ➜ ⮐ log "ko.window #{name} unimplemented!"
+            'Toggle Scheme'         ➜ ⮐ scheme.toggle()
+            'Toggle Center Text'    ➜ ⮐ toggleCenterText()
+            'Toggle Func List'      ➜ ⮐ [prefs.toggle('list|active'), post.emit 'list.toggle']
+            'Toggle Tab Pinned'     ➜ ⮐ toggleTabPinned()
+            'Toggle Tab Extensions' ➜ ⮐ tabs.toggleExtension()
+            'Increase'              ➜ ⮐ changeFontSize +1
+            'Decrease'              ➜ ⮐ changeFontSize -1
+            'Reset'                 ➜ ⮐ resetFontSize()
+            'Navigate Backward'     ➜ ⮐ @navigate.backward()
+            'Navigate Forward'      ➜ ⮐ @navigate.forward()
+            'Maximize Editor'       ➜ ⮐ @split.maximizeEditor()
+            'Activate Next Tab'     ➜ ⮐ tabs.navigate 'right'
+            'Activate Previous Tab' ➜ ⮐ tabs.navigate 'left'
+            'Move Tab Left'         ➜ ⮐ tabs.move 'left'
+            'Move Tab Right'        ➜ ⮐ tabs.move 'right'
+            'Open...'               ➜ ⮐ post.emit 'openFile'
+            'Open In New Window...' ➜ ⮐ post.emit 'openFile' newWindow: true
+            'Open Counterpart'      ➜ ⮐ editor.jumpToCounterpart()
+            'Save'                  ➜ ⮐ post.emit 'saveFile'
+            'Save All'              ➜ ⮐ post.emit 'saveAll'
+            'Save As ...'           ➜ ⮐ post.emit 'saveFileAs'
+            'Revert'                ➜ ⮐ post.emit 'reloadFile' kore.get 'editor|file'
+            'Close Tab'             ➜ ⮐ post.emit 'closeTab'
+            'Close Other Tabs'      ➜ ⮐ post.emit 'closeOtherTabs'
+            'Close Other Windows'   ➜ ⮐ post.toWins 'closeWindow'
+            'Small Browser'         ➜ ⮐ commandline.startCommand 'browse'
+            'Preferences'           ➜ ⮐ post.emit 'loadFile' prefs.store.file
+            'Calculator'            ➜ ⮐ @quickMenu.onKalk()
+    
+        # log 'onMenuAction unhandled' name, trail
+            
+# 00000000    0000000    0000000  000000000
+# 000   000  000   000  000          000
+# 00000000   000   000  0000000      000
+# 000        000   000       000     000
+# 000         0000000   0000000      000
+ 
+post.on 'singleCursorAtPos' (pos, opt) -> # browser double click, funclist, newTabWithFile :l:c
+    window.editor.singleCursorAtPos pos, opt 
+    window.editor.scroll.cursorToTop()
+    
+post.on 'focusEditor'  -> window.split.focus 'editor'
+post.on 'cloneFile'    -> post.toMain 'newWindowWithFile' window.editor.currentFile
+post.on 'closeWindow'  -> post.emit 'menuAction' 'Close'
+post.on 'clearStash'   -> clearStash()
+post.on 'editorFocus' (editor) ->
+    window.setLastFocus window.editor.name
+    window.focusEditor = window.editor
+    window.textEditor = window.editor if window.editor.name != 'commandline-editor'
+ 
+# 00000000  0000000    000  000000000   0000000   00000000
+# 000       000   000  000     000     000   000  000   000
+# 0000000   000   000  000     000     000   000  0000000
+# 000       000   000  000     000     000   000  000   000
+# 00000000  0000000    000     000      0000000   000   000
+ 
+window.editorWithName = n ->
+ 
+    switch n
+        'command' 
+        'commandline' ➜ commandline
+        'terminal'    ➜ terminal
+        'editor'      ➜ editor
+                      ➜ editor
+  
+ # 00000000   00000000   0000000  000  0000000  00000000  
+ # 000   000  000       000       000     000   000       
+ # 0000000    0000000   0000000   000    000    0000000   
+ # 000   000  000            000  000   000     000       
+ # 000   000  00000000  0000000   000  0000000  00000000  
+ 
+window.onresize = ->
+
+    window.split.resized()
+    window.win?.onMoved window.win.getBounds()
+    if window.stash.get 'centerText' false
+        window.editor.centerText true, 200
+
+post.on 'split' (s) ->
+
+    filebrowser?.resized()
+    terminal?.resized()
+    commandline.resized()
+    editor.resized()
+
+#  0000000  00000000  000   000  000000000  00000000  00000000       000000000  00000000  000   000  000000000
+# 000       000       0000  000     000     000       000   000         000     000        000 000      000
+# 000       0000000   000 0 000     000     0000000   0000000           000     0000000     00000       000
+# 000       000       000  0000     000     000       000   000         000     000        000 000      000
+#  0000000  00000000  000   000     000     00000000  000   000         000     00000000  000   000     000
+
+toggleCenterText = ->
+
+    if window.stash.get "invisibles|#{window.editor.currentFile}" false
+        window.editor.toggleInvisibles()
+        restoreInvisibles = true
+
+    if not window.stash.get 'centerText' false
+        window.stash.set 'centerText' true
+        window.editor.centerText true
+    else
+        window.stash.set 'centerText' false
+        window.editor.centerText false
+
+    if restoreInvisibles
+        window.editor.toggleInvisibles()
+                        
+# 00000000   0000000   000   000  000000000      0000000  000  0000000  00000000
+# 000       000   000  0000  000     000        000       000     000   000
+# 000000    000   000  000 0 000     000        0000000   000    000    0000000
+# 000       000   000  000  0000     000             000  000   000     000
+# 000        0000000   000   000     000        0000000   000  0000000  00000000
+
+setFontSize = s ->
+
+    s = prefs.get('editorFontSize' 19) if not s is num
+    s = clamp 8 100 s
+
+    window.stash.set "fontSize" s    
+    window.editor.setFontSize s
+    window.terminal.setFontSize s
+
+changeFontSize = d ->
+
+    if  window.editor.size.fontSize >= 20 ➜ f = 2
+        window.editor.size.fontSize >= 30 ➜ f = 4
+        window.editor.size.fontSize >= 50 ➜ f = 10
+                                          ➜ f = 1
+                                   
+    setFontSize window.editor.size.fontSize + f*d
+
+resetFontSize = ->
+
+    defaultFontSize = prefs.get 'editorFontSize' 19
+    window.stash.set 'fontSize' defaultFontSize
+    setFontSize defaultFontSize
+
+addToShelf = ->
+
+    ⮐ if window.lastFocus == 'shelf'
+    
+    fb = window.filebrowser
+    if window.lastFocus.startsWith fb.name
+        path = fb.columnWithName(window.lastFocus).activePath()
+    else
+        path = window.editor.currentFile
+    post.emit 'addToShelf' path
+
+# 0000000   0000000    0000000   00     00
+#    000   000   000  000   000  000   000
+#   000    000   000  000   000  000000000
+#  000     000   000  000   000  000 0 000
+# 0000000   0000000    0000000   000   000
+
+resetZoom = ->
+
+    webframe.setZoomFactor 1
+    window.editor.resized()
+
+changeZoom = d ->
+    
+    z = webframe.getZoomFactor()
+    z *= 1+d/20
+    z = clamp 0.36 5.23 z
+    webframe.setZoomFactor z
+    window.editor.resized()
+
+# 00000000   0000000    0000000  000   000   0000000
+# 000       000   000  000       000   000  000
+# 000000    000   000  000       000   000  0000000
+# 000       000   000  000       000   000       000
+# 000        0000000    0000000   0000000   0000000
+ 
+window.onblur  = event -> post.emit 'winFocus' false
+window.onfocus = event ->
+    
+    post.emit 'winFocus' true
+    
+    if document.activeElement.className == 'body'
+        if window.split.editorVisible()
+            window.split.focus 'editor'
+        else
+            window.split.focus 'commandline-editor'
+ 
+window.setLastFocus = name -> window.lastFocus = name
+
+kakao.preInit = ○->
+    
+    ○ Syntax.init()
+    ○ Editor.init()
+    ○ CommandLine.init()
+    
+kakao.init -> new win new Window

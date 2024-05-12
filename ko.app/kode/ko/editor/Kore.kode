@@ -1,0 +1,67 @@
+###
+    000   000   0000000   00000000   00000000
+    000  000   000   000  000   000  000     
+    0000000    000   000  0000000    0000000 
+    000  000   000   000  000   000  000     
+    000   000   0000000   000   000  00000000
+
+    stores editor state per window
+        
+        editor
+            file
+            class▸function | test▸tree▸item▸ ... at main cursor
+            
+        tabs
+            path
+            type
+            collapsed
+            pinned
+            tmp
+            state
+            
+        project
+            current
+            
+        navigation
+            index
+            history
+                file
+                line
+                col
+                
+        commandline
+            command
+            text
+            
+        browser
+            columns
+                path
+                type
+                
+        shelf
+            items
+                path
+                type
+                
+        split?
+        
+    ■
+        kore.set 'editor|file' 'some/path'
+        kore.get 'editor|file' 
+        kore.on  'editor|file' @editorFile
+###
+
+use ../../kxk ▪ events
+
+function Kore extends events
+
+    set: (key, value) =>
+        
+        stash.set "kore|#{key}" value 
+        @emit key, value
+        
+    get: (key, def) =>
+        
+        stash.get "kore|#{key}" def
+    
+export window.kore = new Kore

@@ -157,6 +157,9 @@ class GitInfo
                 @logFile 'changed' changeInfo.file # dont delete this for now :)
                 
                 for change in changeInfo.changes
+                    
+                    log 'change' change
+                    
                     line = change.line
                     
                     if not empty change.mod

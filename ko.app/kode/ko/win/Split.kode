@@ -1,0 +1,302 @@
+###
+ 0000000  00000000   000      000  000000000
+000       000   000  000      000     000   
+0000000   00000000   000      000     000   
+     000  000        000      000     000   
+0000000   000        0000000  000     000   
+###
+
+use ../../kxk ▪ post $
+use ./flex/flex
+
+class Split
+    
+    # 000  000   000  000  000000000
+    # 000  0000  000  000     000   
+    # 000  000 0 000  000     000   
+    # 000  000  0000  000     000   
+    # 000  000   000  000     000   
+    
+    @: ->
+        2+2
+        @commandlineHeight = 30
+        
+        @elem        =$ 'split'
+        @terminal    =$ 'terminal'
+        @browser     =$ 'browser'
+        @commandline =$ 'commandline'
+        @editor      =$ 'editor'
+
+        post.on 'focus'       @focus
+        post.on 'stash'       @stash
+        post.on 'stashLoaded' @onStashLoaded
+
+        @flex = new flex
+            panes: [
+                    div:        @terminal
+                    collapsed:  true
+                ,
+                    div:        @commandline
+                    fixed:      @commandlineHeight
+                ,
+                    div:        @editor
+            ]
+            direction:  'vertical'
+            onDrag:     @onDrag
+            onDragEnd:  @onDrag
+            onPaneSize: @onDrag
+            snapFirst:  20
+            snapLast:   100
+            
+    onDrag: => if @flex? ➜ @emitSplit()
+    
+    emitSplit: => post.emit 'split' @flex.panePositions()
+    
+    #  0000000  000000000   0000000    0000000  000   000  
+    # 000          000     000   000  000       000   000  
+    # 0000000      000     000000000  0000000   000000000  
+    #      000     000     000   000       000  000   000  
+    # 0000000      000     000   000  0000000   000   000  
+    
+    stash: => 
+        stash.set 'split|flex'    @flex.getState()
+        stash.set 'split|browser' @flex.panes[0].div == @browser
+        log 'Split.stash' stash.get 'split'
+        
+    onStashLoaded: =>
+
+        log 'onStashLoaded' stash.get 'split|flex'
+        if state = window.stash.get 'split|flex'
+            @flex.restoreState state
+            @emitSplit()
+        else
+            @do 'maximize editor'
+            
+        if @flex.panes[0].div != @browser and window.stash.get 'split|browser'
+            @raise 'browser'
+                
+    # 0000000     0000000 
+    # 000   000  000   000
+    # 000   000  000   000
+    # 000   000  000   000
+    # 0000000     0000000 
+    
+    do: sentence ->
+        
+        sentence = sentence.trim()
+        ⮐ if not sentence.length
+        
+        words  = sentence.split /\s+/
+        action = words[0]
+        what   = words[1]
+        
+        switch action
+            
+            'show'     ➜ ⮐ @show  what
+            'focus'    ➜ ⮐ @focus what
+            'half'     ➜ pos = @flex.size()/2
+            'third'    ➜ pos = @flex.size()/3
+            'quart'    ➜ pos = @flex.size()/4
+            'maximize' 
+                
+                if what == 'editor'   ➜ ⮐ @maximizeEditor()
+                if what == 'terminal' ➜ ⮐ @maximizeTerminal()
+                delta =  @flex.size()
+                
+            'minimize' 
+                
+                if what == 'editor'   ➜ ⮐ @minimizeEditor()
+                delta = -@flex.size()
+                
+            'enlarge'
+                
+                if words[2] == 'by'
+                    delta = parseInt words[3]
+                else
+                    delta = parseInt 0.25 * @termEditHeight()
+                    
+            'reduce'
+                
+                if words[2] == 'by'
+                    delta = - parseInt words[3]
+                else
+                    delta = - parseInt 0.25 * @termEditHeight()
+                    
+            ➜ ⮐ error "Split.do -- unknown action '#{action}'"
+                    
+        switch what
+            
+            'editor' 
+                
+                if delta? ➜ ⮐ @moveCommandLineBy -delta
+                if pos?   ➜ ⮐ @flex.moveHandleToPos @flex.handles[0], pos
+                    
+            'terminal' 'browser' 'commandline'
+                
+                @raise what if what != 'commandline'
+                if delta? ➜ ⮐ @moveCommandLineBy delta
+                if pos?   ➜ ⮐ @flex.moveHandleToPos @flex.handles[0], pos
+            ➜    
+                error "Split.do -- unhandled do command? #{sentence}?"
+                
+    maximizeTerminal: -> 
+        
+        @focus 'terminal'
+        @flex.expand 'terminal'
+        @hideEditor()
+        @flex.resized()
+        @stash()
+
+    maximizeEditor: -> 
+        
+        @focus 'editor'
+        @flex.expand 'editor'
+        if @terminalHeight() > 0
+            @hideTerminal()
+        else
+            @hideCommandline()
+        @flex.resized()
+        @stash()
+        
+    minimizeEditor: ->
+        
+        @showCommandline()
+        @focus 'commandline'
+        @flex.moveHandleToPos @flex.handles[1], @flex.size()
+        @stash()
+                
+    #  0000000  000   000   0000000   000   000  
+    # 000       000   000  000   000  000 0 000  
+    # 0000000   000000000  000   000  000000000  
+    #      000  000   000  000   000  000   000  
+    # 0000000   000   000   0000000   00     00  
+
+    show: n ->
+
+        switch n
+            'terminal' 'browser' ➜ @raise n
+            'editor'     
+                
+                @flex.expand 'editor'
+                if @editorHeight() < @flex.size()/3
+                    if @flex.handles[1]?.pos() > @flex.size()/3
+                        @flex.moveHandleToPos @flex.handles[1], @flex.size()/3
+                    if @flex.handles[2]?.pos() < 2*@flex.size()/3
+                        @flex.moveHandleToPos @flex.handles[2], 2*@flex.size()/3
+                        
+            'command' ➜ @flex.expand 'commandline'
+            ➜ error "split.show -- unhandled: #{n}!"
+        @stash()
+
+    hideEditor:   => @flex.collapse 'editor'
+    hideTerminal: => @flex.collapse 'terminal'
+            
+    # 00000000    0000000   000   0000000  00000000  
+    # 000   000  000   000  000  000       000       
+    # 0000000    000000000  000  0000000   0000000   
+    # 000   000  000   000  000       000  000       
+    # 000   000  000   000  000  0000000   00000000  
+
+    swap: old nju ->
+        
+        if @flex.panes[0].div != nju
+            nju.style.height   = "#{@flex.sizeOfPane 0}px"
+            old.style.display  = 'none'
+            nju.style.display  = 'block'
+            @flex.panes[0].div = nju
+
+    raise: n ->
+
+        switch n
+            'terminal' ➜ @swap @browser, @terminal
+            'browser'  ➜ @swap @terminal, @browser
+            
+        @flex.calculate()
+
+        if n == 'editor'
+            if @editorHeight() < @flex.size()/8
+                @flex.moveHandleToPos @flex.handles[0], 3*@flex.size()/4
+        else
+            if @terminalHeight() < @flex.size()/8
+                @flex.moveHandleToPos @flex.handles[0], @flex.size()/4
+
+    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000     
+    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000 
+    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
+    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+    
+    moveCommandLineBy: deta ->
+        
+        @flex.moveHandle index:1 pos:@flex.posOfHandle(1) + delta
+        
+    hideCommandline: -> 
+        
+        if not @flex.isCollapsed 'commandline'
+            @flex.collapse 'terminal'
+            @flex.collapse 'commandline'
+            post.emit 'commandline' 'hidden'
+        
+    showCommandline: ->
+        
+        if @flex.isCollapsed 'commandline'
+            @flex.expand 'commandline'
+            post.emit 'commandline' 'shown'
+
+    # 00000000   0000000    0000000  000   000   0000000
+    # 000       000   000  000       000   000  000     
+    # 000000    000   000  000       000   000  0000000 
+    # 000       000   000  000       000   000       000
+    # 000        0000000    0000000   0000000   0000000 
+    
+    focus: n ->
+        
+        n = 'commandline-editor' if n == 'commandline'
+        if n == '.' or not $(n)?
+            ⮐  error "Split.focus -- can't find element '#{n}'"
+
+        if e =$ n
+            if e.focus?
+                window.setLastFocus n
+                e.focus()
+            
+    focusAnything: ->
+        
+        ⮐  @focus 'editor'   if @editorVisible()
+        ⮐  @focus 'terminal' if @terminalVisible()
+        @focus 'commandline-editor'
+
+    # 00000000   00000000   0000000  000  0000000  00000000  0000000  
+    # 000   000  000       000       000     000   000       000   000
+    # 0000000    0000000   0000000   000    000    0000000   000   000
+    # 000   000  000            000  000   000     000       000   000
+    # 000   000  00000000  0000000   000  0000000  00000000  0000000  
+    
+    resized: =>
+        
+        main =$ 'main'
+        @elem.style.width  = "#{main.clientWidth}px"
+        @elem.style.height = "#{main.clientHeight}px"
+        @flex.resized()
+        @emitSplit()
+    
+    # 00000000    0000000    0000000          0000000  000  0000000  00000000
+    # 000   000  000   000  000         0    000       000     000   000     
+    # 00000000   000   000  0000000   00000  0000000   000    000    0000000 
+    # 000        000   000       000    0         000  000   000     000     
+    # 000         0000000   0000000          0000000   000  0000000  00000000
+    
+    elemHeight: -> @elem.getBoundingClientRect().height - @flex.handleSize
+    
+    splitPosY:    i -> @flex.posOfHandle i
+    terminalHeight: -> @flex.sizeOfPane 0
+    editorHeight:   -> @flex.sizeOfPane 2
+    termEditHeight: -> @terminalHeight() + @commandlineHeight + @editorHeight()
+        
+    commandlineVisible: -> not @flex.isCollapsed 'commandline'
+    editorMaximized:    -> @flex.isCollapsed('terminal') or @terminalHeight() <= 0
+    editorVisible:      -> not @flex.isCollapsed 'editor'    and @editorHeight() > 0
+    browserVisible:     -> @terminalHeight() > 0 and @flex.panes[0].div == @browser
+    terminalVisible:    -> @terminalHeight() > 0 and @flex.panes[0].div == @terminal
+        
+export Split

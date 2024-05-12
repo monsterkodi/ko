@@ -1,0 +1,112 @@
+###
+00000000  000   000  000   000   0000000  000      000   0000000  000000000
+000       000   000  0000  000  000       000      000  000          000   
+000000    000   000  000 0 000  000       000      000  0000000      000   
+000       000   000  000  0000  000       000      000       000     000   
+000        0000000   000   000   0000000  0000000  000  0000000      000   
+###
+
+use ../../kxk ▪ drag elem post
+use ../tools  ◆ FuncItems Indexer
+use ../editor ◆ Syntax
+
+function FuncList
+
+    @: @editor ->
+        
+        @elem = elem class:'funclist'
+        
+        @editor.view.appendChild @elem
+        
+        @editor.scroll.on 'scroll' @onEditorScrollOrCursor
+        @editor.on 'cursor'        @onEditorScrollOrCursor
+        
+        post.on 'fileIndexed' @onFileIndexed
+        post.on 'split'       @onSplit
+        post.on 'list.toggle' @onSplit
+        
+        kore.on 'editor|file' @onEditorFile
+        
+        @drag = new drag
+            target:  @elem
+            onStart: @onDragMove
+            onMove:  @onDragMove
+            
+        @onSplit()
+            
+    # 0000000    00000000    0000000    0000000   
+    # 000   000  000   000  000   000  000        
+    # 000   000  0000000    000000000  000  0000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000   0000000   
+    
+    onDragMove: drag event => 
+        
+        listitem = elem.upElem event, prop:'item'
+        
+        if item = listitem?.item
+            post.emit 'singleCursorAtPos' [4 item.line-1]
+            
+    onSplit: =>
+        
+        browserVisible = window.split.browserVisible() and prefs.get 'funclist|hideWhenBrowsing' false
+        funclistActive = prefs.get 'list|active' true
+        hide = browserVisible or not funclistActive
+        @elem.style.display = hide ? 'none' : 'inherit'
+        @onEditorScrollOrCursor()
+        
+    #  0000000   0000000  00000000    0000000   000      000      
+    # 000       000       000   000  000   000  000      000      
+    # 0000000   000       0000000    000   000  000      000      
+    #      000  000       000   000  000   000  000      000      
+    # 0000000    0000000  000   000   0000000   0000000  0000000  
+    
+    onEditorScrollOrCursor: => 
+        
+        scroll  = @editor.scroll.scroll
+    
+        topLine = parseInt scroll/@editor.scroll.lineHeight
+        botLine = topLine + @editor.numFullLines()
+        mainLine= @editor.mainCursor()[1]+1
+        
+        for child in @elem.children
+            
+            lastLine = child.nextSibling ? child.nextSibling.item.line : @editor.numLines()
+            
+            visible = lastLine-1 > topLine and child.item.line <= botLine
+            child.classList.toggle 'visible' visible
+            
+            if visible ➜ child.scrollIntoViewIfNeeded()
+            
+            inside = child.item.line <= mainLine and lastLine > mainLine
+            child.classList.toggle 'inside' inside
+                
+    # 00000000  000  000      00000000  
+    # 000       000  000      000       
+    # 000000    000  000      0000000   
+    # 000       000  000      000       
+    # 000       000  0000000  00000000  
+    
+    onEditorFile: file =>
+        
+        if info = Indexer.file file
+            @onFileIndexed file, info
+        
+    # 000  000   000  0000000    00000000  000   000  00000000  0000000    
+    # 000  0000  000  000   000  000        000 000   000       000   000  
+    # 000  000 0 000  000   000  0000000     00000    0000000   000   000  
+    # 000  000  0000  000   000  000        000 000   000       000   000  
+    # 000  000   000  0000000    00000000  000   000  00000000  0000000    
+    
+    onFileIndexed: file info =>
+        
+        if file == kore.get 'editor|file'
+        
+            items = FuncItems.forIndexerInfo file, info
+            @elem.innerHTML = ''
+            
+            for item in items
+                e = elem class:'funclist-item' parent:@elem, html:Syntax.spanForTextAndSyntax item.text, 'browser'
+                e.item = item
+
+export FuncList

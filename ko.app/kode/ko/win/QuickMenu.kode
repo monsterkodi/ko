@@ -1,0 +1,52 @@
+###
+ 0000000   000   000  000   0000000  000   000  00     00  00000000  000   000  000   000  
+000   000  000   000  000  000       000  000   000   000  000       0000  000  000   000  
+000 00 00  000   000  000  000       0000000    000000000  0000000   000 0 000  000   000  
+000 0000   000   000  000  000       000  000   000 0 000  000       000  0000  000   000  
+ 00000 00   0000000   000   0000000  000   000  000   000  00000000  000   000   0000000   
+###
+
+use ../../kxk ▪ elem post stopEvent $
+
+function QuickMenu
+
+    @: ->
+        
+        @div = elem class:'quickmenu' children: [
+            elem text:'' class:'quickmenu-item quickmenu-browser'  click:@onBrowser,  dblclick: (e)-> stopEvent e  
+        ,
+            elem text:'' class:'quickmenu-item quickmenu-terminal' click:@onTerminal, dblclick: (e)-> stopEvent e  
+        ,
+            elem text:'' class:'quickmenu-item quickmenu-devtools' click:@onDevTools, dblclick: (e)-> stopEvent e  
+        ,
+            elem text:'' class:'quickmenu-item quickmenu-kalk'     click:@onKalk,     dblclick: (e)-> stopEvent e  
+        ,
+            elem text:'' class:'quickmenu-item quickmenu-list'     click:@onList,     dblclick: (e)-> stopEvent e  
+        ]
+        
+        title =$ 'title'
+        title.parentElement.insertBefore @div, title.nextSibling
+        
+        post.on 'split' @updateIcons
+        
+    onBrowser:  => @toggle 'browser'  
+    onTerminal: => @toggle 'terminal' 
+    onList:     => post.emit 'menuAction' 'Toggle Func List'
+    onDevTools: => post.emit 'menuAction' 'DevTools'
+    onKalk:     => kakao 'win.new' 'kalk.html'
+        
+    toggle: (what) ->
+        
+        if split["#{what}Visible"]() 
+            split.do 'maximize editor'             
+        else 
+            split.do "quart #{what}"
+            
+        @updateIcons()
+
+    updateIcons: =>
+
+        $(".quickmenu-browser").innerHTML  = split.browserVisible()  ? '' : ''
+        $(".quickmenu-terminal").innerHTML = split.terminalVisible() ? '' : ''
+        
+export QuickMenu

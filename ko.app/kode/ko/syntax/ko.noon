@@ -1,0 +1,46 @@
+
+# 000   000   0000000 
+# 000  000   000   000
+# 0000000    000   000
+# 000  000   000   000
+# 000   000   0000000 
+
+([^']+')(.+)(':)          . class . class.marker . class . class.marker
+
+(▸ )([^']+')(.+)(':)      . class . class.marker . class . class.marker
+(● )(\w+)                 . class.marker . class
+(◆ )(\w+)                 . static.class.marker . static.class
+(▸ )([\w\.]+)             . method.marker . method
+(✔ )([\&\w\s]+)           . static.class.marker . static.class
+(✘ )([\&\w\s]+)           . method.marker . method
+
+(?:^|\s\s+)([◼●]?\s*\~?[\/\S]*\/)(\S+)
+                            dirname
+                            basename
+                            
+[◼]                         dirname
+[○]                         class
+[✘]                         method
+
+(?:^\s*|\/)(\.[\-\_\w][\.\-\_\w]*)(?:\s|$)    . dotfile  
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.coffee\b)       . coffee   . coffee.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.kode\b)         . kode     . kode.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.noon\b)         . noon     . noon.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.json\b)         . json     . json.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.styl\b)         . styl     . styl.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.html\b)         . html     . html.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.jade\b)         . jade     . jade.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.pug\b)          . pug      . pug.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.css\b)          . css      . css.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.cp?p?\b)        . cpp      . cpp.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.cc\b)           . cpp      . cpp.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.mm\b)           . cpp      . cpp.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.hp?p?\b)        . hpp      . hpp.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.mjs\b)          . mjs      . mjs.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.js\b)           . js       . js.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.py\b)           . py       . py.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.sh\b)           . sh       . sh.ext
+([◼●○✘]?\s*~?[\.\/\-\_\w]+)(\.md\b)           . md       . md.ext
+
+# \.[\-\_\w]+\s*$             extname
+[\/]                        sep

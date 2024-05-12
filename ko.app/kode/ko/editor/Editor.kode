@@ -1,0 +1,262 @@
+###
+00000000  0000000    000  000000000   0000000   00000000
+000       000   000  000     000     000   000  000   000
+0000000   000   000  000     000     000   000  0000000
+000       000   000  000     000     000   000  000   000
+00000000  0000000    000     000      0000000   000   000
+###
+
+use ../../kxk ▪ ffs kstr slash
+use ◆ Syntax Buffer
+
+function Editor extends Buffer
+
+    @actions: []
+    @actionModules: []
+
+    # 000  000   000  000  000000000
+    # 000  0000  000  000     000
+    # 000  000 0 000  000     000
+    # 000  000  0000  000     000
+    # 000  000   000  000     000
+
+    @init: ○->
+
+        filelist =○ ffs.list slash.path ◆dir, 'actions'
+
+        for item in filelist
+            actionFile = item.path
+            continue if slash.ext(actionFile) != 'js'
+
+            try
+                moduleJS = './' + slash.relative actionFile, ◆dir
+                actions =○ import(moduleJS)
+            catch err
+                error "import of #{moduleJS} failed" err
+                continue
+            moduleName = slash.name actionFile
+            Editor.actionModules[moduleName] = actions.default
+
+            for key,value of actions.default
+                if value is func
+                    @prototype[key] = value
+                else if key == 'actions'
+                    for k,v of value
+                        if not v is str
+                            v.key = k if not v.key?
+                            Editor.actions.push v
+
+        Editor.actions.sort (a,b) -> a.name?.localeCompare b.name
+        # log 'Editor.actions' Editor.actions.map((a) -> a.name ? a.key).join '\n'
+
+    @: (name, config) ->
+
+        @stringCharacters =
+            "'":  'single'
+            '"':  'double'
+
+        @bracketCharacters =
+            open:
+                '[': ']'
+                '{': '}'
+                '(': ')'
+            close:   {}
+            regexps: []
+
+        super()
+
+        @name   = name
+        @config = config ? {}
+        @config.syntaxName ?= 'txt'
+
+        @indentString    = lpad 4 ""
+        @stickySelection = false
+
+        @syntax = new Syntax @config.syntaxName, @line
+
+        @setupFileType()
+
+    del: -> 
+
+    #  0000000    0000000  000000000  000   0000000   000   000   0000000
+    # 000   000  000          000     000  000   000  0000  000  000
+    # 000000000  000          000     000  000   000  000 0 000  0000000
+    # 000   000  000          000     000  000   000  000  0000       000
+    # 000   000   0000000     000     000   0000000   000   000  0000000
+
+    @actionWithName: (name) ->
+
+        for action in Editor.actions
+            if action.name == name
+                return action
+        null
+
+    # 000000000  000   000  00000000   00000000
+    #    000      000 000   000   000  000
+    #    000       00000    00000000   0000000
+    #    000        000     000        000
+    #    000        000     000        00000000
+
+    shebangFileType: -> @config?.syntaxName ? 'txt'
+
+    setupFileType: ->
+
+        oldType = @fileType
+        newType = @shebangFileType()
+
+        @syntax.name = newType if @syntax
+        @setFileType newType
+
+        if oldType != @fileType
+            @emit 'fileTypeChanged' @fileType
+
+    setFileType: (@fileType) ->
+
+        # _______________________________________________________________ strings
+
+        switch @fileType
+            'md'   ➜ @stringCharacters['*'] = 'bold'
+            'noon' ➜ @stringCharacters['|'] = 'pipe'
+
+        # _______________________________________________________________ brackets
+
+        switch @fileType
+            'html' ➜ @bracketCharacters.open['<'] = '>'
+
+        for k,v of @bracketCharacters.open
+            @bracketCharacters.close[v] = k
+
+        @bracketCharacters.regexp = []
+        for key in ['open' 'close']
+            cstr = Object.keys(@bracketCharacters[key]).join ''
+            reg = new RegExp "[#{kstr.escapeRegexp cstr}]"
+            @bracketCharacters.regexps.push [reg, key]
+
+        @initSurround?()
+
+        # _______________________________________________________________ indent
+
+        @indentNewLineMore = null
+        @indentNewLineLess = null
+        @insertIndentedEmptyLineBetween = '{}'
+
+        switch @fileType
+            'coffee' 'kode'
+                @indentNewLineMore =
+                    lineEndsWith: ['->' '=>' ':' '=']
+                    lineRegExp:   /^(\s+when|\s*if|\s*else\s+if\s+)(?!.*\sthen\s)|(^|\s)(else\s*$|switch\s|for\s|while\s|class\s)/
+
+        # _______________________________________________________________ comment
+
+        # TODO: move this stuff tp a config.noon file
+
+        @multiComment = switch @fileType
+            'coffee' 'kode'                              ➜ open:'###'  close:'###'
+            'html' 'md'                                  ➜ open:'<!--' close:'-->'
+            'styl' 'cpp' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs'
+            'js' 'mjs' 'scss' 'ts' 'swift' 'frag' 'vert' ➜ open:'/*'   close:'*/'
+
+        @lineComment = switch @fileType
+             'coffee' 'kode' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'    ➜ '#'
+             'styl' 'cpp' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs'
+             'js' 'mjs' 'scss' 'ts' 'swift' 'frag' 'vert'           ➜ '//'
+             'iss' 'ini'                                            ➜ ';'
+
+        if @lineComment
+            @headerRegExp = new RegExp("^(\\s*#{kstr.escapeRegexp @lineComment}\\s*)?(\\s*0[0\\s]+)$")
+
+    #  0000000  00000000  000000000         000      000  000   000  00000000   0000000
+    # 000       000          000            000      000  0000  000  000       000
+    # 0000000   0000000      000            000      000  000 0 000  0000000   0000000
+    #      000  000          000            000      000  000  0000  000            000
+    # 0000000   00000000     000            0000000  000  000   000  00000000  0000000
+
+    setText: (text="") =>
+
+        if @syntax.name == 'txt'
+            @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
+
+        lines = text.split /\n/
+
+        @newlineCharacters = '\n'
+        if valid lines
+            if lines[0].endsWith '\r'
+                lines = text.split /\r?\n/
+                @newlineCharacters = '\r\n'
+
+        @setLines lines
+
+    setLines: (lines) ->
+
+        @syntax.setLines lines
+        super lines
+        @emit 'linesSet' lines
+
+    textOfSelectionForClipboard: ->
+
+        if @numSelections()
+            @textOfSelection()
+        else
+            @textInRanges @rangesForCursorLines()
+
+    splitStateLineAtPos: (state, pos) ->
+
+        l = state.line pos[1]
+        error "no line at pos #{pos}?" if not l?
+        return ['' ''] if not l?
+        [l.slice(0, pos[0]), l.slice(pos[0])]
+
+    # 00000000  00     00  000  000000000       00000000  0000000    000  000000000
+    # 000       000   000  000     000          000       000   000  000     000
+    # 0000000   000000000  000     000          0000000   000   000  000     000
+    # 000       000 0 000  000     000          000       000   000  000     000
+    # 00000000  000   000  000     000          00000000  0000000    000     000
+
+    emitEdit: (action) ->
+
+        mc = @mainCursor()
+        line = @line mc[1]
+
+        @emit 'edit',
+            action: action
+            line:   line
+            before: line.slice 0, mc[0]
+            after:  line.slice mc[0]
+            cursor: mc
+
+    # 000  000   000  0000000    00000000  000   000  000000000   0000000  000000000  00000000
+    # 000  0000  000  000   000  000       0000  000     000     000          000     000   000
+    # 000  000 0 000  000   000  0000000   000 0 000     000     0000000      000     0000000
+    # 000  000  0000  000   000  000       000  0000     000          000     000     000   000
+    # 000  000   000  0000000    00000000  000   000     000     0000000      000     000   000
+
+    indentStringForLineAtIndex: (li) ->
+
+        while empty(@line(li).trim()) and li > 0
+            li--
+
+        if 0 <= li < @numLines()
+
+            il = 0
+            line = @line li
+            thisIndent   = @indentationAtLineIndex li
+            indentLength = @indentString.length
+
+            if @indentNewLineMore?
+                if @indentNewLineMore.lineEndsWith?.length
+                    for e in @indentNewLineMore.lineEndsWith
+                        if line.trim().endsWith e
+                            il = thisIndent + indentLength
+                            break
+                if il == 0
+                    if @indentNewLineMore.lineRegExp? and @indentNewLineMore.lineRegExp.test line
+                        il = thisIndent + indentLength
+
+            il = thisIndent if il == 0
+            il = Math.max il, @indentationAtLineIndex li+1
+
+            lpad il, ""
+        else
+            ''
+
+export Editor

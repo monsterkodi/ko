@@ -1,0 +1,113 @@
+###
+00000000   00000000    0000000         000  00000000   0000000  000000000   0000000  
+000   000  000   000  000   000        000  000       000          000     000       
+00000000   0000000    000   000        000  0000000   000          000     0000000   
+000        000   000  000   000  000   000  000       000          000          000  
+000        000   000   0000000    0000000   00000000   0000000     000     0000000   
+###
+
+use ../../kxk ▪ post ffs slash
+
+use ./Walker
+
+class Projects
+    
+    @: ->
+        
+        kore.on 'editor|file'  (file) -> Projects.indexProject file
+        post.on 'indexProject' (file) -> Projects.indexProject file
+    
+    @currentProject: null
+    @projects: {}
+    @allFiles: {}
+    @indexing: null
+    @queue: []
+    
+    @files: path -> Projects.projects[@dir(path)]?.files ? []
+        
+    @dir: path ->
+
+        if valid path
+            if prjPath = @allFiles[path]
+                return prjPath
+            if Projects.projects[path]
+                return @projects[path].dir
+            for prjPath,project of Projects.projects
+                if path.startsWith prjPath
+                    return prjPath
+        # log 'missing prj?' path
+        null
+        
+    @current: ->
+    
+        c  = @currentProject 
+        c ?= last Object.keys @projects
+        c ?= kakao.bundle.path
+        c
+        
+    @setCurrent: @currentProject -> log 'Project.setCurrent' @currentProject
+    
+    # 000  000   000  0000000    00000000  000   000  
+    # 000  0000  000  000   000  000        000 000   
+    # 000  000 0 000  000   000  0000000     00000    
+    # 000  000  0000  000   000  000        000 000   
+    # 000  000   000  0000000    00000000  000   000  
+    
+    @indexProject: file ○=>
+        
+        if not file is str
+            log 'Projects.indexProject file not a str?' file
+            return
+            
+        return if file.startsWith 'untitled-'
+        
+        # log 'Projects.indexProject ●' file
+        
+        exists =○ ffs.exists file
+        
+        return if not exists
+        
+        # log 'Projects.indexProject ▪' exists
+        
+        prjPath =○ ffs.git file
+        
+        prjPath ?= slash.dir file
+        
+        # log 'Projects.indexProject ▸' prjPath
+        
+        if @indexing
+            return if @indexing == prjPath
+            @queue ?= []
+            if prjPath not in @queue
+                @queue.push prjPath
+            return
+        
+        if valid @projects[prjPath]
+            return
+              
+        @indexing = prjPath
+        
+        walker = new Walker
+            root:        prjPath
+            maxDepth:    12
+            maxFiles:    10000
+            file:        (f) => post.emit 'index' f
+                    
+        result = ○ walker.start()
+        
+        if result
+            @projects[prjPath] = dir:prjPath, files:result.files
+            for file in result.files
+                @allFiles[file] = prjPath
+                
+            log 'Projects indexed' prjPath, @projects
+
+            post.emit 'projectIndexed' prjPath
+        
+        delete @indexing
+        
+        if valid @queue
+            log 'dequeue' @queue[0]
+            ○ @indexProject @queue.shift()
+            
+export Projects

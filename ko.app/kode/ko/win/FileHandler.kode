@@ -1,0 +1,189 @@
+###
+00000000  000  000      00000000  000   000   0000000   000   000  0000000    000      00000000  00000000
+000       000  000      000       000   000  000   000  0000  000  000   000  000      000       000   000
+000000    000  000      0000000   000000000  000000000  000 0 000  000   000  000      0000000   0000000
+000       000  000      000       000   000  000   000  000  0000  000   000  000      000       000   000
+000       000  0000000  00000000  000   000  000   000  000   000  0000000    0000000  00000000  000   000
+###
+
+use ../../kxk ▪ pull reversed prefs slash post ffs
+use ../tools  ◆ Projects File
+
+class FileHandler
+
+    @: ->
+        
+        post.on 'saveFileAs'  @saveFileAs
+        post.on 'saveFile'    @saveFile
+        post.on 'saveChanges' @saveChanges
+        post.on 'loadFile'    @loadFile
+        post.on 'openFile'    @openFile
+        post.on 'file'        @onFile
+        post.on 'reloadFile'  @reloadFile
+        post.on 'openDialog'  @onOpenDialog
+        post.on 'saveDialog'  @onSaveDialog
+
+        @cursorToRestore = {}
+
+    # 000       0000000    0000000   0000000          00000000  000  000      00000000
+    # 000      000   000  000   000  000   000        000       000  000      000
+    # 000      000   000  000000000  000   000        000000    000  000      0000000
+    # 000      000   000  000   000  000   000        000       000  000      000
+    # 0000000   0000000   000   000  0000000          000       000  0000000  00000000
+
+    loadFile: file opt={} =>
+
+        file = null if file? and file.length <= 0
+
+        editor.saveFilePosition()
+
+        if file?
+            [file, filePos] = slash.splitFilePos file
+            if filePos? and (filePos[0] or filePos[1])
+                @cursorToRestore[file] = filePos
+            if not file.startsWith 'untitled'
+                file = slash.path file
+
+        if file != editor?.currentFile or valid filePos or opt.reload
+            
+            @addToRecent file
+            
+            if editor.currentFile and editor.currentFile != kore.get 'editor|file'
+                log 'WTF!?' editor.currentFile, kore.get 'editor|file'
+                
+            post.emit 'storeState' kore.get('editor|file'), editor.do.tabState() if not opt.reload
+
+            editor.setCurrentFile file
+            
+            kore.set 'editor|file' file
+            
+            editor.restoreFilePosition()
+
+        split.raise 'editor'
+
+    onFile: file =>
+
+        if filePos = @cursorToRestore[file]
+            editor.singleCursorAtPos filePos
+            editor.scroll.cursorToTop()
+            delete @cursorToRestore[file]
+
+    #  0000000   00000000   00000000  000   000     00000000  000  000      00000000  
+    # 000   000  000   000  000       0000  000     000       000  000      000       
+    # 000   000  00000000   0000000   000 0 000     000000    000  000      0000000   
+    # 000   000  000        000       000  0000     000       000  000      000       
+    #  0000000   000        00000000  000   000     000       000  0000000  00000000  
+       
+    openFile: @openDialogOpt => kakao 'fs.openDialog'
+        
+    #  0000000   000   000       0000000   00000000   00000000  000   000  
+    # 000   000  0000  000      000   000  000   000  000       0000  000  
+    # 000   000  000 0 000      000   000  00000000   0000000   000 0 000  
+    # 000   000  000  0000      000   000  000        000       000  0000  
+    #  0000000   000   000       0000000   000        00000000  000   000  
+    
+    # opens a list of files in new tabs
+    # called from open file dialog
+    
+    onOpenDialog: files =>
+
+        ⮐ if empty files
+
+        options = @openDialogOpt ? {}
+
+        for file in files[0...30]
+            if options.newWindow
+                kakao 'window.new' 'ko.html' file
+            else
+                post.emit 'newTabWithFile' file
+            
+        post.emit 'loadFile' last files
+        true
+
+    # 00000000   00000000  000       0000000    0000000   0000000
+    # 000   000  000       000      000   000  000   000  000   000
+    # 0000000    0000000   000      000   000  000000000  000   000
+    # 000   000  000       000      000   000  000   000  000   000
+    # 000   000  00000000  0000000   0000000   000   000  0000000
+
+    reloadFile: file =>
+
+        if file == kore.get 'editor|file'
+            @loadFile file, reload:true
+        else
+            post.emit 'revertFile' file
+
+    #  0000000   0000000   000   000  00000000        00000000  000  000      00000000
+    # 000       000   000  000   000  000             000       000  000      000
+    # 0000000   000000000   000 000   0000000         000000    000  000      0000000
+    #      000  000   000     000     000             000       000  000      000
+    # 0000000   000   000      0      00000000        000       000  0000000  00000000
+
+    saveFile: file =>
+
+        file ?= kore.get 'editor|file'
+        
+        if not file? or file.startsWith 'untitled'
+            @saveFileAs()
+            ⮐ 
+
+        editor.saveFilePosition()
+            
+        File.save file, editor.text(), (saved) ->
+
+            ⮐ error 'File.save failed!' if not saved
+            
+            post.emit 'clearState' saved
+            
+            if saved != kore.get 'editor|file'
+                close = kore.get 'editor|file'
+                post.emit 'loadFile' saved
+                post.emit 'delTab'   close if close.startsWith 'untitled-'
+            else
+                post.emit 'reloadFile' saved
+                post.emit 'dirty'      false
+    
+    #  0000000   0000000    0000000          00000000   00000000   0000000  00000000  000   000  000000000
+    # 000   000  000   000  000   000        000   000  000       000       000       0000  000     000
+    # 000000000  000   000  000   000        0000000    0000000   000       0000000   000 0 000     000
+    # 000   000  000   000  000   000        000   000  000       000       000       000  0000     000
+    # 000   000  0000000    0000000          000   000  00000000   0000000  00000000  000   000     000
+
+    addToRecent: file =>
+
+        recent = window.stash.get 'recentFiles' []
+        ⮐ if file == first recent
+        pull recent, file
+        recent.unshift file
+        while recent.length > prefs.get 'recentFilesLength' 15
+            recent.pop()
+
+        window.stash.set 'recentFiles' recent
+        window.commandline.commands.open.setHistory reversed recent
+
+    #  0000000   0000000   000   000  00000000         0000000  000   000   0000000   000   000   0000000   00000000   0000000
+    # 000       000   000  000   000  000             000       000   000  000   000  0000  000  000        000       000
+    # 0000000   000000000   000 000   0000000         000       000000000  000000000  000 0 000  000  0000  0000000   0000000
+    #      000  000   000     000     000             000       000   000  000   000  000  0000  000   000  000            000
+    # 0000000   000   000      0      00000000         0000000  000   000  000   000  000   000   0000000   00000000  0000000
+
+    saveChanges: =>
+
+        if editor.currentFile? and editor.do.hasChanges()
+            File.save editor.currentFile, editor.text(), (file) ->
+                error "FileHandler.saveChanges failed #{err}" if not file
+
+    #  0000000   0000000   000   000  00000000        00000000  000  000      00000000         0000000    0000000  
+    # 000       000   000  000   000  000             000       000  000      000             000   000  000       
+    # 0000000   000000000   000 000   0000000         000000    000  000      0000000         000000000  0000000   
+    #      000  000   000     000     000             000       000  000      000             000   000       000  
+    # 0000000   000   000      0      00000000        000       000  0000000  00000000        000   000  0000000   
+    
+    saveFileAs: => kakao 'fs.saveDialog' slash.dir kore.get 'editor|file'
+        
+    onSaveDialog: file =>
+        
+        @addToRecent file
+        @saveFile file
+
+export FileHandler

@@ -1,0 +1,637 @@
+###
+000000000   0000000   0000000     0000000
+   000     000   000  000   000  000
+   000     000000000  0000000    0000000
+   000     000   000  000   000       000
+   000     000   000  0000000    0000000
+###
+
+use ../../kxk ▪ post elem kpos slash drag popup stopEvent $ 
+use ../tools  ◆ Projects File
+use           ◆ Tab
+
+class Tabs
+
+    @: titlebar ->
+
+        @emptyid = 0
+        @tabs   = []
+        
+        @div =$ 'title'
+        @div.classList.add 'tabs'
+
+        @div.addEventListener 'click'       @onClick
+        @div.addEventListener 'contextmenu' @onContextMenu
+
+        @drag = new drag
+            target:  @div
+            onStart: @onDragStart
+            onMove:  @onDragMove
+            onStop:  @onDragStop
+
+        post.on 'newTabWithFile' @onNewTabWithFile
+        post.on 'newEmptyTab'    @onNewEmptyTab
+
+        post.on 'fileRemoved'    @delTab
+        post.on 'fileRenamed'    @renameFile
+        post.on 'fileCreated'    @reloadFile
+        post.on 'fileChanged'    @reloadFile
+        post.on 'reloadFile'     @reloadFile
+        
+        post.on 'saveAll'        @onSaveAll
+        post.on 'closeTab'       @onCloseTab
+        post.on 'closeOtherTabs' @onCloseOtherTabs
+        post.on 'dirty'          @onDirty
+        post.on 'storeState'     @onStoreState
+        post.on 'clearState'     @onClearState
+        post.on 'revertFile'     @revertFile
+        post.on 'editorFocus'    @onEditorFocus
+        post.on 'stashLoaded'    @refreshTabs
+        post.on 'projectIndexed' @onProjectIndexed
+        post.on 'gitStatus'      @onGitStatus
+        
+        kore.on 'tabs'           @onKoreTabs
+        kore.on 'editor|file'    @addTab
+        
+    # 000000000   0000000   0000000
+    #    000     000   000  000   000
+    #    000     000000000  0000000
+    #    000     000   000  000   000
+    #    000     000   000  0000000
+
+    tab: id ->
+
+        if id is num ➜ ⮐ @tabs[id]
+        if elem.isElement id
+            tabDiv = elem.upElem id, class:'tab'
+            ⮐ @tabs.find (t) -> t.div == tabDiv
+        if id is str 
+            ⮐ @tabs.find (t) -> t.path == id
+
+    tabAtX: x ->
+
+        @tabs.find (t) ->
+            br = t.div.getBoundingClientRect()
+            br.left <= x <= br.left + br.width
+        
+    # 000   000   0000000   00000000   00000000  
+    # 000  000   000   000  000   000  000       
+    # 0000000    000   000  0000000    0000000   
+    # 000  000   000   000  000   000  000       
+    # 000   000   0000000   000   000  00000000  
+    
+    koreTabs: -> tabs = kore.get 'tabs'; tabs ? []
+        
+    koreTabForPath: path tabs ->
+        
+        tabs ?= @koreTabs()
+        
+        for tab in tabs
+            if slash.samePath tab.path, path
+                return tab
+
+    fileTabsForPath: path -> @fileTabs(@koreTabs()).filter (t) -> t.path.startsWith path
+    
+    fileTabs: tabs -> tabs.filter (t) -> t.type == 'file'
+    prjTabs:       -> @koreTabs().filter (t) -> t.type == 'prj'
+    numFileTabs:   -> @fileTabs(@koreTabs()).length
+    
+    prjTabForPath: path ->
+        
+        for tab in @prjTabs()
+            ⮐ tab if path.startsWith tab.path
+            
+    setKoreTabs: tabs => kore.set 'tabs' tabs; tabs
+    
+    refreshTabs: => @onKoreTabs @koreTabs()
+        
+    onKoreTabs: tabs =>
+        
+        @div.innerHTML = ''
+        @tabs = []
+        for koreTab in tabs
+            # log 'koreTab' koreTab
+            @tabs.push new Tab @, koreTab
+    
+    activeKoreTab: =>
+        
+        for tab in @koreTabs()
+            ⮐ tab if tab.active
+
+    activeKorePrj: =>
+        
+        if fileTab = @activeKoreTab()
+            for tab in @koreTabs()
+                ⮐ tab if tab.type == 'prj' and fileTab.path.startsWith tab.path 
+                
+    # 00000000  0000000    000  000000000   0000000   00000000         00000000   0000000    0000000  000   000   0000000  
+    # 000       000   000  000     000     000   000  000   000        000       000   000  000       000   000  000       
+    # 0000000   000   000  000     000     000   000  0000000          000000    000   000  000       000   000  0000000   
+    # 000       000   000  000     000     000   000  000   000        000       000   000  000       000   000       000  
+    # 00000000  0000000    000     000      0000000   000   000        000        0000000    0000000   0000000   0000000   
+    
+    onEditorFocus: editor =>
+        
+        if editor.name == 'editor'
+            if tab = @koreTabForPath kore.get 'editor|file'
+                tabs = @setActive tab.path
+                for tab in tabs ➜ delete tab.tmp
+                @setKoreTabs tabs
+
+    #  0000000   0000000    0000000          000000000   0000000   0000000
+    # 000   000  000   000  000   000           000     000   000  000   000
+    # 000000000  000   000  000   000           000     000000000  0000000
+    # 000   000  000   000  000   000           000     000   000  000   000
+    # 000   000  0000000    0000000             000     000   000  0000000
+
+    addTab: path =>
+        
+        ⮐ if empty path
+        
+        if not @koreTabForPath path
+        
+            prjPath = Projects.dir path
+            prjPath ?= slash.dir path
+            prjPath = kakao.bundle.path if empty prjPath
+            tabs = @koreTabs()
+            if not @koreTabForPath prjPath
+                tabs.push type:'prj' path:prjPath
+            for tab in tabs
+                delete tab.active
+            tabs.push type:'file' path:path, active:true tmp:not path.startsWith 'untitled-'
+            @cleanTabs tabs
+            @tab(path)?.div.scrollIntoViewIfNeeded()
+            ⮐ 
+
+        @cleanTabs @setActive path
+        @
+        
+    #  0000000  000      00000000   0000000   000   000        000000000   0000000   0000000     0000000  
+    # 000       000      000       000   000  0000  000           000     000   000  000   000  000       
+    # 000       000      0000000   000000000  000 0 000           000     000000000  0000000    0000000   
+    # 000       000      000       000   000  000  0000           000     000   000  000   000       000  
+    #  0000000  0000000  00000000  000   000  000   000           000     000   000  0000000    0000000   
+    
+    cleanTabs: tabs =>
+        
+        sorted = tabs.filter (t) -> t.type == 'prj'
+        remain = tabs.filter (t) -> t.type != 'prj'
+        
+        prjTabs = {}
+        for tab in sorted
+            prjTabs[tab.path] = [tab]
+           
+        while tab = remain.shift()
+            
+            prjPath  = Projects.dir tab.path
+            prjPath ?= slash.dir tab.path
+            prjPath  = kakao.bundle.path if empty prjPath
+            prjTabs[prjPath] ?= [type:'prj', path:prjPath]
+            prjTabs[prjPath].push tab
+             
+        for k,v of prjTabs
+            if v.length <= 1
+                delete prjTabs[k]
+                
+        tabs = []
+        for k,v of prjTabs
+            if v[-1].tmp
+                for i in v.length-2..0
+                    if v[i].tmp ➜ v.splice i, 1
+            tabs = tabs.concat v
+        
+        @setKoreTabs tabs
+        
+    # 0000000    00000000  000             000000000   0000000   0000000    
+    # 000   000  000       000                000     000   000  000   000  
+    # 000   000  0000000   000                000     000000000  0000000    
+    # 000   000  000       000                000     000   000  000   000  
+    # 0000000    00000000  0000000            000     000   000  0000000    
+    
+    delTab: path =>
+        
+        if tab = @koreTabForPath path
+            
+            tabs = @koreTabs()
+
+            ftabs = @fileTabs tabs
+            index = ftabs.indexOf tab
+            if tab.active
+                if index+1 < ftabs.length
+                    ftabs[index+1].active = true
+                else if index-1 >= 0
+                    ftabs[index-1].active = true
+            
+            index = tabs.indexOf tab
+            tabs.splice index, 1
+            @cleanTabs tabs
+            @activate @activeKoreTab().path
+            
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+    # 000   000  000          000     000  000   000  000   000     000     000       
+    # 000000000  000          000     000   000 000   000000000     000     0000000   
+    # 000   000  000          000     000     000     000   000     000     000       
+    # 000   000   0000000     000     000      0      000   000     000     00000000  
+    
+    activate: path =>
+        
+        if tab = @koreTabForPath path
+            
+            if tab.type == 'file'
+                
+                @cleanTabs @setActive path
+                                    
+                post.emit 'jumpToFile' path
+            else
+                tabs = @koreTabs()
+                tab = @koreTabForPath path, tabs
+                tab.collapsed = not tab.collapsed
+                @setKoreTabs tabs
+            
+    #  0000000  00000000  000000000   0000000    0000000  000000000  000  000   000  00000000  
+    # 000       000          000     000   000  000          000     000  000   000  000       
+    # 0000000   0000000      000     000000000  000          000     000   000 000   0000000   
+    #      000  000          000     000   000  000          000     000     000     000       
+    # 0000000   00000000     000     000   000   0000000     000     000      0      00000000  
+    
+    setActive: path =>
+        
+        tabs = @koreTabs()
+        for tab in tabs
+            delete tab.active
+            if slash.samePath tab.path, path
+                tab.active = true
+                @tab(path)?.div?.scrollIntoViewIfNeeded()
+        tabs
+
+    # 00000000   000  000   000  000   000  00000000  0000000    
+    # 000   000  000  0000  000  0000  000  000       000   000  
+    # 00000000   000  000 0 000  000 0 000  0000000   000   000  
+    # 000        000  000  0000  000  0000  000       000   000  
+    # 000        000  000   000  000   000  00000000  0000000    
+    
+    togglePinned: path =>
+        
+        tabs = @koreTabs()
+        for tab in tabs
+            if slash.samePath tab.path, path
+                if 
+                    tab.tmp    ➜ delete tab.tmp
+                    tab.pinned ➜ delete tab.pinned
+                               ➜ tab.pinned = true
+                ⮐ @setKoreTabs tabs
+        tabs
+                        
+    # 00000000   00000000  000       0000000    0000000   0000000          00000000  000  000      00000000
+    # 000   000  000       000      000   000  000   000  000   000        000       000  000      000
+    # 0000000    0000000   000      000   000  000000000  000   000        000000    000  000      0000000
+    # 000   000  000       000      000   000  000   000  000   000        000       000  000      000
+    # 000   000  00000000  0000000   0000000   000   000  0000000          000       000  0000000  00000000
+
+    reloadFile: file =>
+        
+        file ?= kore.get 'editor|file'
+        tabs = @koreTabs()
+        if tab = @koreTabForPath file, tabs
+            delete tab.dirty
+            @cleanTabs tabs
+            
+    renameFile: file src =>
+        
+        if src
+            if tab = @koreTabForPath src
+                post.emit 'loadFile' file
+                @delTab src
+                ⮐ 
+
+        if file == kore.get('editor|file') and tab = @koreTabForPath file
+            post.emit 'loadFile' file
+        
+    #  0000000   000  000000000        0000000  000000000   0000000   000000000  000   000   0000000  
+    # 000        000     000          000          000     000   000     000     000   000  000       
+    # 000  0000  000     000          0000000      000     000000000     000     000   000  0000000   
+    # 000   000  000     000               000     000     000   000     000     000   000       000  
+    #  0000000   000     000          0000000      000     000   000     000      0000000   0000000   
+    
+    onGitStatus: status =>
+        
+        if tab = @koreTabForPath status.gitDir
+            if tab.type == 'prj'
+                @tab(status.gitDir).onGitStatus status
+        
+    # 00000000   00000000    0000000         000  00000000   0000000  000000000  
+    # 000   000  000   000  000   000        000  000       000          000     
+    # 00000000   0000000    000   000        000  0000000   000          000     
+    # 000        000   000  000   000  000   000  000       000          000     
+    # 000        000   000   0000000    0000000   00000000   0000000     000     
+    
+    onProjectIndexed: path => 
+        
+        tabs = @koreTabs()
+        tabs.push type:'prj' path:path
+        @cleanTabs tabs
+    
+    #  0000000  000      000   0000000  000   000
+    # 000       000      000  000       000  000
+    # 000       000      000  000       0000000
+    # 000       000      000  000       000  000
+    #  0000000  0000000  000   0000000  000   000
+
+    onClick: event =>
+        
+        if tab = @tab event.target
+            if event.target.classList.contains 'dot'
+                @delTab tab.path
+            else if event.target.classList.contains 'unsaved-icon'
+                tab = @koreTabForPath tab.path
+                if tab.dirty
+                    if tab.active
+                        post.emit 'saveFile'
+                    else
+                        if tab.path.startsWith 'untitled'
+                            post.emit 'saveFileAs'
+                        else
+                            delete tab.dirty
+                            if state = tab.state
+                                File.save state.file, state.state.text(), (file) =>
+                                    ⮐ error "Tabs.onClick failed to save #{state.file}" if not file
+                                    delete tab.state
+                                    delete tab.dirty
+                                    @refreshTabs()
+            else
+                if tab.type == 'prj' 
+                    if event.target.classList.contains 'git-status-icon'
+                        ⮐ post.emit 'git.diff' tab.path
+                @activate tab.path
+        true
+            
+    #  0000000  000       0000000    0000000  00000000
+    # 000       000      000   000  000       000
+    # 000       000      000   000  0000000   0000000
+    # 000       000      000   000       000  000
+    #  0000000  0000000   0000000   0000000   00000000
+
+    onCloseTab: =>
+        
+        if @numFileTabs() <= 1
+            post.emit 'menuAction' 'close'
+        else
+            if @koreTabForPath kore.get 'editor|file'
+                @delTab kore.get 'editor|file'
+            else if tab = @activeKoreTab()
+                @delTab tab.path
+
+    onCloseOtherTabs: =>
+
+        active = @activeKoreTab()
+        tabs = @koreTabs()
+        for index in tabs.length-1..0
+            tab = tabs[index]
+            continue if tab == active
+            if not tab.pinned and tab.type == 'file'
+                tabs.splice index, 1
+        @cleanTabs tabs
+        
+    # 000000000  00     00  00000000   
+    #    000     000   000  000   000  
+    #    000     000000000  00000000   
+    #    000     000 0 000  000        
+    #    000     000   000  000        
+    
+    onNewEmptyTab: =>
+
+        log 'onNewEmptyTab'
+        @emptyid += 1
+        @addTab   "untitled-#{@emptyid}"
+        @activate "untitled-#{@emptyid}"
+
+    onNewTabWithFile: file =>
+
+        [path, line, col] = slash.splitFileLine file
+
+        if not @koreTabForPath path
+        
+            tabs = @koreTabs()
+            
+            if prjPath = Projects.dir path
+                if not @koreTabForPath prjPath
+                    tabs.push type:'prj' path:prjPath
+            tabs.push type:'file' path:path
+            @cleanTabs tabs
+
+    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
+    # 0000  000  000   000  000   000  000  000        000   000     000     000
+    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000
+    # 000  0000  000   000     000     000  000   000  000   000     000     000
+    # 000   000  000   000      0      000   0000000   000   000     000     00000000
+
+    navigate: key =>
+        
+        if tab = @activeKoreTab()
+            tabs = @fileTabs @koreTabs()
+            index = tabs.indexOf tab
+            index += switch key
+                'left'  ➜ -1
+                'right' ➜ +1
+            if 0 <= index < tabs.length
+                @activate tabs[index].path
+
+    move: key =>
+        
+        if tab = @activeKoreTab()
+            switch key
+                'left'  ➜ @shiftTab tab, -1
+                'right' ➜ @shiftTab tab, +1
+                
+    shiftTab: tab delta =>
+        
+        tabs = @koreTabs()
+        index = tabs.indexOf tab
+        tabs.splice(index, 1)
+        tabs.splice(index+delta, 0, tab)
+        @cleanTabs tabs
+            
+    # 0000000    00000000    0000000    0000000
+    # 000   000  000   000  000   000  000
+    # 000   000  0000000    000000000  000  0000
+    # 000   000  000   000  000   000  000   000
+    # 0000000    000   000  000   000   0000000
+
+    onDragStart: d event =>
+
+        ⮐ 'skip' if event.target.classList.contains 'tab'
+        ⮐ 'skip' if event.target.classList.contains 'tabstate'
+        
+        @dragTab = @tab event.target
+
+        ⮐ 'skip' if empty @dragTab
+        ⮐ 'skip' if event.button != 0
+
+        @dragIndex = @dragTab.index()
+        @dragDiv = @dragTab.div.cloneNode true
+        @dragTab.div.style.opacity = '0'
+        br = @dragTab.div.getBoundingClientRect()
+        @dragDiv.style.position = 'absolute'
+        @dragDiv.style.top      = "#{br.top}px"
+        @dragDiv.style.left     = "#{br.left}px"
+        @dragDiv.style.width    = "#{br.width}px"
+        @dragDiv.style.height   = "#{br.height}px"
+        @dragDiv.style.flex     = 'unset'
+        @dragDiv.style.pointerEvents = 'none'
+        document.body.appendChild @dragDiv
+
+    onDragMove: d e =>
+
+        swap = (ta, tb) =>
+            if ta? and tb?
+                [ta, tb] = [tb, ta] if ta.index() > tb.index()
+                @tabs[ta.index()]   = tb
+                @tabs[tb.index()+1] = ta
+                @div.insertBefore tb.div, ta.div
+        
+        @dragDiv.style.transform = "translateX(#{d.deltaSum.x}px)"
+        if tab = @tabAtX d.pos.x
+            dragIndex = @dragTab.index()
+            hovrIndex = tab.index()
+            if dragIndex > hovrIndex
+                swap @tabs[hovrIndex], @tabs[dragIndex]
+            else if dragIndex < hovrIndex
+                swap @tabs[dragIndex], @tabs[hovrIndex]
+                
+    onDragStop: d e =>
+
+        index = @dragTab.index()
+        @dragTab.div.style.opacity = ''
+        @dragDiv.remove()
+        if index != @dragIndex
+            @shiftTab @koreTabs()[@dragIndex], index-@dragIndex
+    
+    # 00000000  000   000  000000000  00000000  000   000   0000000  000   0000000   000   000  
+    # 000        000 000      000     000       0000  000  000       000  000   000  0000  000  
+    # 0000000     00000       000     0000000   000 0 000  0000000   000  000   000  000 0 000  
+    # 000        000 000      000     000       000  0000       000  000  000   000  000  0000  
+    # 00000000  000   000     000     00000000  000   000  0000000   000   0000000   000   000  
+    
+    toggleExtension: =>
+        
+        prefs.toggle 'tabs|extension'
+        
+        for tab in @tabs
+            tab.update()
+                
+    # 0000000    000  00000000   000000000  000   000  
+    # 000   000  000  000   000     000      000 000   
+    # 000   000  000  0000000       000       00000    
+    # 000   000  000  000   000     000        000     
+    # 0000000    000  000   000     000        000     
+    
+    onDirty: dirty =>
+        
+        if tab = @activeKoreTab()
+            @setDirty tab.path, dirty
+            
+    setDirty: path dirty =>
+        
+        tabs = @koreTabs()
+        if tab  = @koreTabForPath path, tabs
+            if dirty ➜ tab.dirty = true
+            else delete tab.dirty
+            @setKoreTabs tabs
+            
+    # 000000000   0000000   0000000           0000000  000000000   0000000   000000000  00000000  
+    #    000     000   000  000   000        000          000     000   000     000     000       
+    #    000     000000000  0000000          0000000      000     000000000     000     0000000   
+    #    000     000   000  000   000             000     000     000   000     000     000       
+    #    000     000   000  0000000          0000000      000     000   000     000     00000000  
+    
+    onStoreState: path state =>
+
+        tabStates = kore.get 'tabStates' {}
+        if tab = @koreTabForPath path
+            if valid state
+                tabStates[path] = state
+                kore.set 'tabStates' tabStates
+                ⮐ 
+          
+        @onClearState path
+        
+    onClearState: path =>
+        
+        @setDirty path, false
+        tabStates = kore.get 'tabStates' {}
+        delete tabStates[path]
+        kore.set 'tabStates' tabStates
+                
+    # 00000000   00000000  000   000  00000000  00000000   000000000       00000000  000  000      00000000  
+    # 000   000  000       000   000  000       000   000     000          000       000  000      000       
+    # 0000000    0000000    000 000   0000000   0000000       000          000000    000  000      0000000   
+    # 000   000  000          000     000       000   000     000          000       000  000      000       
+    # 000   000  00000000      0      00000000  000   000     000          000       000  0000000  00000000  
+
+    revertFile: path =>
+        
+        tabs = @koreTabs()
+        if tab = @koreTabForPath path, tabs
+            delete tab.dirty
+            tabStates = kore.get 'tabStates' {}
+            delete tabStates[path]
+            kore.set 'tabStates' tabStates
+            @setKoreTabs tabs
+        
+    #  0000000   0000000   000   000  00000000         0000000   000      000
+    # 000       000   000  000   000  000             000   000  000      000
+    # 0000000   000000000   000 000   0000000         000000000  000      000
+    #      000  000   000     000     000             000   000  000      000
+    # 0000000   000   000      0      00000000        000   000  0000000  0000000
+
+    onSaveAll: =>
+
+        for tab in @koreTabs()
+            if tab.dirty
+                if tab.active
+                    post.emit 'saveFile'
+                else
+                    continue if tab.path.startsWith 'untitled'
+                    if state = tab.state
+                        File.save state.file, state.state.text(), (file) =>
+                            ⮐ error "Tabs.onSaveAll failed to save #{state.file}" if not file
+                            tabs = @koreTabs()
+                            if tab = @koreTabForPath file, tabs
+                                delete tab.state
+                                delete tab.dirty
+                                @setKoreTabs tabs
+
+    #  0000000   0000000   000   000  000000000  00000000  000   000  000000000
+    # 000       000   000  0000  000     000     000        000 000      000
+    # 000       000   000  000 0 000     000     0000000     00000       000
+    # 000       000   000  000  0000     000     000        000 000      000
+    #  0000000   0000000   000   000     000     00000000  000   000     000
+
+    onContextMenu: event =>
+
+        if tab = @tab event.target
+            @activate tab.path
+        stopEvent event
+        @showContextMenu kpos event
+
+    showContextMenu: absPos =>
+
+        if not absPos?
+            absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+
+        opt = items: [
+            text:   'Close Other Tabs'
+            combo:  'alt+cmdctrl+w'
+        ,
+            text:   'New Window'
+            combo:  'cmdctrl+shift+n'
+        ,
+            text:   'Toggle Tab Extensions'
+            combo:  'alt+cmdctrl+t'
+        ]
+
+        opt.x = absPos.x
+        opt.y = absPos.y
+        popup.menu opt
+
+export Tabs

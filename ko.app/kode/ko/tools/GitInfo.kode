@@ -1,0 +1,467 @@
+###
+ 0000000   000  000000000  000  000   000  00000000   0000000
+000        000     000     000  0000  000  000       000   000
+000  0000  000     000     000  000 0 000  000000    000   000
+000   000  000     000     000  000  0000  000       000   000
+ 0000000   000     000     000  000   000  000        0000000
+###
+
+use ../../kxk ▪ linediff post slash ffs kstr
+use ../tools  ◆ Git Projects
+use ../editor ◆ Syntax
+
+SOURCE_FILE_EXTS = ['kode' 'styl' 'pug' 'h' 'mm' 'cpp' 'noon']
+IGNORE_FILE_EXTS = ['js' 'css' 'json' 'html']
+
+class GitInfo
+
+    @: ->
+        
+        post.on 'git.log'     @log      # diff for certain revision
+        post.on 'git.diff'    @diff     # diff for whole project
+        post.on 'git.status'  @status   # current file status (file changes) in project
+        post.on 'git.commit'  @commit   
+        post.on 'git.history' @history  # history of commits and file changes in project
+        
+    # 000   000  000   0000000  000000000   0000000   00000000   000   000  
+    # 000   000  000  000          000     000   000  000   000   000 000   
+    # 000000000  000  0000000      000     000   000  0000000      00000    
+    # 000   000  000       000     000     000   000  000   000     000     
+    # 000   000  000  0000000      000      0000000   000   000     000     
+    
+    history: path => @doHistory path
+        
+    doHistory: path ○->
+
+        path ?= window.editor.currentFile
+        ⮐ if not path
+        
+        window.split.raise 'terminal'
+        window.terminal.clear()
+        window.terminal.singleCursorAtPos [0 0]
+
+        gitDir  =○ kakao 'fs.git' path
+        history =○ Git.history()
+            
+        for commit in history
+                        
+            # text = "#{commit.msg} #{commit.commit}"
+            text = "#{commit.msg}"
+            window.terminal.queueMeta
+                diss:  Syntax.dissForTextAndSyntax text, 'git'
+                text:  text
+                clss:  'gitInfoFile'
+                href:  "macro log #{commit.commit}"
+                click: @onMetaClick
+                line:  '●'
+
+            for file in commit.files
+                
+                continue if slash.ext(file.path) in ['js''css''html''json']
+
+                symbol = switch file.type
+                    'M' ➜ ' '
+                    'A' ➜ '■'
+                    'D' ➜ '✘'
+                        ➜ '▶'
+                        
+                change = switch file.type
+                    'M' ➜ 'changed'
+                    'A' ➜ 'added'
+                    'D' ➜ 'deleted'
+                        ➜ 'renamed'
+                        
+                text = "        #{slash.tilde file.path}"
+                window.terminal.queueMeta
+                    diss:     Syntax.dissForTextAndSyntax text, 'git'
+                    text:     text
+                    clss:     'gitInfoFile'
+                    href:     "#{gitDir}/#{file.path}"
+                    click:    @onMetaClick
+                    line:     symbol
+                    lineClss: 'gitInfoLine '+change
+                    
+        window.split.do 'minimize editor' 
+        window.split.do 'focus terminal' 
+        window.terminal.singleCursorAtPos [0 0]
+
+    #  0000000   0000000   00     00  00     00  000  000000000  
+    # 000       000   000  000   000  000   000  000     000     
+    # 000       000   000  000000000  000000000  000     000     
+    # 000       000   000  000 0 000  000 0 000  000     000     
+    #  0000000   0000000   000   000  000   000  000     000     
+    
+    commit: msg ○->
+        
+        window.split.raise 'terminal'
+        window.terminal.clear()
+        window.terminal.appendMeta diss: Syntax.dissForTextAndSyntax "commit #{msg}", 'kode'
+
+        log 'GitInfo.commit' msg
+        log 'GitInfo.commit editor|file' kore.get 'editor|file'
+        log 'GitInfo.commit currentFile' window.textEditor.currentFile
+        log 'GitInfo.commit Projects.current' Projects.current()
+        
+        gitDir  = Projects.dir kore.get 'editor|file'
+        gitDir ?= Projects.current()
+        
+        if empty gitDir
+            gitDir =○ kakao 'fs.git' kore.get 'editor|file'
+        
+        if gitDir
+            
+            m = msg.join ' '
+            m = 'misc' if empty m
+
+            out = ''
+            
+            out +=○ kakao 'app.sh' '/usr/bin/git' cwd:gitDir, arg:"add ."                   
+            out +=○ kakao 'app.sh' '/usr/bin/git' cwd:gitDir, arg:['commit' '-m' m] 
+            out +=○ kakao 'app.sh' '/usr/bin/git' cwd:gitDir, arg:"push -q" 
+
+            window.terminal.clear()
+            for line in out.split '\n'
+                window.terminal.appendMeta diss: Syntax.dissForTextAndSyntax line, 'kode'
+                
+            window.split.do 'maximize editor'
+
+            Git.status gitDir
+                    
+    # 0000000    000  00000000  00000000  
+    # 000   000  000  000       000       
+    # 000   000  000  000000    000000    
+    # 000   000  000  000       000       
+    # 0000000    000  000       000       
+
+    diff: prjDir =>
+        
+        window.commandline.startCommand 'macro'
+        @status diff:true prjDir:prjDir
+        window.split.do 'minimize editor'
+        window.commandline.setText 'commit '
+        window.commandline.selectNone()
+
+    # 000       0000000    0000000   
+    # 000      000   000  000        
+    # 000      000   000  000  0000  
+    # 000      000   000  000   000  
+    # 0000000   0000000    0000000   
+    
+    log: rev => @doLog rev
+    
+    doLog: rev ○->
+        
+        # log 'doLog' rev
+        
+        window.split.raise 'terminal'
+        window.terminal.clear()
+        
+        gitDir =○ kakao 'fs.git' editor.currentFile
+        patch  =○ Git.patch rev
+        
+        for p in patch
+            
+            path = slash.path gitDir, p.srcfile[2..]
+            
+            log 'doLog' path
+            
+            continue if slash.ext(path) in IGNORE_FILE_EXTS
+            
+            window.terminal.appendMeta
+                diss:       Syntax.dissForTextAndSyntax "#{path}" 'ko'
+                href:       path
+                list:       path
+                clss:       'gitInfoFile'
+                click:      @onMetaClick
+                line:       '●'
+                lineClss:   'gitInfoLine changed'
+
+            # post.emit 'filelist.add' path, window.terminal.numLines()
+            
+            if p.changes is arr
+                
+                @logChanges gitDir, path, p.changes
+                window.terminal.appendMeta clss:'spacer'
+                
+        window.terminal.do.resetHistory()
+    
+    #  0000000  000   000   0000000   000   000   0000000   00000000   0000000  
+    # 000       000   000  000   000  0000  000  000        000       000       
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   0000000   
+    # 000       000   000  000   000  000  0000  000   000  000            000  
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000   
+    
+    logChanges: gitDir path changes =>
+        
+        for change in changes
+            
+            window.terminal.appendMeta clss:'spacer'
+            
+            linfo = change.lineinfo.split ' '
+            if linfo[0][0] == '-' and linfo[1][0] == '+'
+                [dline, dn] = linfo[0][1..].split(',').map (i) -> parseInt i
+                [aline, an] = linfo[1][1..].split(',').map (i) -> parseInt i
+                dn = 1 if not dn is num
+                an = 1 if not an is num
+                
+            for line in change.changedlines
+                
+                switch line.type
+                    '-'
+                        dss = Syntax.dissForTextAndSyntax line.line, slash.ext path
+                        for ds in dss ➜ ds.clss += ' ' + 'git-deleted'
+                        window.terminal.appendMeta
+                            diss:       dss
+                            href:       path + ':' + dline
+                            clss:       'gitInfoDelete'
+                            click:      @onMetaClick
+                            line:       '✘'
+                            
+                        dline++
+    
+                    '+' # TODO: add diff line metas like in logDiff 'changed'
+                        window.terminal.appendMeta
+                            diss:       Syntax.dissForTextAndSyntax line.line, slash.ext path
+                            href:       path + ':' + aline
+                            clss:       'gitInfoAdded'
+                            click:      @onMetaClick
+                        aline++
+                    
+    # 000       0000000    0000000   0000000    000  00000000  00000000  
+    # 000      000   000  000        000   000  000  000       000       
+    # 000      000   000  000  0000  000   000  000  000000    000000    
+    # 000      000   000  000   000  000   000  000  000       000       
+    # 0000000   0000000    0000000   0000000    000  000       000       
+    
+    logDiff: changes =>
+        
+        extn = slash.ext changes.file
+        if extn in Syntax.syntaxNames
+            syntaxName = extn
+        else
+            syntaxName = 'txt'
+
+        linesAdded = 0
+        index = 0
+        for text in changes.lines
+            
+            dss = Syntax.dissForTextAndSyntax text, syntaxName
+                        
+            continue if empty dss
+            
+            switch changes.change
+                
+                'deleted'
+
+                    for ds in dss ➜ ds.clss += ' ' + 'git-deleted'
+                    
+                    window.terminal.appendMeta
+                        line:   '✘'
+                        diss:   dss
+                        href:   "#{changes.file}:#{changes.line+index}"
+                        clss:   'gitInfoDelete'
+                        click:  @onMetaClick
+
+                'added'
+
+                    window.terminal.appendMeta
+                        diss:   dss
+                        href:   "#{changes.file}:#{changes.line+index}"
+                        clss:   'gitInfoAdded'
+                        click:  @onMetaClick
+
+                'changed'
+                    
+                    if linediff.isBoring changes.info.mod[index].old, changes.info.mod[index].new
+                        
+                        # log 'boring' changes.info.mod[index].old, changes.info.mod[index].new
+                                    
+                        index += 1
+                        continue
+    
+                    diffs = linediff changes.info.mod[index].old, changes.info.mod[index].new
+                    
+                    if empty diffs and not trim(changes.info.mod[index].old).startsWith "#"
+                        diffs = linediff changes.info.mod[index].new, changes.info.mod[index].old
+                        if valid diffs
+    
+                            metas = []
+                            for diff in diffs
+            
+                                metas.push 
+                                    start:      diff.index
+                                    end:        diff.index+diff.length
+                                    clss:       'gitInfoChange'
+                                                                                                                                        
+                            dss = Syntax.dissForTextAndSyntax changes.info.mod[index].old, syntaxName
+                            
+                            window.terminal.appendMeta
+                                diss:   dss
+                                href:   "#{changes.file}:#{changes.line+index}"
+                                clss:   'gitInfoDelete'
+                                click:  @onMetaClick
+                                metas:  metas
+                    else 
+
+                        metas = []
+                        for diff in diffs
+        
+                           metas.push 
+                                start:      diff.index
+                                end:        diff.index+diff.length
+                                clss:       'gitInfoChange'
+    
+                        window.terminal.appendMeta
+                            diss:       dss
+                            href:       "#{changes.file}:#{changes.line+index}"
+                            clss:       'gitInfoAdded'
+                            click:      @onMetaClick
+                            metas:      metas
+                            
+                ➜
+                    log 'CHANGE EVER COME HERE?'
+                    for diff in diffs
+    
+                        window.terminal.appendMeta
+                            line:       window.terminal.numLines()
+                            start:      diff.index
+                            end:        diff.index+diff.length
+                            clss:       'gitInfoChange'
+                            
+            linesAdded++
+                
+            index += 1
+            
+        if linesAdded ➜ window.terminal.appendMeta clss: 'spacer'
+        index
+
+    #  0000000  000000000   0000000   000000000  000   000   0000000
+    # 000          000     000   000     000     000   000  000
+    # 0000000      000     000000000     000     000   000  0000000
+    #      000     000     000   000     000     000   000       000
+    # 0000000      000     000   000     000      0000000   0000000
+                            
+    status: opt={} ○->
+        
+        opt.diff   ?= false
+        opt.prjDir ?= Projects.dir editor.currentFile
+
+        window.split.raise 'terminal'
+        window.terminal.clear()
+        
+        onMetaClick = @onMetaClick
+        logDiff  = @logDiff
+        
+        if empty opt.prjDir 
+            if globalThis.kakao
+                opt.prjDir =○ globalThis.kakao 'fs.git' editor.currentFile
+            else
+                error 'GitInfo.status -- no prjDir and no kakao?'
+                return 
+        
+        log 'GitInfo.status dir' opt.prjDir
+        
+        Git.status(opt.prjDir).then (status) ○->
+
+            ⮐ if empty status
+            ⮐ if empty status.gitDir
+            
+            log 'GitInfo.status got' status
+
+            logFile = change file status spacer ->
+
+                ⮐ if slash.ext(file) in IGNORE_FILE_EXTS
+
+                symbol = switch change
+
+                    'changed' ➜ '●'
+                    'added'   ➜ '◼'
+                    'deleted' ➜ '✘'
+
+                path = slash.relative file, status.gitDir
+
+                window.terminal.appendMeta
+                    diss:       Syntax.dissForTextAndSyntax "#{path}" 'ko'
+                    href:       file
+                    list:       file
+                    clss:       'gitInfoFile'
+                    click:      onMetaClick
+                    line:       symbol
+                    lineClss:   'gitInfoLine '+change
+                
+                # post.emit 'filelist.add' file, window.terminal.numLines()
+                    
+                if spacer ➜ window.terminal.appendMeta clss:'spacer'
+
+            for file in status.deleted
+
+                if slash.ext(file) in SOURCE_FILE_EXTS
+                    logFile 'deleted' file, status, opt.diff
+
+            for file in status.added
+
+                if slash.ext(file) in SOURCE_FILE_EXTS
+                    logFile 'added' file, status, opt.diff
+                    continue if not opt.diff
+                    text =○ ffs.read file
+                    lines = text.split '\n'
+                    logDiff lines:lines, line:1, file:file, change:'added'
+
+                
+            for file in status.changed.filter (f) -> slash.ext(f) in SOURCE_FILE_EXTS
+                
+                logFile 'changed' file, status
+                    
+                if opt.diff 
+                    
+                    changeInfo =○ Git.diff file
+
+                    for change in changeInfo.changes
+
+                        line = change.line
+
+                        if not empty change.mod
+                            lines = change.mod.map (l) -> l.new
+                            logDiff lines:lines, file:changeInfo.file, line:line, info:change, change:'changed'
+
+                        if not empty change.add
+                            lines = change.add.map (l) -> l.new
+                            logDiff lines:lines, file:changeInfo.file, line:line, info:change, change:'added'
+
+                        if not empty change.del
+                            lines = change.del.map (l) -> l.old
+                            logDiff lines:lines, file:changeInfo.file, line:line, info:change, change:'deleted'
+
+            window.terminal.appendMeta clss: 'spacer'
+            window.terminal.scroll.cursorToTop 7
+            
+            window.terminal.do.resetHistory()
+            
+    #  0000000  000      000   0000000  000   000
+    # 000       000      000  000       000  000
+    # 000       000      000  000       0000000
+    # 000       000      000  000       000  000
+    #  0000000  0000000  000   0000000  000   000
+
+    onMetaClick: meta event =>
+        
+        if href = meta[2].href
+            
+            if href.startsWith 'macro '
+                window.commandline.startCommand 'macro'
+                window.commandline.hideList() # should startCommand get more parameters to prevent list opening?
+                cmmd = href[6..]
+                if cmmd.startsWith 'log'
+                    window.commandline.setText 'history'
+                else
+                    window.commandline.setText cmmd
+                window.commandline.command.execute cmmd
+            else
+                if href.indexOf(':') > 0
+                    href += ':' + window.terminal.posForEvent(event)[0]
+                post.emit 'loadFile' href
+                window.split.do 'quart terminal'
+                
+        'unhandled' # otherwise cursor doesn't get set
+                    
+export new GitInfo

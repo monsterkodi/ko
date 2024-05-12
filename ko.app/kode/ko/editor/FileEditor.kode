@@ -1,0 +1,540 @@
+###
+00000000  000  000      00000000        00000000  0000000    000  000000000   0000000   00000000
+000       000  000      000             000       000   000  000     000     000   000  000   000
+000000    000  000      0000000         0000000   000   000  000     000     000   000  0000000
+000       000  000      000             000       000   000  000     000     000   000  000   000
+000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
+###
+
+use ../../kxk ▪ deleteBy findIf ffs kpos post popup slash stopEvent setStyle kstr
+use ../tools  ◆ File
+use           ◆ Syntax TextEditor
+
+function FileEditor extends TextEditor
+
+    @: viewElem ->
+
+        super viewElem,
+            features: [
+                'Diffbar'
+                'Scrollbar'
+                'Numbers'
+                'Minimap'
+                'Meta'
+                'AutoComplete'
+                'Brackets'
+                'Strings'
+                'CursorLine'
+                'FuncList'
+            ],
+            fontSize: 19
+
+        @currentFile = null
+
+        @view.addEventListener 'contextmenu' @onContextMenu
+
+        post.on 'commandline'   @onCommandline
+        post.on 'jumpTo'        @jumpTo
+        post.on 'jumpToFile'    @jumpToFile
+        post.on 'jumpToFilePos' @jumpToFilePos
+
+        @setText ''
+
+        @initInvisibles()
+        @initPigments()
+
+    #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
+    # 000       000   000  000   000  0000  000  000        000       000   000
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   000   000
+    # 000       000   000  000   000  000  0000  000   000  000       000   000
+    #  0000000  000   000  000   000  000   000   0000000   00000000  0000000
+
+    changed: changeInfo ->
+
+        super changeInfo
+
+        if changeInfo.changes.length
+            @dirty = @do.hasChanges()
+            post.emit 'dirty' @dirty
+
+    # 00000000  000  000      00000000
+    # 000       000  000      000
+    # 000000    000  000      0000000
+    # 000       000  000      000
+    # 000       000  0000000  00000000
+
+    clear: ->
+
+        @dirty = false
+        @setSalterMode false
+        @diffbar?.clear()
+        @meta?.clear()
+        @setLines ['']
+        @do.reset()
+
+    setCurrentFile: file ->
+
+        @clear()
+
+        @currentFile = file
+
+        @setupFileType()
+
+        if @currentFile
+            ffs.read(@currentFile).then @setText
+
+    setText: text="" =>
+
+        super text
+        
+        tabStates = kore.get 'tabStates'
+            
+        if tab = window.tabs.koreTabForPath @currentFile
+            if tab.dirty and tabStates[@currentFile]
+                # log 'apply  tabstate' @currentFile, tabStates[@currentFile]
+                @do.setTabState tabStates[@currentFile]
+        
+        @restoreFilePosition()
+        post.emit 'file' @currentFile # browser & shelf
+        @emit 'file' @currentFile # diffbar, invisible, pigments, ...
+
+    currentDir: ->
+
+        if @currentFile?
+            slash.dir @currentFile
+        else
+            slash.path kakao.bundle.path
+
+    # 000000000  000   000  00000000   00000000
+    #    000      000 000   000   000  000
+    #    000       00000    00000000   0000000
+    #    000        000     000        000
+    #    000        000     000        00000000
+
+    shebangFileType: ->
+
+        fileType = Syntax.shebang @line(0) if @numLines()
+        if fileType == 'txt'
+            if @currentFile?
+                ext = slash.ext @currentFile
+                if ext in Syntax.syntaxNames
+                    return ext
+        else if fileType
+            return fileType
+
+        super()
+
+    #  0000000   0000000   00     00  00     00   0000000   000   000  0000000    000      000  000   000  00000000
+    # 000       000   000  000   000  000   000  000   000  0000  000  000   000  000      000  0000  000  000
+    # 000       000   000  000000000  000000000  000000000  000 0 000  000   000  000      000  000 0 000  0000000
+    # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000
+    #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
+
+    onCommandline: e =>
+
+        switch e
+            'hidden' 'shown'
+                d = window.split.commandlineHeight + window.split.flex.handleSize
+                d = Math.min d, @scroll.scrollMax - @scroll.scroll
+                d *= -1 if e == 'hidden'
+                @scroll.by d
+
+    #  0000000   0000000   000   000  00000000
+    # 000       000   000  000   000  000
+    # 0000000   000000000   000 000   0000000
+    #      000  000   000     000     000
+    # 0000000   000   000      0      00000000
+
+    saveFilePosition: ->
+        
+        ⮐  if not @currentFile
+        
+        filePositions = window.stash.get 'filePositions' {}
+
+        if not filePositions is obj ➜ filePositions = {}
+
+        cursor = @mainCursor()
+        if cursor[0] or cursor[1]
+            filePositions[@currentFile] = "#{cursor[0]} #{cursor[1]} #{@scroll.scroll}"
+        else
+            delete filePositions[@currentFile]
+
+        deleteBy filePositions, (f,fp) -> fp.startsWith '0 0 '
+
+        window.stash.set 'filePositions' filePositions
+
+    # 00000000   00000000   0000000  000000000   0000000   00000000   00000000
+    # 000   000  000       000          000     000   000  000   000  000
+    # 0000000    0000000   0000000      000     000   000  0000000    0000000
+    # 000   000  000            000     000     000   000  000   000  000
+    # 000   000  00000000  0000000      000      0000000   000   000  00000000
+                        
+    restoreFilePosition: ->
+
+        ⮐  if not @currentFile
+
+        filePositions = window.stash.get 'filePositions' {}
+        
+        if cursor = filePositions[@currentFile]
+
+            posScroll = cursor.split(' ').map (c) -> parseInt c
+            @singleCursorAtPos posScroll
+            # @scroll.cursorInitView()
+            if posScroll.length == 3
+                @scroll.scroll = 0
+                @scroll.by last posScroll
+            
+        else
+            @singleCursorAtPos [0,0]
+            @scroll.top = 0 if @mainCursor()[1] == 0
+            @scroll.bot = @scroll.top-1
+            @scroll.to 0
+            
+        @updateLayers()
+        @numbers?.updateColors()
+        @minimap.onEditorScroll()
+        
+        @emit 'selection'
+
+    #       000  000   000  00     00  00000000
+    #       000  000   000  000   000  000   000
+    #       000  000   000  000000000  00000000
+    # 000   000  000   000  000 0 000  000
+    #  0000000    0000000   000   000  000
+
+    jumpToFilePos: opt =>
+
+        if opt.path == @currentFile
+            @singleCursorAtPos [opt.col, opt.line-1]
+            @scroll.cursorToTop()
+        else
+            log 'FileEditor.jumpToFilePos loadFile?' opt
+
+    jumpToFile: opt =>
+        
+        opt ?= {}
+        if opt is str ➜ opt = path:opt
+
+        if File.isImage opt.path
+            # kore.set 'view|file' opt.path
+            ⮐ 
+
+        # log 'jumpToFile' opt, window.lastFocus
+        if window.lastFocus == 'editor'
+
+            [file, fpos] = slash.splitFilePos opt.path
+            opt.pos = fpos
+            opt.pos[0] = opt.col if opt.col
+            opt.pos[1] = opt.line-1 if opt.line
+            opt.winID  = window.winID
+
+            opt.oldPos = @cursorPos()
+            opt.oldFile = @currentFile
+
+            opt.file ?= opt.path
+
+            # log 'jumpToFile navigate.gotoFilePos' opt
+
+            window.navigate.gotoFilePos opt
+            
+        else
+
+            file = slash.joinFileLine opt.path, opt.line, opt.col
+
+            # log 'jumpToFile post loadFile' file
+
+            post.emit 'loadFile' file
+
+    jumpTo: word opt =>
+
+        log 'FileEditor jumpTo' word, opt
+        if typeof(word) == 'object' and not opt?
+            opt  = word
+            word = opt.word
+
+        opt ?= {}
+
+        if opt.path?
+            @jumpToFile opt
+            ⮐ true
+
+        ⮐ error 'nothing to jump to?' if empty word
+
+        word = word.trim()
+        find = word.toLowerCase()
+        find = find.slice 1 if find[0] == '@'
+
+        ⮐ error 'FileEditor.jumpTo -- nothing to find?' if empty find
+
+        type = opt?.type
+
+        log 'FileEditor jumpTo' word, type
+        
+        if not type or type == 'class'
+            classes = window.indexer.classes
+            for clss, info of classes
+                if clss.toLowerCase() == find
+                    @jumpToFile info
+                    ⮐ true
+
+        if not type or type == 'func'
+            funcs = window.indexer.funcs
+            
+            log 'funcs' funcs
+            
+            if infos = funcs[word]
+                log 'direct func infos' infos
+                info  = findIf infos, (info) => info.file == @currentFile
+                info ?= findIf infos, (info) => slash.ext(info.file) == slash.ext @currentFile                    
+                info ?= first infos
+                log 'FileEditor jumpTo jumpToFile direct' info
+                @jumpToFile info
+                ⮐ true
+            
+            for func, infos of funcs
+                if func.toLowerCase() == find
+                    info = infos[0]
+                    for i in infos
+                        if i.file == @currentFile
+                            info = i
+                            
+                    log 'FileEditor jumpTo jumpToFile indirect' info
+                    @jumpToFile info
+                    ⮐ true
+
+        if not type or type == 'file'
+            files = window.indexer.files
+            for file, info of files
+                if slash.name(file).toLowerCase() == find and file != @currentFile
+                    @jumpToFile path:file, line:6
+
+        window.commandline.commands.search.start 'search'
+        window.commandline.commands.search.execute word
+
+        window.split.do 'show terminal'
+
+        true
+
+    #  0000000   0000000   000   000  000   000  000000000  00000000  00000000   00000000    0000000   00000000   000000000
+    # 000       000   000  000   000  0000  000     000     000       000   000  000   000  000   000  000   000     000
+    # 000       000   000  000   000  000 0 000     000     0000000   0000000    00000000   000000000  0000000       000
+    # 000       000   000  000   000  000  0000     000     000       000   000  000        000   000  000   000     000
+    #  0000000   0000000    0000000   000   000     000     00000000  000   000  000        000   000  000   000     000
+
+    jumpToCounterpart: ○->
+
+        cp = @cursorPos()
+        currext = slash.ext @currentFile
+
+        # TODO: move this stuff to a config.noon file
+        
+        counterparts =
+            mm:      ['h']
+            cpp:     ['hpp' 'h']
+            cc:      ['hpp' 'h']
+            h:       ['cpp' 'c' 'mm']
+            hpp:     ['cpp' 'c']
+            coffee:  ['js' 'mjs']
+            kode:    ['js' 'mjs']
+            js:      ['coffee' 'kode']
+            mjs:     ['coffee' 'kode']
+            pug:     ['html']
+            noon:    ['json']
+            json:    ['noon']
+            html:    ['pug']
+            css:     ['styl']
+            styl:    ['css']
+
+        for ext in counterparts[currext] ? []
+            
+            if ○ ffs.fileExists slash.swapExt @currentFile, ext
+                post.emit 'loadFile' slash.swapExt @currentFile, ext
+                ⮐ true
+
+        for ext in counterparts[currext] ? []
+            
+            counter = slash.swapExt @currentFile, ext
+            file = @swapLastDir counter, currext, ext
+            
+            if ○ ffs.fileExists file
+                post.emit 'loadFile' file
+                ⮐ true
+
+        for ext in counterparts[currext] ? []
+            
+            counter = slash.swapExt @currentFile, ext
+            
+            if currext in ['noon']
+
+                file = @swapLastDir counter, 'kode' 'js'
+                if ○ ffs.fileExists file
+                    post.emit 'loadFile' file
+                    ⮐ true
+                    
+            if currext in ['json']
+                
+                file = @swapLastDir counter, 'js' 'kode'
+                if ○ ffs.fileExists file
+                    post.emit 'loadFile' file
+                    ⮐ true
+
+        log 'cant find counterpart' @currentFile
+        true
+
+    swapLastDir: path from to ->
+
+        lastIndex = path.lastIndexOf "/#{from}/"
+        if lastIndex >= 0
+            path = path[..lastIndex] + to + path[lastIndex+("/#{from}").length..]
+        path
+
+    #  0000000  00000000  000   000  000000000  00000000  00000000
+    # 000       000       0000  000     000     000       000   000
+    # 000       0000000   000 0 000     000     0000000   0000000
+    # 000       000       000  0000     000     000       000   000
+    #  0000000  00000000  000   000     000     00000000  000   000
+
+    centerText: center animate=300 ->
+
+        @size.centerText = center
+        @updateLayers()
+
+        @size.offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
+        if center
+            br        = @view.getBoundingClientRect()
+            visCols   = parseInt br.width / @size.charWidth
+            newOffset = parseInt @size.charWidth * (visCols - 100) / 2
+            @size.offsetX = Math.max @size.offsetX, newOffset
+            @size.centerText = true
+        else
+            @size.centerText = false
+
+        @updateLinePositions animate
+
+        if animate
+            layers = ['.selections' '.highlights' '.cursors']
+            transi = ['.selection'  '.highlight'  '.cursor' ].concat layers
+            resetTrans = =>
+                setStyle '.editor .layers '+l, 'transform' "translateX(0)" for l in layers
+                setStyle '.editor .layers '+t, 'transition' "initial" for t in transi
+                @updateLayers()
+
+            if center
+                offsetX = @size.offsetX - @size.numbersWidth - @size.charWidth/2
+            else
+                offsetX = Math.floor @size.charWidth/2 + @size.numbersWidth
+                offsetX -= @size.numbersWidth + @size.charWidth/2
+                offsetX *= -1
+
+            setStyle '.editor .layers '+l, 'transform' "translateX(#{offsetX}px)" for l in layers
+            setStyle '.editor .layers '+t, 'transition' "all #{animate/1000}s" for t in transi
+            setTimeout resetTrans, animate
+        else
+            @updateLayers()
+
+    # 00000000    0000000   00000000   000   000  00000000
+    # 000   000  000   000  000   000  000   000  000   000
+    # 00000000   000   000  00000000   000   000  00000000
+    # 000        000   000  000        000   000  000
+    # 000         0000000   000         0000000   000
+
+    onContextMenu: event => stopEvent event, @showContextMenu kpos event
+
+    showContextMenu: absPos =>
+
+        if not absPos?
+            absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
+
+        opt = items: [
+            text:   'Browse'
+            combo:  'command+.'
+            cb:     -> window.commandline.startCommand 'browse'
+        ,
+            text:   'Back'
+            combo:  'command+1'
+            cb:     -> post.emit 'menuAction' 'Navigate Backward'
+        ,
+            text:   ''
+        ,
+            text:   'Maximize'
+            combo:  'command+,'
+            cb:     -> window.split.maximizeEditor()
+        ,
+            text:   ''
+        ,
+            text:   'DevTools'
+            combo:  'alt+cmdctrl+i'
+        ,
+            text:   ''
+        ]
+
+        template = clone kakao.menuTemplate
+        opt.items = opt.items.concat template
+        
+        RecentMenu = []
+
+        fileSpan = f ->
+            if f?
+                span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dir(f)), 'browser'
+                span += Syntax.spanForTextAndSyntax '/' + slash.name(f), 'browser'
+            return span
+
+        recent = window.stash.get 'recentFiles' []
+        recent ?= []
+        for f in recent
+            RecentMenu.unshift
+                html: fileSpan f
+                arg: f
+                cb: (arg) -> post.emit 'loadFile' arg
+
+        getMenu = template name ->
+            for item in template
+                if item.text == name
+                    return item
+
+        if RecentMenu.length
+            if fileMenu = getMenu opt.items, 'File'
+                fileMenu.menu = [{text:'Recent' menu:RecentMenu}, {text:''}].concat fileMenu.menu
+
+        opt.x = absPos.x
+        opt.y = absPos.y
+        
+        popup.menu opt
+
+    #  0000000  000      000   0000000  000   000
+    # 000       000      000  000       000  000
+    # 000       000      000  000       0000000
+    # 000       000      000  000       000  000
+    #  0000000  0000000  000   0000000  000   000
+
+    clickAtPos: p event ->
+
+        if event.metaKey
+            if kpos(event).x <= @size.numbersWidth
+                @singleCursorAtPos p
+                ⮐
+
+        super p, event
+
+    # 000   000  00000000  000   000
+    # 000  000   000        000 000
+    # 0000000    0000000     00000
+    # 000  000   000          000
+    # 000   000  00000000     000
+
+    handleModKeyComboCharEvent: mod key combo char event ->
+
+        ⮐ if 'unhandled' != super mod, key, combo, char, event
+        switch combo
+            'alt+ctrl+enter'         ➜ ⮐ window.commandline.commands.coffee.executeText @textOfSelectionForClipboard()
+            'alt+ctrl+shift+enter'   ➜ ⮐ window.commandline.commands.coffee.executeTextInMain @textOfSelectionForClipboardt()            
+            'esc'
+                split = window.split
+                if split.terminalVisible()
+                    split.hideTerminal()
+                else if split.commandlineVisible()
+                    split.hideCommandline()
+                ⮐ 
+        'unhandled'
+
+export FileEditor

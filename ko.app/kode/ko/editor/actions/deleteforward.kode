@@ -1,0 +1,81 @@
+
+# 00000000   0000000   00000000   000   000   0000000   00000000   0000000  
+# 000       000   000  000   000  000 0 000  000   000  000   000  000   000
+# 000000    000   000  0000000    000000000  000000000  0000000    000   000
+# 000       000   000  000   000  000   000  000   000  000   000  000   000
+# 000        0000000   000   000  00     00  000   000  000   000  0000000  
+
+use ../../../kxk ▪ kstr reversed
+
+export
+    
+    actions:
+        menu: 'Delete'
+        
+        deleteForward:
+            name:   'Delete Forward'
+            combo:  'delete'
+            text:   'delete character to the right'
+
+        deleteToEndOfLine:
+            name:   'Delete to End of Line'
+            combo:  'ctrl+shift+k'
+            text:   'delete characters to the end of line'
+            
+        deleteToEndOfLineOrWholeLine:
+            name:   'Delete to End of Line or Delete Whole Line'
+            combo:  'ctrl+k'
+            text:   """delete characters to the end of line, if cursor is not at end of line.
+                delete whole line otherwise.
+                """
+                
+    deleteToEndOfLine: ->
+        
+        @do.start()
+        @moveCursorsToLineBoundary 'right', extend:true
+        @deleteSelection deleteLines:false
+        @do.end()
+        
+    deleteToEndOfLineOrWholeLine: ->
+        
+        cursors = @do.isDoing() and @do.cursors() or @cursors()
+        for c in cursors
+            if c[0] != 0 and not @isCursorAtEndOfLine(c)
+                return @deleteToEndOfLine()
+        
+        @do.start()
+        @selectMoreLines()
+        @deleteSelection deleteLines:true      
+        @do.end()
+
+    deleteForward: ->
+        
+        if @numSelections()
+            @deleteSelection()
+        else
+            @do.start()
+            newCursors = @do.cursors()
+            for c in reversed newCursors
+            
+                if @isCursorAtEndOfLine c # cursor at end of line
+                    if not @isCursorInLastLine c # cursor not in first line
+                    
+                        ll = @line(c[1]).length
+                    
+                        @do.change c[1], @do.line(c[1]) + @do.line(c[1]+1)
+                        @do.delete c[1]+1
+                                    
+                        # move cursors in joined line
+                        for nc in positionsAtLineIndexInPositions c[1]+1, newCursors
+                            cursorDelta nc, ll, -1
+                        # move cursors below deleted line up
+                        for nc in positionsBelowLineIndexInPositions c[1]+1, newCursors
+                            cursorDelta nc, 0, -1
+                else
+                    @do.change c[1], kstr.splice @do.line(c[1]), c[0], 1
+                    for nc in positionsAtLineIndexInPositions c[1], newCursors
+                        if nc[0] > c[0]
+                            cursorDelta nc, -1
+
+            @do.setCursors newCursors
+            @do.end()

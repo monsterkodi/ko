@@ -1,0 +1,105 @@
+###
+000   000   0000000   000      000   000  00000000  00000000 
+000 0 000  000   000  000      000  000   000       000   000
+000000000  000000000  000      0000000    0000000   0000000  
+000   000  000   000  000      000  000   000       000   000
+00     00  000   000  0000000  000   000  00000000  000   000
+###
+
+use ../../kxk ▪ slash ffs 
+
+use ./File
+
+class Walker
+
+    @: (@cfg) ->
+
+        @cfg.files       = []
+        @cfg.maxDepth    ?= 3
+        @cfg.dotFiles    ?= false
+        @cfg.maxFiles    ?= 15000
+        @cfg.ignore      ?= ['node_modules' 'build' 'Build' 'Library' 'Applications'] #, 'resources' 'ThirdParty' 'Binaries' 'Intermediate' 'Saved' 'Programs' 'Shaders' 'DerivedDataCache' 'Content' 'Samples']
+        @cfg.include     ?= ['.konrad.noon' '.gitignore' '.npmignore']
+        @cfg.ignoreExt   ?= ['asar']
+        @cfg.includeExt  ?= File.sourceFileExtensions
+        
+        # log 'Walker' @cfg
+        
+    ignore: (p) -> #log 'ignore' p; true
+      
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000   
+    # 0000000      000     000000000  0000000       000   
+    #      000     000     000   000  000   000     000   
+    # 0000000      000     000   000  000   000     000   
+    
+    start: ○->
+        
+        dir = @cfg.root
+        
+        # log 'Walker.start' dir
+        
+        @running = true
+        
+        toWalk = [dir]
+        
+        while valid toWalk
+            
+            listDir = toWalk.shift()
+            
+            # log 'walk dir' listDir
+        
+            items = ○ ffs.list listDir
+            # log 'Walker items' items
+            
+            for item in items
+                # log 'item' item
+                file = item.file
+                ext = slash.ext file
+                p = item.path
+                
+                if 
+                    @cfg.filter?(p) ➜ @ignore p; continue
+                    file in ['.DS_Store' 'Icon\r'] or ext in ['pyc'] ➜ @ignore p; continue
+                    # @cfg.includeDir? and slash.dir(p) == @cfg.includeDir
+                        # @cfg.files.push item.path
+                        # @ignore p if file in @cfg.ignore
+                        # @ignore p if file.startsWith('.') and not @cfg.dotFiles
+                    file in @cfg.ignore ➜ @ignore p; continue
+                    file in @cfg.include ➜ @cfg.files.push item.path
+                    file.startsWith '.'
+                        if @cfg.dotFiles
+                            @cfg.files.push item.path
+                        else
+                            @ignore p; continue
+                    ext in @cfg.ignoreExt ➜ @ignore p; continue
+                    ext in @cfg.includeExt or @cfg.includeExt.indexOf('') >= 0
+                        @cfg.files.push item.path
+                        
+                @cfg.path item.path if @cfg.path is func
+                
+                if item.type == 'dir'
+                    if @cfg.dir is func
+                        continuer if not @cfg.dir item.path 
+                    toWalk.push item.path
+                    # if cfg.skipDir? item.path
+                        # @ignore p
+                else
+                    if ext in @cfg.includeExt or slash.file(item.path) in @cfg.include or @cfg.includeExt.indexOf('') >= 0
+                        @cfg.file item.path if @cfg.file is func
+                        
+                if @cfg.files.length > @cfg.maxFiles
+                    log 'maxFiles reached'
+                    break
+                    
+        @running = false
+        @cfg.done? @
+        # log 'Walker done' @cfg
+        @cfg
+                
+    stop: ->
+        
+        @running = false
+        @walker = null
+    
+export Walker

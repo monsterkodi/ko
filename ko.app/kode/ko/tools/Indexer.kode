@@ -1,0 +1,411 @@
+###
+000  000   000  0000000    00000000  000   000  00000000  00000000
+000  0000  000  000   000  000        000 000   000       000   000
+000  000 0 000  000   000  0000000     00000    0000000   0000000
+000  000  0000  000   000  000        000 000   000       000   000
+000  000   000  0000000    00000000  000   000  00000000  000   000
+###
+
+use ../../kxk ▪ pickBy pullIf deleteBy sds matchr slash post ffs 
+
+use ◆ Walker IndexHpp IndexJS
+
+class Indexer
+
+    @requireRegExp : /^\s*([\w\{\}]+)\s+=\s+require\s+[\'\"]([\.\/\w]+)[\'\"]/
+    @includeRegExp : /^#include\s+[\"\<]([\.\/\w]+)[\"\>]/
+    @methodRegExp  : /^\s+([\@]?\w+|@)\s*\:\s*(\(?.*\)?)?\s*○?[=-]\>/
+    @funcRegExp    : /^\s*([\w\.]+)\s*[\:\=][^\(\)\'\"]*(\(.*\))?\s*○?[=-]\>/
+    @postRegExp    : /^\s*post\.on\s+[\'\"](\w+)[\'\"]\s*\,?\s*(\(.*\))?\s*[=-]\>/
+    @testRegExp    : /^\s*(▸\s+.+)/
+    @splitRegExp   : new RegExp "[^\\w\\d\\_]+", 'g'
+    @classRegExp   : /^(\s*\S+\s*=)?\s*(class|function)\s+(\w+)/
+
+    @classNameInLine: line ->
+                    
+        m = line.match Indexer.classRegExp
+        m?[3]
+        
+    @methodNameInLine: line ->
+        
+        m = line.match Indexer.methodRegExp
+        if m?
+            rgs = matchr.ranges Indexer.methodRegExp, line
+            if rgs[0].start > 11
+                return null
+        m?[1]
+        
+    @funcNameInLine: line ->
+
+        if m = line.match Indexer.funcRegExp
+            rgs = matchr.ranges Indexer.funcRegExp, line
+            if rgs[0].start > 7
+                return null
+            
+        m?[1]
+
+    @postNameInLine: line ->
+        
+        if m = line.match Indexer.postRegExp
+            rgs = matchr.ranges Indexer.postRegExp, line
+        
+        m?[1]
+        
+    @file: file -> window.indexer.files[file]
+        
+    # 000000000  00000000   0000000  000000000  000   000   0000000   00000000   0000000    
+    #    000     000       000          000     000 0 000  000   000  000   000  000   000  
+    #    000     0000000   0000000      000     000000000  000   000  0000000    000   000  
+    #    000     000            000     000     000   000  000   000  000   000  000   000  
+    #    000     00000000  0000000      000     00     00   0000000   000   000  0000000    
+    
+    @testWord: word ->
+        
+        if
+            word.length < 3                     ➜ false # exclude when too short
+            word[0] in ['-', "#"]               ➜ false
+            word[word.length-1] == '-'          ➜ false 
+            word[0] == '_' and word.length < 4  ➜ false # exclude when starts with underscore and is short
+            /^[0\_\-\@\#]+$/.test word          ➜ false # exclude when consist of special characters only
+            /\d/.test word                      ➜ false # exclude when word contains number
+                                                ➜ true
+        
+    # 000  000   000  0000000    00000000  000   000  00000000  00000000   
+    # 000  0000  000  000   000  000        000 000   000       000   000  
+    # 000  000 0 000  000   000  0000000     00000    0000000   0000000    
+    # 000  000  0000  000   000  000        000 000   000       000   000  
+    # 000  000   000  0000000    00000000  000   000  00000000  000   000  
+    
+    @: ->
+        
+        # post.onGet 'indexer' @onGet
+        # post.on 'sourceInfoForFile' @onSourceInfoForFile
+        
+        post.on 'index' (file) => @indexFile file
+        post.on 'saved' (file) => @indexFile file, refresh: true
+        
+        @imageExtensions = ['png' 'jpg' 'gif' 'tiff' 'pxm' 'icns']        
+
+        @dirs    = {}
+        @files   = {}
+        @classes = {}
+        @funcs   = {}
+        @words   = {}
+        @queue   = []
+        
+    #  0000000   000   000   0000000   00000000  000000000  
+    # 000   000  0000  000  000        000          000     
+    # 000   000  000 0 000  000  0000  0000000      000     
+    # 000   000  000  0000  000   000  000          000     
+    #  0000000   000   000   0000000   00000000     000     
+    
+    onGet: (key, filter...) =>
+        
+        switch key
+            'counts'
+                return
+                    classes: @classes.length ? 0
+                    files:   @files.length   ? 0
+                    funcs:   @funcs.length   ? 0
+                    words:   @words.length   ? 0
+                    dirs:    @dirs.length    ? 0
+            'file'
+                ⮐ @files[filter[0]]
+            'project'
+                ⮐ @projectInfo filter[0]
+        
+        value = @[key]
+        if valid filter
+            
+            names = filter.filter (c) -> valid c
+                        
+            if valid names
+                
+                names = names.map (c) -> c?.toLowerCase()
+                
+                value = pickBy value, (key) ->
+                    for cn in names
+                        lc = key.toLowerCase()
+                        if cn.length>1 and lc.indexOf(cn)>=0 or lc.startsWith(cn)
+                            ⮐ true
+        value
+                
+    #  0000000   0000000    0000000        00000000  000   000  000   000   0000000  
+    # 000   000  000   000  000   000      000       000   000  0000  000  000       
+    # 000000000  000   000  000   000      000000    000   000  000 0 000  000       
+    # 000   000  000   000  000   000      000       000   000  000  0000  000       
+    # 000   000  0000000    0000000        000        0000000   000   000   0000000  
+
+    addFuncInfo: funcName funcInfo ->
+        
+        if not funcName
+            log "addFuncInfo #{funcName}" funcInfo
+        
+        if funcName.length > 1 and funcName.startsWith '@'
+            funcName = funcName.slice 1
+            funcInfo.static = true
+            
+        funcInfo.name = funcName
+        
+        funcInfos = @funcs[funcName] ? []
+        funcInfos = [] if not funcInfos is arr
+        funcInfos.push funcInfo
+        @funcs[funcName] = funcInfos
+        
+        funcInfo
+
+    addMethod: className funcName file li async bound statik ->
+
+        funcInfo = @addFuncInfo funcName,
+            line:   li+1
+            file:   file
+            class:  className
+            async:  async
+            bound:  bound
+            static: statik
+
+        sds.set @classes, "#{className}.methods.#{funcInfo.name}" funcInfo
+        
+        # log 'Index.addMethod' @classes
+
+        funcInfo
+
+    # 00000000   00000000  00     00   0000000   000   000  00000000        00000000  000  000      00000000
+    # 000   000  000       000   000  000   000  000   000  000             000       000  000      000
+    # 0000000    0000000   000000000  000   000   000 000   0000000         000000    000  000      0000000
+    # 000   000  000       000 0 000  000   000     000     000             000       000  000      000
+    # 000   000  00000000  000   000   0000000       0      00000000        000       000  0000000  00000000
+
+    removeFile: file ->
+        
+        return if not @files[file]?
+        
+        for name,infos of @funcs
+            pullIf infos, (v) -> v.file == file
+            delete @funcs[name] if not infos.length
+                    
+        deleteBy @classes, (k,v) -> v.file == file
+        
+        delete @files[file]
+
+    # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
+    # 000  0000  000  000   000  000        000 000         000       000  000      000
+    # 000  000 0 000  000   000  0000000     00000          000000    000  000      0000000
+    # 000  000  0000  000   000  000        000 000         000       000  000      000
+    # 000  000   000  0000000    00000000  000   000        000       000  0000000  00000000
+
+    indexFile: file opt =>
+        
+        # ● indexFile
+        # log 'Indexer.indexFile' file
+        
+        @removeFile file if opt?.refresh
+
+        if @files[file]?
+            post.emit 'fileIndexed' file, @files[file]
+            ⮐ @shiftQueue()
+
+        fileExt = slash.ext file 
+
+        if fileExt in @imageExtensions
+            @files[file] = {}
+            ⮐ @shiftQueue()
+            
+        isCpp = fileExt in ['cpp' 'cc' 'mm' 'c' 'frag' 'vert']
+        isHpp = fileExt in ['hpp' 'h' ]
+        isJS  = fileExt in ['js' 'mjs']
+        
+        ffs.read(file).then (text) =>
+            
+            ⮐ if empty text
+            
+            lines = text.split /\r?\n/
+            
+            fileInfo =
+                lines: lines.length
+                funcs: []
+                classes: []
+                
+            funcAdded = false
+            funcStack = []
+            currentClass = null
+            
+            if isHpp or isCpp
+                
+                indexHpp = new IndexHpp
+                parsed = indexHpp.parse text
+                funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
+                
+                for clss in parsed.classes
+                    
+                    sds.set @classes, "#{clss.name}.file" file
+                    sds.set @classes, "#{clss.name}.line" clss.line+1
+                    
+                    fileInfo.classes.push 
+                        name: clss.name
+                        line: clss.line+1
+                        
+                for func in parsed.funcs
+                    funcInfo = @addMethod func.class, func.method, file, func.line
+                    fileInfo.funcs.push funcInfo
+                    
+            else if isJS
+                
+                indexJS = new IndexJS
+                parsed = indexJS.parse text
+                
+                funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
+                
+                for clss in parsed.classes
+                    
+                    sds.set @classes, "#{clss.name}.file" file
+                    sds.set @classes, "#{clss.name}.line" clss.line+1
+                    
+                    fileInfo.classes.push 
+                        name: clss.name
+                        line: clss.line+1
+                        
+                for func in parsed.funcs
+                    # this is ugly as fuck, consider fixing it!
+                    if func.method
+                        funcInfo = @addMethod func.class, func.method, file, func.line, func.async, func.bound, func.static
+                    else
+                        func.line = func.line+1
+                        func.file = file
+                        funcInfo = @addFuncInfo func.name, func
+                        
+                    fileInfo.funcs.push funcInfo
+                    
+            else
+                
+                # this is essentially the kode indexer. shouldn't that get split off like cpp and js indexers?
+                
+                for li in 0...lines.length
+                    
+                    line = lines[li]
+    
+                    if line.trim().length # ignoring empty lines
+                        
+                        indent = line.search /\S/
+    
+                        while funcStack.length and indent <= last(funcStack)[0]
+                            last(funcStack)[1].last = li - 1
+                            funcInfo = funcStack.pop()[1]
+                            funcInfo.class ?= slash.name file
+                            fileInfo.funcs.push funcInfo 
+    
+                        if currentClass? 
+    
+                            # 00     00  00000000  000000000  000   000   0000000   0000000     0000000
+                            # 000   000  000          000     000   000  000   000  000   000  000
+                            # 000000000  0000000      000     000000000  000   000  000   000  0000000
+                            # 000 0 000  000          000     000   000  000   000  000   000       000
+                            # 000   000  00000000     000     000   000   0000000   0000000    0000000
+    
+                            if methodName = Indexer.methodNameInLine line
+                                funcInfo = @addMethod currentClass, methodName, file, li, line.indexOf('○')>=0, line.indexOf('=>')>=0
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true
+                        else
+        
+                            # 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000   0000000
+                            # 000       000   000  0000  000  000          000     000  000   000  0000  000  000
+                            # 000000    000   000  000 0 000  000          000     000  000   000  000 0 000  0000000
+                            # 000       000   000  000  0000  000          000     000  000   000  000  0000       000
+                            # 000        0000000   000   000   0000000     000     000   0000000   000   000  0000000
+    
+                            currentClass = null if indent < 2 
+    
+                            if funcName = Indexer.funcNameInLine line
+                                funcInfo = @addFuncInfo funcName,
+                                    line: li+1
+                                    file: file
+                                    async: line.indexOf('○')>=0
+    
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true
+
+                            else if funcName = Indexer.postNameInLine line
+                                funcInfo = @addFuncInfo funcName,
+                                    line: li+1
+                                    file: file
+                                    post: true
+    
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true
+                                
+                            m = line.match Indexer.testRegExp
+                            if m?[0]?
+                                funcInfo = @addFuncInfo m[0].replaceAll('▸ ' ''),
+                                    line: li+1
+                                    file: file
+                                    test: m[0].replaceAll '▸ ' ''
+    
+                                funcStack.push [indent, funcInfo]
+                                funcAdded = true
+    
+                    words = line.split Indexer.splitRegExp
+                    
+                    for word in words
+                        
+                        if Indexer.testWord word
+                            cnt = @words[word] ? 0
+                            @words[word] = cnt + 1
+    
+                        switch word
+    
+                            #  0000000  000       0000000    0000000   0000000
+                            # 000       000      000   000  000       000
+                            # 000       000      000000000  0000000   0000000
+                            # 000       000      000   000       000       000
+                            #  0000000  0000000  000   000  0000000   0000000
+                            
+                            'class' 'function'
+                                
+                                if className = Indexer.classNameInLine line
+                                    
+                                    currentClass = className
+                                    sds.set @classes, "#{className}.file" file
+                                    sds.set @classes, "#{className}.line" li+1
+                                    
+                                    fileInfo.classes.push 
+                                        name: className
+                                        line: li+1
+    
+            if funcAdded
+
+                while funcStack.length
+                    last(funcStack)[1].last = li - 1
+                    funcInfo = funcStack.pop()[1]
+                    funcInfo.class ?= slash.name funcInfo.file
+                    funcInfo.class ?= slash.name file
+                    fileInfo.funcs.push funcInfo
+
+                if opt?.post != false
+                    # post.emit 'classesCount' Object.keys(@classes).length
+                    # post.emit 'funcsCount'   Object.keys(@funcs).length
+                    post.emit 'fileIndexed' file, fileInfo
+
+            @files[file] = fileInfo
+            
+            # log 'Indexer' file, fileInfo
+            
+            if opt?.post != false
+                post.emit 'filesCount' Object.keys(@files).length
+
+            @shiftQueue()
+        @
+
+    #  0000000  000   000  000  00000000  000000000  
+    # 000       000   000  000  000          000     
+    # 0000000   000000000  000  000000       000     
+    #      000  000   000  000  000          000     
+    # 0000000   000   000  000  000          000     
+    
+    shiftQueue: =>
+        
+        if @queue.length
+            file = @queue.shift()
+            @indexFile file
+
+export Indexer

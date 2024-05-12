@@ -1,0 +1,206 @@
+###
+ 0000000  00000000   0000000   00000000    0000000  000   000
+000       000       000   000  000   000  000       000   000
+0000000   0000000   000000000  0000000    000       000000000
+     000  000       000   000  000   000  000       000   000
+0000000   00000000  000   000  000   000   0000000  000   000
+###
+
+use ../../kolor/kolor
+use ../../kxk       ▪ ffs kstr post slash matchr
+use ../tools        ◆ Walker Projects
+use ../editor       ◆ Syntax
+use ../commandline  ◆ Command
+
+function Search extends Command
+
+    @: commandline ->
+
+        super commandline
+
+        @names = ['search' 'Search' '/search/' '/Search/']
+
+    historyKey: -> @name
+
+    # 00000000  000   000  00000000   0000000  000   000  000000000  00000000
+    # 000        000 000   000       000       000   000     000     000
+    # 0000000     00000    0000000   000       000   000     000     0000000
+    # 000        000 000   000       000       000   000     000     000
+    # 00000000  000   000  00000000   0000000   0000000      000     00000000
+
+    execute: command ->
+
+        return if not command.length
+        
+        log 'Search.execute command' command
+
+        switch @name
+            '/search/' '/Search/'
+                if command in ['^' '$' '.']
+                    return
+                rngs = matchr.ranges command, '  '
+                if rngs.length == 2
+                    return
+
+        command = super command
+        file = window.editor.currentFile
+
+        return if not file?
+
+        window.terminal.clear()
+
+        dir = Projects.dir(file) ? slash.dir file
+
+        @startSearch
+            dir:  dir
+            text: command
+            name: @name
+
+        focus:  'terminal'
+        show:   'terminal'
+        text:   command
+        select: true
+
+    #  0000000  000000000   0000000   00000000   000000000         0000000  00000000   0000000   00000000    0000000  000   000
+    # 000          000     000   000  000   000     000           000       000       000   000  000   000  000       000   000
+    # 0000000      000     000000000  0000000       000           0000000   0000000   000000000  0000000    000       000000000
+    #      000     000     000   000  000   000     000                000  000       000   000  000   000  000       000   000
+    # 0000000      000     000   000  000   000     000           0000000   00000000  000   000  000   000   0000000  000   000
+
+    startSearch: opt ->
+
+        terminal = window.terminal
+
+        terminal.appendMeta clss:'searchHeader' diss:Syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':" 'ko'
+        terminal.appendMeta clss:'spacer'
+        terminal.singleCursorAtPos [0, terminal.numLines()-2]
+
+        @walker = new Walker
+            root:        opt.dir
+            maxDepth:    12
+            maxFiles:    10000
+            file:        (f) => @searchInFile opt, f
+
+        @walker.cfg.ignore.push 'js'  # these directories are not included in search results
+        @walker.cfg.ignore.push 'lib' # they should be configurable, maybe in package.noon or .konrad.noon?
+        @walker.cfg.ignore.push 'data'
+
+        @walker.start()
+
+    searchInFile: opt file =>
+        # log file, opt.text
+        new FileSearcher @, opt, file
+
+    # 00     00  00000000  000000000   0000000    0000000  000      000   0000000  000   000
+    # 000   000  000          000     000   000  000       000      000  000       000  000
+    # 000000000  0000000      000     000000000  000       000      000  000       0000000
+    # 000 0 000  000          000     000   000  000       000      000  000       000  000
+    # 000   000  00000000     000     000   000   0000000  0000000  000   0000000  000   000
+
+    onMetaClick: meta event =>
+
+        if href = meta[2].href
+    
+            # if href.startsWith '>'
+#     
+                # split = href.split '>'
+                # if window.commandline.commands[split[1]]?
+                    # command = window.commandline.commands[split[1]]
+                    # window.commandline.startCommand split[1]
+                    # window.commandline.setText split[2]
+                    # command.execute split[2]
+            # else
+                if href.indexOf(':') > 0
+                    href += ':' + window.terminal.posForEvent(event)[0]
+                post.emit 'loadFile' href
+
+        'unhandled'
+
+#  0000000  00000000   0000000   00000000    0000000  000   000  00000000  00000000
+# 000       000       000   000  000   000  000       000   000  000       000   000
+# 0000000   0000000   000000000  0000000    000       000000000  0000000   0000000
+#      000  000       000   000  000   000  000       000   000  000       000   000
+# 0000000   00000000  000   000  000   000   0000000  000   000  00000000  000   000
+
+function FileSearcher
+
+    @: @command @opt @file ->
+
+        @line = 0
+        @flags = ''
+        @patterns = switch @opt.name
+            'search'   ➜ [[new RegExp(kstr.escapeRegExp(@opt.text), 'i'), 'found']]
+            'Search'   ➜ [[new RegExp(kstr.escapeRegExp(@opt.text)),      'found']]
+            '/search/' ➜ @flags='i'; @opt.text
+            '/Search/' ➜ @opt.text
+            ➜
+                error "commands/search FileSearcher -- unhandled '#{@opt.name}' command:" @command.name, 'opt:' @opt, 'file:' @file
+                [[new RegExp(kstr.escapeRegExp(@opt.text), 'i'), 'found']]
+
+        @found = []
+        extn = slash.ext @file
+        if extn in Syntax.syntaxNames
+            @syntaxName = extn
+        else
+            @syntaxName = null
+
+        ffs.read(@file).then (text) =>
+
+            return if empty text
+
+            lines = text.split '\n'
+
+            @syntaxName = Syntax.shebang lines[0] if not @syntaxName?
+            for l in lines
+                @line += 1
+                rngs = matchr.ranges @patterns, l, @flags
+                if rngs.length
+                    @found.push [@line, l, rngs]
+
+            @report() if valid @found
+
+    # 00000000   00000000  00000000    0000000   00000000   000000000  
+    # 000   000  000       000   000  000   000  000   000     000     
+    # 0000000    0000000   00000000   000   000  0000000       000     
+    # 000   000  000       000        000   000  000   000     000     
+    # 000   000  00000000  000         0000000   000   000     000     
+    
+    report: =>
+        
+        # log 'report' @found.length
+
+        terminal = window.terminal
+
+        meta =
+            diss:  Syntax.dissForTextAndSyntax "#{slash.tilde @file}" 'ko'
+            href:  @file
+            list:  @file
+            clss:  'gitInfoFile'
+            click: @command.onMetaClick
+            line:  '◼'
+
+        terminal.queueMeta meta
+        terminal.queueMeta clss: 'spacer'
+                
+        for fi in 0...@found.length
+
+            f = @found[fi]
+
+            regions = kolor.dissect([f[1]], @syntaxName)[0]
+            dss = matchr.merge regions, matchr.dissect f[2]
+
+            meta =
+                diss: dss
+                href: "#{@file}:#{f[0]}"
+                clss: 'searchResult'
+                click: @command.onMetaClick
+
+            if fi and @found[fi-1][0] != f[0]-1
+                terminal.queueMeta clss: 'spacer'
+
+            terminal.queueMeta meta
+
+        terminal.queueMeta clss: 'spacer'
+        terminal.scroll.cursorToTop()
+
+export Search

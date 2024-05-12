@@ -1,0 +1,94 @@
+
+# 000  000   000   0000000  00000000  00000000   000000000
+# 000  0000  000  000       000       000   000     000   
+# 000  000 0 000  0000000   0000000   0000000       000   
+# 000  000  0000       000  000       000   000     000   
+# 000  000   000  0000000   00000000  000   000     000   
+
+use ../../../kxk ▪ kstr reversed
+
+export
+    
+    insertCharacter: (ch) ->
+        
+        return @newline() if ch == '\n'
+        return if @salterMode and @insertSalterCharacter ch
+        
+        @do.start()
+        @clampCursorOrFillVirtualSpaces()
+        
+        if valid @surroundCharacters
+            if ch in @surroundCharacters
+                if @insertSurroundCharacter ch
+                    @do.end()
+                    return
+    
+        @deleteSelection()
+
+        newCursors = @do.cursors()
+        
+        for cc in newCursors
+            cline = @do.line cc[1]
+            sline = @twiggleSubstitute cline, cc, ch
+            if sline
+                @do.change cc[1], sline
+            else
+                @do.change cc[1], kstr.splice cline, cc[0], 0, ch
+                for nc in positionsAtLineIndexInPositions cc[1], newCursors
+                    if nc[0] >= cc[0]
+                        nc[0] += 1
+        
+        @do.setCursors newCursors
+        @do.end()
+        @emitEdit 'insert'
+
+    twiggleSubstitute: (line,cursor,char) ->
+        
+        if cursor[0] and line[cursor[0]-1] == '~'
+            
+            substitute = switch char
+                '>' ➜ '▸'
+                '.' ➜ '▶'
+                '<' ➜ '◂'
+                ',' ➜ '◀'
+                'v' ➜ '▾'
+                'V' ➜ '▼'
+                '^' ➜ '▴'
+                '6' ➜ '▲'
+                'd' ➜ '◆'
+                'c' ➜ '●'
+                'o' ➜ '○'
+                'r' ➜ '⮐'
+                's' ➜ '▪'
+                'S' ➜ '■'
+                't' ➜ '➜'
+                'X' ➜ '✘'
+                'O' ➜ '✔'
+                
+            if substitute
+                
+                sub = kstr.splice line, cursor[0]-1, 1, substitute
+                # if char == 'r' ➜ cursor[0]++
+                sub
+    
+    clampCursorOrFillVirtualSpaces: ->
+        
+        @do.start()
+        if @do.numCursors() == 1
+            cursor = @do.cursor 0
+            y = clamp 0, @do.numLines()-1, cursor[1]
+            lineLength = @do.numLines() and @do.line(cursor[1]).length or 0
+            x = clamp 0, lineLength, cursor[0]
+            @do.setCursors [[x,y]]
+        else 
+            @fillVirtualSpaces()
+        @do.end()
+
+    fillVirtualSpaces: -> # fill spaces between line ends and cursors
+                
+        @do.start() 
+        for c in reversed @do.cursors()
+            if c[0] > @do.line(c[1]).length
+                @do.change c[1], kstr.splice @do.line(c[1]), c[0], 0, lpad c[0]-@do.line(c[1]).length
+        @do.end()
+        

@@ -164,7 +164,7 @@ View
 # 00     00  000  000   000  0000000     0000000   00     00
 
 Window
-    Arrange Windows         alt+cmdctrl+a
+    Arrange Windows         alt+cmdctrl+`
     Cycle Windows           cmdctrl+`
     Open Window List        alt+`
     -

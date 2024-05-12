@@ -1,0 +1,508 @@
+###
+00000000  000  000      00000000        0000000    00000000    0000000   000   000   0000000  00000000  00000000
+000       000  000      000             000   000  000   000  000   000  000 0 000  000       000       000   000
+000000    000  000      0000000         0000000    0000000    000   000  000000000  0000000   0000000   0000000
+000       000  000      000             000   000  000   000  000   000  000   000       000  000       000   000
+000       000  0000000  00000000        0000000    000   000   0000000   00     00  0000000   00000000  000   000
+###
+
+use ../../kxk ▪ slash elem drag post util ffs $
+
+use ../tools ◆ File Git FuncItems
+use          ◆ Select Info Browser Shelf
+
+function FileBrowser extends Browser
+
+    @: view ->
+
+        super view
+
+        window.filebrowser = @
+
+        @loadID = 0
+        @shelf  = new Shelf @
+        @select = new Select @
+        @name   = 'FileBrowser'
+        @srcCache = {}
+
+        post.on 'file'           @onFile
+        post.on 'browse'         @browse
+        post.on 'filebrowser'    @onFileBrowser
+
+        post.on 'gitStatus'      @onGitStatus
+        post.on 'fileIndexed'    @onFileIndexed
+        post.on 'dirChanged'     @onDirChanged
+
+        @shelfResize = elem 'div' class: 'shelfResize'
+        @shelfResize.style.position = 'absolute'
+        @shelfResize.style.top      = '0px'
+        @shelfResize.style.bottom   = '0px'
+        @shelfResize.style.left     = '194px'
+        @shelfResize.style.width    = '6px'
+        @shelfResize.style.cursor   = 'ew-resize'
+
+        @drag = new drag
+            target:  @shelfResize
+            onMove:  @onShelfDrag
+
+        @shelfSize = window.stash.get 'shelf|size' 200
+
+        @initColumns()
+
+    # 0000000    00000000    0000000   00000000    0000000    0000000  000000000  000   0000000   000   000
+    # 000   000  000   000  000   000  000   000  000   000  000          000     000  000   000  0000  000
+    # 000   000  0000000    000   000  00000000   000000000  000          000     000  000   000  000 0 000
+    # 000   000  000   000  000   000  000        000   000  000          000     000  000   000  000  0000
+    # 0000000    000   000   0000000   000        000   000   0000000     000     000   0000000   000   000
+
+    dropAction: action sources target ->
+
+        # if slash.isFile target
+            # target = slash.dir target
+
+        for source in sources
+
+            if action == 'move'
+                if source == target or slash.dir(source) == target
+                    log 'noop' source, target
+                    ⮐ 
+
+        for source in sources
+
+            switch action
+                'move' ➜ File.rename source, target
+                'copy' ➜ File.copy source, target
+
+    columnForFile: file ->
+
+        for column in @columns
+            ⮐ column if column.parent?.path == slash.dir file
+
+    # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000
+    # 0000  000  000   000  000   000  000  000        000   000     000     000
+    # 000 0 000  000000000   000 000   000  000  0000  000000000     000     0000000
+    # 000  0000  000   000     000     000  000   000  000   000     000     000
+    # 000   000  000   000      0      000   0000000   000   000     000     00000000
+
+    sharedColumnIndex: file ->
+
+        col = 0
+
+        for column in @columns
+            if column.isDir() and file.startsWith column.path()
+                col += 1
+            else
+                break
+
+        ⮐ 0 if col == 1 and slash.dir(file) != @columns[0]?.path()
+            
+        Math.max -1, col-2
+
+    browse: file opt =>
+
+        log 'FileBrowser.browse' file, opt
+        if file ➜ @loadItem @pathItem(file), opt
+
+    onFile: file =>
+
+        # log 'onFile' file
+        if file and @flex ➜ @navigateToFile file
+
+    navigateToFile: file =>
+
+        # triggered by
+        #     browse.start
+        #     'file' posted from
+        #         fileeditor.setCurrentFile
+        # 
+        # reuses shared columns of current and new path
+
+        lastPath = @lastDirColumn()?.path()
+
+        file = slash.path file
+
+        ⮐ if file == lastPath or file == @lastColumnPath() or slash.isRelative file
+
+        col = @sharedColumnIndex file
+
+        # log 'navigateToFile' file
+
+        filelist = slash.pathlist file
+
+        # log 'navigateToFile' filelist
+
+        if col >= 0
+            paths = filelist.slice filelist.indexOf(@columns[col].path())+1
+        else
+            paths = filelist.slice filelist.length-2
+
+        @clearColumnsFrom col+1, pop:true clear:col+paths.length
+
+        while @numCols() < paths.length ➜ @addColumn()
+
+        for index in 0...paths.length
+
+            if index < paths.length-1
+                item = @dirItem paths[index]
+            else # todo: need to check if last component is actually a file?
+                item = @fileItem paths[index]
+
+            switch item.type
+
+                'file' ➜ @loadFileItem item, col+1+index
+
+                'dir'
+                    opt = {}
+                    if index < paths.length-1
+                        opt.active = paths[index+1]
+                    @loadDirItem item, col+1+index, opt
+
+        if col = @lastDirColumn()
+
+            if row = col.row slash.file file
+                row.setActive()
+
+    refresh: =>
+
+        # hub.refresh()
+        @srcCache = {}
+
+        if @lastUsedColumn()
+            @navigateToFile @lastUsedColumn().path()
+
+    # 000  000000000  00000000  00     00
+    # 000     000     000       000   000
+    # 000     000     0000000   000000000
+    # 000     000     000       000 0 000
+    # 000     000     00000000  000   000
+
+    pathItem: path ->
+
+        p = slash.path path
+        item = slash.parse p
+        item.type = undefined
+        ffs.type(p).then ((i) -> (t) -> i.type = t)(item)
+        item
+
+    fileItem: path ->
+
+        p = slash.path path
+        item = slash.parse p
+        item.type = 'file'
+        item
+
+    dirItem: path ->
+
+        item = slash.parse path
+        item.type = 'dir'
+        item
+
+    onFileBrowser: action item arg =>
+
+        switch action
+            'loadItem'     ➜ @loadItem     item, arg
+            'activateItem' ➜ @activateItem item, arg
+
+    loadDir: path -> @loadItem type:'dir' path:path
+
+    loadItem: item opt ->
+
+        ###
+        triggered by
+            @loadDir
+            @browse
+            @navigate (defined in browser)
+            'filebrowser' 'loadItem' posted from
+                shelf.activateRow
+                shelf.navigatingRows
+                browse.start
+
+        clears all columns, loads the dir in column 0 and the file in column 1, if any
+        ###
+
+        opt ?= active:'..' focus:true
+
+        @clearColumnsFrom 1, pop:true, clear:opt.clear ? 1
+
+        switch item.type
+            'dir'  ➜ @loadDirItem item, 0, opt
+            'file'
+                opt.activate = item.path
+                while @numCols() < 2 then @addColumn()
+                @loadDirItem @fileItem(slash.dir(item.path)), 0, opt
+            ➜
+                ffs.isDir(item.path).then (stat) => if stat then @loadDirItem item, 0, opt
+                return
+
+        if opt.focus
+            @columns[0]?.focus()
+
+    #  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000
+    # 000   000  000          000     000  000   000  000   000     000     000
+    # 000000000  000          000     000   000 000   000000000     000     0000000
+    # 000   000  000          000     000     000     000   000     000     000
+    # 000   000   0000000     000     000      0      000   000     000     00000000
+
+    activateItem: item col ->
+
+        # triggered by post('filebrowser' 'activateItem') in row.activate
+        # loads item in the column to the right of col while keeping the other columns
+
+        @clearColumnsFrom col+2 pop:true
+
+        switch item.type
+            'dir'
+                @loadDirItem  item, col+1, focus:false
+            'file'
+                @loadFileItem item, col+1
+                if item.textFile or File.isText item.path
+                    # log 'FileBrowser emit jumpToFile' item
+                    post.emit 'jumpToFile' item
+
+    # 00000000  000  000      00000000  000  000000000  00000000  00     00
+    # 000       000  000      000       000     000     000       000   000
+    # 000000    000  000      0000000   000     000     0000000   000000000
+    # 000       000  000      000       000     000     000       000 0 000
+    # 000       000  0000000  00000000  000     000     00000000  000   000
+
+    loadFileItem: (item, col=0) ->
+
+        @clearColumnsFrom col, pop:true
+
+        while col >= @numCols()
+            @addColumn()
+
+        file = item.path
+
+        @columns[col].parent = item
+
+        if File.isImage file
+            @imageInfoColumn col, file
+        else
+            if File.isText item.path
+                @loadSourceItem item, col
+            if not File.isCode item.path
+                @fileInfoColumn col, file
+
+        post.emit 'load' col:col, item:item
+
+        @updateColumnScrolls()
+
+    imageInfoColumn: col file ->
+
+        @columns[col].crumb.hide()
+        @columns[col].table.appendChild Info.image file
+
+    fileInfoColumn: col file ->
+        # log 'fileInfoColumn' col, file
+        @columns[col].crumb.hide()
+        @columns[col].table.appendChild Info.file file
+
+    #  0000000   0000000   000   000  00000000    0000000  00000000  000  000000000  00000000  00     00
+    # 000       000   000  000   000  000   000  000       000       000     000     000       000   000
+    # 0000000   000   000  000   000  0000000    000       0000000   000     000     0000000   000000000
+    #      000  000   000  000   000  000   000  000       000       000     000     000       000 0 000
+    # 0000000    0000000    0000000   000   000   0000000  00000000  000     000     00000000  000   000
+
+    onFileIndexed: file info =>
+
+        @srcCache[file] = info
+
+        if file == @lastUsedColumn()?.parent?.file
+            @loadSourceItem { file:file, type:'file' }, @lastUsedColumn()?.index
+
+    loadSourceItem: item col ->
+
+        info = @srcCache[item.path]
+
+        ⮐ if empty info
+
+        items = FuncItems.forIndexerInfo item.path, info
+
+        if valid items
+            @columns[col].loadItems items, item
+
+    # 0000000    000  00000000   000  000000000  00000000  00     00
+    # 000   000  000  000   000  000     000     000       000   000
+    # 000   000  000  0000000    000     000     0000000   000000000
+    # 000   000  000  000   000  000     000     000       000 0 000
+    # 0000000    000  000   000  000     000     00000000  000   000
+
+    onDirChanged: info =>
+
+        for column in @columns
+            if column.path() == info.dir
+                @loadDirItem {path:info.dir, type:'dir'}, column.index, active:column.activePath(), focus:false
+            if column.path() == info.path and info.change == 'remove'
+                column.clear()
+
+    loadDirItem: item col=0 opt={} ○->
+
+        return if col > 0 and item.name == '/'
+
+        dir = item.path
+
+        items =○ ffs.list dir
+
+        if not prefs.get "browser|showHidden|#{dir}"
+            items = items.filter (i) -> i.file[0] != '.'
+
+        items = util.sortBy items, (i) -> i.type + ((i.file[0].toUpperCase()==i.file[0]) ? '-' : '+') + i.file
+
+        @loadDirItems item, items, col, opt
+                
+        true
+
+    loadDirItems: item items col opt =>
+
+        # log 'loadDirItems' item, items, col, opt
+
+        @updateColumnScrolls()
+
+        if @skipOnDblClick and col > 0
+            delete @skipOnDblClick
+            return
+
+        while col >= @numCols()
+            @addColumn()
+
+        @columns[col].loadItems items, item
+
+        post.emit 'load' col:col, item:item
+
+        if opt.activate
+            if row = @columns[col].row slash.file opt.activate
+                row.activate()
+                post.emit 'load' col:col+1 item:row.item
+        else if opt.active
+            @columns[col].row(slash.file opt.active)?.setActive()
+
+        @getGitStatus item, col
+
+        if opt.focus != false and empty(document.activeElement) and empty($('.popup')?.outerHTML)
+            if lastColumn = @lastDirColumn()
+                lastColumn.focus()
+
+        opt.cb? col:col, item:item
+
+        if col >= 2 and @columns[0].width() < 250
+            @columns[1].makeRoot()
+
+        cols = @columns.filter (c) -> c.parent
+        cols = cols.map (c) -> path:c.parent.path, type:c.parent.type
+        kore.set 'browser|columns' cols
+
+    #  0000000   0000000   000      000   000  00     00  000   000   0000000
+    # 000       000   000  000      000   000  000   000  0000  000  000
+    # 000       000   000  000      000   000  000000000  000 0 000  0000000
+    # 000       000   000  000      000   000  000 0 000  000  0000       000
+    #  0000000   0000000   0000000   0000000   000   000  000   000  0000000
+
+    initColumns: ->
+
+        super()
+
+        @view.insertBefore @shelf.div, @view.firstChild
+        @view.insertBefore @shelfResize, null
+
+        @setShelfSize @shelfSize
+
+    columnAtPos: pos ->
+
+        if column = super pos
+            ⮐ column
+
+        if elem.containsPos @shelf.div, pos
+            ⮐ @shelf
+
+    lastColumnPath: ->
+
+        if lastColumn = @lastUsedColumn()
+            ⮐ lastColumn.path()
+
+    lastDirColumn: ->
+
+        if lastColumn = @lastUsedColumn()
+            if lastColumn.isDir()
+                ⮐ lastColumn
+            else
+                ⮐ lastColumn.prevColumn()
+
+    lastDirOrSrcColumn: ->
+
+        if lastColumn = @lastUsedColumn()
+            if lastColumn.isDir() or lastColumn.isSrc()
+                ⮐ lastColumn
+            else
+                ⮐ lastColumn.prevColumn()
+
+    onBackspaceInColumn: column ->
+
+        column.backspaceSearch()
+
+    onDeleteInColumn: column ->
+
+        if column.searchDiv
+            column.clearSearch()
+        else
+            column.moveToTrash()
+
+    updateColumnScrolls: =>
+
+        super()
+        @shelf?.scroll.update()
+
+    #  0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000
+    # 000        000     000     000          000     000   000     000     000   000  000
+    # 000  0000  000     000     0000000      000     000000000     000     000   000  0000000
+    # 000   000  000     000          000     000     000   000     000     000   000       000
+    #  0000000   000     000     0000000      000     000   000     000      0000000   0000000
+
+    getGitStatus: item col =>
+
+        file = item.path ? item.parent?.path
+        if valid file
+            Git.status(file).then (status) => @applyGitStatusFiles col, status.files
+        @
+
+    applyGitStatusFiles: col files =>
+
+        @columns[col]?.updateGitFiles files
+
+    onGitStatus: status =>
+
+        for col in 0...@columns.length
+            @applyGitStatusFiles col, status.files
+        @
+
+    #  0000000  000   000  00000000  000      00000000
+    # 000       000   000  000       000      000
+    # 0000000   000000000  0000000   000      000000
+    #      000  000   000  000       000      000
+    # 0000000   000   000  00000000  0000000  000
+
+    onShelfDrag: drag event =>
+
+        shelfSize = clamp 0 400 drag.pos.x
+        @setShelfSize shelfSize
+
+    setShelfSize: (@shelfSize) ->
+
+        window.stash.set 'shelf|size' @shelfSize
+        @shelfResize.style.left = "#{@shelfSize}px"
+        @shelf.div.style.width = "#{@shelfSize}px"
+        @cols.style.left = "#{@shelfSize}px"
+        @updateColumnScrolls()
+
+    toggleShelf: ->
+
+        if @shelfSize < 1
+            @setShelfSize 200
+        else
+            # log 'toggleShelf lastUsedColumn.focus'
+            @lastUsedColumn()?.focus()
+            @setShelfSize 0
+
+        @updateColumnScrolls()
+
+export FileBrowser

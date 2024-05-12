@@ -1,0 +1,195 @@
+###
+    0000000     0000000    0000000  000000000   0000000   000000000  00000000  
+    000   000  000   000  000          000     000   000     000     000       
+    000   000  000   000  0000000      000     000000000     000     0000000   
+    000   000  000   000       000     000     000   000     000     000       
+    0000000     0000000   0000000      000     000   000     000     00000000  
+###
+
+use ../../kxk ◆ kstr
+use ../editor ◆ DoState
+
+▸ DoState
+
+    # 000  000   000  000  000000000  
+    # 000  0000  000  000     000     
+    # 000  000 0 000  000     000     
+    # 000  000  0000  000     000     
+    # 000  000   000  000     000     
+    
+    ▸ init
+    
+        os = new DoState ['hello' 'world' '!']
+        os.lines() ▸ ['hello' 'world' '!']
+        os.numLines() ▸ 3
+        
+    # 0000000    00000000  000      00000000  000000000  00000000  
+    # 000   000  000       000      000          000     000       
+    # 000   000  0000000   000      0000000      000     0000000   
+    # 000   000  000       000      000          000     000       
+    # 0000000    00000000  0000000  00000000     000     00000000  
+    
+    ▸ delete
+    
+        ds = new DoState os.s
+        
+        ds.deleteLine 1
+        os.lines() ▸ ['hello' 'world' '!']
+        ds.lines() ▸ ['hello' '!']
+        ds.numLines() ▸ 2
+        
+        ds.deleteLine 1
+        os.lines() ▸ ['hello' 'world' '!']        
+        ds.lines() ▸ ['hello']
+        ds.numLines() ▸ 1
+        
+        ds.deleteLine 0
+        os.lines() ▸ ['hello' 'world' '!']        
+        ds.lines() ▸ [] 
+        ds.numLines() ▸ 0
+        
+        ds.deleteLine 0
+        ds.lines() ▸ []  
+        ds.numLines() ▸ 0
+    
+    ▸ delete fail
+        
+        ds = new DoState os.s
+        
+        ds.deleteLine -1
+        ds.lines() ▸ ['hello' 'world']
+        
+        ds.deleteLine -2
+        ds.lines() ▸ ['world']
+
+        ds.deleteLine Infinity
+        ds.lines() ▸ ['world']
+
+        ds.deleteLine -5
+        ds.lines() ▸ ['world']
+        
+    #  0000000  000   000   0000000   000   000   0000000   00000000  
+    # 000       000   000  000   000  0000  000  000        000       
+    # 000       000000000  000000000  000 0 000  000  0000  0000000   
+    # 000       000   000  000   000  000  0000  000   000  000       
+    #  0000000  000   000  000   000  000   000   0000000   00000000  
+    
+    ▸ change
+    
+        cs = new DoState os.s
+        cs.changeLine 1, 'test'
+        os.lines() ▸ ['hello' 'world' '!']        
+        cs.lines() ▸ ['hello' 'test' '!']
+        cs.numLines() ▸ 3
+        
+        cs.changeLine 0, 'good'
+        os.lines() ▸ ['hello' 'world' '!']
+        cs.lines() ▸ ['good' 'test' '!']
+        cs.numLines() ▸ 3
+        
+        cs.changeLine 2, '!!!'
+        os.lines() ▸ ['hello' 'world' '!']
+        cs.lines() ▸ ['good' 'test' '!!!']
+        cs.numLines() ▸ 3
+        
+    # 000  000   000   0000000  00000000  00000000   000000000  
+    # 000  0000  000  000       000       000   000     000     
+    # 000  000 0 000  0000000   0000000   0000000       000     
+    # 000  000  0000       000  000       000   000     000     
+    # 000  000   000  0000000   00000000  000   000     000     
+    
+    ▸ insert
+    
+        cs = new DoState os.s
+        
+        cs.insertLine 1 'new'
+        os.lines() ▸ ['hello' 'world' '!']
+        cs.lines() ▸ ['hello' 'new' 'world' '!']
+        cs.numLines() ▸ 4
+        
+        cs.insertLine 1 'brave'
+        cs.lines() ▸ ['hello' 'brave' 'new' 'world' '!']
+        cs.numLines() ▸ 5
+
+        cs.insertLine 0, 'hi'
+        cs.lines() ▸ ['hi' 'hello' 'brave' 'new' 'world' '!']
+        cs.numLines() ▸ 6
+
+        cs.insertLine -1, '>'
+        cs.lines() ▸ ['hi' 'hello' 'brave' 'new' 'world' '>' '!']
+        cs.numLines() ▸ 7
+
+        cs.insertLine Infinity, '<'
+        cs.lines() ▸ ['hi' 'hello' 'brave' 'new' 'world' '>' '!']
+        cs.numLines() ▸ 7
+        
+        cs.insertLine 7, '<'
+        cs.lines() ▸ ['hi' 'hello' 'brave' 'new' 'world' '>' '!' '<']
+        cs.numLines() ▸ 8
+        
+    #  0000000   00000000   00000000   00000000  000   000  0000000    
+    # 000   000  000   000  000   000  000       0000  000  000   000  
+    # 000000000  00000000   00000000   0000000   000 0 000  000   000  
+    # 000   000  000        000        000       000  0000  000   000  
+    # 000   000  000        000        00000000  000   000  0000000    
+    
+    ▸ append
+    
+        cs = new DoState os.s
+        
+        cs.appendLine 'howdy?'
+        os.lines() ▸ ['hello' 'world' '!']
+        cs.lines() ▸ ['hello' 'world' '!' 'howdy?']
+        cs.numLines() ▸ 4
+        
+    # 000      000  000   000  00000000  
+    # 000      000  0000  000  000       
+    # 000      000  000 0 000  0000000   
+    # 000      000  000  0000  000       
+    # 0000000  000  000   000  00000000  
+    
+    ▸ line
+        
+        is = new DoState os.s
+        is.line 0  ▸ 'hello'
+        is.line 1  ▸ 'world'
+        is.line 2  ▸ '!'
+        is.line 3  ▸ undefined
+        is.line -1 ▸ undefined
+        
+    # 00000000  00     00  00000000   000000000  000   000  
+    # 000       000   000  000   000     000      000 000   
+    # 0000000   000000000  00000000      000       00000    
+    # 000       000 0 000  000           000        000     
+    # 00000000  000   000  000           000        000     
+    
+    ▸ empty
+    
+        es = new DoState []
+        es.numLines() ▸ 0
+        es.text() ▸ ''
+        es.lines() ▸ []
+
+        es = new DoState ['']
+        es.numLines() ▸ 1
+        es.text() ▸ ''
+        es.lines() ▸ ['']
+        
+        es = new DoState()
+        es.numLines() ▸ 0
+        es.text() ▸ ''
+        es.lines() ▸ []
+
+        es.insertLine 0 '!'
+        es.text() ▸ '!'
+        es.numLines() ▸ 1
+
+        es.changeLine 0 '!!!'
+        es.text() ▸ '!!!'
+        es.numLines() ▸ 1
+
+        es.changeLine 0 '!?!'
+        es.text() ▸ '!?!'
+        es.numLines() ▸ 1
+        
+        

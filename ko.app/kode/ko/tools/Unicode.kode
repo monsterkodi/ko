@@ -1,0 +1,88 @@
+###
+000   000  000   000  000   0000000   0000000   0000000    00000000
+000   000  0000  000  000  000       000   000  000   000  000     
+000   000  000 0 000  000  000       000   000  000   000  0000000 
+000   000  000  0000  000  000       000   000  000   000  000     
+ 0000000   000   000  000   0000000   0000000   0000000    00000000
+###
+
+use ../../kxk ▪ post slash ffs noon
+
+function Unicode
+
+    @: ->
+        
+        ffs.read( slash.path ◆dir, '../../../kode/ko/tools/Uniko.txt' ).then (@uniko) =>
+        noon.load(slash.path ◆dir, '../../../kode/ko/tools/Uniko.noon').then (@fonts) =>
+        
+        post.on 'unicode' @onUnicode
+        
+    onUnicode: =>
+        
+        window.split.raise 'terminal'
+        window.split.do 'maximize terminal'
+        window.terminal.clear()
+        window.terminal.singleCursorAtPos [0 0]
+        window.terminal.setFontSize Math.round window.terminal.view.getBoundingClientRect().width / 64
+
+        if false
+            start = 67400
+            for li in 0..42
+                line = ' '
+                for ci in 0..80
+                    line += String.fromCharCode start+ci+80*li
+                    
+                window.terminal.queueMeta
+                    font:  'fontMono'
+                    text:  line
+                    line:  ''
+            
+        if true
+            for line in @uniko.split '\n'
+                window.terminal.queueMeta
+                    text: line
+                    line: '●'
+                    
+        if false
+            fonts = 
+                fontMono:61440 
+                # fontMono:61440 
+                # FontAwesome:61440 
+                # FontAwesomeSolid:61440 
+                # FontAwesomeRegular:61440 
+                # octicons:61440 
+                # Mfizz:61440
+                # 'file-icons':0xe500
+                # Devicons:0xe500
+                    
+            for font,start of fonts
+    
+                window.terminal.queueMeta
+                    list: font
+                    text: font
+                    line: '●'
+                
+                for li in 0..42
+                    line = ' '
+                    for ci in 0..80
+                        line += String.fromCharCode start+ci+80*li
+                        line += ' '
+                    window.terminal.queueMeta
+                        font:  font
+                        text:  line
+                        line:  ''
+                    
+        for font,lines of @fonts
+            
+            window.terminal.queueMeta
+                list: font
+                text: font
+                line: '◆'
+                
+            for line in lines
+                window.terminal.queueMeta
+                    font:  font
+                    text:  '        ' + line
+                    line:  ''
+                                        
+export Unicode

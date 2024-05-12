@@ -1,0 +1,51 @@
+###
+00000000  000   000  000   000   0000000  000  000000000  00000000  00     00   0000000
+000       000   000  0000  000  000       000     000     000       000   000  000     
+000000    000   000  000 0 000  000       000     000     0000000   000000000  0000000 
+000       000   000  000  0000  000       000     000     000       000 0 000       000
+000        0000000   000   000   0000000  000     000     00000000  000   000  0000000 
+###
+
+function FuncItems
+
+    @forIndexerInfo: file info ->
+    
+        items = []
+        clsss = info.classes ? []
+        for clss in clsss
+            text = '● '+clss.name
+            items.push name:clss.name, text:text, type:'class' path:file, line:clss.line
+
+        funcs = info.funcs ? []
+        
+        for func in funcs
+            
+            type = 'func'
+            arr = func.bound ? '=> ' : '-> '
+            
+            if func.test 
+                type = 'test'
+                if func.test == 'describe'
+                    log 'describe still used?'
+                    text = '● '+func.name
+                else
+                    text = '▸ '+func.name
+            else if func.static
+                if func.async
+                    text = '○●'+arr+func.name
+                else
+                    text = ' ●'+arr+func.name
+            else
+                if func.async
+                    text = ' ○'+arr+func.name
+                else
+                    text = '  '+arr+func.name
+                    
+            items.push name:func.name, text:text, type:type, path:file, line:func.line
+
+        if valid items
+            items.sort (a,b) -> a.line - b.line
+            
+        items
+
+export FuncItems
