@@ -6,13 +6,13 @@
    000     00000000  000   000     000           00000000  0000000    000     000      0000000   000   000
 ###
 
-use ../../kxk ▪ profile keyinfo prefs post drag elem stopEvent $
+use ../../kxk ▪ $ profile keyinfo prefs post drag elem stopEvent
 
 use ◆ Do Meta AutoComplete Scrollbar Brackets Numbers Diffbar Minimap Strings Render EditorScroll FuncList FileList Editor
 
 function TextEditor extends Editor
 
-    @: (viewElem, config) ->
+    @: viewElem config ->
 
         name = viewElem
         name = name.slice 1 if name[0] == '.'
@@ -27,7 +27,7 @@ function TextEditor extends Editor
         layer = []
         layer.push 'selections'
         layer.push 'highlights'
-        layer.push 'meta'    if 'Meta' in @config.features
+        layer.push 'meta'    if 'Meta'    in @config.features
         layer.push 'lines'
         layer.push 'cursors'
         layer.push 'numbers' if 'Numbers' in @config.features

@@ -1,5 +1,3 @@
-var _k_
-
 import kxk from "../../kxk.js"
 let kpos = kxk.kpos
 let elem = kxk.elem

@@ -791,32 +791,11 @@ function Column
 
         @crumb.setFile @parent.path
 
-    onContextMenu: event column =>
+    onContextMenu: event =>
 
         stopEvent event
 
-        absPos = kpos event
-
-        if not column
-            @showContextMenu absPos
-        else
-
-            opt = items: [
-                text:   'Root'
-                cb:     @makeRoot
-            ,
-                text:   'Add to Shelf'
-                combo:  'alt+shift+.'
-                cb:     => post.emit 'addToShelf' @parent.path
-            ,
-                text:   'Explorer'
-                combo:  'alt+e'
-                cb:     => open @parent.path
-            ]
-
-            opt.x = absPos.x
-            opt.y = absPos.y
-            popup.menu opt
+        @showContextMenu kpos event
 
     showContextMenu: absPos =>
 
@@ -841,7 +820,7 @@ function Column
             text:   ''
         ,
             text:   'Add to Shelf'
-            combo:  'alt+shift+.'
+            combo:  'alt+shift+s'
             cb:     @addToShelf
         ,
             text:   ''

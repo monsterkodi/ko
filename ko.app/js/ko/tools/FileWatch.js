@@ -1,5 +1,3 @@
-var _k_
-
 import kxk from "../../kxk.js"
 let post = kxk.post
 

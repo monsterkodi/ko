@@ -1,9 +1,11 @@
 ###
- 0000000  00000000    0000000   000   000  000   000
-000       000   000  000   000  000 0 000  0000  000
-0000000   00000000   000000000  000000000  000 0 000
-     000  000        000   000  000   000  000  0000
-0000000   000        000   000  00     00  000   000
+     0000000  00000000    0000000   000   000  000   000
+    000       000   000  000   000  000 0 000  0000  000
+    0000000   00000000   000000000  000000000  000 0 000
+         000  000        000   000  000   000  000  0000
+    0000000   000        000   000  00     00  000   000
+    
+    clones subprojects into their own application folder
 ###
 
 use ../kxk ◆ slash nfs
@@ -27,8 +29,7 @@ export (args) ○->
     
     ⮐ error "parent directory #{tgt} doesn't exist" if not prtExists
     
-    if ○ nfs.exists tgt
-        ○ nfs.remove tgt
+    if ○ nfs.exists tgt ➜ ○ nfs.remove tgt
     
     log b3(''), b5(bundle.path), g3('▸'), g2(tgt)
     
@@ -39,30 +40,52 @@ export (args) ○->
     ○ nfs.copy slash.path(bundle.path, "Contents/Resources/img/#{app}.icns"), slash.path(tgt, 'Contents/Resources/img/app.icns')
     
     ○ nfs.remove slash.path tgt, '.stash'
-    ○ nfs.remove slash.path tgt, 'package.noon'
-    ○ nfs.remove slash.path tgt, 'package.json'
     ○ nfs.remove slash.path tgt, 'Contents/Resources/img/zen.png'
     
     if app != 'ko'
-    
-        ○ nfs.remove slash.path tgt, 'js/ko'
-        ○ nfs.remove slash.path tgt, 'kode/ko'
-        ○ nfs.remove slash.path tgt, 'pyg/ko'
-        ○ nfs.remove slash.path tgt, 'pyg/ko.pug'
-        ○ nfs.remove slash.path tgt, 'js/css/ko'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/img/ko.icns'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/img/ko.png'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/img/ko.pxm'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/img/menu_ko.png'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/menu_ko.noon'
         
+        remove = [
+            'js/ko'
+            'kode/ko'
+            'pyg/ko'
+            'pyg/ko.pug'
+            'js/css/ko'
+            
+            'Contents/Resources/img/ko.icns'
+            'Contents/Resources/img/ko.png'
+            'Contents/Resources/img/ko.pxm'
+            'Contents/Resources/img/menu_ko.png'
+            'Contents/Resources/menu_ko.noon'
+            
+            'Contents/Resources/font/Lilex-Bold.woff2'
+            'Contents/Resources/font/devopicons.woff2'
+            'Contents/Resources/font/fa-regular-400.woff2'
+            'Contents/Resources/font/fa-solid-900.woff2'
+            'Contents/Resources/font/file-icons.woff2'
+            'Contents/Resources/font/fontawesome.woff2'
+            'Contents/Resources/font/mfixx.woff2'
+            'Contents/Resources/font/octicons.woff2'
+            ]
     
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/Lilex-Bold.woff2'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/devopicons.woff2'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/fa-regular-400.woff2'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/fa-solid-900.woff2'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/file-icons.woff2'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/fontawesome.woff2'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/mfixx.woff2'
-        ○ nfs.remove slash.path tgt, 'Contents/Resources/font/octicons.woff2'
+        # ○ nfs.remove slash.path tgt, 'js/ko'
+        # ○ nfs.remove slash.path tgt, 'kode/ko'
+        # ○ nfs.remove slash.path tgt, 'pyg/ko'
+        # ○ nfs.remove slash.path tgt, 'pyg/ko.pug'
+        # ○ nfs.remove slash.path tgt, 'js/css/ko'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/img/ko.icns'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/img/ko.png'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/img/ko.pxm'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/img/menu_ko.png'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/menu_ko.noon'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/Lilex-Bold.woff2'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/devopicons.woff2'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/fa-regular-400.woff2'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/fa-solid-900.woff2'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/file-icons.woff2'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/fontawesome.woff2'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/mfixx.woff2'
+        # ○ nfs.remove slash.path tgt, 'Contents/Resources/font/octicons.woff2'
+        
+        for f in remove
+            ○ nfs.remove slash.path tgt, f
     

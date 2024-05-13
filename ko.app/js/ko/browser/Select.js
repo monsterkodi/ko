@@ -1,5 +1,3 @@
-var _k_
-
 class Select
 {
     constructor (browser)

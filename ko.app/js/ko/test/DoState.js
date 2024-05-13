@@ -1,6 +1,4 @@
 var toExport = {}
-var _k_
-
 var cs, ds, es, is, os
 
 import kstr from "../../kxk/kstr.js"

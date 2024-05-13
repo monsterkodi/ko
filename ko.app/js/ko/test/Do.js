@@ -1,6 +1,4 @@
 var toExport = {}
-var _k_
-
 var d2, d3, doo, lines, text, ts
 
 import Do from "../editor/Do.js"

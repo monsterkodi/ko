@@ -1,6 +1,4 @@
 var toExport = {}
-var _k_
-
 var idx
 
 import IndexJS from "../tools/IndexJS.js"

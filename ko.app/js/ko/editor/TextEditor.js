@@ -3,6 +3,7 @@ var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOw
 var TextEditor
 
 import kxk from "../../kxk.js"
+let $ = kxk.$
 let profile = kxk.profile
 let keyinfo = kxk.keyinfo
 let prefs = kxk.prefs
@@ -10,7 +11,6 @@ let post = kxk.post
 let drag = kxk.drag
 let elem = kxk.elem
 let stopEvent = kxk.stopEvent
-let $ = kxk.$
 
 import Do from "./Do.js"
 import Meta from "./Meta.js"

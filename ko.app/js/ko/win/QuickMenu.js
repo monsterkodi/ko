@@ -1,5 +1,3 @@
-var _k_
-
 var QuickMenu
 
 import kxk from "../../kxk.js"

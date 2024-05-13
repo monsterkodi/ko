@@ -1219,29 +1219,10 @@ Column = (function ()
         return this.crumb.setFile(this.parent.path)
     }
 
-    Column.prototype["onContextMenu"] = function (event, column)
+    Column.prototype["onContextMenu"] = function (event)
     {
-        var absPos, opt
-
         stopEvent(event)
-        absPos = kpos(event)
-        if (!column)
-        {
-            return this.showContextMenu(absPos)
-        }
-        else
-        {
-            opt = {items:[{text:'Root',cb:this.makeRoot},{text:'Add to Shelf',combo:'alt+shift+.',cb:(function ()
-            {
-                return post.emit('addToShelf',this.parent.path)
-            }).bind(this)},{text:'Explorer',combo:'alt+e',cb:(function ()
-            {
-                return open(this.parent.path)
-            }).bind(this)}]}
-            opt.x = absPos.x
-            opt.y = absPos.y
-            return popup.menu(opt)
-        }
+        return this.showContextMenu(kpos(event))
     }
 
     Column.prototype["showContextMenu"] = function (absPos)
@@ -1252,7 +1233,7 @@ Column = (function ()
         {
             absPos = kpos(this.div.getBoundingClientRect().left,this.div.getBoundingClientRect().top)
         }
-        opt = {items:[{text:'Toggle Invisible',combo:'ctrl+i',cb:this.toggleDotFiles},{text:'Toggle Extensions',combo:'ctrl+e',cb:this.toggleExtensions},{text:''},{text:'Explorer',combo:'alt+e',cb:this.explorer},{text:''},{text:'Add to Shelf',combo:'alt+shift+.',cb:this.addToShelf},{text:''},{text:'Delete',combo:'ctrl+backspace',cb:this.moveToTrash},{text:'',hide:this.parent.type === 'file'},{text:'Duplicate',combo:'ctrl+d',cb:this.duplicateFile,hide:this.parent.type === 'file'},{text:'New Folder',combo:'alt+n',cb:this.newFolder,hide:this.parent.type === 'file'}]}
+        opt = {items:[{text:'Toggle Invisible',combo:'ctrl+i',cb:this.toggleDotFiles},{text:'Toggle Extensions',combo:'ctrl+e',cb:this.toggleExtensions},{text:''},{text:'Explorer',combo:'alt+e',cb:this.explorer},{text:''},{text:'Add to Shelf',combo:'alt+shift+s',cb:this.addToShelf},{text:''},{text:'Delete',combo:'ctrl+backspace',cb:this.moveToTrash},{text:'',hide:this.parent.type === 'file'},{text:'Duplicate',combo:'ctrl+d',cb:this.duplicateFile,hide:this.parent.type === 'file'},{text:'New Folder',combo:'alt+n',cb:this.newFolder,hide:this.parent.type === 'file'}]}
         if (this.parent.type !== 'file')
         {
             opt.items = opt.items.concat([{text:''},{text:'Sort',menu:[{text:'By Name',combo:'ctrl+n',cb:this.sortByName},{text:'By Type',combo:'ctrl+t',cb:this.sortByType},{text:'By Date',combo:'ctrl+a',cb:this.sortByDateAdded}]}])
@@ -1278,7 +1259,7 @@ Column = (function ()
 
     Column.prototype["pastePaths"] = async function ()
     {
-        var action, paths, target, text, _912_23_
+        var action, paths, target, text, _891_23_
 
         text = await kakao('clipboard.get')
         paths = text.split('\n')
@@ -1300,7 +1281,7 @@ Column = (function ()
 
     Column.prototype["onKey"] = function (event)
     {
-        var char, combo, key, mod, _949_88_
+        var char, combo, key, mod, _928_88_
 
         mod = keyinfo.forEvent(event).mod
         key = keyinfo.forEvent(event).key

@@ -1,5 +1,3 @@
-var _k_
-
 class Invisibles
 {
     constructor (editor)
