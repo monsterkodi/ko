@@ -17,9 +17,9 @@ export default {actions:{menu:'Delete',deleteForward:{name:'Delete Forward',comb
 
     cursors = this.do.isDoing() && this.do.cursors() || this.cursors()
     var list = _k_.list(cursors)
-    for (var _42_14_ = 0; _42_14_ < list.length; _42_14_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        c = list[_42_14_]
+        c = list[_a_]
         if (c[0] !== 0 && !this.isCursorAtEndOfLine(c))
         {
             return this.deleteToEndOfLine()
@@ -42,9 +42,9 @@ export default {actions:{menu:'Delete',deleteForward:{name:'Delete Forward',comb
         this.do.start()
         newCursors = this.do.cursors()
         var list = _k_.list(reversed(newCursors))
-        for (var _58_18_ = 0; _58_18_ < list.length; _58_18_++)
+        for (var _b_ = 0; _b_ < list.length; _b_++)
         {
-            c = list[_58_18_]
+            c = list[_b_]
             if (this.isCursorAtEndOfLine(c))
             {
                 if (!this.isCursorInLastLine(c))
@@ -53,15 +53,15 @@ export default {actions:{menu:'Delete',deleteForward:{name:'Delete Forward',comb
                     this.do.change(c[1],this.do.line(c[1]) + this.do.line(c[1] + 1))
                     this.do.delete(c[1] + 1)
                     var list1 = _k_.list(positionsAtLineIndexInPositions(c[1] + 1,newCursors))
-                    for (var _69_31_ = 0; _69_31_ < list1.length; _69_31_++)
+                    for (var _c_ = 0; _c_ < list1.length; _c_++)
                     {
-                        nc = list1[_69_31_]
+                        nc = list1[_c_]
                         cursorDelta(nc,ll,-1)
                     }
                     var list2 = _k_.list(positionsBelowLineIndexInPositions(c[1] + 1,newCursors))
-                    for (var _72_31_ = 0; _72_31_ < list2.length; _72_31_++)
+                    for (var _d_ = 0; _d_ < list2.length; _d_++)
                     {
-                        nc = list2[_72_31_]
+                        nc = list2[_d_]
                         cursorDelta(nc,0,-1)
                     }
                 }
@@ -70,9 +70,9 @@ export default {actions:{menu:'Delete',deleteForward:{name:'Delete Forward',comb
             {
                 this.do.change(c[1],kstr.splice(this.do.line(c[1]),c[0],1))
                 var list3 = _k_.list(positionsAtLineIndexInPositions(c[1],newCursors))
-                for (var _76_27_ = 0; _76_27_ < list3.length; _76_27_++)
+                for (var _e_ = 0; _e_ < list3.length; _e_++)
                 {
-                    nc = list3[_76_27_]
+                    nc = list3[_e_]
                     if (nc[0] > c[0])
                     {
                         cursorDelta(nc,-1)

@@ -40,17 +40,17 @@ export default {actions:{cutCopyPaste:{combos:['command+x','ctrl+x','command+c',
     this.do.start()
     newSelections = this.do.selections()
     var list = _k_.list(newSelections)
-    for (var _48_15_ = 0; _48_15_ < list.length; _48_15_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        ns = list[_48_15_]
+        ns = list[_a_]
         insert = lines.shift()
         oldLength = ns[1][1] - ns[1][0]
         this.do.change(ns[0],kstr.splice(this.do.line(ns[0]),ns[1][0],oldLength,insert))
         ldiff = insert.length - oldLength
         var list1 = _k_.list(rangesAfterLineColInRanges(ns[0],ns[1][1],newSelections))
-        for (var _53_19_ = 0; _53_19_ < list1.length; _53_19_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            os = list1[_53_19_]
+            os = list1[_b_]
             os[1][0] += ldiff
             os[1][1] += ldiff
         }
@@ -80,19 +80,19 @@ export default {actions:{cutCopyPaste:{combos:['command+x','ctrl+x','command+c',
     newCursors = this.do.cursors()
     if (newCursors.length > 1 && lines.length === 1)
     {
-        lines = (function () { var r_91_36_ = []; var list = _k_.list(newCursors); for (var _91_36_ = 0; _91_36_ < list.length; _91_36_++)  { c = list[_91_36_];r_91_36_.push(lines[0])  } return r_91_36_ }).bind(this)()
+        lines = (function () { var r_c_ = []; var list = _k_.list(newCursors); for (var _d_ = 0; _d_ < list.length; _d_++)  { c = list[_d_];r_c_.push(lines[0])  } return r_c_ }).bind(this)()
     }
     if (newCursors.length > 1 || (lines.length === 1))
     {
-        for (var _95_23_ = ci = newCursors.length - 1, _95_44_ = 0; (_95_23_ <= _95_44_ ? ci <= 0 : ci >= 0); (_95_23_ <= _95_44_ ? ++ci : --ci))
+        for (var _e_ = ci = newCursors.length - 1, _f_ = 0; (_e_ <= _f_ ? ci <= 0 : ci >= 0); (_e_ <= _f_ ? ++ci : --ci))
         {
             c = newCursors[ci]
             insert = lines[ci % lines.length]
             this.do.change(c[1],kstr.splice(this.do.line(c[1]),c[0],0,insert))
             var list1 = _k_.list(positionsAfterLineColInPositions(c[1],c[0] - 1,newCursors))
-            for (var _99_22_ = 0; _99_22_ < list1.length; _99_22_++)
+            for (var _10_ = 0; _10_ < list1.length; _10_++)
             {
-                c = list1[_99_22_]
+                c = list1[_10_]
                 cursorDelta(c,insert.length)
             }
         }
@@ -104,7 +104,7 @@ export default {actions:{cutCopyPaste:{combos:['command+x','ctrl+x','command+c',
         newCursors = null
         if (cp[0] > 0)
         {
-            var _109_32_ = this.splitStateLineAtPos(this.do,cp); before = _109_32_[0]; after = _109_32_[1]
+            var _11_ = this.splitStateLineAtPos(this.do,cp); before = _11_[0]; after = _11_[1]
 
             after = after.trimLeft()
             indt = _k_.lpad(indentationInLine(this.do.line(cp[1])))
@@ -127,9 +127,9 @@ export default {actions:{cutCopyPaste:{combos:['command+x','ctrl+x','command+c',
             }
         }
         var list2 = _k_.list(lines)
-        for (var _123_21_ = 0; _123_21_ < list2.length; _123_21_++)
+        for (var _12_ = 0; _12_ < list2.length; _12_++)
         {
-            line = list2[_123_21_]
+            line = list2[_12_]
             this.do.insert(li,line)
             li += 1
         }

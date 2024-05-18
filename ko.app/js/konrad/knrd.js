@@ -93,9 +93,9 @@ gatherFiles = async function ()
         var ignore
 
         var list1 = _k_.list(rules.ignore)
-        for (var _95_19_ = 0; _95_19_ < list1.length; _95_19_++)
+        for (var _a_ = 0; _a_ < list1.length; _a_++)
         {
-            ignore = list1[_95_19_]
+            ignore = list1[_a_]
             if (file.endsWith(ignore))
             {
                 return false
@@ -147,14 +147,14 @@ knrd = async function (files = [], opt = {})
     }
     transpiled = 0
     var list = _k_.list(files)
-    for (var _131_13_ = 0; _131_13_ < list.length; _131_13_++)
+    for (var _b_ = 0; _b_ < list.length; _b_++)
     {
-        file = list[_131_13_]
+        file = list[_b_]
         skip = false
         var list1 = _k_.list(rules.ignore)
-        for (var _134_19_ = 0; _134_19_ < list1.length; _134_19_++)
+        for (var _c_ = 0; _c_ < list1.length; _c_++)
         {
-            ignore = list1[_134_19_]
+            ignore = list1[_c_]
             if (file.endsWith(ignore))
             {
                 if (opt.verbose)

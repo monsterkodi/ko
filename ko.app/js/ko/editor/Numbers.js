@@ -38,7 +38,7 @@ class Numbers extends events
 
         this.elem.innerHTML = ''
         this.lineDivs = {}
-        for (var _44_19_ = li = top, _44_24_ = bot; (_44_19_ <= _44_24_ ? li <= bot : li >= bot); (_44_19_ <= _44_24_ ? ++li : --li))
+        for (var _a_ = li = top, _b_ = bot; (_a_ <= _b_ ? li <= bot : li >= bot); (_a_ <= _b_ ? ++li : --li))
         {
             div = this.addLine(li)
             this.emit('numberAdded',{numberDiv:div,numberSpan:div.firstChild,lineIndex:li})
@@ -138,7 +138,7 @@ class Numbers extends events
 
         if (this.editor.scroll.bot > this.editor.scroll.top)
         {
-            for (var _151_23_ = li = this.editor.scroll.top, _151_43_ = this.editor.scroll.bot; (_151_23_ <= _151_43_ ? li <= this.editor.scroll.bot : li >= this.editor.scroll.bot); (_151_23_ <= _151_43_ ? ++li : --li))
+            for (var _a_ = li = this.editor.scroll.top, _b_ = this.editor.scroll.bot; (_a_ <= _b_ ? li <= this.editor.scroll.bot : li >= this.editor.scroll.bot); (_a_ <= _b_ ? ++li : --li))
             {
                 this.updateColor(li)
             }
@@ -157,9 +157,9 @@ class Numbers extends events
         {
             return
         }
-        si = (function () { var r_160_25_ = []; var list = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.selections())); for (var _160_25_ = 0; _160_25_ < list.length; _160_25_++)  { s = list[_160_25_];r_160_25_.push(s[0])  } return r_160_25_ }).bind(this)()
-        hi = (function () { var r_161_25_ = []; var list1 = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.highlights())); for (var _161_25_ = 0; _161_25_ < list1.length; _161_25_++)  { s = list1[_161_25_];r_161_25_.push(s[0])  } return r_161_25_ }).bind(this)()
-        ci = (function () { var r_162_25_ = []; var list2 = _k_.list(rangesFromTopToBotInRanges(li,li,rangesFromPositions(this.editor.cursors()))); for (var _162_25_ = 0; _162_25_ < list2.length; _162_25_++)  { s = list2[_162_25_];r_162_25_.push(s[0])  } return r_162_25_ }).bind(this)()
+        si = (function () { var r_a_ = []; var list = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.selections())); for (var _b_ = 0; _b_ < list.length; _b_++)  { s = list[_b_];r_a_.push(s[0])  } return r_a_ }).bind(this)()
+        hi = (function () { var r_c_ = []; var list1 = _k_.list(rangesFromTopToBotInRanges(li,li,this.editor.highlights())); for (var _d_ = 0; _d_ < list1.length; _d_++)  { s = list1[_d_];r_c_.push(s[0])  } return r_c_ }).bind(this)()
+        ci = (function () { var r_e_ = []; var list2 = _k_.list(rangesFromTopToBotInRanges(li,li,rangesFromPositions(this.editor.cursors()))); for (var _f_ = 0; _f_ < list2.length; _f_++)  { s = list2[_f_];r_e_.push(s[0])  } return r_e_ }).bind(this)()
         cls = ''
         if (_k_.in(li,ci))
         {

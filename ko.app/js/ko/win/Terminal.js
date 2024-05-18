@@ -71,9 +71,9 @@ Terminal = (function ()
         {
             this.appendMeta({clss:'spacer'})
             var list = _k_.list(salt(meta.text).split('\n'))
-            for (var _69_22_ = 0; _69_22_ < list.length; _69_22_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                l = list[_69_22_]
+                l = list[_a_]
                 this.appendMeta({clss:'spacer',text:'# ' + l})
             }
             this.appendMeta({clss:'spacer'})
@@ -107,9 +107,9 @@ Terminal = (function ()
             }
         }
         var list1 = _k_.list(meta.metas)
-        for (var _91_15_ = 0; _91_15_ < list1.length; _91_15_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            mm = list1[_91_15_]
+            mm = list1[_b_]
             this.meta.appendLineMeta(mm)
         }
         return meta

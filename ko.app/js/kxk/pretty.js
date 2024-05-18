@@ -125,7 +125,7 @@ pretty = (function ()
         }
     }
 
-    pretty["path"] = function (p, c = klor.yellow)
+    pretty["path"] = function (p, c = klor.y5)
     {
         return p.split('/').map(function (n)
         {
@@ -133,21 +133,22 @@ pretty = (function ()
         }).join(klor.dim(c('/')))
     }
 
-    pretty["ext"] = function (e, c = klor.yellow)
+    pretty["ext"] = function (e, c = klor.y3)
     {
         return (e.length ? klor.dim(c('.')) + c(e) : '')
     }
 
-    pretty["file"] = function (f, c = klor.yellow)
+    pretty["file"] = function (f, c = klor.y5, e = klor.y3)
     {
-        return `${klor.bold(c(slash.name(f)))}${pretty.ext(slash.ext(f),c)}`
+        return `${klor.bold(c(slash.name(f)))}${pretty.ext(slash.ext(f),e)}`
     }
 
-    pretty["filePath"] = function (p, c = klor.yellow)
+    pretty["filePath"] = function (p, c = klor.y5, d = klor.y3, e)
     {
+        e = (e != null ? e : d)
         if (!_k_.empty(slash.dir(p)))
         {
-            return `${pretty.path(slash.dir(p),c)}${pretty.path('/',c)}${pretty.file(slash.file(p),c)}`
+            return `${pretty.path(slash.tilde(slash.dir(p)),d)}${pretty.path('/',d)}${pretty.file(slash.file(p),c,e)}`
         }
         else
         {
@@ -162,9 +163,9 @@ pretty = (function ()
         result = ''
         plain = ''
         var list = _k_.list(rgs)
-        for (var _143_16_ = 0; _143_16_ < list.length; _143_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            rng = list[_143_16_]
+            rng = list[_a_]
             while (plain.length < rng.start)
             {
                 plain += ' '

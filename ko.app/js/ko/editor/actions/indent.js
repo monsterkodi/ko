@@ -8,20 +8,20 @@ export default {actions:{menu:'Line',indent:{name:'Indent',combo:'alt+cmdctrl+sh
     newSelections = this.do.selections()
     newCursors = this.do.cursors()
     var list = _k_.list(this.selectedAndCursorLineIndices())
-    for (var _25_14_ = 0; _25_14_ < list.length; _25_14_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        i = list[_25_14_]
+        i = list[_a_]
         this.do.change(i,this.indentString + this.do.line(i))
         var list1 = _k_.list(positionsAtLineIndexInPositions(i,newCursors))
-        for (var _27_19_ = 0; _27_19_ < list1.length; _27_19_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            nc = list1[_27_19_]
+            nc = list1[_b_]
             cursorDelta(nc,this.indentString.length)
         }
         var list2 = _k_.list(rangesAtLineIndexInRanges(i,newSelections))
-        for (var _29_19_ = 0; _29_19_ < list2.length; _29_19_++)
+        for (var _c_ = 0; _c_ < list2.length; _c_++)
         {
-            ns = list2[_29_19_]
+            ns = list2[_c_]
             ns[1][0] += this.indentString.length
             ns[1][1] += this.indentString.length
         }
@@ -37,23 +37,23 @@ export default {actions:{menu:'Line',indent:{name:'Indent',combo:'alt+cmdctrl+sh
     newSelections = this.do.selections()
     newCursors = this.do.cursors()
     var list = _k_.list(this.selectedAndCursorLineIndices())
-    for (var _40_14_ = 0; _40_14_ < list.length; _40_14_++)
+    for (var _d_ = 0; _d_ < list.length; _d_++)
     {
-        i = list[_40_14_]
+        i = list[_d_]
         if (this.do.line(i).startsWith(this.indentString))
         {
             this.do.change(i,this.do.line(i).substr(this.indentString.length))
             lineCursors = positionsAtLineIndexInPositions(i,newCursors)
             var list1 = _k_.list(lineCursors)
-            for (var _44_23_ = 0; _44_23_ < list1.length; _44_23_++)
+            for (var _e_ = 0; _e_ < list1.length; _e_++)
             {
-                nc = list1[_44_23_]
+                nc = list1[_e_]
                 cursorDelta(nc,-this.indentString.length)
             }
             var list2 = _k_.list(rangesAtLineIndexInRanges(i,newSelections))
-            for (var _46_23_ = 0; _46_23_ < list2.length; _46_23_++)
+            for (var _f_ = 0; _f_ < list2.length; _f_++)
             {
-                ns = list2[_46_23_]
+                ns = list2[_f_]
                 ns[1][0] -= this.indentString.length
                 ns[1][1] -= this.indentString.length
             }

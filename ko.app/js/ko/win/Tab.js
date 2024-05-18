@@ -67,7 +67,7 @@ class Tab
         diss = Syntax.dissForTextAndSyntax(slash.file(this.path),'ko')
         if (!prefs.get('tabs|extension'))
         {
-            if (!_k_.empty(slash.ext(this.path)))
+            if (!_k_.empty(slash.ext(this.path)) && !_k_.empty(slash.name(this.path)))
             {
                 diss.pop()
                 diss.pop()
@@ -84,11 +84,11 @@ class Tab
             html = ''
             if (this.pinned)
             {
-                html = `<span class="tab-lock"><span class="lock-icon"></span></span>`
+                html = '<span class="tab-lock"><span class="lock-icon"></span></span>'
             }
             else if (this.tmp)
             {
-                html = `<span class="tab-temp"><span class="temp-icon"></span></span>`
+                html = '<span class="tab-temp"><span class="temp-icon"></span></span>'
             }
             this.div.appendChild(elem('span',{class:'tabstate app-drag-region',html:html,click:this.togglePinned}))
         }
@@ -103,9 +103,9 @@ class Tab
             {
                 tabs = this.tabs.fileTabsForPath(this.path)
                 var list = _k_.list(tabs)
-                for (var _96_24_ = 0; _96_24_ < list.length; _96_24_++)
+                for (var _a_ = 0; _a_ < list.length; _a_++)
                 {
-                    tab = list[_96_24_]
+                    tab = list[_a_]
                     dot = elem('span',{class:'prjdot',text:'■'})
                     this.div.appendChild(dot)
                     if (tab.active)
@@ -130,7 +130,7 @@ class Tab
 
     tooltipHtml ()
     {
-        var diss, html, numFiles, _116_16_
+        var diss, html, numFiles, _99_16_
 
         if ((this.path != null))
         {
@@ -148,7 +148,7 @@ class Tab
 
     onGitStatus (status)
     {
-        var t, _137_19_, _137_24_
+        var t, _120_19_, _120_24_
 
         if (status.gitDir !== this.path)
         {

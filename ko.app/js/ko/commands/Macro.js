@@ -5,6 +5,8 @@ var Macro
 import kxk from "../../kxk.js"
 let reversed = kxk.reversed
 let uniq = kxk.uniq
+let clippo = kxk.clippo
+let scooter = kxk.scooter
 let slash = kxk.slash
 let prefs = kxk.prefs
 let post = kxk.post
@@ -23,7 +25,7 @@ import Command from "../commandline/Command.js"
 Macro = (function ()
 {
     _k_.extend(Macro, Command)
-    Macro["macroNames"] = ['clean','help','class','inv','blink','color','fps','status','diff','history','count','sort','case','lower','upper']
+    Macro["macroNames"] = ['clean','help','class','unicode','clippo','inv','blink','color','fps','status','diff','history','count','sort','case','lower','upper']
     function Macro (commandline)
     {
         Macro.__super__.constructor.call(this,commandline)
@@ -52,12 +54,12 @@ Macro = (function ()
         var i, items
 
         items = uniq(reversed(this.history).concat(this.macros))
-        return (function () { var r_54_74_ = []; var list = _k_.list(items); for (var _54_74_ = 0; _54_74_ < list.length; _54_74_++)  { i = list[_54_74_];r_54_74_.push({text:i,line:_k_.in(i,this.macros) && '◼' || '◆',type:'macro'})  } return r_54_74_ }).bind(this)()
+        return (function () { var r_a_ = []; var list = _k_.list(items); for (var _b_ = 0; _b_ < list.length; _b_++)  { i = list[_b_];r_a_.push({text:i,line:_k_.in(i,this.macros) && '◼' || '◆',type:'macro'})  } return r_a_ }).bind(this)()
     }
 
     Macro.prototype["execute"] = function (command, trail)
     {
-        var cleaned, clss, cmds, cmmd, cp, dir, editor, file, helpFile, indent, insert, li, line, lines, lst, num, s, step, t, text, ti, transform, words, wordsInArgsOrCursorsOrSelection, _126_35_, _244_42_
+        var cleaned, clss, cmds, cmmd, cp, dir, editor, file, helpFile, i, indent, insert, l, li, line, lines, lst, num, result, s, step, t, text, ti, transform, words, wordsInArgsOrCursorsOrSelection, _126_35_, _274_42_
 
         if (_k_.empty(command))
         {
@@ -123,7 +125,8 @@ Macro = (function ()
             case 'kd':
             case 'diff':
                 post.emit('git.diff',cmds)
-                break
+                return {select:false}
+
             case 'log':
                 post.emit('git.log',cmds)
                 break
@@ -133,6 +136,32 @@ Macro = (function ()
             case 'ci':
                 post.emit('git.commit',cmds)
                 break
+            case 'pb':
+            case 'paste':
+            case 'clippo':
+                window.split.raise('terminal')
+                window.terminal.clear()
+                var list = _k_.list(reversed(clippo.history))
+                for (var _a_ = 0; _a_ < list.length; _a_++)
+                {
+                    t = list[_a_]
+                    window.terminal.queueMeta({text:'',line:'&nbsp;'})
+                    var list1 = _k_.list(t.split('\n'))
+                    for (i = 0; i < list1.length; i++)
+                    {
+                        l = list1[i]
+                        window.terminal.queueMeta({diss:Syntax.dissForTextAndSyntax(l,'kode'),text:l,clss:'clippoResult',click:(function (t)
+                        {
+                            return function ()
+                            {
+                                return kakao('clipboard.set',t)
+                            }
+                        })(t),line:i + 1})
+                    }
+                }
+                window.terminal.queueMeta({text:'',line:'&nbsp;'})
+                return {focus:'terminal'}
+
             case 'u':
             case 'unicode':
                 post.emit('unicode')
@@ -141,13 +170,11 @@ Macro = (function ()
                 helpFile = slash.path(kakao.bundle.path,'kode/ko/help.noon')
                 ffs.read(helpFile).then(function (text)
                 {
-                    var l
-
                     window.terminal.clear()
-                    var list = _k_.list(text.split('\n'))
-                    for (var _174_26_ = 0; _174_26_ < list.length; _174_26_++)
+                    var list2 = _k_.list(text.split('\n'))
+                    for (var _c_ = 0; _c_ < list2.length; _c_++)
                     {
-                        l = list[_174_26_]
+                        l = list2[_c_]
                         window.terminal.appendLineDiss(l,Syntax.dissForTextAndSyntax(l,'noon'))
                     }
                     window.terminal.scroll.cursorToTop(1)
@@ -163,10 +190,10 @@ Macro = (function ()
                 if (!_k_.empty(lines))
                 {
                     editor.do.start()
-                    var list = _k_.list(lines)
-                    for (var _193_29_ = 0; _193_29_ < list.length; _193_29_++)
+                    var list2 = _k_.list(lines)
+                    for (var _d_ = 0; _d_ < list2.length; _d_++)
                     {
-                        line = list[_193_29_]
+                        line = list2[_d_]
                         if (line.op === 'insert')
                         {
                             editor.do.insert(line.index,line.text)
@@ -195,7 +222,7 @@ Macro = (function ()
                     cmds.shift()
                 }
                 words = wordsInArgsOrCursorsOrSelection(cmds,{include:"#@.-"})
-                for (var _218_27_ = ti = 0, _218_31_ = words.length - lst; (_218_27_ <= _218_31_ ? ti < words.length - lst : ti > words.length - lst); (_218_27_ <= _218_31_ ? ++ti : --ti))
+                for (var _e_ = ti = 0, _f_ = words.length - lst; (_e_ <= _f_ ? ti < words.length - lst : ti > words.length - lst); (_e_ <= _f_ ? ++ti : --ti))
                 {
                     t = words[ti]
                     insert += `${t}:\#{kstr ${t}} `
@@ -204,7 +231,7 @@ Macro = (function ()
                 insert += '"'
                 if (lst)
                 {
-                    insert += (function () { var r_224_61_ = []; for (var _224_65_ = ti = words.length - lst, _224_86_ = words.length; (_224_65_ <= _224_86_ ? ti < words.length : ti > words.length); (_224_65_ <= _224_86_ ? ++ti : --ti))  { r_224_61_.push(`, kstr(${words[ti]})`)  } return r_224_61_ }).bind(this)().join('')
+                    insert += (function () { var r_10_ = []; for (var _11_ = ti = words.length - lst, _12_ = words.length; (_11_ <= _12_ ? ti < words.length : ti > words.length); (_11_ <= _12_ ? ++ti : --ti))  { r_10_.push(`, kstr(${words[ti]})`)  } return r_10_ }).bind(this)().join('')
                 }
                 editor.do.start()
                 editor.do.insert(li,insert)
@@ -218,12 +245,12 @@ Macro = (function ()
                 dir = (editor.currentFile != null) && slash.dir(editor.currentFile) || kakao.bundle.app('kode')
                 file = slash.path(dir,clss + '.kode')
                 text = "###\n"
-                text += (function () { var r_249_33_ = []; var list1 = _k_.list(salt(clss).split('\n')); for (var _249_33_ = 0; _249_33_ < list1.length; _249_33_++)  { s = list1[_249_33_];r_249_33_.push(s)  } return r_249_33_ }).bind(this)().join('\n')
+                text += (function () { var r_13_ = []; var list3 = _k_.list(salt(clss).split('\n')); for (var _14_ = 0; _14_ < list3.length; _14_++)  { s = list3[_14_];r_13_.push(s)  } return r_13_ }).bind(this)().join('\n')
                 text += "\n###\n"
                 text += `
 function ${clss}
 
-    @: () ->
+    @: ->
 
 export ${clss}
 `
@@ -235,7 +262,7 @@ export ${clss}
 
             case 'clean':
                 editor.do.start()
-                for (var _274_27_ = li = 0, _274_31_ = editor.numLines(); (_274_27_ <= _274_31_ ? li < editor.numLines() : li > editor.numLines()); (_274_27_ <= _274_31_ ? ++li : --li))
+                for (var _15_ = li = 0, _16_ = editor.numLines(); (_15_ <= _16_ ? li < editor.numLines() : li > editor.numLines()); (_15_ <= _16_ ? ++li : --li))
                 {
                     line = editor.line(li)
                     cleaned = line.trimRight()
@@ -271,6 +298,16 @@ export ${clss}
             }
             else
             {
+                try
+                {
+                    result = scooter(cmmd)
+                    kakao('clipboard.set',result)
+                    return {select:true,text:result}
+                }
+                catch (err)
+                {
+                    console.log("scooter can't calculate",cmmd)
+                }
                 console.error('unhandled macro',cmmd,transform.transformNames)
                 if (_k_.last(this.history) === command.trim())
                 {

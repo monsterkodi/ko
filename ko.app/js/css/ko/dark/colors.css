@@ -490,12 +490,27 @@ span.macro.macro,
 
 .quickmenu-kalk
 {
-    color: #444;
+    color: #668;
 }
 
 .quickmenu-kalk:hover
 {
+    color: #88a;
+}
+
+.quickmenu-navigate
+{
+    color: #444;
+}
+
+.quickmenu-navigate:hover
+{
     color: #666;
+}
+
+.quickmenu-inactive
+{
+    color: #444;
 }
 
 #browser
@@ -695,6 +710,8 @@ span.macro.macro,
     background-color: #222;
 }
 
+
+.meta.clippoResult,
 .meta.gitInfoFile
 {
     background: #222;
@@ -717,6 +734,11 @@ span.macro.macro,
 .meta.searchResult:hover
 {
     background: #444;
+}
+
+.meta.clippoResult:hover
+{
+    background: #808;
 }
 
 .meta.gitInfoChange
@@ -829,17 +851,17 @@ span.macro.macro,
 }
 
 
-.filelist-item:active,
-.funclist-item:active
-{
-        background-color: #222;
-}
-
-
 .filelist-item.visible,
 .funclist-item.visible
 {
         background-color: #111111;
+}
+
+
+.filelist-item:hover,
+.funclist-item:hover
+{
+        background-color: #222;
 }
 
 

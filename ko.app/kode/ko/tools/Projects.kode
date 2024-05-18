@@ -59,13 +59,13 @@ class Projects
             log 'Projects.indexProject file not a str?' file
             return
             
-        return if file.startsWith 'untitled-'
+        ⮐  if file.startsWith 'untitled-'
         
         # log 'Projects.indexProject ●' file
         
         exists =○ ffs.exists file
         
-        return if not exists
+        ⮐  if not exists
         
         # log 'Projects.indexProject ▪' exists
         
@@ -76,15 +76,14 @@ class Projects
         # log 'Projects.indexProject ▸' prjPath
         
         if @indexing
-            return if @indexing == prjPath
+            ⮐  if @indexing == prjPath
             @queue ?= []
             if prjPath not in @queue
                 @queue.push prjPath
-            return
+            ⮐ 
         
-        if valid @projects[prjPath]
-            return
-              
+        ⮐ if valid @projects[prjPath]
+            
         @indexing = prjPath
         
         walker = new Walker

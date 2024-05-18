@@ -98,10 +98,11 @@ function Open extends Command
             @changed @getText()
             true
         else
-            projects = post.get 'indexer', 'projects'
+            # projects = post.get 'indexer' 'projects'
+            projects = Projects.projects
             for p in Object.keys(projects).sort()
                 if p.startsWith @getText()
-                    pdir = Projects.projects[p].dir
+                    pdir = projects[p].dir
                     # pdir = slash.path(pdir, 'coffee') if slash.dirExists slash.path pdir, 'coffee'
                     @setText pdir + '/'
                     @changed @getText()

@@ -16,15 +16,15 @@ export default {actions:{menu:'Quotes',singleQuotes:{name:'Single',combo:"alt+co
     this.deleteSelection()
     tmpCursors = this.do.cursors()
     var list = _k_.list(tmpCursors)
-    for (var _34_15_ = 0; _34_15_ < list.length; _34_15_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        cc = list[_34_15_]
+        cc = list[_a_]
         cline = this.do.line(cc[1])
         this.do.change(cc[1],cline.splice(cc[0],0,quote))
         var list1 = _k_.list(positionsAtLineIndexInPositions(cc[1],tmpCursors))
-        for (var _37_19_ = 0; _37_19_ < list1.length; _37_19_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            nc = list1[_37_19_]
+            nc = list1[_b_]
             if (nc[0] >= cc[0])
             {
                 nc[0] += 1

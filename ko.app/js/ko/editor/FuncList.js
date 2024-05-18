@@ -67,9 +67,9 @@ FuncList = (function ()
         botLine = topLine + this.editor.numFullLines()
         mainLine = this.editor.mainCursor()[1] + 1
         var list = _k_.list(this.elem.children)
-        for (var _72_18_ = 0; _72_18_ < list.length; _72_18_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            child = list[_72_18_]
+            child = list[_a_]
             lastLine = (child.nextSibling ? child.nextSibling.item.line : this.editor.numLines())
             visible = lastLine - 1 > topLine && child.item.line <= botLine
             child.classList.toggle('visible',visible)
@@ -101,9 +101,9 @@ FuncList = (function ()
             items = FuncItems.forIndexerInfo(file,info)
             this.elem.innerHTML = ''
             var list = _k_.list(items)
-            for (var _108_21_ = 0; _108_21_ < list.length; _108_21_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                item = list[_108_21_]
+                item = list[_a_]
                 e = elem({class:'funclist-item',parent:this.elem,html:Syntax.spanForTextAndSyntax(item.text,'browser')})
                 e.item = item
             }

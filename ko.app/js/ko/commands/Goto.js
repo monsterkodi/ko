@@ -35,17 +35,17 @@ Goto = (function ()
         funcs = (files[window.editor.currentFile] != null ? files[window.editor.currentFile].funcs : undefined)
         funcs = (funcs != null ? funcs : [])
         var list = _k_.list(funcs)
-        for (var _49_17_ = 0; _49_17_ < list.length; _49_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            func = list[_49_17_]
+            func = list[_a_]
             items.push({text:func.name,line:'▸',clss:'method'})
             this.types[func.name] = 'func'
         }
         clsss = window.indexer.classes
         var list1 = _k_.list(Object.keys(clsss))
-        for (var _54_14_ = 0; _54_14_ < list1.length; _54_14_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            k = list1[_54_14_]
+            k = list1[_b_]
             name = k
             items.push({text:k,line:'●',clss:'class'})
             this.types[name] = 'class'

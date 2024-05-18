@@ -44,7 +44,7 @@ class Transform
         }
 
         pad = Number(step * (cs.length - 1) + offset).toString(base).length
-        numbers = (function () { var r_57_77_ = []; for (var _57_81_ = i = 0, _57_85_ = cs.length; (_57_81_ <= _57_85_ ? i < cs.length : i > cs.length); (_57_81_ <= _57_85_ ? ++i : --i))  { r_57_77_.push(_k_.lpad(pad,Number(step * i + offset).toString(base),'0'))  } return r_57_77_ }).bind(this)()
+        numbers = (function () { var r_a_ = []; for (var _b_ = i = 0, _c_ = cs.length; (_b_ <= _c_ ? i < cs.length : i > cs.length); (_b_ <= _c_ ? ++i : --i))  { r_a_.push(_k_.lpad(pad,Number(step * i + offset).toString(base),'0'))  } return r_a_ }).bind(this)()
         this.editor.replaceSelectedText(numbers)
         this.editor.do.end()
         return 'count'
@@ -115,9 +115,9 @@ class Transform
             v = []
             r = []
             var list = _k_.list(l)
-            for (var _109_18_ = 0; _109_18_ < list.length; _109_18_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                a = list[_109_18_]
+                a = list[_a_]
                 _k_.in(a,v) ? r.push('') : v.push(a)
             }
             return r
@@ -155,9 +155,9 @@ class Transform
             var r
 
             var list = _k_.list(matchr.ranges(/\w+/,t))
-            for (var _135_18_ = 0; _135_18_ < list.length; _135_18_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                r = list[_135_18_]
+                r = list[_a_]
                 t = kstr.splice(t,r.start,r.match.length,r.match.substr(0,1).toUpperCase() + r.match.slice(1).toLowerCase())
             }
             return t

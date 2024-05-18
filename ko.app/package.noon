@@ -1,10 +1,5 @@
 name      kakao
 type      module
-notes   
-          kalk   ▸ disable buttons ▸ color buttons (red backspace)
-          clippo ▸ terminal/macro?
-          scooter macro?
-          context menu include quick menu?
 scripts
           stage     pnpm run build0 && pnpm run build1 && pnpm run testage
           build0    node js/kode/kode.js -v kode/kode/*.kode -o js/kode0 && cp js/kode/lexer.json js/kode0

@@ -119,13 +119,14 @@ function pretty
     # 000       000      000        000   000  000  0000       000  000    
     #  0000000  0000000  000        000   000  000   000  0000000   000    
     
-    @path:     p c=klor.yellow -> p.split('/').map((n) -> c(n)).join klor.dim(c('/'))
-    @ext:      e c=klor.yellow -> e.length ? klor.dim(c('.')) + c(e) : ''
-    @file:     f c=klor.yellow -> "#{klor.bold(c(slash.name(f)))}#{pretty.ext(slash.ext(f),c)}"
-    @filePath: p c=klor.yellow ->
+    @path:     p c=klor.y5 -> p.split('/').map((n) -> c(n)).join klor.dim(c('/'))
+    @ext:      e c=klor.y3 -> e.length ? klor.dim(c('.')) + c(e) : ''
+    @file:     f c=klor.y5, e=klor.y3 -> "#{klor.bold(c(slash.name(f)))}#{pretty.ext(slash.ext(f),e)}"
+    @filePath: p c=klor.y5, d=klor.y3, e ->
 
+        e ?= d
         if valid slash.dir p
-            "#{pretty.path(slash.dir(p),c)}#{pretty.path('/',c)}#{pretty.file(slash.file(p),c)}"
+            "#{pretty.path(slash.tilde(slash.dir(p)),d)}#{pretty.path('/',d)}#{pretty.file(slash.file(p),c,e)}"
         else
             "#{pretty.file(slash.file(p),c)}"
 

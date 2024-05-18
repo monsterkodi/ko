@@ -38,6 +38,7 @@ QuickMenu = (function ()
         title = $('title')
         title.parentElement.insertBefore(this.div,title.nextSibling)
         post.on('split',this.updateIcons)
+        post.on('list.toggle',this.updateIcons)
     }
 
     QuickMenu.prototype["onBrowser"] = function ()
@@ -81,7 +82,8 @@ QuickMenu = (function ()
     QuickMenu.prototype["updateIcons"] = function ()
     {
         $(".quickmenu-browser").innerHTML = (split.browserVisible() ? '' : '')
-        return $(".quickmenu-terminal").innerHTML = (split.terminalVisible() ? '' : '')
+        $(".quickmenu-terminal").innerHTML = (split.terminalVisible() ? '' : '')
+        return $(".quickmenu-list").classList.toggle('quickmenu-inactive',!prefs.get('list|active'))
     }
 
     return QuickMenu

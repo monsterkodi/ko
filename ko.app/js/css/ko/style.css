@@ -888,6 +888,17 @@ body
     padding-top: 2px;
 }
 
+.popup .quickmenu-item
+{
+    width: 29.5px;
+    padding-top: 3px;
+}
+
+.popup .quickmenu-item:active
+{
+    padding-top: 5px;
+}
+
 #browser
 {
     font-family: titlebarFont;
@@ -1100,7 +1111,9 @@ body
 
 
 
+
 .meta.gitInfoFile,
+.meta.clippoResult,
 .meta.termCommand,
 .meta.coffeeCommand,
 .meta.searchResult
@@ -1239,6 +1252,7 @@ body
     bottom: 0;
     right: 130px;
     min-width: 130px;
+    max-width: 260px;
     padding-top: 6px;
     padding-bottom: 6px;
     font-size: 16px;
@@ -1251,6 +1265,7 @@ body
 .filelist-item,
 .funclist-item
 {
+    white-space: nowrap;
     pointer-events: auto;
     padding-left: 10px;
     padding-right: 6px;

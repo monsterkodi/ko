@@ -350,13 +350,21 @@ span.macro
         
 .quickmenu-devtools
     color               #800
-    &:hover               
+    &:hover
         color           #a00
 
 .quickmenu-kalk
+    color               #668
+    &:hover
+        color           #88a
+
+.quickmenu-navigate
     color               #444
     &:hover               
         color           #666
+        
+.quickmenu-inactive
+    color               #444
         
 // 0000000    00000000    0000000   000   000   0000000  00000000  00000000   
 // 000   000  000   000  000   000  000 0 000  000       000       000   000  
@@ -490,6 +498,7 @@ span.macro
     &.href
         background-color    titleColor
 
+    &.clippoResult
     &.gitInfoFile
         background          titleColor
         opacity             0.5
@@ -505,6 +514,9 @@ span.macro
     &.searchResult:hover
             background      textBlurColor
 
+    &.clippoResult:hover
+        background          #808
+            
     &.gitInfoChange
         border-bottom       3px solid #060
         
@@ -577,14 +589,14 @@ span.macro
     &:hover    
         background-color        bgColor
 
-.filelist-item:active
-.funclist-item:active
-        background-color        titleColor
-        
 .filelist-item.visible
 .funclist-item.visible
         background-color        frameColor
 
+.filelist-item:hover
+.funclist-item:hover
+        background-color        titleColor
+        
 .filelist-item.inside
 .funclist-item.inside
         background-color        scrollColor

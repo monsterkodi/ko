@@ -28,11 +28,11 @@ export default {actions:{menu:'Line',moveLinesUp:{name:'Move Lines Up',combo:'al
     newCursors = this.do.cursors()
     newSelections = this.do.selections()
     var list = _k_.list(csr.reverse())
-    for (var _38_14_ = 0; _38_14_ < list.length; _38_14_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        r = list[_38_14_]
+        r = list[_a_]
         ls = []
-        for (var _40_23_ = li = r[0], _40_29_ = r[1]; (_40_23_ <= _40_29_ ? li <= r[1] : li >= r[1]); (_40_23_ <= _40_29_ ? ++li : --li))
+        for (var _b_ = li = r[0], _c_ = r[1]; (_b_ <= _c_ ? li <= r[1] : li >= r[1]); (_b_ <= _c_ ? ++li : --li))
         {
             ls.push(this.do.line(li))
         }
@@ -48,21 +48,21 @@ export default {actions:{menu:'Line',moveLinesUp:{name:'Move Lines Up',combo:'al
                 break
         }
 
-        for (var _47_22_ = i = 0, _47_26_ = ls.length; (_47_22_ <= _47_26_ ? i < ls.length : i > ls.length); (_47_22_ <= _47_26_ ? ++i : --i))
+        for (var _d_ = i = 0, _e_ = ls.length; (_d_ <= _e_ ? i < ls.length : i > ls.length); (_d_ <= _e_ ? ++i : --i))
         {
             this.do.change(si + i,ls[i])
         }
     }
     var list1 = _k_.list(newSelections)
-    for (var _50_15_ = 0; _50_15_ < list1.length; _50_15_++)
+    for (var _f_ = 0; _f_ < list1.length; _f_++)
     {
-        ns = list1[_50_15_]
+        ns = list1[_f_]
         ns[0] += d
     }
     var list2 = _k_.list(newCursors)
-    for (var _53_15_ = 0; _53_15_ < list2.length; _53_15_++)
+    for (var _10_ = 0; _10_ < list2.length; _10_++)
     {
-        nc = list2[_53_15_]
+        nc = list2[_10_]
         cursorDelta(nc,0,d)
     }
     this.do.select(newSelections)

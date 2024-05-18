@@ -50,9 +50,9 @@ Unicode = (function ()
         if (true)
         {
             var list = _k_.list(this.uniko.split('\n'))
-            for (var _41_21_ = 0; _41_21_ < list.length; _41_21_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                line = list[_41_21_]
+                line = list[_a_]
                 window.terminal.queueMeta({text:line,line:'●'})
             }
         }
@@ -80,9 +80,9 @@ Unicode = (function ()
             lines = this.fonts[font]
             window.terminal.queueMeta({list:font,text:font,line:'◆'})
             var list1 = _k_.list(lines)
-            for (var _82_21_ = 0; _82_21_ < list1.length; _82_21_++)
+            for (var _b_ = 0; _b_ < list1.length; _b_++)
             {
-                line = list1[_82_21_]
+                line = list1[_b_]
                 window.terminal.queueMeta({font:font,text:'        ' + line,line:''})
             }
         }

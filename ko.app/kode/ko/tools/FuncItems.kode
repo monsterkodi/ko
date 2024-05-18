@@ -20,6 +20,10 @@ function FuncItems
         
         for func in funcs
             
+            if empty func
+                log 'empty func' funcs
+                continue 
+            
             type = 'func'
             arr = func.bound ? '=> ' : '-> '
             

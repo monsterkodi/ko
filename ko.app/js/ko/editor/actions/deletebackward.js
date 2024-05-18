@@ -99,9 +99,9 @@ export default {actions:{menu:'Delete',deleteBackward:{name:'Delete Backward',co
         }).bind(this))))
     }
     var list = _k_.list(reversed(newCursors))
-    for (var _80_14_ = 0; _80_14_ < list.length; _80_14_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        c = list[_80_14_]
+        c = list[_a_]
         if (c[0] === 0)
         {
             if ((opt != null ? opt.ignoreLineBoundary : undefined) || this.do.numCursors() === 1)
@@ -112,15 +112,15 @@ export default {actions:{menu:'Delete',deleteBackward:{name:'Delete Backward',co
                     this.do.change(c[1] - 1,this.do.line(c[1] - 1) + this.do.line(c[1]))
                     this.do.delete(c[1])
                     var list1 = _k_.list(positionsAtLineIndexInPositions(c[1],newCursors))
-                    for (var _88_31_ = 0; _88_31_ < list1.length; _88_31_++)
+                    for (var _b_ = 0; _b_ < list1.length; _b_++)
                     {
-                        nc = list1[_88_31_]
+                        nc = list1[_b_]
                         cursorDelta(nc,ll,-1)
                     }
                     var list2 = _k_.list(positionsBelowLineIndexInPositions(c[1],newCursors))
-                    for (var _91_31_ = 0; _91_31_ < list2.length; _91_31_++)
+                    for (var _c_ = 0; _c_ < list2.length; _c_++)
                     {
-                        nc = list2[_91_31_]
+                        nc = list2[_c_]
                         cursorDelta(nc,0,-1)
                     }
                 }
@@ -144,9 +144,9 @@ export default {actions:{menu:'Delete',deleteBackward:{name:'Delete Backward',co
             }
             this.do.change(c[1],kstr.splice(this.do.line(c[1]),c[0] - n,n))
             var list3 = _k_.list(positionsAtLineIndexInPositions(c[1],newCursors))
-            for (var _103_23_ = 0; _103_23_ < list3.length; _103_23_++)
+            for (var _d_ = 0; _d_ < list3.length; _d_++)
             {
-                nc = list3[_103_23_]
+                nc = list3[_d_]
                 if (nc[0] >= c[0])
                 {
                     cursorDelta(nc,-n)

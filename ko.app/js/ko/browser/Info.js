@@ -31,9 +31,9 @@ image = function (file)
 
         img.style.opacity = '1'
         info = await ffs.info(file)
-        var _35_26_ = pretty.bytes(info.size).split(' '); size = _35_26_[0]; size_unit = _35_26_[1]
+        var _a_ = pretty.bytes(info.size).split(' '); size = _a_[0]; size_unit = _a_[1]
 
-        var _36_26_ = pretty.age(info.modified).split(' '); time = _36_26_[0]; time_unit = _36_26_[1]
+        var _b_ = pretty.age(info.modified).split(' '); time = _b_[0]; time_unit = _b_[1]
 
         return table.innerHTML = `<tr class='fileRow'><th colspan=2><div class='fileInfoFile ${slash.ext(file)}'>${File.span(file)}</div></th></tr><tr class='dataRow'><th>${size}</th><td>${size_unit}</td></tr><tr class='dataRow'><th>${time}</th><td>${time_unit}</td></tr>`
     }
@@ -55,9 +55,9 @@ file = function (file)
             return console.error(`file ${file} doesn't exist?`)
         }
         info = await ffs.info(file)
-        var _60_26_ = pretty.bytes(info.size).split(' '); size = _60_26_[0]; size_unit = _60_26_[1]
+        var _c_ = pretty.bytes(info.size).split(' '); size = _c_[0]; size_unit = _c_[1]
 
-        var _61_26_ = pretty.age(info.modified).split(' '); time = _61_26_[0]; time_unit = _61_26_[1]
+        var _d_ = pretty.age(info.modified).split(' '); time = _d_[0]; time_unit = _d_[1]
 
         return table.innerHTML = `<tr class='dataRow'><th>${size}</th><td>${size_unit}</td></tr><tr class='dataRow'><th>${time}</th><td>${time_unit}</td></tr>`
     })

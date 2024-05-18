@@ -13,7 +13,7 @@ class Render
         l = ""
         if ((diss != null ? diss.length : undefined))
         {
-            for (var _23_22_ = di = diss.length - 1, _23_37_ = 0; (_23_22_ <= _23_37_ ? di <= 0 : di >= 0); (_23_22_ <= _23_37_ ? ++di : --di))
+            for (var _a_ = di = diss.length - 1, _b_ = 0; (_a_ <= _b_ ? di <= 0 : di >= 0); (_a_ <= _b_ ? ++di : --di))
             {
                 d = diss[di]
                 tx = d.start * ((_25_45_=opt.charWidth) != null ? _25_45_ : 0)
@@ -52,9 +52,9 @@ class Render
         cx = 0
         ds = 0
         var list = (diss != null ? diss : [])
-        for (var _51_14_ = 0; _51_14_ < list.length; _51_14_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            d = list[_51_14_]
+            d = list[_a_]
             cx += (d.start - ds) * size.charWidth
             cf = cx.toFixed(1)
             span = elem('span')
@@ -69,9 +69,9 @@ class Render
             if ((d.styl != null))
             {
                 var list1 = _k_.list(d.styl.split(';'))
-                for (var _66_23_ = 0; _66_23_ < list1.length; _66_23_++)
+                for (var _b_ = 0; _b_ < list1.length; _b_++)
                 {
-                    st = list1[_66_23_]
+                    st = list1[_b_]
                     ss = st.split(':')
                     span.style[ss[0]] = ss[1]
                 }
@@ -89,9 +89,9 @@ class Render
         h = ""
         lh = size.lineHeight
         var list = _k_.list(cs)
-        for (var _84_14_ = 0; _84_14_ < list.length; _84_14_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            c = list[_84_14_]
+            c = list[_a_]
             tx = size.xOffsetAtCharacterInLine(c[0],c[1] + top)
             ty = c[1] * lh
             cls = ""
@@ -113,7 +113,7 @@ class Render
         h = ""
         p = null
         n = null
-        for (var _105_18_ = si = 0, _105_22_ = ss.length; (_105_18_ <= _105_22_ ? si < ss.length : si > ss.length); (_105_18_ <= _105_22_ ? ++si : --si))
+        for (var _a_ = si = 0, _b_ = ss.length; (_a_ <= _b_ ? si < ss.length : si > ss.length); (_a_ <= _b_ ? ++si : --si))
         {
             s = ss[si]
             n = (si < ss.length - 1) && (ss[si + 1][0] === s[0] + 1) && ss[si + 1] || null

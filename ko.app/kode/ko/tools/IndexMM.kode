@@ -1,0 +1,60 @@
+###
+000  000   000  0000000    00000000  000   000        00     00  00     00  
+000  0000  000  000   000  000        000 000         000   000  000   000  
+000  000 0 000  000   000  0000000     00000          000000000  000000000  
+000  000  0000  000   000  000        000 000         000 0 000  000 0 000  
+000  000   000  0000000    00000000  000   000        000   000  000   000  
+###
+
+use ../../kxk ▪ kermit
+
+class IndexMM
+
+    # 00000000    0000000   00000000    0000000  00000000       000      000  000   000  00000000
+    # 000   000  000   000  000   000  000       000            000      000  0000  000  000
+    # 00000000   000000000  0000000    0000000   0000000        000      000  000 0 000  0000000
+    # 000        000   000  000   000       000  000            000      000  000  0000  000
+    # 000        000   000  000   000  0000000   00000000       0000000  000  000   000  00000000
+    
+    parseLine: index line ->
+                
+        ⮐ if line.startsWith ' '
+            
+        if match = kermit.lineMatch line, '@implementation ●name' or\
+           match = kermit.lineMatch line, '@interface ●name'
+            match.type = 'class'
+            match.line = index
+            @result.classes.push match
+            ⮐ 
+
+        if line[0] in '+-'
+            name = trim(line[1..]).split(/[\:\;\{]/)[0].split(')')[-1]
+            if empty name
+                log 'no name?' line
+                ⮐ 
+            if valid @result.classes
+                fnc = method:name, line:index, class:@result.classes[-1].name
+                fnc.static = true if line[0] == '+'
+            else
+                fnc = name:name, line:index
+            @result.funcs.push fnc
+            ⮐
+
+    # 00000000    0000000   00000000    0000000  00000000       000000000  00000000  000   000  000000000
+    # 000   000  000   000  000   000  000       000               000     000        000 000      000
+    # 00000000   000000000  0000000    0000000   0000000           000     0000000     00000       000
+    # 000        000   000  000   000       000  000               000     000        000 000      000
+    # 000        000   000  000   000  0000000   00000000          000     00000000  000   000     000
+
+    parse: text ->
+        
+        lines = text.split '\n'
+
+        @result = classes:[], funcs:[], lines:lines.length
+        
+        for lineText,lineIndex in lines
+            @parseLine lineIndex, lineText
+
+        @result
+
+export IndexMM

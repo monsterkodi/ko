@@ -174,9 +174,9 @@ FileSearcher = (function ()
                 this.syntaxName = Syntax.shebang(lines[0])
             }
             var list = _k_.list(lines)
-            for (var _154_18_ = 0; _154_18_ < list.length; _154_18_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                l = list[_154_18_]
+                l = list[_a_]
                 this.line += 1
                 rngs = matchr.ranges(this.patterns,l,this.flags)
                 if (rngs.length)
@@ -199,7 +199,7 @@ FileSearcher = (function ()
         meta = {diss:Syntax.dissForTextAndSyntax(`${slash.tilde(this.file)}`,'ko'),href:this.file,list:this.file,clss:'gitInfoFile',click:this.command.onMetaClick,line:'◼'}
         terminal.queueMeta(meta)
         terminal.queueMeta({clss:'spacer'})
-        for (var _185_18_ = fi = 0, _185_22_ = this.found.length; (_185_18_ <= _185_22_ ? fi < this.found.length : fi > this.found.length); (_185_18_ <= _185_22_ ? ++fi : --fi))
+        for (var _a_ = fi = 0, _b_ = this.found.length; (_a_ <= _b_ ? fi < this.found.length : fi > this.found.length); (_a_ <= _b_ ? ++fi : --fi))
         {
             f = this.found[fi]
             regions = kolor.dissect([f[1]],this.syntaxName)[0]

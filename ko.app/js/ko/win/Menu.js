@@ -15,9 +15,9 @@ getMenu = function (template, name)
     var item
 
     var list = _k_.list(template)
-    for (var _15_13_ = 0; _15_13_ < list.length; _15_13_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        item = list[_15_13_]
+        item = list[_a_]
         if (item.text === name)
         {
             return item
@@ -83,9 +83,9 @@ Menu = function (template)
     editMenu.menu = editMenu.menu.concat(EditMenu)
     MacroMenu = [{text:'Macro',combo:'command+m',command:'macro'}]
     var list = _k_.list(Macro.macroNames)
-    for (var _57_14_ = 0; _57_14_ < list.length; _57_14_++)
+    for (var _b_ = 0; _b_ < list.length; _b_++)
     {
-        macro = list[_57_14_]
+        macro = list[_b_]
         MacroMenu.push({text:macro})
     }
     commandMenu = getMenu(template,'Command')
@@ -99,9 +99,9 @@ Menu = function (template)
             transformList = transform.Transform.transformMenus[transformMenu]
             transformSubmenu = []
             var list1 = _k_.list(transformList)
-            for (var _69_30_ = 0; _69_30_ < list1.length; _69_30_++)
+            for (var _c_ = 0; _c_ < list1.length; _c_++)
             {
-                transformText = list1[_69_30_]
+                transformText = list1[_c_]
                 transformSubmenu.push({text:transformText,action:'doTransform'})
             }
             TransformMenu.push({text:transformMenu,menu:transformSubmenu})

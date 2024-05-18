@@ -23,9 +23,9 @@ CommandLine = (function ()
 
         files = await ffs.list(slash.path(_k_.dir(),'../commands'))
         var list = _k_.list(files)
-        for (var _28_17_ = 0; _28_17_ < list.length; _28_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            file = list[_28_17_]
+            file = list[_a_]
             if (!(_k_.in(slash.ext(file.path),['js','mjs'])))
             {
                 continue
@@ -325,15 +325,15 @@ CommandLine = (function ()
         this.list.innerHTML = ""
         this.list.style.display = 'unset'
         var list = _k_.list(this.mainCommands)
-        for (var _260_17_ = 0; _260_17_ < list.length; _260_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            name = list[_260_17_]
+            name = list[_a_]
             cmmd = this.commands[name]
             if (_k_.empty(cmmd))
             {
                 continue
             }
-            for (var _264_22_ = ci = 0, _264_26_ = cmmd.names.length; (_264_22_ <= _264_26_ ? ci < cmmd.names.length : ci > cmmd.names.length); (_264_22_ <= _264_26_ ? ++ci : --ci))
+            for (var _b_ = ci = 0, _c_ = cmmd.names.length; (_b_ <= _c_ ? ci < cmmd.names.length : ci > cmmd.names.length); (_b_ <= _c_ ? ++ci : --ci))
             {
                 cname = cmmd.names[ci]
                 if (_k_.in(cname,this.hideCommands))

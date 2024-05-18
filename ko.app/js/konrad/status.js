@@ -42,9 +42,9 @@ report = async function (status, opt = {})
                 c = _k_.w2('●')
                 start = 0
                 var list = _k_.list(res.split(/\r?\n/))
-                for (var _48_23_ = 0; _48_23_ < list.length; _48_23_++)
+                for (var _a_ = 0; _a_ < list.length; _a_++)
                 {
-                    ls = list[_48_23_]
+                    ls = list[_a_]
                     if (_k_.in(ls.substr(0,4),['+++ ','--- ']))
                     {
                     }
@@ -92,9 +92,9 @@ report = async function (status, opt = {})
     gitPath = pretty.filePath(relPath,klor.w5)
     console.log(_k_.B5('    ' + gitPath + ' ') + ' ')
     var list1 = _k_.list(changes)
-    for (var _97_10_ = 0; _97_10_ < list1.length; _97_10_++)
+    for (var _b_ = 0; _b_ < list1.length; _b_++)
     {
-        c = list1[_97_10_]
+        c = list1[_b_]
         console.log(c)
     }
 }
@@ -135,13 +135,13 @@ parseStatus = function (gitStatus, gitDir)
     })
     list = ['deleted','created','changed']
     var list1 = _k_.list(list)
-    for (var _134_12_ = 0; _134_12_ < list1.length; _134_12_++)
+    for (var _c_ = 0; _c_ < list1.length; _c_++)
     {
-        key = list1[_134_12_]
+        key = list1[_c_]
         var list2 = _k_.list(status[key])
-        for (var _135_17_ = 0; _135_17_ < list2.length; _135_17_++)
+        for (var _d_ = 0; _d_ < list2.length; _d_++)
         {
-            file = list2[_135_17_]
+            file = list2[_d_]
             status.files[file] = key
         }
     }

@@ -29,9 +29,9 @@ class Brackets
         if (this.editor.numHighlights())
         {
             var list = _k_.list(this.editor.highlights())
-            for (var _36_18_ = 0; _36_18_ < list.length; _36_18_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                h = list[_36_18_]
+                h = list[_a_]
                 if (!(h[2] != null))
                 {
                     return
@@ -39,7 +39,7 @@ class Brackets
             }
         }
         cp = this.editor.cursorPos()
-        var _40_24_ = this.beforeAfterForPos(cp); before = _40_24_[0]; after = _40_24_[1]
+        var _b_ = this.beforeAfterForPos(cp); before = _b_[0]; after = _b_[1]
 
         if (after.length || before.length)
         {
@@ -71,7 +71,7 @@ class Brackets
         cnt = 0
         while (pp[1] >= 0)
         {
-            var _67_28_ = this.beforeAfterForPos(pp); before = _67_28_[0]; after = _67_28_[1]
+            var _a_ = this.beforeAfterForPos(pp); before = _a_[0]; after = _a_[1]
 
             while (before.length)
             {
@@ -120,7 +120,7 @@ class Brackets
         pp = pos
         while (pp[1] <= this.editor.numLines())
         {
-            var _92_28_ = this.beforeAfterForPos(pp); before = _92_28_[0]; after = _92_28_[1]
+            var _b_ = this.beforeAfterForPos(pp); before = _b_[0]; after = _b_[1]
 
             while (after.length)
             {
@@ -176,7 +176,7 @@ class Brackets
     {
         var after, before, cp, firstAfterIndex, fst, i, li, line, lst, r, rngs
 
-        var _126_17_ = pos; cp = _126_17_[0]; li = _126_17_[1]
+        var _a_ = pos; cp = _a_[0]; li = _a_[1]
 
         line = this.editor.line(li)
         rngs = matchr.ranges(this.config,line)
@@ -202,14 +202,14 @@ class Brackets
         if (rngs.length)
         {
             var list = _k_.list(rngs)
-            for (var _146_30_ = 0; _146_30_ < list.length; _146_30_++)
+            for (var _b_ = 0; _b_ < list.length; _b_++)
             {
-                r = list[_146_30_]
+                r = list[_b_]
                 r.line = li
             }
             lst = _k_.last(rngs)
             fst = _k_.first(rngs)
-            for (var _149_36_ = firstAfterIndex = 0, _149_40_ = rngs.length; (_149_36_ <= _149_40_ ? firstAfterIndex < rngs.length : firstAfterIndex > rngs.length); (_149_36_ <= _149_40_ ? ++firstAfterIndex : --firstAfterIndex))
+            for (var _c_ = firstAfterIndex = 0, _d_ = rngs.length; (_c_ <= _d_ ? firstAfterIndex < rngs.length : firstAfterIndex > rngs.length); (_c_ <= _d_ ? ++firstAfterIndex : --firstAfterIndex))
             {
                 if (rngs[firstAfterIndex].start >= cp)
                 {

@@ -57,9 +57,9 @@ select text between highlighted brackets or quotes otherwise.`,combo:'alt+b'},to
         if (this.numSelections())
         {
             var list = _k_.list(this.startSelectionCursors)
-            for (var _105_22_ = 0; _105_22_ < list.length; _105_22_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                c = list[_105_22_]
+                c = list[_a_]
                 if (sel = this.continuousSelectionAtPosInRanges(c,this.do.selections()))
                 {
                     if (isSamePos(sel[1],c))
@@ -96,7 +96,7 @@ select text between highlighted brackets or quotes otherwise.`,combo:'alt+b'},to
         {
             return console.error(`Editor.${this.name}.endSelection -- oldCursors.size != newCursors.size`,oldCursors.length,newCursors.length)
         }
-        for (var _131_23_ = ci = 0, _131_27_ = this.do.numCursors(); (_131_23_ <= _131_27_ ? ci < this.do.numCursors() : ci > this.do.numCursors()); (_131_23_ <= _131_27_ ? ++ci : --ci))
+        for (var _b_ = ci = 0, _c_ = this.do.numCursors(); (_b_ <= _c_ ? ci < this.do.numCursors() : ci > this.do.numCursors()); (_b_ <= _c_ ? ++ci : --ci))
         {
             oc = oldCursors[ci]
             nc = newCursors[ci]
@@ -156,7 +156,7 @@ select text between highlighted brackets or quotes otherwise.`,combo:'alt+b'},to
 
     invertedRanges = []
     sc = this.selectedAndCursorLineIndices()
-    for (var _195_19_ = li = 0, _195_23_ = this.numLines(); (_195_19_ <= _195_23_ ? li < this.numLines() : li > this.numLines()); (_195_19_ <= _195_23_ ? ++li : --li))
+    for (var _d_ = li = 0, _e_ = this.numLines(); (_d_ <= _e_ ? li < this.numLines() : li > this.numLines()); (_d_ <= _e_ ? ++li : --li))
     {
         if (!(_k_.in(li,sc)))
         {
@@ -180,7 +180,7 @@ select text between highlighted brackets or quotes otherwise.`,combo:'alt+b'},to
         newSelections = []
         newCursors = []
         oldCursors = this.do.cursors()
-        for (var _217_22_ = i = 0, _217_26_ = oldCursors.length; (_217_22_ <= _217_26_ ? i < oldCursors.length : i > oldCursors.length); (_217_22_ <= _217_26_ ? ++i : --i))
+        for (var _f_ = i = 0, _10_ = oldCursors.length; (_f_ <= _10_ ? i < oldCursors.length : i > oldCursors.length); (_f_ <= _10_ ? ++i : --i))
         {
             c0 = oldCursors[i]
             c1 = oldCursors[i + 1]
@@ -227,7 +227,7 @@ select text between highlighted brackets or quotes otherwise.`,combo:'alt+b'},to
         this.do.select(surr)
         if (this.do.numSelections())
         {
-            this.do.setCursors((function () { var r_248_53_ = []; var list = _k_.list(this.do.selections()); for (var _248_53_ = 0; _248_53_ < list.length; _248_53_++)  { r = list[_248_53_];r_248_53_.push(rangeEndPos(r))  } return r_248_53_ }).bind(this)(),{main:'closest'})
+            this.do.setCursors((function () { var r_11_ = []; var list = _k_.list(this.do.selections()); for (var _12_ = 0; _12_ < list.length; _12_++)  { r = list[_12_];r_11_.push(rangeEndPos(r))  } return r_11_ }).bind(this)(),{main:'closest'})
         }
         return this.do.end()
     }

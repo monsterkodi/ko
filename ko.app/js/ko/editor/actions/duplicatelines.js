@@ -22,32 +22,32 @@ export default {actions:{menu:'Line',duplicateLinesUp:{name:'Duplicate Lines Up'
     }
     newCursors = this.do.cursors()
     var list = _k_.list(csr.reverse())
-    for (var _37_14_ = 0; _37_14_ < list.length; _37_14_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        r = list[_37_14_]
+        r = list[_a_]
         ls = []
-        for (var _39_23_ = li = r[0], _39_29_ = r[1]; (_39_23_ <= _39_29_ ? li <= r[1] : li >= r[1]); (_39_23_ <= _39_29_ ? ++li : --li))
+        for (var _b_ = li = r[0], _c_ = r[1]; (_b_ <= _c_ ? li <= r[1] : li >= r[1]); (_b_ <= _c_ ? ++li : --li))
         {
             ls.push(this.do.line(li))
         }
-        for (var _42_22_ = i = 0, _42_26_ = ls.length; (_42_22_ <= _42_26_ ? i < ls.length : i > ls.length); (_42_22_ <= _42_26_ ? ++i : --i))
+        for (var _d_ = i = 0, _e_ = ls.length; (_d_ <= _e_ ? i < ls.length : i > ls.length); (_d_ <= _e_ ? ++i : --i))
         {
             this.do.insert(r[1] + 1 + i,ls[i])
         }
         var list1 = _k_.list(positionsBelowLineIndexInPositions(r[1] + 1,newCursors))
-        for (var _45_19_ = 0; _45_19_ < list1.length; _45_19_++)
+        for (var _f_ = 0; _f_ < list1.length; _f_++)
         {
-            nc = list1[_45_19_]
+            nc = list1[_f_]
             cursorDelta(nc,0,ls.length)
         }
         if (dir === 'down')
         {
-            for (var _49_26_ = i = 0, _49_30_ = ls.length; (_49_26_ <= _49_30_ ? i < ls.length : i > ls.length); (_49_26_ <= _49_30_ ? ++i : --i))
+            for (var _10_ = i = 0, _11_ = ls.length; (_10_ <= _11_ ? i < ls.length : i > ls.length); (_10_ <= _11_ ? ++i : --i))
             {
                 var list2 = _k_.list(positionsAtLineIndexInPositions(r[0] + i,newCursors))
-                for (var _50_27_ = 0; _50_27_ < list2.length; _50_27_++)
+                for (var _12_ = 0; _12_ < list2.length; _12_++)
                 {
-                    nc = list2[_50_27_]
+                    nc = list2[_12_]
                     cursorDelta(nc,0,ls.length)
                 }
             }

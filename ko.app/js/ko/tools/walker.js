@@ -39,9 +39,9 @@ class Walker
             listDir = toWalk.shift()
             items = await ffs.list(listDir)
             var list = _k_.list(items)
-            for (var _55_21_ = 0; _55_21_ < list.length; _55_21_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                item = list[_55_21_]
+                item = list[_a_]
                 file = item.file
                 ext = slash.ext(file)
                 p = item.path

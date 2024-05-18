@@ -27,7 +27,8 @@ function QuickMenu
         title =$ 'title'
         title.parentElement.insertBefore @div, title.nextSibling
         
-        post.on 'split' @updateIcons
+        post.on 'split'       @updateIcons
+        post.on 'list.toggle' @updateIcons
         
     onBrowser:  => @toggle 'browser'  
     onTerminal: => @toggle 'terminal' 
@@ -48,5 +49,6 @@ function QuickMenu
 
         $(".quickmenu-browser").innerHTML  = split.browserVisible()  ? '' : ''
         $(".quickmenu-terminal").innerHTML = split.terminalVisible() ? '' : ''
+        $(".quickmenu-list").classList.toggle 'quickmenu-inactive' not prefs.get 'list|active'
         
 export QuickMenu

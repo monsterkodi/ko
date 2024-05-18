@@ -50,7 +50,7 @@ class Tab
         diss = Syntax.dissForTextAndSyntax slash.file(@path), 'ko'
 
         if not prefs.get 'tabs|extension'
-            if valid slash.ext @path
+            if valid slash.ext(@path) and valid slash.name @path
                 diss.pop()
                 diss.pop()
 
@@ -62,27 +62,10 @@ class Tab
         else
             html = ''
             if @pinned
-                html = """
-                    <span class="tab-lock"><span class="lock-icon"></span></span>
-                    """
-                # html = """
-                # <svg width="100%" height="100%" viewBox="0 0 30 30" fill="transparent">
-                    # <circle cx="15" cy="12" r="4" />
-                    # <line x1="15" y1="16"  x2="15"  y2="22" stroke-linecap="round"></line>
-                # </svg>
-                # """
+                html = '<span class="tab-lock"><span class="lock-icon"></span></span>'
             else if @tmp
-                html = """
-                    <span class="tab-temp"><span class="temp-icon"></span></span>
-                    """
-                # html = """
-                # <svg width="100%" height="100%" viewBox="0 0 30 30">
-                    # <circle cx="15" cy="9"  r="2" />
-                    # <circle cx="15" cy="15" r="2" />
-                    # <circle cx="15" cy="21" r="2" />
-                # </svg>
-                # """
-
+                html = '<span class="tab-temp"><span class="temp-icon"></span></span>'
+                
             @div.appendChild elem 'span' class:'tabstate app-drag-region' html:html, click:@togglePinned
 
         @tooltip = new tooltip elem:name, bound:@div, html:@tooltipHtml, x:-2
@@ -130,7 +113,7 @@ class Tab
     # 000   000  000     000          000     000     000   000     000     000   000       000
     #  0000000   000     000     0000000      000     000   000     000      0000000   0000000
 
-    onGitStatus: (status) =>
+    onGitStatus: status =>
 
         return if status.gitDir != @path
 

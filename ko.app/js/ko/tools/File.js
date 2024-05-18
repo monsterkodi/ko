@@ -116,7 +116,7 @@ class File
             root = '/'
         }
         split = slash.split(dir)
-        for (var _92_18_ = i = 0, _92_22_ = split.length - 1; (_92_18_ <= _92_22_ ? i < split.length - 1 : i > split.length - 1); (_92_18_ <= _92_22_ ? ++i : --i))
+        for (var _a_ = i = 0, _b_ = split.length - 1; (_a_ <= _b_ ? i < split.length - 1 : i > split.length - 1); (_a_ <= _b_ ? ++i : --i))
         {
             s = split[i]
             spans.push(`<div class='inline path' id='${root}${split.slice(0, typeof i === 'number' ? i+1 : Infinity).join('/')}'>${s}</div>`)

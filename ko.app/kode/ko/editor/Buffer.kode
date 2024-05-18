@@ -9,9 +9,6 @@
 use ../../kxk ▪ kstr matchr events uniq
 use           ◆ Do
 
-startOf = (r) -> r[0]
-endOf   = (r) -> r[0] + Math.max 1, r[1]-r[0]
-
 function Buffer extends events
 
     @: ->
@@ -347,9 +344,12 @@ function Buffer extends events
         r
 
     rangesForLinesFromTopToBot: top bot ->
+        
         r = []
         ir = [top,bot]
-        for li in startOf(ir)...endOf(ir)
+        
+        endOf = (r) -> r[0] + Math.max 1, r[1]-r[0]
+        for li in ir[0]...endOf(ir)
             if 0 <= li < @numLines()
                 r.push @rangeForLineAtIndex li
         r

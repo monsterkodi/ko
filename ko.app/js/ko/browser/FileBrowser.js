@@ -69,9 +69,9 @@ FileBrowser = (function ()
         var source
 
         var list = _k_.list(sources)
-        for (var _63_19_ = 0; _63_19_ < list.length; _63_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            source = list[_63_19_]
+            source = list[_a_]
             if (action === 'move')
             {
                 if (source === target || slash.dir(source) === target)
@@ -82,9 +82,9 @@ FileBrowser = (function ()
             }
         }
         var list1 = _k_.list(sources)
-        for (var _70_19_ = 0; _70_19_ < list1.length; _70_19_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            source = list1[_70_19_]
+            source = list1[_b_]
             switch (action)
             {
                 case 'move':
@@ -103,9 +103,9 @@ FileBrowser = (function ()
         var column, _79_42_
 
         var list = _k_.list(this.columns)
-        for (var _78_19_ = 0; _78_19_ < list.length; _78_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            column = list[_78_19_]
+            column = list[_a_]
             if ((column.parent != null ? column.parent.path : undefined) === slash.dir(file))
             {
                 return column
@@ -119,9 +119,9 @@ FileBrowser = (function ()
 
         col = 0
         var list = _k_.list(this.columns)
-        for (var _91_19_ = 0; _91_19_ < list.length; _91_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            column = list[_91_19_]
+            column = list[_a_]
             if (column.isDir() && file.startsWith(column.path()))
             {
                 col += 1
@@ -180,7 +180,7 @@ FileBrowser = (function ()
         {
             this.addColumn()
         }
-        for (var _143_21_ = index = 0, _143_25_ = paths.length; (_143_21_ <= _143_25_ ? index < paths.length : index > paths.length); (_143_21_ <= _143_25_ ? ++index : --index))
+        for (var _a_ = index = 0, _b_ = paths.length; (_a_ <= _b_ ? index < paths.length : index > paths.length); (_a_ <= _b_ ? ++index : --index))
         {
             if (index < paths.length - 1)
             {
@@ -408,9 +408,9 @@ FileBrowser = (function ()
         var column
 
         var list = _k_.list(this.columns)
-        for (var _333_19_ = 0; _333_19_ < list.length; _333_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            column = list[_333_19_]
+            column = list[_a_]
             if (column.path() === info.dir)
             {
                 this.loadDirItem({path:info.dir,type:'dir'},column.index,{active:column.activePath(),focus:false})
@@ -616,7 +616,7 @@ FileBrowser = (function ()
     {
         var col
 
-        for (var _474_19_ = col = 0, _474_23_ = this.columns.length; (_474_19_ <= _474_23_ ? col < this.columns.length : col > this.columns.length); (_474_19_ <= _474_23_ ? ++col : --col))
+        for (var _a_ = col = 0, _b_ = this.columns.length; (_a_ <= _b_ ? col < this.columns.length : col > this.columns.length); (_a_ <= _b_ ? ++col : --col))
         {
             this.applyGitStatusFiles(col,status.files)
         }

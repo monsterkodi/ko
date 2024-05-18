@@ -58,7 +58,7 @@ class Navigate
         # log 'addToHistory'
         # for fp in @navlist ➜ log fp
             
-        stash.set 'navigate' @navlist
+        stash.set 'navigate' @navlist 
 
     # 000   000   0000000   000   000  000   0000000    0000000   000000000  00000000  
     # 0000  000  000   000  000   000  000  000        000   000     000     000       
@@ -66,17 +66,19 @@ class Navigate
     # 000  0000  000   000     000     000  000   000  000   000     000     000       
     # 000   000  000   000      0      000   0000000   000   000     000     00000000  
     
+    canNavigateBack:    => @navlist.length and @currentIndex > 0 
+    canNavigateForward: => @navlist.length and @currentIndex < @navlist.length-1
+    
     navigate: opt =>
 
         switch opt.action
 
             'clear'
-                @navlist = []
+                @navlist = [] 
                 @currentIndex = -1
 
             'backward'
                 
-                log 'Navigate backward' @navlist
                 ⮐ if not @navlist.length
                 @currentIndex = clamp 0 Math.max(0 @navlist.length-2), @currentIndex-1
                 @navigating = true

@@ -39,9 +39,9 @@ moduleKeys = async function (moduleName, file)
         if (slash.ext(file) === 'kode')
         {
             var list = ['valid','empty','clamp']
-            for (var _33_19_ = 0; _33_19_ < list.length; _33_19_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                kw = list[_33_19_]
+                kw = list[_a_]
                 index = keys.indexOf(kw)
                 if (index >= 0)
                 {
@@ -64,7 +64,7 @@ req = async function (file, lines, editor)
     regexes = {'$':/\$[\s\(]/}
     firstIndex = null
     keys = {Math:['E','LN2','LN10','LOG2E','LOG10E','PI','SQRT1_2','SQRT2','abs','acos','acosh','asin','asinh','atan','atanh','atan2','cbrt','ceil','clz32','cos','cosh','exp','expm1','floor','fround','hypot','imul','log1p','log10','log2','max','min','pow','random','round','sign','sin','sinh','sqrt','tan','tanh','trunc']}
-    for (var _57_15_ = li = 0, _57_19_ = lines.length; (_57_15_ <= _57_19_ ? li < lines.length : li > lines.length); (_57_15_ <= _57_19_ ? ++li : --li))
+    for (var _b_ = li = 0, _c_ = lines.length; (_b_ <= _c_ ? li < lines.length : li > lines.length); (_b_ <= _c_ ? ++li : --li))
     {
         m = lines[li].match(requireRegExp)
         if (!((m != null ? m[1] : undefined) != null))
@@ -93,9 +93,9 @@ req = async function (file, lines, editor)
                             newKeys = await moduleKeys(moduleName,file)
                             keys[m[2]] = newKeys
                             var list = _k_.list(newKeys)
-                            for (var _80_34_ = 0; _80_34_ < list.length; _80_34_++)
+                            for (var _d_ = 0; _d_ < list.length; _d_++)
                             {
-                                k = list[_80_34_]
+                                k = list[_d_]
                                 regexes[k] = ((_81_43_=regexes[k]) != null ? _81_43_ : new RegExp(`(^|[\\:\\(\\{]|\\s+)${k}(\\s+[^:]|\\s*$|[\\.\\,\\(])`))
                             }
                         }
@@ -121,9 +121,9 @@ req = async function (file, lines, editor)
         {
             values = keys[mod]
             var list1 = _k_.list(values)
-            for (var _96_18_ = 0; _96_18_ < list1.length; _96_18_++)
+            for (var _e_ = 0; _e_ < list1.length; _e_++)
             {
-                k = list1[_96_18_]
+                k = list1[_e_]
                 reqValues[mod] = ((_98_31_=reqValues[mod]) != null ? _98_31_ : [])
                 if (_k_.in(k,reqValues[mod]))
                 {

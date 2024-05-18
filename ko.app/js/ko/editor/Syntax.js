@@ -47,10 +47,10 @@ class Syntax
         var ch, change, di, li
 
         var list = _k_.list(changeInfo.changes)
-        for (var _55_19_ = 0; _55_19_ < list.length; _55_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            change = list[_55_19_]
-            var _57_23_ = [change.doIndex,change.newIndex,change.change]; di = _57_23_[0]; li = _57_23_[1]; ch = _57_23_[2]
+            change = list[_a_]
+            var _b_ = [change.doIndex,change.newIndex,change.change]; di = _b_[0]; li = _b_[1]; ch = _b_[2]
 
             switch (ch)
             {
@@ -127,12 +127,12 @@ class Syntax
         if ((diss != null ? diss.length : undefined))
         {
             last = 0
-            for (var _117_22_ = di = 0, _117_26_ = diss.length; (_117_22_ <= _117_26_ ? di < diss.length : di > diss.length); (_117_22_ <= _117_26_ ? ++di : --di))
+            for (var _a_ = di = 0, _b_ = diss.length; (_a_ <= _b_ ? di < diss.length : di > diss.length); (_a_ <= _b_ ? ++di : --di))
             {
                 d = diss[di]
                 style = (d.styl != null) && d.styl.length && ` style=\"${d.styl}\"` || ''
                 spc = ''
-                for (var _121_26_ = sp = last, _121_33_ = d.start; (_121_26_ <= _121_33_ ? sp < d.start : sp > d.start); (_121_26_ <= _121_33_ ? ++sp : --sp))
+                for (var _c_ = sp = last, _d_ = d.start; (_c_ <= _d_ ? sp < d.start : sp > d.start); (_c_ <= _d_ ? ++sp : --sp))
                 {
                     spc += '&nbsp;'
                 }
@@ -175,9 +175,9 @@ class Syntax
 
         l = ""
         var list = _k_.list(dss)
-        for (var _147_14_ = 0; _147_14_ < list.length; _147_14_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            d = list[_147_14_]
+            d = list[_a_]
             l = _k_.rpad(d.start,l)
             l += d.match
         }
@@ -220,9 +220,9 @@ class Syntax
         syntaxDir = slash.path(_k_.dir(),'../syntax/')
         syntaxFiles = await ffs.list(syntaxDir)
         var list = _k_.list(syntaxFiles)
-        for (var _180_23_ = 0; _180_23_ < list.length; _180_23_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            syntaxFile = list[_180_23_]
+            syntaxFile = list[_a_]
             syntaxName = slash.name(syntaxFile.path)
             patterns = JSON.parse(await ffs.read(syntaxFile.path))
             patterns['\\w+'] = 'text'
@@ -233,9 +233,9 @@ class Syntax
                 delete patterns.ko
                 config = matchr.config(patterns)
                 var list1 = _k_.list(extnames)
-                for (var _194_31_ = 0; _194_31_ < list1.length; _194_31_++)
+                for (var _b_ = 0; _b_ < list1.length; _b_++)
                 {
-                    syntaxName = list1[_194_31_]
+                    syntaxName = list1[_b_]
                     this.syntaxNames.push(syntaxName)
                     this.matchrConfigs[syntaxName] = config
                 }

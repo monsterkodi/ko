@@ -21,7 +21,7 @@ class Strings
     {
         var a, p
 
-        return this.config = (function () { var r_21_66_ = []; for (var p in this.editor.stringCharacters)  { var a = this.editor.stringCharacters[p];r_21_66_.push([new RegExp(kstr.escapeRegexp(p)),a])  } return r_21_66_ }).bind(this)()
+        return this.config = (function () { var r_a_ = []; for (var p in this.editor.stringCharacters)  { var a = this.editor.stringCharacters[p];r_a_.push([new RegExp(kstr.escapeRegexp(p)),a])  } return r_a_ }).bind(this)()
     }
 
     onCursor ()
@@ -31,9 +31,9 @@ class Strings
         if (this.editor.numHighlights())
         {
             var list = _k_.list(this.editor.highlights())
-            for (var _28_18_ = 0; _28_18_ < list.length; _28_18_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                h = list[_28_18_]
+                h = list[_a_]
                 if (!(h[2] != null))
                 {
                     return
@@ -55,7 +55,7 @@ class Strings
         stack = []
         pairs = []
         pair = null
-        var _41_17_ = pos; cp = _41_17_[0]; li = _41_17_[1]
+        var _a_ = pos; cp = _a_[0]; li = _a_[1]
 
         line = this.editor.line(li)
         rngs = matchr.ranges(this.config,line)
@@ -63,7 +63,7 @@ class Strings
         {
             return
         }
-        for (var _45_18_ = i = 0, _45_22_ = rngs.length; (_45_18_ <= _45_22_ ? i < rngs.length : i > rngs.length); (_45_18_ <= _45_22_ ? ++i : --i))
+        for (var _b_ = i = 0, _c_ = rngs.length; (_b_ <= _c_ ? i < rngs.length : i > rngs.length); (_b_ <= _c_ ? ++i : --i))
         {
             ths = rngs[i]
             if (ths.start > 0 && line[ths.start - 1] === '\\')
@@ -120,7 +120,7 @@ class Strings
         var cls, opn
 
         this.clear()
-        var _81_18_ = pair; opn = _81_18_[0]; cls = _81_18_[1]
+        var _a_ = pair; opn = _a_[0]; cls = _a_[1]
 
         pair[0].clss = `stringmatch ${this.editor.stringCharacters[opn.match]}`
         pair[1].clss = `stringmatch ${this.editor.stringCharacters[cls.match]}`

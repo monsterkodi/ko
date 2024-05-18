@@ -4,14 +4,19 @@ var addToShelf, changeFontSize, changeZoom, resetFontSize, resetZoom, setFontSiz
 
 import kakao from "../../kakao.js"
 
+import version from "../../konrad/version.js"
+
 import kxk from "../../kxk.js"
 let win = kxk.win
 let scheme = kxk.scheme
+let fps = kxk.fps
+let clippo = kxk.clippo
 let stash = kxk.stash
 let post = kxk.post
 let prefs = kxk.prefs
 let store = kxk.store
 let stopEvent = kxk.stopEvent
+let $ = kxk.$
 
 import Split from "./Split.js"
 import Info from "./Info.js"
@@ -28,7 +33,6 @@ import Projects from "../tools/Projects.js"
 import Indexer from "../tools/Indexer.js"
 import Git from "../tools/Git.js"
 import Unicode from "../tools/Unicode.js"
-import fps from "../tools/fps.js"
 
 import Kore from "../editor/Kore.js"
 import Editor from "../editor/Editor.js"
@@ -77,6 +81,8 @@ Window = (function ()
         this.menuIcon = kakao.bundle.img('menu_ko.png')
         this.menuNoon = kakao.bundle.res('menu_ko.noon')
         this.aboutImage = kakao.bundle.img('about_ko.png')
+        this.aboutVersion = `${version}`
+        this.aboutURL = "https://github.com/monsterkodi/ko"
         post.on('menuAction',this.onMenuAction)
         post.on('stash',function ()
         {
@@ -87,7 +93,6 @@ Window = (function ()
 
     Window.prototype["onWindowWithoutStash"] = async function ()
     {
-        console.log('onWindowWithoutStash!')
         if (_k_.empty(window.tabs.tabs))
         {
             console.log('new empty tab!')
@@ -105,6 +110,7 @@ Window = (function ()
         new Projects
         new Unicode
         new Git
+        clippo.watch()
         this.tabs = window.tabs = new Tabs()
         this.quickMenu = window.quickMenu = new QuickMenu()
         this.navigate = window.navigate = new Navigate()
@@ -113,7 +119,7 @@ Window = (function ()
         this.editor = window.editor = new FileEditor('editor')
         this.commandline = window.commandline = new CommandLine('commandline-editor')
         this.info = window.info = new Info(this.editor)
-        this.fps = window.fps = new fps()
+        this.fps = window.fps = new fps($('commandline-span'))
         this.indexer = window.indexer = new Indexer()
         this.viewer = window.viewer = new Viewer('editor')
         window.textEditor = window.focusEditor = this.editor
@@ -154,7 +160,7 @@ Window = (function ()
 
     Window.prototype["onMenuAction"] = function (name, trail)
     {
-        var action, _116_25_
+        var action, _122_25_
 
         if (action = Editor.actionWithName(name))
         {
@@ -338,7 +344,7 @@ window.editorWithName = function (n)
 
 window.onresize = function ()
 {
-    var _208_14_
+    var _214_14_
 
     window.split.resized()
     ;(window.win != null ? window.win.onMoved(window.win.getBounds()) : undefined)

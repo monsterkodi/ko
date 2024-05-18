@@ -20,9 +20,9 @@ export default {actions:{menu:'Line',joinLines:{name:'Join Lines',combo:'command
     this.do.start()
     newCursors = []
     var list = _k_.list(this.do.cursors().reverse())
-    for (var _29_14_ = 0; _29_14_ < list.length; _29_14_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        c = list[_29_14_]
+        c = list[_a_]
         if (!this.isCursorInLastLine(c))
         {
             before = this.do.line(c[1]).trimRight() + " "
@@ -35,15 +35,15 @@ export default {actions:{menu:'Line',joinLines:{name:'Join Lines',combo:'command
             this.do.delete(c[1] + 1)
             newCursors.push([before.length,c[1]])
             var list1 = _k_.list(positionsAtLineIndexInPositions(c[1] + 1,newCursors))
-            for (var _43_23_ = 0; _43_23_ < list1.length; _43_23_++)
+            for (var _b_ = 0; _b_ < list1.length; _b_++)
             {
-                nc = list1[_43_23_]
+                nc = list1[_b_]
                 cursorDelta(nc,before.length,-1)
             }
             var list2 = _k_.list(positionsBelowLineIndexInPositions(c[1],newCursors))
-            for (var _45_23_ = 0; _45_23_ < list2.length; _45_23_++)
+            for (var _c_ = 0; _c_ < list2.length; _c_++)
             {
-                nc = list2[_45_23_]
+                nc = list2[_c_]
                 cursorDelta(nc,0,-1)
             }
         }

@@ -1,4 +1,4 @@
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}}
 
 var Kore
 
@@ -18,7 +18,15 @@ Kore = (function ()
 
     Kore.prototype["set"] = function (key, value)
     {
-        stash.set(`kore|${key}`,value)
+        if (_k_.empty(value))
+        {
+            console.log('del key',key)
+            stash.del(`kore|${key}`)
+        }
+        else
+        {
+            stash.set(`kore|${key}`,value)
+        }
         return this.emit(key,value)
     }
 

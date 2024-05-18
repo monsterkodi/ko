@@ -31,9 +31,9 @@ export default {actions:{insertOrDeleteTab:{combos:['tab','shift+tab']}},insertO
         newCursors = this.do.cursors()
         il = this.indentString.length
         var list = _k_.list(newCursors)
-        for (var _32_18_ = 0; _32_18_ < list.length; _32_18_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            c = list[_32_18_]
+            c = list[_a_]
             n = 4 - (c[0] % il)
             this.do.change(c[1],kstr.splice(this.do.line(c[1]),c[0],0,_k_.lpad(n)))
             cursorDelta(c,n)
@@ -54,9 +54,9 @@ export default {actions:{insertOrDeleteTab:{combos:['tab','shift+tab']}},insertO
         this.do.start()
         newCursors = this.do.cursors()
         var list = _k_.list(newCursors)
-        for (var _46_18_ = 0; _46_18_ < list.length; _46_18_++)
+        for (var _b_ = 0; _b_ < list.length; _b_++)
         {
-            c = list[_46_18_]
+            c = list[_b_]
             if (c[0])
             {
                 n = (c[0] % this.indentString.length) || this.indentString.length

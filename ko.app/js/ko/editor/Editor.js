@@ -22,9 +22,9 @@ Editor = (function ()
 
         filelist = await ffs.list(slash.path(_k_.dir(),'actions'))
         var list = _k_.list(filelist)
-        for (var _27_17_ = 0; _27_17_ < list.length; _27_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            item = list[_27_17_]
+            item = list[_a_]
             actionFile = item.path
             if (slash.ext(actionFile) !== 'js')
             {
@@ -99,9 +99,9 @@ Editor = (function ()
         var action
 
         var list = _k_.list(Editor.actions)
-        for (var _89_19_ = 0; _89_19_ < list.length; _89_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            action = list[_89_19_]
+            action = list[_a_]
             if (action.name === name)
             {
                 return action
@@ -164,9 +164,9 @@ Editor = (function ()
         }
         this.bracketCharacters.regexp = []
         var list = ['open','close']
-        for (var _130_16_ = 0; _130_16_ < list.length; _130_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            key = list[_130_16_]
+            key = list[_a_]
             cstr = Object.keys(this.bracketCharacters[key]).join('')
             reg = new RegExp(`[${kstr.escapeRegexp(cstr)}]`)
             this.bracketCharacters.regexps.push([reg,key])
@@ -343,9 +343,9 @@ Editor = (function ()
                 if ((this.indentNewLineMore.lineEndsWith != null ? this.indentNewLineMore.lineEndsWith.length : undefined))
                 {
                     var list = _k_.list(this.indentNewLineMore.lineEndsWith)
-                    for (var _247_26_ = 0; _247_26_ < list.length; _247_26_++)
+                    for (var _a_ = 0; _a_ < list.length; _a_++)
                     {
-                        e = list[_247_26_]
+                        e = list[_a_]
                         if (line.trim().endsWith(e))
                         {
                             il = thisIndent + indentLength

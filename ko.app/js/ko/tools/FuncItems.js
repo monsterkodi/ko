@@ -15,17 +15,22 @@ FuncItems = (function ()
         items = []
         clsss = ((_14_29_=info.classes) != null ? _14_29_ : [])
         var list = _k_.list(clsss)
-        for (var _15_17_ = 0; _15_17_ < list.length; _15_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            clss = list[_15_17_]
+            clss = list[_a_]
             text = '● ' + clss.name
             items.push({name:clss.name,text:text,type:'class',path:file,line:clss.line})
         }
         funcs = ((_19_27_=info.funcs) != null ? _19_27_ : [])
         var list1 = _k_.list(funcs)
-        for (var _21_17_ = 0; _21_17_ < list1.length; _21_17_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            func = list1[_21_17_]
+            func = list1[_b_]
+            if (_k_.empty(func))
+            {
+                console.log('empty func',funcs)
+                continue
+            }
             type = 'func'
             arr = (func.bound ? '=> ' : '-> ')
             if (func.test)

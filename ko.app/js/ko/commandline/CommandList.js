@@ -42,9 +42,9 @@ CommandList = (function ()
             this.resized()
         }
         var list = _k_.list(items)
-        for (var _45_17_ = 0; _45_17_ < list.length; _45_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            item = list[_45_17_]
+            item = list[_a_]
             if (!(item != null))
             {
                 continue

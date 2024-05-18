@@ -57,9 +57,9 @@ FileList = (function ()
         botLine = topLine + this.editor.numFullLines()
         mainLine = this.editor.mainCursor()[1] + 1
         var list = _k_.list(this.elem.children)
-        for (var _50_18_ = 0; _50_18_ < list.length; _50_18_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            child = list[_50_18_]
+            child = list[_a_]
             lastLine = (child.nextSibling ? child.nextSibling.line : this.editor.numLines())
             visible = lastLine - 1 > topLine && child.line <= botLine
             child.classList.toggle('visible',visible)

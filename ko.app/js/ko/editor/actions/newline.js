@@ -33,10 +33,10 @@ export default {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['ent
         newCursors = this.do.cursors()
     }
     var list = _k_.list(this.do.cursors().reverse())
-    for (var _50_14_ = 0; _50_14_ < list.length; _50_14_++)
+    for (var _a_ = 0; _a_ < list.length; _a_++)
     {
-        c = list[_50_14_]
-        var _52_28_ = this.splitStateLineAtPos(this.do,c); before = _52_28_[0]; after = _52_28_[1]
+        c = list[_a_]
+        var _b_ = this.splitStateLineAtPos(this.do,c); before = _b_[0]; after = _b_[1]
 
         if (doIndent)
         {
@@ -90,9 +90,9 @@ export default {actions:{menu:'Line',newline:{name:'Insert Newline',combos:['ent
             this.do.change(c[1],before)
         }
         var list1 = _k_.list(positionsFromPosInPositions(c,newCursors))
-        for (var _88_19_ = 0; _88_19_ < list1.length; _88_19_++)
+        for (var _c_ = 0; _c_ < list1.length; _c_++)
         {
-            nc = list1[_88_19_]
+            nc = list1[_c_]
             cursorDelta(nc,nc[1] === c[1] && indent.length - bl || 0,1)
         }
     }

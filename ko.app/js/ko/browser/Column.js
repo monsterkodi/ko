@@ -132,9 +132,9 @@ Column = (function ()
         if (!_k_.empty(this.items))
         {
             var list = _k_.list(this.items)
-            for (var _96_21_ = 0; _96_21_ < list.length; _96_21_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                item = list[_96_21_]
+                item = list[_a_]
                 this.rows.push(new Row(this,item))
             }
             this.scroll.update()
@@ -225,9 +225,9 @@ Column = (function ()
             this.dragInd = elem({class:'dragIndicator'})
             this.dragDiv.appendChild(this.dragInd)
             var list = _k_.list(this.browser.select.rows)
-            for (var _174_20_ = 0; _174_20_ < list.length; _174_20_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                row = list[_174_20_]
+                row = list[_a_]
                 rowClone = row.div.cloneNode(true)
                 rowClone.style.flex = 'unset'
                 rowClone.style.pointerEvents = 'none'
@@ -453,9 +453,9 @@ Column = (function ()
             console.error("setItems -- no parent type?",this.parent)
         }
         var list = _k_.list(this.items)
-        for (var _341_17_ = 0; _341_17_ < list.length; _341_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            item = list[_341_17_]
+            item = list[_a_]
             this.rows.push(new Row(this,item))
         }
         this.scroll.update()
@@ -905,9 +905,9 @@ Column = (function ()
             activeIndex = 0
         }
         var list = [this.rows.slice(activeIndex),this.rows.slice(0,activeIndex + 1)]
-        for (var _572_17_ = 0; _572_17_ < list.length; _572_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            rows = list[_572_17_]
+            rows = list[_a_]
             k = new krzl({values:rows,sortByLength:false,extract:function (r)
             {
                 var _574_84_
@@ -975,9 +975,9 @@ Column = (function ()
         })
         this.table.innerHTML = ''
         var list = _k_.list(this.rows)
-        for (var _621_16_ = 0; _621_16_ < list.length; _621_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_621_16_]
+            row = list[_a_]
             this.table.appendChild(row.div)
         }
         prefs.set(`browser|sort|${this.parent.path}`)
@@ -998,9 +998,9 @@ Column = (function ()
         })
         this.table.innerHTML = ''
         var list = _k_.list(this.rows)
-        for (var _635_16_ = 0; _635_16_ < list.length; _635_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_635_16_]
+            row = list[_a_]
             this.table.appendChild(row.div)
         }
         prefs.set(`browser|sort|${this.parent.path}`,'type')
@@ -1019,9 +1019,9 @@ Column = (function ()
         })
         this.table.innerHTML = ''
         var list = _k_.list(this.rows)
-        for (var _646_16_ = 0; _646_16_ < list.length; _646_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_646_16_]
+            row = list[_a_]
             this.table.appendChild(row.div)
         }
         prefs.set(`browser|sort|${this.parent.path}`,'date')
@@ -1068,9 +1068,9 @@ Column = (function ()
             selectRow = this.row(index)
         }
         var list = _k_.list(this.browser.select.rows)
-        for (var _688_16_ = 0; _688_16_ < list.length; _688_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_688_16_]
+            row = list[_a_]
             ffs.trash(row.path()).then((function (d)
             {
                 if (d)
@@ -1122,9 +1122,9 @@ Column = (function ()
         var item
 
         var list = _k_.list(this.browser.select.items())
-        for (var _721_17_ = 0; _721_17_ < list.length; _721_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            item = list[_721_17_]
+            item = list[_a_]
             File.duplicate(item.path).then((function (target)
             {
                 var col, row
@@ -1170,9 +1170,9 @@ Column = (function ()
         var file, icon, row, status
 
         var list = _k_.list(this.rows)
-        for (var _757_16_ = 0; _757_16_ < list.length; _757_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_757_16_]
+            row = list[_a_]
             if (!(_k_.in(row.item.type,['dir','file'])))
             {
                 return

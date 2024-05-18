@@ -79,7 +79,7 @@ Shelf = (function ()
             delete this.navigatingRows
             return
         }
-        for (var _61_21_ = index = 0, _61_25_ = this.items.length; (_61_21_ <= _61_25_ ? index < this.items.length : index > this.items.length); (_61_21_ <= _61_25_ ? ++index : --index))
+        for (var _a_ = index = 0, _b_ = this.items.length; (_a_ <= _b_ ? index < this.items.length : index > this.items.length); (_a_ <= _b_ ? ++index : --index))
         {
             if (this.items[index].path === file)
             {
@@ -102,7 +102,7 @@ Shelf = (function ()
             {
                 return b[1].path.length - a[1].path.length
             })
-            var _73_26_ = _k_.first(matches); index = _73_26_[0]; item = _73_26_[1]
+            var _c_ = _k_.first(matches); index = _c_[0]; item = _c_[1]
 
             return this.rows[index].setActive()
         }
@@ -177,9 +177,9 @@ Shelf = (function ()
             return
         }
         var list = _k_.list(items)
-        for (var _127_17_ = 0; _127_17_ < list.length; _127_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            item = list[_127_17_]
+            item = list[_a_]
             this.rows.push(new Row(this,item))
         }
         this.scroll.update()
@@ -211,9 +211,9 @@ Shelf = (function ()
         var file
 
         var list = _k_.list(files)
-        for (var _153_17_ = 0; _153_17_ < list.length; _153_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            file = list[_153_17_]
+            file = list[_a_]
             if (await ffs.isDir(file))
             {
                 this.addDir(file,opt)
@@ -276,9 +276,9 @@ Shelf = (function ()
         var row, _201_48_
 
         var list = _k_.list(this.rows)
-        for (var _199_16_ = 0; _199_16_ < list.length; _199_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_199_16_]
+            row = list[_a_]
             if (row.path().startsWith(status.gitDir))
             {
                 ;($('.browserStatusIcon',row.div) != null ? $('.browserStatusIcon',row.div).remove() : undefined)
@@ -300,9 +300,9 @@ Shelf = (function ()
         var row
 
         var list = _k_.list(this.rows)
-        for (var _210_16_ = 0; _210_16_ < list.length; _210_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_210_16_]
+            row = list[_a_]
             Git.status(row.path())
         }
         return this

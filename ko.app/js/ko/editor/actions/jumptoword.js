@@ -17,12 +17,12 @@ export default {actions:{jumpToWord:{name:'Jump to Word',text:'jump to word at c
         ranges = matchr.ranges(rgx,text)
         diss = matchr.dissect(ranges,{join:false})
         var list = _k_.list(diss)
-        for (var _29_18_ = 0; _29_18_ < list.length; _29_18_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            d = list[_29_18_]
+            d = list[_a_]
             if ((d.start <= p[0] && p[0] <= d.start + d.match.length))
             {
-                var _32_38_ = slash.splitFileLine(d.match); file = _32_38_[0]; line = _32_38_[1]; col = _32_38_[2]
+                var _b_ = slash.splitFileLine(d.match); file = _b_[0]; line = _b_[1]; col = _b_[2]
 
                 console.log('jumpToFileAtPos check file exists -----------',slash.dir(this.currentFile),file,slash.path(slash.dir(this.currentFile),file))
                 ffs.fileExists(file).catch(function (err)
@@ -40,7 +40,7 @@ export default {actions:{jumpToWord:{name:'Jump to Word',text:'jump to word at c
                     else if (!slash.isAbsolute(d.match))
                     {
                         cwd = kakao.bundle.path
-                        var _40_46_ = slash.splitFileLine(slash.path(cwd,d.match)); file = _40_46_[0]; line = _40_46_[1]; col = _40_46_[2]
+                        var _c_ = slash.splitFileLine(slash.path(cwd,d.match)); file = _c_[0]; line = _c_[1]; col = _c_[2]
 
                         console.log('jumpTo',cwd,{path:file,line:line,col:col})
                         return post.emit('jumpTo ++++++++++++',{path:file,line:line,col:col})
@@ -51,7 +51,7 @@ export default {actions:{jumpToWord:{name:'Jump to Word',text:'jump to word at c
             }
             if (!slash.isAbsolute(d.match))
             {
-                var _48_38_ = slash.splitFileLine(slash.path(kakao.bundle.path,d.match)); file = _48_38_[0]; line = _48_38_[1]; col = _48_38_[2]
+                var _d_ = slash.splitFileLine(slash.path(kakao.bundle.path,d.match)); file = _d_[0]; line = _d_[1]; col = _d_[2]
 
                 post.emit('jumpTo',{path:file,line:line,col:col})
                 return true
@@ -64,12 +64,12 @@ export default {actions:{jumpToWord:{name:'Jump to Word',text:'jump to word at c
         ranges = matchr.ranges(rgx,text)
         diss = matchr.dissect(ranges,{join:false})
         var list1 = _k_.list(diss)
-        for (var _59_18_ = 0; _59_18_ < list1.length; _59_18_++)
+        for (var _e_ = 0; _e_ < list1.length; _e_++)
         {
-            d = list1[_59_18_]
+            d = list1[_e_]
             if ((d.start <= p[0] && p[0] <= d.start + d.match.length))
             {
-                var _61_38_ = slash.splitFileLine(d.match); file = _61_38_[0]; line = _61_38_[1]; col = _61_38_[2]
+                var _f_ = slash.splitFileLine(d.match); file = _f_[0]; line = _f_[1]; col = _f_[2]
 
                 if (slash.fileExists(file))
                 {

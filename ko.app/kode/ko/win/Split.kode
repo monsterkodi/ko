@@ -90,6 +90,8 @@ class Split
         action = words[0]
         what   = words[1]
         
+        log 'split.do' sentence
+        
         switch action
             
             'show'     ➜ ⮐ @show  what

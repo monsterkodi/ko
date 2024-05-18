@@ -6,14 +6,14 @@
 000   000  000   000   0000000  000   000   0000000
 ###
 
-use ../../kxk      ▪ reversed uniq slash prefs post ffs
+use ../../kxk      ▪ reversed uniq clippo scooter slash prefs post ffs
 use ../tools       ◆ salt req GitInfo
 use ../editor      ◆ Syntax Editor
 use ../commandline ◆ Command
 
 function Macro extends Command
 
-    @macroNames: ['clean' 'help' 'class' 'inv' 'blink' 'color' 'fps' 'status' 'diff' 'history' 'count' 'sort' 'case' 'lower' 'upper']
+    @macroNames: ['clean' 'help' 'class' 'unicode' 'clippo' 'inv' 'blink' 'color' 'fps' 'status' 'diff' 'history' 'count' 'sort' 'case' 'lower' 'upper']
 
     @: commandline ->
 
@@ -141,7 +141,7 @@ function Macro extends Command
 
             'd'
             'kd'
-            'diff'      ➜ post.emit 'git.diff' cmds
+            'diff'      ➜ post.emit 'git.diff' cmds; ⮐ select:false
                 
             'log'       ➜ post.emit 'git.log' cmds
             
@@ -149,6 +149,36 @@ function Macro extends Command
             'kc'
             'commit'
             'ci'        ➜ post.emit 'git.commit' cmds
+            
+            #  0000000  000      000  00000000   00000000    0000000   
+            # 000       000      000  000   000  000   000  000   000  
+            # 000       000      000  00000000   00000000   000   000  
+            # 000       000      000  000        000        000   000  
+            #  0000000  0000000  000  000        000         0000000   
+            
+            'pb'
+            'paste'
+            'clippo'
+                
+                window.split.raise 'terminal'
+                window.terminal.clear()
+                
+                for t in reversed clippo.history
+                    
+                    window.terminal.queueMeta text:'' line:'&nbsp;'
+                    
+                    for l,i in t.split '\n'
+                        
+                        window.terminal.queueMeta
+                            diss:  Syntax.dissForTextAndSyntax l, 'kode'
+                            text:  l
+                            clss:  'clippoResult'
+                            click: ((t) -> -> kakao 'clipboard.set' t) t
+                            line:  i+1
+                            
+                window.terminal.queueMeta text:'' line:'&nbsp;'
+                 
+                ⮐ focus:'terminal'
             
             # 000   000  000   000  000   0000000   0000000   0000000    00000000  
             # 000   000  0000  000  000  000       000   000  000   000  000       
@@ -242,7 +272,6 @@ function Macro extends Command
                 clss ?= 'Class'
                 
                 dir   = editor.currentFile? and slash.dir(editor.currentFile) or kakao.bundle.app('kode')
-                # file  = slash.path dir, clss.toLowerCase() + '.kode'
                 file  = slash.path dir, clss + '.kode'
                 
                 text  = "###\n"
@@ -252,7 +281,7 @@ function Macro extends Command
 
                 function #{clss}
 
-                    @: () ->
+                    @: ->
 
                 export #{clss}
 
@@ -317,6 +346,13 @@ function Macro extends Command
                 if transform.transformNames and cmmd in transform.transformNames
                     window.textEditor.transform.do.apply window.textEditor.transform, [cmmd].concat cmds
                 else
+                    try
+                        result = scooter cmmd
+                        kakao 'clipboard.set' result
+                        ⮐ select:true text:result
+                    catch err
+                        log "scooter can't calculate" cmmd
+                    
                     error 'unhandled macro', cmmd, transform.transformNames
                     if last(@history) == command.trim()
                         @history.pop()

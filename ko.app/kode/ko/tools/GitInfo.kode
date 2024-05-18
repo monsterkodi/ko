@@ -163,7 +163,7 @@ class GitInfo
             
             path = slash.path gitDir, p.srcfile[2..]
             
-            log 'doLog' path
+            # log 'doLog' path
             
             continue if slash.ext(path) in IGNORE_FILE_EXTS
             
@@ -359,7 +359,7 @@ class GitInfo
                 error 'GitInfo.status -- no prjDir and no kakao?'
                 return 
         
-        log 'GitInfo.status dir' opt.prjDir
+        # log 'GitInfo.status dir' opt.prjDir
         
         Git.status(opt.prjDir).then (status) ○->
 

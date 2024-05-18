@@ -104,9 +104,9 @@ TextEditor = (function ()
         var feature, featureClss, featureName
 
         var list = _k_.list(this.config.features)
-        for (var _78_20_ = 0; _78_20_ < list.length; _78_20_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            feature = list[_78_20_]
+            feature = list[_a_]
             if (feature === 'CursorLine')
             {
                 this.cursorLine = elem('div',{class:'cursor-line'})
@@ -169,9 +169,9 @@ TextEditor = (function ()
 
         this.layerDict = {}
         var list = _k_.list(layerClasses)
-        for (var _139_16_ = 0; _139_16_ < list.length; _139_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            cls = list[_139_16_]
+            cls = list[_a_]
             this.layerDict[cls] = this.addLayer(cls)
         }
     }
@@ -222,9 +222,9 @@ TextEditor = (function ()
         appended = []
         ls = (text != null ? text.split(/\n/) : undefined)
         var list = _k_.list(ls)
-        for (var _198_14_ = 0; _198_14_ < list.length; _198_14_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            l = list[_198_14_]
+            l = list[_a_]
             this.do.append(l)
             appended.push(this.numLines() - 1)
         }
@@ -235,9 +235,9 @@ TextEditor = (function ()
         showLines = (this.scroll.bot < this.scroll.top) || (this.scroll.bot < this.scroll.viewLines)
         this.scroll.setNumLines(this.numLines(),{showLines:showLines})
         var list1 = _k_.list(appended)
-        for (var _209_15_ = 0; _209_15_ < list1.length; _209_15_++)
+        for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
-            li = list1[_209_15_]
+            li = list1[_b_]
             this.emit('lineAppended',{lineIndex:li,text:this.line(li)})
         }
         this.emit('linesAppended',ls)
@@ -277,10 +277,10 @@ TextEditor = (function ()
 
         this.syntax.changed(changeInfo)
         var list = _k_.list(changeInfo.changes)
-        for (var _260_19_ = 0; _260_19_ < list.length; _260_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            change = list[_260_19_]
-            var _261_23_ = [change.doIndex,change.newIndex,change.change]; di = _261_23_[0]; li = _261_23_[1]; ch = _261_23_[2]
+            change = list[_a_]
+            var _b_ = [change.doIndex,change.newIndex,change.change]; di = _b_[0]; li = _b_[1]; ch = _b_[2]
 
             switch (ch)
             {
@@ -365,7 +365,7 @@ TextEditor = (function ()
 
         this.lineDivs = {}
         this.elem.innerHTML = ''
-        for (var _340_19_ = li = top, _340_24_ = bot; (_340_19_ <= _340_24_ ? li <= bot : li >= bot); (_340_19_ <= _340_24_ ? ++li : --li))
+        for (var _a_ = li = top, _b_ = bot; (_a_ <= _b_ ? li <= bot : li >= bot); (_a_ <= _b_ ? ++li : --li))
         {
             this.appendLine(li)
         }
@@ -460,9 +460,9 @@ TextEditor = (function ()
                 var c
 
                 var list = _k_.list(this.elem.children)
-                for (var _417_22_ = 0; _417_22_ < list.length; _417_22_++)
+                for (var _a_ = 0; _a_ < list.length; _a_++)
                 {
-                    c = list[_417_22_]
+                    c = list[_a_]
                     c.style.transition = 'initial'
                 }
             }).bind(this)
@@ -474,7 +474,7 @@ TextEditor = (function ()
     {
         var li
 
-        for (var _423_19_ = li = this.scroll.top, _423_32_ = this.scroll.bot; (_423_19_ <= _423_32_ ? li <= this.scroll.bot : li >= this.scroll.bot); (_423_19_ <= _423_32_ ? ++li : --li))
+        for (var _a_ = li = this.scroll.top, _b_ = this.scroll.bot; (_a_ <= _b_ ? li <= this.scroll.bot : li >= this.scroll.bot); (_a_ <= _b_ ? ++li : --li))
         {
             this.updateLine(li)
         }
@@ -504,9 +504,9 @@ TextEditor = (function ()
 
         cs = []
         var list = _k_.list(this.cursors())
-        for (var _449_14_ = 0; _449_14_ < list.length; _449_14_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            c = list[_449_14_]
+            c = list[_a_]
             if (c[1] >= this.scroll.top && c[1] <= this.scroll.bot)
             {
                 cs.push([c[0],c[1] - this.scroll.top])
@@ -546,9 +546,9 @@ TextEditor = (function ()
         {
             vc = []
             var list1 = _k_.list(cs)
-            for (var _476_18_ = 0; _476_18_ < list1.length; _476_18_++)
+            for (var _b_ = 0; _b_ < list1.length; _b_++)
             {
-                c = list1[_476_18_]
+                c = list1[_b_]
                 if (isSamePos(this.mainCursor(),[c[0],c[1] + this.scroll.top]))
                 {
                     c[2] = 'main'
@@ -770,9 +770,9 @@ TextEditor = (function ()
         {
             lr = lineElem.getBoundingClientRect()
             var list = _k_.list(lineElem.firstChild.children)
-            for (var _647_18_ = 0; _647_18_ < list.length; _647_18_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                e = list[_647_18_]
+                e = list[_a_]
                 br = e.getBoundingClientRect()
                 if ((br.left <= x && x <= br.left + br.width))
                 {
@@ -969,18 +969,18 @@ TextEditor = (function ()
         }
 
         var list = _k_.list(Editor.actions)
-        for (var _794_19_ = 0; _794_19_ < list.length; _794_19_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            action = list[_794_19_]
+            action = list[_a_]
             combos = ((_796_35_=action.combos) != null ? _796_35_ : [action.combo])
             if (_k_.empty(combos))
             {
                 continue
             }
             var list1 = _k_.list(combos)
-            for (var _800_28_ = 0; _800_28_ < list1.length; _800_28_++)
+            for (var _b_ = 0; _b_ < list1.length; _b_++)
             {
-                actionCombo = list1[_800_28_]
+                actionCombo = list1[_b_]
                 if (combo === actionCombo)
                 {
                     if ((action.key != null) && _k_.isFunc(this[action.key]))

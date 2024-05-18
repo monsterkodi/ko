@@ -28,7 +28,7 @@ keeps current main cursor position in cursors if shift is pressed.`,combos:['ctr
     opt = _k_.clone(info)
     opt.erase = ((_72_18_=opt.erase) != null ? _72_18_ : (info.mod != null ? info.mod.indexOf('shift') : undefined) < 0)
     this.do.start()
-    var _74_17_ = ((function ()
+    var _a_ = ((function ()
     {
         switch (dir)
         {
@@ -46,7 +46,7 @@ keeps current main cursor position in cursors if shift is pressed.`,combos:['ctr
 
         }
 
-    }).bind(this))(); dx = _74_17_[0]; dy = _74_17_[1]
+    }).bind(this))(); dx = _a_[0]; dy = _a_[1]
 
     newCursors = this.do.cursors()
     oldMain = this.mainCursor()
@@ -166,9 +166,9 @@ keeps current main cursor position in cursors if shift is pressed.`,combos:['ctr
     newCursors = []
     main = 'last'
     var list = _k_.list(this.do.selections())
-    for (var _148_14_ = 0; _148_14_ < list.length; _148_14_++)
+    for (var _b_ = 0; _b_ < list.length; _b_++)
     {
-        s = list[_148_14_]
+        s = list[_b_]
         p = rangeIndexPos(s,i)
         newCursors.push(p)
         if (this.isCursorInRange(s))
@@ -190,9 +190,9 @@ keeps current main cursor position in cursors if shift is pressed.`,combos:['ctr
     if (newCursors.length > 1)
     {
         var list = _k_.list(newCursors)
-        for (var _172_18_ = 0; _172_18_ < list.length; _172_18_++)
+        for (var _c_ = 0; _c_ < list.length; _c_++)
         {
-            c = list[_172_18_]
+            c = list[_c_]
             newPos = func(c)
             if (newPos[1] === c[1] || !opt.keepLine)
             {
@@ -270,7 +270,7 @@ keeps current main cursor position in cursors if shift is pressed.`,combos:['ctr
 
     if (e && this.numSelections() === 0)
     {
-        if (0 === _k_.max((function () { var r_208_36_ = []; var list = _k_.list(this.cursors()); for (var _208_36_ = 0; _208_36_ < list.length; _208_36_++)  { c = list[_208_36_];r_208_36_.push(c[0])  } return r_208_36_ }).bind(this)()))
+        if (0 === _k_.max((function () { var r_d_ = []; var list = _k_.list(this.cursors()); for (var _e_ = 0; _e_ < list.length; _e_++)  { c = list[_e_];r_d_.push(c[0])  } return r_d_ }).bind(this)()))
         {
             this.do.start()
             this.do.select(this.rangesForCursorLines())

@@ -8,7 +8,7 @@
 
 use ../../kxk ▪ pickBy pullIf deleteBy sds matchr slash post ffs 
 
-use ◆ Walker IndexHpp IndexJS
+use ◆ Walker IndexHpp IndexJS IndexMM IndexStyl
 
 class Indexer
 
@@ -78,7 +78,6 @@ class Indexer
     
     @: ->
         
-        # post.onGet 'indexer' @onGet
         # post.on 'sourceInfoForFile' @onSourceInfoForFile
         
         post.on 'index' (file) => @indexFile file
@@ -99,7 +98,7 @@ class Indexer
     # 000   000  000  0000  000   000  000          000     
     #  0000000   000   000   0000000   00000000     000     
     
-    onGet: (key, filter...) =>
+    onGet: (key, filter...) => # not used anymore?
         
         switch key
             'counts'
@@ -140,6 +139,7 @@ class Indexer
         
         if not funcName
             log "addFuncInfo #{funcName}" funcInfo
+            ⮐ 
         
         if funcName.length > 1 and funcName.startsWith '@'
             funcName = funcName.slice 1
@@ -187,6 +187,40 @@ class Indexer
         deleteBy @classes, (k,v) -> v.file == file
         
         delete @files[file]
+        
+    #  0000000   00000000   00000000   000      000   000  000  000   000  0000000    00000000  000   000  00000000  00000000   
+    # 000   000  000   000  000   000  000       000 000   000  0000  000  000   000  000        000 000   000       000   000  
+    # 000000000  00000000   00000000   000        00000    000  000 0 000  000   000  0000000     00000    0000000   0000000    
+    # 000   000  000        000        000         000     000  000  0000  000   000  000        000 000   000       000   000  
+    # 000   000  000        000        0000000     000     000  000   000  0000000    00000000  000   000  00000000  000   000  
+    
+    applyIndexer: file fileInfo text IndexerClass ->
+                
+        indexer = new IndexerClass
+        parsed = indexer.parse text
+        
+        funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
+        
+        for clss in parsed.classes
+            
+            sds.set @classes, "#{clss.name}.file" file
+            sds.set @classes, "#{clss.name}.line" clss.line+1
+            
+            fileInfo.classes.push 
+                name: clss.name
+                line: clss.line+1
+                
+        for func in parsed.funcs
+            # this is ugly as fuck, consider fixing it!
+            if func.method
+                funcInfo = @addMethod func.class, func.method, file, func.line, func.async, func.bound, func.static
+            else
+                func.line = func.line+1
+                func.file = file
+                funcInfo = @addFuncInfo func.name, func
+                
+            fileInfo.funcs.push funcInfo
+
 
     # 000  000   000  0000000    00000000  000   000        00000000  000  000      00000000
     # 000  0000  000  000   000  000        000 000         000       000  000      000
@@ -211,7 +245,7 @@ class Indexer
             @files[file] = {}
             ⮐ @shiftQueue()
             
-        isCpp = fileExt in ['cpp' 'cc' 'mm' 'c' 'frag' 'vert']
+        isCpp = fileExt in ['cpp' 'cc' 'c' 'frag' 'vert']
         isHpp = fileExt in ['hpp' 'h' ]
         isJS  = fileExt in ['js' 'mjs']
         
@@ -230,147 +264,106 @@ class Indexer
             funcStack = []
             currentClass = null
             
-            if isHpp or isCpp
+            if 
                 
-                indexHpp = new IndexHpp
-                parsed = indexHpp.parse text
-                funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
-                
-                for clss in parsed.classes
+                isHpp or isCpp    ➜ @applyIndexer file, fileInfo, text, IndexHpp
+                isJS              ➜ @applyIndexer file, fileInfo, text, IndexJS
+                fileExt == 'mm'   ➜ @applyIndexer file, fileInfo, text, IndexMM
+                fileExt == 'styl' ➜ @applyIndexer file, fileInfo, text, IndexStyl
+                ➜
+                    # this is essentially the kode indexer. shouldn't that get split off like cpp and js indexers?
                     
-                    sds.set @classes, "#{clss.name}.file" file
-                    sds.set @classes, "#{clss.name}.line" clss.line+1
-                    
-                    fileInfo.classes.push 
-                        name: clss.name
-                        line: clss.line+1
+                    for li in 0...lines.length
                         
-                for func in parsed.funcs
-                    funcInfo = @addMethod func.class, func.method, file, func.line
-                    fileInfo.funcs.push funcInfo
-                    
-            else if isJS
-                
-                indexJS = new IndexJS
-                parsed = indexJS.parse text
-                
-                funcAdded = not empty(parsed.classes) or not empty(parsed.funcs)
-                
-                for clss in parsed.classes
-                    
-                    sds.set @classes, "#{clss.name}.file" file
-                    sds.set @classes, "#{clss.name}.line" clss.line+1
-                    
-                    fileInfo.classes.push 
-                        name: clss.name
-                        line: clss.line+1
-                        
-                for func in parsed.funcs
-                    # this is ugly as fuck, consider fixing it!
-                    if func.method
-                        funcInfo = @addMethod func.class, func.method, file, func.line, func.async, func.bound, func.static
-                    else
-                        func.line = func.line+1
-                        func.file = file
-                        funcInfo = @addFuncInfo func.name, func
-                        
-                    fileInfo.funcs.push funcInfo
-                    
-            else
-                
-                # this is essentially the kode indexer. shouldn't that get split off like cpp and js indexers?
-                
-                for li in 0...lines.length
-                    
-                    line = lines[li]
-    
-                    if line.trim().length # ignoring empty lines
-                        
-                        indent = line.search /\S/
-    
-                        while funcStack.length and indent <= last(funcStack)[0]
-                            last(funcStack)[1].last = li - 1
-                            funcInfo = funcStack.pop()[1]
-                            funcInfo.class ?= slash.name file
-                            fileInfo.funcs.push funcInfo 
-    
-                        if currentClass? 
-    
-                            # 00     00  00000000  000000000  000   000   0000000   0000000     0000000
-                            # 000   000  000          000     000   000  000   000  000   000  000
-                            # 000000000  0000000      000     000000000  000   000  000   000  0000000
-                            # 000 0 000  000          000     000   000  000   000  000   000       000
-                            # 000   000  00000000     000     000   000   0000000   0000000    0000000
-    
-                            if methodName = Indexer.methodNameInLine line
-                                funcInfo = @addMethod currentClass, methodName, file, li, line.indexOf('○')>=0, line.indexOf('=>')>=0
-                                funcStack.push [indent, funcInfo]
-                                funcAdded = true
-                        else
+                        line = lines[li]
         
-                            # 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000   0000000
-                            # 000       000   000  0000  000  000          000     000  000   000  0000  000  000
-                            # 000000    000   000  000 0 000  000          000     000  000   000  000 0 000  0000000
-                            # 000       000   000  000  0000  000          000     000  000   000  000  0000       000
-                            # 000        0000000   000   000   0000000     000     000   0000000   000   000  0000000
-    
-                            currentClass = null if indent < 2 
-    
-                            if funcName = Indexer.funcNameInLine line
-                                funcInfo = @addFuncInfo funcName,
-                                    line: li+1
-                                    file: file
-                                    async: line.indexOf('○')>=0
-    
-                                funcStack.push [indent, funcInfo]
-                                funcAdded = true
-
-                            else if funcName = Indexer.postNameInLine line
-                                funcInfo = @addFuncInfo funcName,
-                                    line: li+1
-                                    file: file
-                                    post: true
-    
-                                funcStack.push [indent, funcInfo]
-                                funcAdded = true
-                                
-                            m = line.match Indexer.testRegExp
-                            if m?[0]?
-                                funcInfo = @addFuncInfo m[0].replaceAll('▸ ' ''),
-                                    line: li+1
-                                    file: file
-                                    test: m[0].replaceAll '▸ ' ''
-    
-                                funcStack.push [indent, funcInfo]
-                                funcAdded = true
-    
-                    words = line.split Indexer.splitRegExp
-                    
-                    for word in words
-                        
-                        if Indexer.testWord word
-                            cnt = @words[word] ? 0
-                            @words[word] = cnt + 1
-    
-                        switch word
-    
-                            #  0000000  000       0000000    0000000   0000000
-                            # 000       000      000   000  000       000
-                            # 000       000      000000000  0000000   0000000
-                            # 000       000      000   000       000       000
-                            #  0000000  0000000  000   000  0000000   0000000
+                        if line.trim().length # ignoring empty lines
                             
-                            'class' 'function'
-                                
-                                if className = Indexer.classNameInLine line
-                                    
-                                    currentClass = className
-                                    sds.set @classes, "#{className}.file" file
-                                    sds.set @classes, "#{className}.line" li+1
-                                    
-                                    fileInfo.classes.push 
-                                        name: className
+                            indent = line.search /\S/
+        
+                            while funcStack.length and indent <= last(funcStack)[0]
+                                last(funcStack)[1].last = li - 1
+                                funcInfo = funcStack.pop()[1]
+                                funcInfo.class ?= slash.name file
+                                fileInfo.funcs.push funcInfo 
+        
+                            if currentClass? 
+        
+                                # 00     00  00000000  000000000  000   000   0000000   0000000     0000000
+                                # 000   000  000          000     000   000  000   000  000   000  000
+                                # 000000000  0000000      000     000000000  000   000  000   000  0000000
+                                # 000 0 000  000          000     000   000  000   000  000   000       000
+                                # 000   000  00000000     000     000   000   0000000   0000000    0000000
+        
+                                if methodName = Indexer.methodNameInLine line
+                                    funcInfo = @addMethod currentClass, methodName, file, li, line.indexOf('○')>=0, line.indexOf('=>')>=0
+                                    funcStack.push [indent, funcInfo]
+                                    funcAdded = true
+                            else
+            
+                                # 00000000  000   000  000   000   0000000  000000000  000   0000000   000   000   0000000
+                                # 000       000   000  0000  000  000          000     000  000   000  0000  000  000
+                                # 000000    000   000  000 0 000  000          000     000  000   000  000 0 000  0000000
+                                # 000       000   000  000  0000  000          000     000  000   000  000  0000       000
+                                # 000        0000000   000   000   0000000     000     000   0000000   000   000  0000000
+        
+                                currentClass = null if indent < 2 
+        
+                                if funcName = Indexer.funcNameInLine line
+                                    funcInfo = @addFuncInfo funcName,
                                         line: li+1
+                                        file: file
+                                        async: line.indexOf('○')>=0
+        
+                                    funcStack.push [indent, funcInfo]
+                                    funcAdded = true
+    
+                                else if funcName = Indexer.postNameInLine line
+                                    funcInfo = @addFuncInfo funcName,
+                                        line: li+1
+                                        file: file
+                                        post: true
+        
+                                    funcStack.push [indent, funcInfo]
+                                    funcAdded = true
+                                    
+                                m = line.match Indexer.testRegExp
+                                if m?[0]?
+                                    funcInfo = @addFuncInfo m[0].replaceAll('▸ ' ''),
+                                        line: li+1
+                                        file: file
+                                        test: m[0].replaceAll '▸ ' ''
+        
+                                    funcStack.push [indent, funcInfo]
+                                    funcAdded = true
+        
+                        words = line.split Indexer.splitRegExp
+                        
+                        for word in words
+                            
+                            if Indexer.testWord word
+                                cnt = @words[word] ? 0
+                                @words[word] = cnt + 1
+        
+                            switch word
+        
+                                #  0000000  000       0000000    0000000   0000000
+                                # 000       000      000   000  000       000
+                                # 000       000      000000000  0000000   0000000
+                                # 000       000      000   000       000       000
+                                #  0000000  0000000  000   000  0000000   0000000
+                                
+                                'class' 'function'
+                                    
+                                    if className = Indexer.classNameInLine line
+                                        
+                                        currentClass = className
+                                        sds.set @classes, "#{className}.file" file
+                                        sds.set @classes, "#{className}.line" li+1
+                                        
+                                        fileInfo.classes.push 
+                                            name: className
+                                            line: li+1
     
             if funcAdded
 

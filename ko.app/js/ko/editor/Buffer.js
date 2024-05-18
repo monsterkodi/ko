@@ -1,6 +1,6 @@
 var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var Buffer, endOf, startOf
+var Buffer
 
 import kxk from "../../kxk.js"
 let kstr = kxk.kstr
@@ -10,16 +10,6 @@ let uniq = kxk.uniq
 
 import Do from "./Do.js"
 
-
-startOf = function (r)
-{
-    return r[0]
-}
-
-endOf = function (r)
-{
-    return r[0] + Math.max(1,r[1] - r[0])
-}
 
 Buffer = (function ()
 {
@@ -41,7 +31,7 @@ Buffer = (function ()
 
     Buffer.prototype["onDoChanges"] = function (changes)
     {
-        var _30_16_
+        var _27_16_
 
         return (typeof this.changed === "function" ? this.changed(changes) : undefined)
     }
@@ -207,14 +197,14 @@ Buffer = (function ()
     {
         var r
 
-        return (function () { var r_91_66_ = []; var list = _k_.list(this.rangesForWordsAtCursors(cs,opt)); for (var _91_66_ = 0; _91_66_ < list.length; _91_66_++)  { r = list[_91_66_];r_91_66_.push(this.textInRange(r))  } return r_91_66_ }).bind(this)()
+        return (function () { var r_a_ = []; var list = _k_.list(this.rangesForWordsAtCursors(cs,opt)); for (var _b_ = 0; _b_ < list.length; _b_++)  { r = list[_b_];r_a_.push(this.textInRange(r))  } return r_a_ }).bind(this)()
     }
 
     Buffer.prototype["rangesForWordsAtCursors"] = function (cs = this.cursors(), opt)
     {
         var c, rngs
 
-        rngs = (function () { var r_94_49_ = []; var list = _k_.list(cs); for (var _94_49_ = 0; _94_49_ < list.length; _94_49_++)  { c = list[_94_49_];r_94_49_.push(this.rangeForWordAtPos(c,opt))  } return r_94_49_ }).bind(this)()
+        rngs = (function () { var r_a_ = []; var list = _k_.list(cs); for (var _b_ = 0; _b_ < list.length; _b_++)  { c = list[_b_];r_a_.push(this.rangeForWordAtPos(c,opt))  } return r_a_ }).bind(this)()
         return rngs = cleanRanges(rngs)
     }
 
@@ -300,10 +290,10 @@ Buffer = (function ()
 
     Buffer.prototype["wordRangesInLineAtIndex"] = function (li, opt = {})
     {
-        var mtch, r, _145_19_, _146_89_
+        var mtch, r, _142_19_, _143_89_
 
-        opt.regExp = ((_145_19_=opt.regExp) != null ? _145_19_ : this.wordRegExp)
-        if ((opt != null ? (_146_89_=opt.include) != null ? _146_89_.length : undefined : undefined))
+        opt.regExp = ((_142_19_=opt.regExp) != null ? _142_19_ : this.wordRegExp)
+        if ((opt != null ? (_143_89_=opt.include) != null ? _143_89_.length : undefined : undefined))
         {
             opt.regExp = new RegExp(`(\\s+|[\\w${opt.include}]+|[^\\s])`,'g')
         }
@@ -334,7 +324,7 @@ Buffer = (function ()
         hl = this.highlightsInLineIndexRange(lineIndexRange)
         if (hl)
         {
-            return (function () { var r_169_61_ = []; var list = _k_.list(hl); for (var _169_61_ = 0; _169_61_ < list.length; _169_61_++)  { s = list[_169_61_];r_169_61_.push([s[0] - relIndex,[s[1][0],s[1][1]],s[2]])  } return r_169_61_ }).bind(this)()
+            return (function () { var r_a_ = []; var list = _k_.list(hl); for (var _b_ = 0; _b_ < list.length; _b_++)  { s = list[_b_];r_a_.push([s[0] - relIndex,[s[1][0],s[1][1]],s[2]])  } return r_a_ }).bind(this)()
         }
     }
 
@@ -353,7 +343,7 @@ Buffer = (function ()
         sl = this.selectionsInLineIndexRange(lineIndexRange)
         if (sl)
         {
-            return (function () { var r_185_55_ = []; var list = _k_.list(sl); for (var _185_55_ = 0; _185_55_ < list.length; _185_55_++)  { s = list[_185_55_];r_185_55_.push([s[0] - relIndex,[s[1][0],s[1][1]]])  } return r_185_55_ }).bind(this)()
+            return (function () { var r_a_ = []; var list = _k_.list(sl); for (var _b_ = 0; _b_ < list.length; _b_++)  { s = list[_b_];r_a_.push([s[0] - relIndex,[s[1][0],s[1][1]]])  } return r_a_ }).bind(this)()
         }
     }
 
@@ -369,14 +359,14 @@ Buffer = (function ()
     {
         var s
 
-        return uniq((function () { var r_191_45_ = []; var list = _k_.list(this.selections()); for (var _191_45_ = 0; _191_45_ < list.length; _191_45_++)  { s = list[_191_45_];r_191_45_.push(s[0])  } return r_191_45_ }).bind(this)())
+        return uniq((function () { var r_a_ = []; var list = _k_.list(this.selections()); for (var _b_ = 0; _b_ < list.length; _b_++)  { s = list[_b_];r_a_.push(s[0])  } return r_a_ }).bind(this)())
     }
 
     Buffer.prototype["cursorLineIndices"] = function ()
     {
         var c
 
-        return uniq((function () { var r_192_45_ = []; var list = _k_.list(this.cursors()); for (var _192_45_ = 0; _192_45_ < list.length; _192_45_++)  { c = list[_192_45_];r_192_45_.push(c[1])  } return r_192_45_ }).bind(this)())
+        return uniq((function () { var r_a_ = []; var list = _k_.list(this.cursors()); for (var _b_ = 0; _b_ < list.length; _b_++)  { c = list[_b_];r_a_.push(c[1])  } return r_a_ }).bind(this)())
     }
 
     Buffer.prototype["selectedAndCursorLineIndices"] = function ()
@@ -393,9 +383,9 @@ Buffer = (function ()
         if (il.length)
         {
             var list = _k_.list(il)
-            for (var _203_19_ = 0; _203_19_ < list.length; _203_19_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                li = list[_203_19_]
+                li = list[_a_]
                 if (csr.length && _k_.last(csr)[1] === li - 1)
                 {
                     _k_.last(csr)[1] = li
@@ -432,7 +422,7 @@ Buffer = (function ()
 
     Buffer.prototype["textInRange"] = function (rg)
     {
-        var _226_58_
+        var _223_58_
 
         return (!_k_.empty((rg)) ? (typeof this.line(rg[0]).slice === "function" ? this.line(rg[0]).slice(rg[1][0],rg[1][1]) : undefined) : '')
     }
@@ -441,7 +431,7 @@ Buffer = (function ()
     {
         var r
 
-        return (function () { var r_227_51_ = []; var list = _k_.list(rgs); for (var _227_51_ = 0; _227_51_ < list.length; _227_51_++)  { r = list[_227_51_];r_227_51_.push(this.textInRange(r))  } return r_227_51_ }).bind(this)()
+        return (function () { var r_a_ = []; var list = _k_.list(rgs); for (var _b_ = 0; _b_ < list.length; _b_++)  { r = list[_b_];r_a_.push(this.textInRange(r))  } return r_a_ }).bind(this)()
     }
 
     Buffer.prototype["textInRanges"] = function (rgs)
@@ -537,7 +527,7 @@ Buffer = (function ()
 
     Buffer.prototype["isRangeInString"] = function (r)
     {
-        var _291_59_
+        var _288_59_
 
         return (this.rangeOfStringSurroundingRange(r) != null)
     }
@@ -599,7 +589,7 @@ Buffer = (function ()
     {
         var c
 
-        return (function () { var r_333_78_ = []; var list = _k_.list(cs); for (var _333_78_ = 0; _333_78_ < list.length; _333_78_++)  { c = list[_333_78_];r_333_78_.push(this.rangeForLineAtIndex(c[1]))  } return r_333_78_ }).bind(this)()
+        return (function () { var r_a_ = []; var list = _k_.list(cs); for (var _b_ = 0; _b_ < list.length; _b_++)  { c = list[_b_];r_a_.push(this.rangeForLineAtIndex(c[1]))  } return r_a_ }).bind(this)()
     }
 
     Buffer.prototype["rangesForAllLines"] = function ()
@@ -612,7 +602,7 @@ Buffer = (function ()
         var i, r
 
         r = []
-        var _338_14_ = sortPositions([a,b]); a = _338_14_[0]; b = _338_14_[1]
+        var _a_ = sortPositions([a,b]); a = _a_[0]; b = _a_[1]
 
         if (a[1] === b[1])
         {
@@ -623,7 +613,7 @@ Buffer = (function ()
             r.push([a[1],[a[0],this.line(a[1]).length]])
             if (b[1] - a[1] > 1)
             {
-                for (var _344_26_ = i = a[1] + 1, _344_35_ = b[1]; (_344_26_ <= _344_35_ ? i < b[1] : i > b[1]); (_344_26_ <= _344_35_ ? ++i : --i))
+                for (var _b_ = i = a[1] + 1, _c_ = b[1]; (_b_ <= _c_ ? i < b[1] : i > b[1]); (_b_ <= _c_ ? ++i : --i))
                 {
                     r.push([i,[0,this.line(i).length]])
                 }
@@ -635,11 +625,15 @@ Buffer = (function ()
 
     Buffer.prototype["rangesForLinesFromTopToBot"] = function (top, bot)
     {
-        var ir, li, r
+        var endOf, ir, li, r
 
         r = []
         ir = [top,bot]
-        for (var _352_18_ = li = startOf(ir), _352_32_ = endOf(ir); (_352_18_ <= _352_32_ ? li < endOf(ir) : li > endOf(ir)); (_352_18_ <= _352_32_ ? ++li : --li))
+        endOf = function (r)
+        {
+            return r[0] + Math.max(1,r[1] - r[0])
+        }
+        for (var _a_ = li = ir[0], _b_ = endOf(ir); (_a_ <= _b_ ? li < endOf(ir) : li > endOf(ir)); (_a_ <= _b_ ? ++li : --li))
         {
             if ((0 <= li && li < this.numLines()))
             {
@@ -655,7 +649,7 @@ Buffer = (function ()
 
         t = t.split('\n')[0]
         r = []
-        for (var _360_19_ = li = 0, _360_23_ = this.numLines(); (_360_19_ <= _360_23_ ? li < this.numLines() : li > this.numLines()); (_360_19_ <= _360_23_ ? ++li : --li))
+        for (var _a_ = li = 0, _b_ = this.numLines(); (_a_ <= _b_ ? li < this.numLines() : li > this.numLines()); (_a_ <= _b_ ? ++li : --li))
         {
             r = r.concat(this.rangesForTextInLineAtIndex(t,li,opt))
             if (r.length >= (((_362_43_=(opt != null ? opt.max : undefined)) != null ? _362_43_ : 999)))
@@ -678,9 +672,9 @@ Buffer = (function ()
         }
         rngs = matchr.ranges(t,this.line(i),_k_.in(type,['str','reg']) && 'i' || '')
         var list = _k_.list(rngs)
-        for (var _370_16_ = 0; _370_16_ < list.length; _370_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            rng = list[_370_16_]
+            rng = list[_a_]
             r.push([i,[rng.start,rng.start + rng.match.length]])
         }
         return r
@@ -694,7 +688,7 @@ Buffer = (function ()
         r = []
         ss = -1
         cc = null
-        for (var _379_18_ = i = 0, _379_22_ = t.length; (_379_18_ <= _379_22_ ? i < t.length : i > t.length); (_379_18_ <= _379_22_ ? ++i : --i))
+        for (var _a_ = i = 0, _b_ = t.length; (_a_ <= _b_ ? i < t.length : i > t.length); (_a_ <= _b_ ? ++i : --i))
         {
             c = t[i]
             if (!cc && _k_.in(c,"'\""))

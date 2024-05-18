@@ -41,9 +41,9 @@ Pigments = (function ()
             rngs = matchr.ranges(this.regexps,line)
             ri = -1
             var list = _k_.list(rngs)
-            for (var _38_20_ = 0; _38_20_ < list.length; _38_20_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                rng = list[_38_20_]
+                rng = list[_a_]
                 ri++
                 color = (rng.match.startsWith('0x') ? "#" + rng.match.slice(2) : rng.match)
                 this.editor.meta.add({line:li,start:line.length + 2 + ri * 3,end:line.length + 2 + ri * 3 + 2,clss:'pigment',style:{backgroundColor:color}})
@@ -62,9 +62,9 @@ Pigments = (function ()
         if (metas.length)
         {
             var list = _k_.list(metas)
-            for (var _59_18_ = 0; _59_18_ < list.length; _59_18_++)
+            for (var _a_ = 0; _a_ < list.length; _a_++)
             {
-                m = list[_59_18_]
+                m = list[_a_]
                 this.editor.meta.delMeta(m)
             }
         }
@@ -104,7 +104,7 @@ Pigments = (function ()
 
         this.editor.on('lineChanged',this.onLineChanged)
         this.editor.on('lineInserted',this.onLineInserted)
-        for (var _104_19_ = li = 0, _104_23_ = this.editor.numLines(); (_104_19_ <= _104_23_ ? li < this.editor.numLines() : li > this.editor.numLines()); (_104_19_ <= _104_23_ ? ++li : --li))
+        for (var _a_ = li = 0, _b_ = this.editor.numLines(); (_a_ <= _b_ ? li < this.editor.numLines() : li > this.editor.numLines()); (_a_ <= _b_ ? ++li : --li))
         {
             this.onLineInserted(li)
         }

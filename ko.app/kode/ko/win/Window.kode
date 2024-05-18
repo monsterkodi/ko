@@ -7,12 +7,13 @@
 ###
 
 use ../../kakao
-use ../../kxk      ▪ win scheme stash post prefs store stopEvent
+use ../../konrad   ◆ version
+use ../../kxk      ▪ win scheme fps clippo stash post prefs store stopEvent $
 use                ◆ Split Info Tabs Menu QuickMenu Navigate FileHandler Terminal Viewer
-use ../tools       ◆ FileWatch Projects Indexer Git Unicode fps
+use ../tools       ◆ FileWatch Projects Indexer Git Unicode
 use ../editor      ◆ Kore Editor Syntax FileEditor
 use ../commands    ◆ Macro
-use ../commandline ◆ CommandLine 
+use ../commandline ◆ CommandLine
 
 # 000   000  000  000   000  0000000     0000000   000   000  
 # 000 0 000  000  0000  000  000   000  000   000  000 0 000  
@@ -33,16 +34,19 @@ function Window extends win.Delegate
     
     @: ->
         
-        @menuIcon   = kakao.bundle.img 'menu_ko.png'
-        @menuNoon   = kakao.bundle.res 'menu_ko.noon'
-        @aboutImage = kakao.bundle.img 'about_ko.png'
+        @menuIcon     = kakao.bundle.img 'menu_ko.png'
+        @menuNoon     = kakao.bundle.res 'menu_ko.noon'
+        
+        @aboutImage   = kakao.bundle.img 'about_ko.png'
+        @aboutVersion = "#{version}"
+        @aboutURL     = "https://github.com/monsterkodi/ko"
         
         post.on 'menuAction' @onMenuAction
         post.on 'stash' -> window.editor.saveFilePosition()
         
     onWindowWithoutStash: ○->
         
-        log 'onWindowWithoutStash!'
+        # log 'onWindowWithoutStash!'
         
         if empty window.tabs.tabs ➜ log 'new empty tab!'; post.emit 'newEmptyTab'
             
@@ -59,6 +63,8 @@ function Window extends win.Delegate
         new Unicode
         new Git
         
+        clippo.watch()
+        
         @tabs        = window.tabs        = new Tabs()
         @quickMenu   = window.quickMenu   = new QuickMenu()
         @navigate    = window.navigate    = new Navigate()
@@ -67,7 +73,7 @@ function Window extends win.Delegate
         @editor      = window.editor      = new FileEditor 'editor'
         @commandline = window.commandline = new CommandLine 'commandline-editor'
         @info        = window.info        = new Info @editor
-        @fps         = window.fps         = new fps()
+        @fps         = window.fps         = new fps $ 'commandline-span'
         @indexer     = window.indexer     = new Indexer()
         @viewer      = window.viewer      = new Viewer 'editor'
         

@@ -159,7 +159,7 @@ Browse = (function ()
         var i, prefix
 
         prefix = ''
-        for (var _154_18_ = i = 0, _154_22_ = Math.min(strA.length,strB.length); (_154_18_ <= _154_22_ ? i < Math.min(strA.length,strB.length) : i > Math.min(strA.length,strB.length)); (_154_18_ <= _154_22_ ? ++i : --i))
+        for (var _a_ = i = 0, _b_ = Math.min(strA.length,strB.length); (_a_ <= _b_ ? i < Math.min(strA.length,strB.length) : i > Math.min(strA.length,strB.length)); (_a_ <= _b_ ? ++i : --i))
         {
             if (strA[i] !== strB[i])
             {
@@ -177,9 +177,9 @@ Browse = (function ()
         brokenPath = slash.path(this.getText())
         longestMatch = ''
         var list = _k_.list(files)
-        for (var _164_17_ = 0; _164_17_ < list.length; _164_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            file = list[_164_17_]
+            file = list[_a_]
             file = file.file
             prefix = this.commonPrefix(file,brokenPath)
             if (prefix.length > longestMatch.length)

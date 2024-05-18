@@ -48,7 +48,7 @@ class FileHandler
         editor.saveFilePosition()
         if ((file != null))
         {
-            var _41_28_ = slash.splitFilePos(file); file = _41_28_[0]; filePos = _41_28_[1]
+            var _a_ = slash.splitFilePos(file); file = _a_[0]; filePos = _a_[1]
 
             if ((filePos != null) && (filePos[0] || filePos[1]))
             {
@@ -106,9 +106,9 @@ class FileHandler
         }
         options = ((_92_33_=this.openDialogOpt) != null ? _92_33_ : {})
         var list = _k_.list(files.slice(0, 30))
-        for (var _94_17_ = 0; _94_17_ < list.length; _94_17_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            file = list[_94_17_]
+            file = list[_a_]
             if (options.newWindow)
             {
                 kakao('window.new','ko.html',file)

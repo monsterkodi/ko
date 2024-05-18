@@ -6,7 +6,7 @@
 000       000  0000000  00000000        00000000  0000000    000     000      0000000   000   000
 ###
 
-use ../../kxk ▪ deleteBy findIf ffs kpos post popup slash stopEvent setStyle kstr
+use ../../kxk ▪ deleteBy findIf ffs kpos post popup slash stopEvent elem setStyle kstr
 use ../tools  ◆ File
 use           ◆ Syntax TextEditor
 
@@ -179,7 +179,7 @@ function FileEditor extends TextEditor
 
             posScroll = cursor.split(' ').map (c) -> parseInt c
             @singleCursorAtPos posScroll
-            # @scroll.cursorInitView()
+
             if posScroll.length == 3
                 @scroll.scroll = 0
                 @scroll.by last posScroll
@@ -445,31 +445,8 @@ function FileEditor extends TextEditor
         if not absPos?
             absPos = kpos @view.getBoundingClientRect().left, @view.getBoundingClientRect().top
 
-        opt = items: [
-            text:   'Browse'
-            combo:  'command+.'
-            cb:     -> window.commandline.startCommand 'browse'
-        ,
-            text:   'Back'
-            combo:  'command+1'
-            cb:     -> post.emit 'menuAction' 'Navigate Backward'
-        ,
-            text:   ''
-        ,
-            text:   'Maximize'
-            combo:  'command+,'
-            cb:     -> window.split.maximizeEditor()
-        ,
-            text:   ''
-        ,
-            text:   'DevTools'
-            combo:  'alt+cmdctrl+i'
-        ,
-            text:   ''
-        ]
-
-        template = clone kakao.menuTemplate
-        opt.items = opt.items.concat template
+        opt = {}
+        opt.items = clone kakao.menuTemplate
         
         RecentMenu = []
 
@@ -499,7 +476,33 @@ function FileEditor extends TextEditor
         opt.x = absPos.x
         opt.y = absPos.y
         
-        popup.menu opt
+        opt.selectFirstItem = false
+        
+        pup = popup.menu opt
+        act = event fnc -> stopEvent event; fnc(); pup.close all:true focus:true
+        
+        ti  = split.terminalVisible() ? '' : ''
+        bi  = split.browserVisible()  ? '' : ''
+        qiq = prefs.get('list|active') ? '' : ' quickmenu-inactive'
+        
+        quiq = elem class:'quickmenu' children: [
+                elem { text:bi, class:'quickmenu-item quickmenu-browser'    mouseup:( (e) -> act e, window.quickMenu.onBrowser  )},
+                elem { text:ti, class:'quickmenu-item quickmenu-terminal'   mouseup:( (e) -> act e, window.quickMenu.onTerminal )},
+                elem { text:'' class:'quickmenu-item quickmenu-devtools'   mouseup:( (e) -> act e, window.quickMenu.onDevTools )},
+                elem { text:'' class:'quickmenu-item quickmenu-kalk'       mouseup:( (e) -> act e, window.quickMenu.onKalk     )},
+                elem { text:'' class:"quickmenu-item quickmenu-list#{qiq}" mouseup:( (e) -> act e, window.quickMenu.onList     )}                
+            ]
+        
+        if window.navigate.canNavigateBack()
+            quiq.appendChild elem text:'' class:'quickmenu-item quickmenu-navigate'  mouseup:(e) -> act e, -> post.emit 'menuAction' 'Navigate Backward'
+
+        if window.navigate.canNavigateForward()
+            quiq.appendChild elem text:'' class:'quickmenu-item quickmenu-navigate'  mouseup:(e) -> act e, -> post.emit 'menuAction' 'Navigate Forward'
+                        
+        pup.items.insertBefore quiq, pup.items.firstChild
+        pup.select quiq
+        
+        pup
 
     #  0000000  000      000   0000000  000   000
     # 000       000      000  000       000  000

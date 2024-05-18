@@ -24,16 +24,16 @@ class Do extends events
         var c, changes, chg, index, nxt, o, prv
 
         changes = []
-        for (var _31_21_ = index = 0, _31_25_ = this.history.length - 1 - this.undos; (_31_21_ <= _31_25_ ? index < this.history.length - 1 - this.undos : index > this.history.length - 1 - this.undos); (_31_21_ <= _31_25_ ? ++index : --index))
+        for (var _a_ = index = 0, _b_ = this.history.length - 1 - this.undos; (_a_ <= _b_ ? index < this.history.length - 1 - this.undos : index > this.history.length - 1 - this.undos); (_a_ <= _b_ ? ++index : --index))
         {
             chg = this.calculateChanges(this.history[index],this.history[index + 1])
             if (!_k_.empty((chg != null ? chg.changes : undefined)))
             {
                 o = {}
                 var list = _k_.list(chg.changes)
-                for (var _35_22_ = 0; _35_22_ < list.length; _35_22_++)
+                for (var _c_ = 0; _c_ < list.length; _c_++)
                 {
-                    c = list[_35_22_]
+                    c = list[_c_]
                     switch (c.change)
                     {
                         case 'changed':
@@ -73,14 +73,14 @@ class Do extends events
         var changes, index, key, type, value
 
         var list = _k_.list(tabState)
-        for (var _56_20_ = 0; _56_20_ < list.length; _56_20_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            changes = list[_56_20_]
+            changes = list[_a_]
             this.start()
             for (key in changes)
             {
                 value = changes[key]
-                var _59_30_ = key.split(' '); type = _59_30_[0]; index = _59_30_[1]
+                var _b_ = key.split(' '); type = _b_[0]; index = _b_[1]
 
                 switch (type)
                 {
@@ -279,16 +279,16 @@ class Do extends events
         var c, ci, p
 
         var list = _k_.list(cs)
-        for (var _228_14_ = 0; _228_14_ < list.length; _228_14_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            p = list[_228_14_]
+            p = list[_a_]
             p[0] = Math.max(p[0],0)
             p[1] = _k_.clamp(0,this.state.numLines() - 1,p[1])
         }
         sortPositions(cs)
         if (cs.length > 1)
         {
-            for (var _235_22_ = ci = cs.length - 1, _235_36_ = 0; (_235_22_ <= _235_36_ ? ci < 0 : ci > 0); (_235_22_ <= _235_36_ ? ++ci : --ci))
+            for (var _b_ = ci = cs.length - 1, _c_ = 0; (_b_ <= _c_ ? ci < 0 : ci > 0); (_b_ <= _c_ ? ++ci : --ci))
             {
                 c = cs[ci]
                 p = cs[ci - 1]

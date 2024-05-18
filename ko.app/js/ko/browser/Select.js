@@ -64,9 +64,9 @@ class Select
         var row, _44_25_
 
         var list = ((_44_25_=this.rows) != null ? _44_25_ : [])
-        for (var _44_16_ = 0; _44_16_ < list.length; _44_16_++)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
         {
-            row = list[_44_16_]
+            row = list[_a_]
             row.clearSelected()
         }
         this.rows = []
@@ -149,7 +149,7 @@ class Select
             from = row.index()
             to = this.active.index() - 1
         }
-        for (var _101_22_ = index = from, _101_28_ = to; (_101_22_ <= _101_28_ ? index <= to : index >= to); (_101_22_ <= _101_28_ ? ++index : --index))
+        for (var _a_ = index = from, _b_ = to; (_a_ <= _b_ ? index <= to : index >= to); (_a_ <= _b_ ? ++index : --index))
         {
             r = this.active.column.rows[index]
             if (!r.isSelected())

@@ -79,7 +79,7 @@ class Invisibles
         this.clear()
         this.editor.on('lineChanged',this.onLineChanged)
         this.editor.on('lineInserted',this.onLineInserted)
-        for (var _109_19_ = li = 0, _109_23_ = this.editor.numLines(); (_109_19_ <= _109_23_ ? li < this.editor.numLines() : li > this.editor.numLines()); (_109_19_ <= _109_23_ ? ++li : --li))
+        for (var _a_ = li = 0, _b_ = this.editor.numLines(); (_a_ <= _b_ ? li < this.editor.numLines() : li > this.editor.numLines()); (_a_ <= _b_ ? ++li : --li))
         {
             this.onLineInserted(li)
         }

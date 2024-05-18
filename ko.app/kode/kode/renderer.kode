@@ -41,6 +41,8 @@ class Renderer
         @hint = _k_:{}
         @varstack = [ast.vars]
         @indent = ''
+        @varindex = 0
+        @varcontext = {}
 
         s = ''
         
@@ -209,7 +211,7 @@ class Renderer
             lhs = @atom p.lhs
             "(#{lhs} != null ? #{lhs} : #{@atom p.rhs})"
         else
-            vn = @makeVar p.qmrk
+            vn = @lineVar p.qmrk
             "((#{vn}=#{@atom p.lhs}) != null ? #{vn} : #{@atom p.rhs})"
 
     qmrkcolon: (p) ->
@@ -1709,7 +1711,7 @@ class Renderer
     # 000       000   000  000            000  000   000     000     000   000  000   000  
     # 000       000   000  00000000  0000000   000   000      0      000   000  000   000  
     
-    freshVar: (name, suffix=0) ->
+    freshVar: name suffix=0 ->
 
         for vars in @varstack
             for v in vars
@@ -1718,8 +1720,17 @@ class Renderer
 
         @varstack[-1].push text:name + (suffix or '')
         name + (suffix or '')
+        
+    lineVar: tok -> "_#{tok.line}_#{tok.col}_"
 
-    makeVar: (tok) -> "_#{tok.line}_#{tok.col}_"
+    makeVar: tok ->
+        
+        ctx = @fncsName ? @mthdName
+        ctx ?= '_k_'
+        ctx = '@' if ctx == 'constructor'
+        @varcontext[ctx] ?= 0
+        @varcontext[ctx] = @varcontext[ctx] + 1
+        "_#{(@varcontext[ctx]+9).toString(16)}_"
         
     verb: -> if @debug then console.log.apply console.log, arguments
     
