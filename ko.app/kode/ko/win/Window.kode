@@ -73,7 +73,7 @@ function Window extends win.Delegate
         @editor      = window.editor      = new FileEditor 'editor'
         @commandline = window.commandline = new CommandLine 'commandline-editor'
         @info        = window.info        = new Info @editor
-        @fps         = window.fps         = new fps $ 'commandline-span'
+        @fps         = window.fps         = new fps $('commandline-span'), width:260
         @indexer     = window.indexer     = new Indexer()
         @viewer      = window.viewer      = new Viewer 'editor'
         

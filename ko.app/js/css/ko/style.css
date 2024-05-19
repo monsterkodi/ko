@@ -57,7 +57,6 @@ body
 
 #titlebar .winicon img
 {
-    opacity: 0.6;
     padding-top: 4px;
     padding-left: 20px;
     padding-right: 14px;
@@ -628,9 +627,9 @@ body
 {
     pointer-events: none;
     position: absolute;
-    right: 131px;
-    top: 0;
-    width: 130px;
+    right: 130px;
+    top: -9px;
+    width: 260px;
     height: 30px;
 }
 

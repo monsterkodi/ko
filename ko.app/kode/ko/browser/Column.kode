@@ -740,11 +740,16 @@ function Column
 
     explorer: =>
 
-        open slash.dir @activePath()
+        kakao 'finder' @browser.select.files()
+        
+    openSelected: =>
+        
+        kakao 'open' @browser.select.files()
 
     open: =>
 
-        open @activePath()
+        # open @activePath()
+        kakao 'open' slash.fileUrl @activePath()
 
     #  0000000   000  000000000
     # 000        000     000
@@ -916,6 +921,7 @@ function Column
             'ctrl+v' 'command+v'               ➜ ⮐ stopEvent event, @pastePaths()
             'page up' 'page down' 'home' 'end' ➜ ⮐ stopEvent event, @navigateRows key
             'enter''alt+up'                    ➜ ⮐ stopEvent event, @navigateCols key
+            'command+enter'                    ➜ ⮐ stopEvent event, @openSelected()
             'command+up' 'ctrl+up'             ➜ ⮐ stopEvent event, @navigateRows 'home'
             'command+down' 'ctrl+down'         ➜ ⮐ stopEvent event, @navigateRows 'end'
             'ctrl+t'                           ➜ ⮐ stopEvent event, @sortByType()

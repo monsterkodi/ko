@@ -20,6 +20,7 @@ class FileHandler
         post.on 'openFile'    @openFile
         post.on 'file'        @onFile
         post.on 'reloadFile'  @reloadFile
+        post.on 'loadFiles'   @onOpenDialog
         post.on 'openDialog'  @onOpenDialog
         post.on 'saveDialog'  @onSaveDialog
 
@@ -83,7 +84,7 @@ class FileHandler
     #  0000000   000   000       0000000   000        00000000  000   000  
     
     # opens a list of files in new tabs
-    # called from open file dialog
+    # called from open file dialog and main process
     
     onOpenDialog: files =>
 

@@ -32,6 +32,7 @@ class FileHandler
         post.on('openFile',this.openFile)
         post.on('file',this.onFile)
         post.on('reloadFile',this.reloadFile)
+        post.on('loadFiles',this.onOpenDialog)
         post.on('openDialog',this.onOpenDialog)
         post.on('saveDialog',this.onSaveDialog)
         this.cursorToRestore = {}
@@ -98,13 +99,13 @@ class FileHandler
 
     onOpenDialog (files)
     {
-        var file, options, _92_33_
+        var file, options, _93_33_
 
         if (_k_.empty(files))
         {
             return
         }
-        options = ((_92_33_=this.openDialogOpt) != null ? _92_33_ : {})
+        options = ((_93_33_=this.openDialogOpt) != null ? _93_33_ : {})
         var list = _k_.list(files.slice(0, 30))
         for (var _a_ = 0; _a_ < list.length; _a_++)
         {
@@ -190,7 +191,7 @@ class FileHandler
 
     saveChanges ()
     {
-        var _172_29_
+        var _173_29_
 
         if ((editor.currentFile != null) && editor.do.hasChanges())
         {

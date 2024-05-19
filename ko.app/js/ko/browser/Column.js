@@ -39,6 +39,7 @@ Column = (function ()
         this["onContextMenu"] = this["onContextMenu"].bind(this)
         this["makeRoot"] = this["makeRoot"].bind(this)
         this["open"] = this["open"].bind(this)
+        this["openSelected"] = this["openSelected"].bind(this)
         this["explorer"] = this["explorer"].bind(this)
         this["duplicateFile"] = this["duplicateFile"].bind(this)
         this["newFolder"] = this["newFolder"].bind(this)
@@ -1157,12 +1158,17 @@ Column = (function ()
 
     Column.prototype["explorer"] = function ()
     {
-        return open(slash.dir(this.activePath()))
+        return kakao('finder',this.browser.select.files())
+    }
+
+    Column.prototype["openSelected"] = function ()
+    {
+        return kakao('open',this.browser.select.files())
     }
 
     Column.prototype["open"] = function ()
     {
-        return open(this.activePath())
+        return kakao('open',slash.fileUrl(this.activePath()))
     }
 
     Column.prototype["updateGitFiles"] = function (files)
@@ -1259,7 +1265,7 @@ Column = (function ()
 
     Column.prototype["pastePaths"] = async function ()
     {
-        var action, paths, target, text, _891_23_
+        var action, paths, target, text, _896_23_
 
         text = await kakao('clipboard.get')
         paths = text.split('\n')
@@ -1281,7 +1287,7 @@ Column = (function ()
 
     Column.prototype["onKey"] = function (event)
     {
-        var char, combo, key, mod, _928_88_
+        var char, combo, key, mod, _934_88_
 
         mod = keyinfo.forEvent(event).mod
         key = keyinfo.forEvent(event).key
@@ -1336,6 +1342,9 @@ Column = (function ()
             case 'enter':
             case 'alt+up':
                 return stopEvent(event,this.navigateCols(key))
+
+            case 'command+enter':
+                return stopEvent(event,this.openSelected())
 
             case 'command+up':
             case 'ctrl+up':

@@ -119,7 +119,7 @@ Window = (function ()
         this.editor = window.editor = new FileEditor('editor')
         this.commandline = window.commandline = new CommandLine('commandline-editor')
         this.info = window.info = new Info(this.editor)
-        this.fps = window.fps = new fps($('commandline-span'))
+        this.fps = window.fps = new fps($('commandline-span'),{width:260})
         this.indexer = window.indexer = new Indexer()
         this.viewer = window.viewer = new Viewer('editor')
         window.textEditor = window.focusEditor = this.editor
