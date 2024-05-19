@@ -284,8 +284,8 @@ class Flex
     sizeOfPane:    i -> @pane(i).size
     posOfPane:     i -> @pane(i).pos()
     posOfHandle:   i -> @handle(i).pos()
-    pane:          i -> i is num and @panes[i]   or i is str and @panes.find((p) -> p.id == i) or i
-    handle:        i -> i is num and @handles[i] or i
+    pane:          i -> ((i is num) and @panes[i]) or ((i is str) and @panes.find((p) -> p.id == i)) or i
+    handle:        i -> ((i is num) and @handles[i]) or i
 
     height: -> @view.getBoundingClientRect().height
     size:   -> @view.getBoundingClientRect()[@dimension]
@@ -304,18 +304,25 @@ class Flex
         if pane = @pane i
             if not pane.collapsed
                 pane.collapse()
-                @calculate()
+                # @calculate()
         
     expand: i factor=0.5 ->
         
         if pane = @pane i
             if pane.collapsed
+                # log 'expand' i
                 pane.expand()
-                if flex = @closestVisFlex pane
-                    size = pane.fixed ? flex.size * factor
-                    flex.size -= size
-                    pane.size = size
-                @calculate()
+                # if flex = @closestVisFlex pane
+                    # size = pane.fixed ? flex.size * factor
+                    # log 'closestVisFelx' size
+                    # flex.size -= size
+                    # pane.size = size
+                    # log 'precalculate'
+                    # @calculate()
+            else
+                log 'no expand?' i, pane
+        else
+            log 'pane not found' i
 
     # 000   000  000   0000000  00000000  000      00000000  000   000  
     # 000   000  000  000       000       000      000        000 000   

@@ -1090,6 +1090,11 @@ body
     border-bottom-right-radius: 0.15em;
 }
 
+.meta.gitInfoChange
+{
+    pointer-events: none;
+}
+
 
 .meta.gitInfoChange,
 .meta.gitInfoAdded

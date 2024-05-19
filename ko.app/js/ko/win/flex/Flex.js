@@ -399,15 +399,15 @@ class Flex
 
     pane (i)
     {
-        return _k_.isNum(i) && this.panes[i] || _k_.isStr(i) && this.panes.find(function (p)
+        return ((_k_.isNum(i)) && this.panes[i]) || ((_k_.isStr(i)) && this.panes.find(function (p)
         {
             return p.id === i
-        }) || i
+        })) || i
     }
 
     handle (i)
     {
-        return _k_.isNum(i) && this.handles[i] || i
+        return ((_k_.isNum(i)) && this.handles[i]) || i
     }
 
     height ()
@@ -438,29 +438,29 @@ class Flex
         {
             if (!pane.collapsed)
             {
-                pane.collapse()
-                return this.calculate()
+                return pane.collapse()
             }
         }
     }
 
     expand (i, factor = 0.5)
     {
-        var flex, pane, size, _315_38_
+        var pane
 
         if (pane = this.pane(i))
         {
             if (pane.collapsed)
             {
-                pane.expand()
-                if (flex = this.closestVisFlex(pane))
-                {
-                    size = ((_315_38_=pane.fixed) != null ? _315_38_ : flex.size * factor)
-                    flex.size -= size
-                    pane.size = size
-                }
-                return this.calculate()
+                return pane.expand()
             }
+            else
+            {
+                console.log('no expand?',i,pane)
+            }
+        }
+        else
+        {
+            console.log('pane not found',i)
         }
     }
 

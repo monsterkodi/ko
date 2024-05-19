@@ -58,7 +58,6 @@ function Kore extends events
     set: key value =>
         
         if empty value
-            log 'del key' key
             stash.del "kore|#{key}"
         else
             stash.set "kore|#{key}" value

@@ -88,7 +88,7 @@ function Shelf extends Column
     loadShelfItems: ->
 
         items = window.prefs.get "shelf|items"
-
+        items = [] if not items is arr
         @setItems items, save:false
 
     addPath: path opt =>
@@ -107,17 +107,14 @@ function Shelf extends Column
 
     itemPaths: -> @rows.map (r) -> r.path()
 
-    savePrefs: -> prefs.set "shelf|items" @items
+    savePrefs: -> log 'Shelf.savePrefs' @items; prefs.set "shelf|items" @items
 
     setItems: @items opt ->
 
         @clear()
 
         @items ?= []
-        @addItems @items
-
-        if opt?.save != false
-            @savePrefs()
+        @addItems @items, opt
         @
 
     addItems: items opt ->
@@ -128,6 +125,9 @@ function Shelf extends Column
             @rows.push new Row @, item
 
         @scroll.update()
+        
+        if opt?.save != false
+            @savePrefs()
         @
 
     addDir: dir opt ->

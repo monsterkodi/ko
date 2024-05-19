@@ -18,7 +18,7 @@ class Split
     # 000  000   000  000     000   
     
     @: ->
-        2+2
+
         @commandlineHeight = 30
         
         @elem        =$ 'split'
@@ -61,11 +61,9 @@ class Split
     stash: => 
         stash.set 'split|flex'    @flex.getState()
         stash.set 'split|browser' @flex.panes[0].div == @browser
-        log 'Split.stash' stash.get 'split'
         
     onStashLoaded: =>
 
-        log 'onStashLoaded' stash.get 'split|flex'
         if state = window.stash.get 'split|flex'
             @flex.restoreState state
             @emitSplit()
@@ -90,7 +88,7 @@ class Split
         action = words[0]
         what   = words[1]
         
-        log 'split.do' sentence
+        # log 'split.do' sentence
         
         switch action
             
@@ -141,6 +139,12 @@ class Split
             ➜    
                 error "Split.do -- unhandled do command? #{sentence}?"
                 
+    # 00     00   0000000   000   000  000  00     00  000  0000000  00000000  
+    # 000   000  000   000   000 000   000  000   000  000     000   000       
+    # 000000000  000000000    00000    000  000000000  000    000    0000000   
+    # 000 0 000  000   000   000 000   000  000 0 000  000   000     000       
+    # 000   000  000   000  000   000  000  000   000  000  0000000  00000000  
+    
     maximizeTerminal: -> 
         
         @focus 'terminal'
@@ -151,8 +155,8 @@ class Split
 
     maximizeEditor: -> 
         
-        @focus 'editor'
         @flex.expand 'editor'
+        @focus 'editor'
         if @terminalHeight() > 0
             @hideTerminal()
         else
@@ -228,7 +232,7 @@ class Split
     # 000       000   000  000 0 000  000 0 000  000   000  000  0000  000   000  000      000  000  0000  000     
     #  0000000   0000000   000   000  000   000  000   000  000   000  0000000    0000000  000  000   000  00000000
     
-    moveCommandLineBy: deta ->
+    moveCommandLineBy: delta ->
         
         @flex.moveHandle index:1 pos:@flex.posOfHandle(1) + delta
         
@@ -297,7 +301,7 @@ class Split
         
     commandlineVisible: -> not @flex.isCollapsed 'commandline'
     editorMaximized:    -> @flex.isCollapsed('terminal') or @terminalHeight() <= 0
-    editorVisible:      -> not @flex.isCollapsed 'editor'    and @editorHeight() > 0
+    editorVisible:      -> not @flex.isCollapsed('editor') and @editorHeight() > 0
     browserVisible:     -> @terminalHeight() > 0 and @flex.panes[0].div == @browser
     terminalVisible:    -> @terminalHeight() > 0 and @flex.panes[0].div == @terminal
         

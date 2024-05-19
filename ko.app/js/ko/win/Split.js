@@ -15,7 +15,6 @@ class Split
         this.stash = this.stash.bind(this)
         this.emitSplit = this.emitSplit.bind(this)
         this.onDrag = this.onDrag.bind(this)
-        2 + 2
         this.commandlineHeight = 30
         this.elem = $('split')
         this.terminal = $('terminal')
@@ -46,15 +45,13 @@ class Split
     stash ()
     {
         stash.set('split|flex',this.flex.getState())
-        stash.set('split|browser',this.flex.panes[0].div === this.browser)
-        console.log('Split.stash',stash.get('split'))
+        return stash.set('split|browser',this.flex.panes[0].div === this.browser)
     }
 
     onStashLoaded ()
     {
         var state
 
-        console.log('onStashLoaded',stash.get('split|flex'))
         if (state = window.stash.get('split|flex'))
         {
             this.flex.restoreState(state)
@@ -82,7 +79,6 @@ class Split
         words = sentence.split(/\s+/)
         action = words[0]
         what = words[1]
-        console.log('split.do',sentence)
         switch (action)
         {
             case 'show':
@@ -189,8 +185,8 @@ class Split
 
     maximizeEditor ()
     {
-        this.focus('editor')
         this.flex.expand('editor')
+        this.focus('editor')
         if (this.terminalHeight() > 0)
         {
             this.hideTerminal()
@@ -293,7 +289,7 @@ class Split
         }
     }
 
-    moveCommandLineBy (deta)
+    moveCommandLineBy (delta)
     {
         return this.flex.moveHandle({index:1,pos:this.flex.posOfHandle(1) + delta})
     }
@@ -319,7 +315,7 @@ class Split
 
     focus (n)
     {
-        var e, _257_31_, _261_22_
+        var e, _261_31_, _265_22_
 
         if (n === 'commandline')
         {
@@ -400,7 +396,7 @@ class Split
 
     editorVisible ()
     {
-        return !this.flex.isCollapsed('editor' && this.editorHeight() > 0)
+        return !this.flex.isCollapsed('editor') && this.editorHeight() > 0
     }
 
     browserVisible ()

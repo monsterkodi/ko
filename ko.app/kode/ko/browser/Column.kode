@@ -913,7 +913,7 @@ function Column
             'backspace'                        ➜ ⮐ stopEvent event, @browser.onBackspaceInColumn @
             'delete'                           ➜ ⮐ stopEvent event, @browser.onDeleteInColumn @
             'alt+left'                         ➜ ⮐ stopEvent event, window.split.focus 'shelf'
-            'alt+shift+.'                      ➜ ⮐ stopEvent event, @addToShelf()
+            'alt+shift+s'                      ➜ ⮐ stopEvent event, @addToShelf()
             'alt+e'                            ➜ ⮐ stopEvent event, @explorer()
             'alt+n'                            ➜ ⮐ stopEvent event, @newFolder()
             'ctrl+x' 'command+x'               ➜ ⮐ stopEvent event, @cutPaths()

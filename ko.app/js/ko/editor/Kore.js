@@ -20,7 +20,6 @@ Kore = (function ()
     {
         if (_k_.empty(value))
         {
-            console.log('del key',key)
             stash.del(`kore|${key}`)
         }
         else

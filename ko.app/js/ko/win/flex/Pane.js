@@ -40,25 +40,26 @@ class Pane
         {
             return
         }
-        this.size = parseInt(this.collapsed && -1 || Math.max(this.size,0))
-        this.div.style.display = this.collapsed && 'none' || this.display
+        this.size = (this.collapsed ? -1 : Math.max(0,parseInt(this.size)))
+        this.div.style.display = (this.collapsed ? 'none' : this.display)
         if (this.fixed)
         {
             this.div.style[this.flex.dimension] = `${this.fixed}px`
-            return this.div.style.flex = `0 0 ${this.fixed}px`
+            this.div.style.flex = `0 0 ${this.fixed}px`
         }
         else if (this.size > 0)
         {
-            return this.div.style.flex = `1 1 ${this.size}px`
+            this.div.style.flex = `1 1 ${this.size}px`
         }
         else if (this.size === 0)
         {
-            return this.div.style.flex = "0.01 0.01 0"
+            this.div.style.flex = "0.01 0.01 0"
         }
         else
         {
-            return this.div.style.flex = "0 0 0"
+            this.div.style.flex = "0 0 0"
         }
+        return this
     }
 
     setSize (size)
@@ -87,10 +88,9 @@ class Pane
 
     expand ()
     {
-        var _55_53_
+        var _55_34_
 
-        delete this.collapsed
-        return this.setSize(((_55_53_=this.fixed) != null ? _55_53_ : 0))
+        return this.setSize(((_55_34_=this.fixed) != null ? _55_34_ : 0))
     }
 
     isVisible ()

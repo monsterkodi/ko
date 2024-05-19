@@ -454,7 +454,7 @@ function FileEditor extends TextEditor
             if f?
                 span  = Syntax.spanForTextAndSyntax slash.tilde(slash.dir(f)), 'browser'
                 span += Syntax.spanForTextAndSyntax '/' + slash.name(f), 'browser'
-            return span
+            span
 
         recent = window.stash.get 'recentFiles' []
         recent ?= []

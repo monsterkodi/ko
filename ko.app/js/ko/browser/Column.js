@@ -1312,7 +1312,7 @@ Column = (function ()
             case 'alt+left':
                 return stopEvent(event,window.split.focus('shelf'))
 
-            case 'alt+shift+.':
+            case 'alt+shift+s':
                 return stopEvent(event,this.addToShelf())
 
             case 'alt+e':

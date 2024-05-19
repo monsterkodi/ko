@@ -166,7 +166,7 @@ function Window extends win.Delegate
             'Preferences'           ➜ ⮐ post.emit 'loadFile' prefs.store.file
             'Calculator'            ➜ ⮐ @quickMenu.onKalk()
     
-        # log 'onMenuAction unhandled' name, trail
+        log 'onMenuAction unhandled' name, trail
             
 # 00000000    0000000    0000000  000000000
 # 000   000  000   000  000          000
