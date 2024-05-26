@@ -133,7 +133,7 @@ class Flex
 
     calculate ()
     {
-        var avail, diff, flexPanes, h, p, visPanes, _148_19_
+        var avail, diff, flexPanes, h, p, visPanes, _150_19_
 
         visPanes = this.panes.filter(function (p)
         {
@@ -144,6 +144,10 @@ class Flex
             return !p.fixed
         })
         avail = this.size()
+        if (avail <= 0)
+        {
+            return
+        }
         var list = _k_.list(this.handles)
         for (var _a_ = 0; _a_ < list.length; _a_++)
         {
@@ -186,7 +190,7 @@ class Flex
 
     moveHandleToPos (handle, pos)
     {
-        var deduct, leftOver, next, nextHandle, nextSize, nextVisFlex, offset, prev, prevHandle, prevSize, prevVisFlex, _170_36_, _170_59_, _171_36_, _171_59_, _179_21_, _198_20_, _220_19_
+        var deduct, leftOver, next, nextHandle, nextSize, nextVisFlex, offset, prev, prevHandle, prevSize, prevVisFlex, _172_36_, _172_59_, _173_36_, _173_59_, _181_21_, _200_20_, _222_19_
 
         pos = parseInt(pos)
         if (this.relaxed)
@@ -196,10 +200,10 @@ class Flex
         offset = pos - handle.actualPos()
         if (Math.abs(offset) < 1)
         {
-            return
+            return false
         }
-        prev = ((_170_36_=this.prevAllInv(handle)) != null ? _170_36_ : ((_170_59_=this.prevVisFlex(handle)) != null ? _170_59_ : this.prevFlex(handle)))
-        next = ((_171_36_=this.nextAllInv(handle)) != null ? _171_36_ : ((_171_59_=this.nextVisFlex(handle)) != null ? _171_59_ : this.nextFlex(handle)))
+        prev = ((_172_36_=this.prevAllInv(handle)) != null ? _172_36_ : ((_172_59_=this.prevVisFlex(handle)) != null ? _172_59_ : this.prevFlex(handle)))
+        next = ((_173_36_=this.nextAllInv(handle)) != null ? _173_36_ : ((_173_59_=this.nextVisFlex(handle)) != null ? _173_59_ : this.nextFlex(handle)))
         delete prev.collapsed
         delete next.collapsed
         prevSize = prev.size + offset
@@ -251,12 +255,13 @@ class Flex
         prev.setSize(prevSize)
         next.setSize(nextSize)
         this.update()
-        return (typeof this.onPaneSize === "function" ? this.onPaneSize() : undefined)
+        ;(typeof this.onPaneSize === "function" ? this.onPaneSize() : undefined)
+        return true
     }
 
     restoreState (state)
     {
-        var p, s, si, _239_19_
+        var p, s, si, _242_19_
 
         if (!(state != null ? state.length : undefined))
         {
@@ -332,22 +337,24 @@ class Flex
 
     handleStart (handle)
     {
-        var _265_39_
+        var _268_39_
 
         return (typeof this.onDragStart === "function" ? this.onDragStart() : undefined)
     }
 
     handleDrag (handle, drag)
     {
-        var _268_15_
+        var _271_19_
 
-        this.moveHandleToPos(handle,drag.pos[this.axis] - this.pos() - 4)
-        return (typeof this.onDrag === "function" ? this.onDrag() : undefined)
+        if (this.moveHandleToPos(handle,drag.pos[this.axis] - this.pos() - 4))
+        {
+            return (typeof this.onDrag === "function" ? this.onDrag() : undefined)
+        }
     }
 
     handleEnd ()
     {
-        var _272_18_
+        var _275_18_
 
         this.update()
         return (typeof this.onDragEnd === "function" ? this.onDragEnd() : undefined)

@@ -378,12 +378,12 @@ FileBrowser = (function ()
 
     FileBrowser.prototype["onFileIndexed"] = function (file, info)
     {
-        var _311_36_, _311_44_, _312_73_
+        var _311_36_, _311_44_
 
         this.srcCache[file] = info
-        if (file === ((_311_36_=this.lastUsedColumn()) != null ? (_311_44_=_311_36_.parent) != null ? _311_44_.file : undefined : undefined))
+        if (file === ((_311_36_=this.lastUsedColumn()) != null ? (_311_44_=_311_36_.parent) != null ? _311_44_.path : undefined : undefined))
         {
-            return this.loadSourceItem({file:file,type:'file'},(this.lastUsedColumn() != null ? this.lastUsedColumn().index : undefined))
+            return this.loadSourceItem({path:file,type:'file'},this.lastUsedColumn().index)
         }
     }
 

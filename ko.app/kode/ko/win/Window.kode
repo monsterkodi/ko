@@ -42,16 +42,17 @@ function Window extends win.Delegate
         @aboutURL     = "https://github.com/monsterkodi/ko"
         
         post.on 'menuAction' @onMenuAction
+        post.on 'status.click' -> kakao 'window.raise'
         post.on 'stash' -> window.editor.saveFilePosition()
         
     onWindowWithoutStash: ○->
         
         # log 'onWindowWithoutStash!'
         
-        if empty window.tabs.tabs ➜ log 'new empty tab!'; post.emit 'newEmptyTab'
+        if empty window.tabs.tabs ➜ post.emit 'newEmptyTab'
             
-        ○ kakao 'win.setSize' 1000 1000
-        ○ kakao 'win.center' 
+        ○ kakao 'window.setSize' 1000 1000
+        ○ kakao 'window.center' 
         
     onWindowCreated: win =>
         
@@ -100,6 +101,8 @@ function Window extends win.Delegate
         window.info.reload()
         
         # if empty window.tabs.tabs ➜ log 'not tab! empty tab!'; post.emit 'newEmptyTab'
+        
+        kakao 'window.new' 'icon' 'window.statusIcon = "menu_ko.png"'
         
         @editor.focus()
 

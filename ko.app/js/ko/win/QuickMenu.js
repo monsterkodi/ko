@@ -63,7 +63,7 @@ QuickMenu = (function ()
 
     QuickMenu.prototype["onKalk"] = function ()
     {
-        return kakao('win.new','kalk.html')
+        return kakao('window.new','kalk.html')
     }
 
     QuickMenu.prototype["toggle"] = function (what)

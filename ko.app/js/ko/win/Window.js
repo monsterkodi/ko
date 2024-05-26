@@ -84,6 +84,10 @@ Window = (function ()
         this.aboutVersion = `${version}`
         this.aboutURL = "https://github.com/monsterkodi/ko"
         post.on('menuAction',this.onMenuAction)
+        post.on('status.click',function ()
+        {
+            return kakao('window.raise')
+        })
         post.on('stash',function ()
         {
             return window.editor.saveFilePosition()
@@ -95,11 +99,10 @@ Window = (function ()
     {
         if (_k_.empty(window.tabs.tabs))
         {
-            console.log('new empty tab!')
             post.emit('newEmptyTab')
         }
-        await kakao('win.setSize',1000,1000)
-        return await kakao('win.center')
+        await kakao('window.setSize',1000,1000)
+        return await kakao('window.center')
     }
 
     Window.prototype["onWindowCreated"] = function (win)
@@ -150,6 +153,7 @@ Window = (function ()
         }).bind(this))
         window.split.resized()
         window.info.reload()
+        kakao('window.new','icon','window.statusIcon = "menu_ko.png"')
         return this.editor.focus()
     }
 
@@ -160,7 +164,7 @@ Window = (function ()
 
     Window.prototype["onMenuAction"] = function (name, trail)
     {
-        var action, _122_25_
+        var action, _125_25_
 
         if (action = Editor.actionWithName(name))
         {
@@ -345,7 +349,7 @@ window.editorWithName = function (n)
 
 window.onresize = function ()
 {
-    var _214_14_
+    var _217_14_
 
     window.split.resized()
     ;(window.win != null ? window.win.onMoved(window.win.getBounds()) : undefined)

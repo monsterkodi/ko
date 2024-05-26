@@ -89,6 +89,7 @@ function Shelf extends Column
 
         items = window.prefs.get "shelf|items"
         items = [] if not items is arr
+        
         @setItems items, save:false
 
     addPath: path opt =>

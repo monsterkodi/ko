@@ -159,12 +159,12 @@ Shelf = (function ()
 
     Shelf.prototype["setItems"] = function (items, opt)
     {
-        var _116_15_
+        var _117_15_
 
         this.items = items
     
         this.clear()
-        this.items = ((_116_15_=this.items) != null ? _116_15_ : [])
+        this.items = ((_117_15_=this.items) != null ? _117_15_ : [])
         this.addItems(this.items,opt)
         return this
     }
@@ -278,7 +278,7 @@ Shelf = (function ()
 
     Shelf.prototype["onGitStatus"] = function (status)
     {
-        var row, _201_48_
+        var row, _202_48_
 
         var list = _k_.list(this.rows)
         for (var _a_ = 0; _a_ < list.length; _a_++)
@@ -324,16 +324,16 @@ Shelf = (function ()
 
     Shelf.prototype["onMouseOver"] = function (event)
     {
-        var _232_44_, _232_57_
+        var _233_44_, _233_57_
 
-        return ((_232_44_=this.row(event.target)) != null ? typeof (_232_57_=_232_44_.onMouseOver) === "function" ? _232_57_() : undefined : undefined)
+        return ((_233_44_=this.row(event.target)) != null ? typeof (_233_57_=_233_44_.onMouseOver) === "function" ? _233_57_() : undefined : undefined)
     }
 
     Shelf.prototype["onMouseOut"] = function (event)
     {
-        var _233_44_, _233_56_
+        var _234_44_, _234_56_
 
-        return ((_233_44_=this.row(event.target)) != null ? typeof (_233_56_=_233_44_.onMouseOut) === "function" ? _233_56_() : undefined : undefined)
+        return ((_234_44_=this.row(event.target)) != null ? typeof (_234_56_=_234_44_.onMouseOut) === "function" ? _234_56_() : undefined : undefined)
     }
 
     Shelf.prototype["onDblClick"] = function (event)
@@ -343,13 +343,13 @@ Shelf = (function ()
 
     Shelf.prototype["navigateRows"] = function (key)
     {
-        var index, navigate, row, _246_28_, _246_38_, _261_99_
+        var index, navigate, row, _247_28_, _247_38_, _262_99_
 
         if (!this.numRows())
         {
             return console.error(`no rows in column ${this.index}?`)
         }
-        index = ((_246_38_=(this.activeRow() != null ? this.activeRow().index() : undefined)) != null ? _246_38_ : -1)
+        index = ((_247_38_=(this.activeRow() != null ? this.activeRow().index() : undefined)) != null ? _247_38_ : -1)
         if (!(index != null) || Number.isNaN(index))
         {
             console.error(`no index from activeRow? ${index}?`,this.activeRow())
@@ -420,7 +420,7 @@ Shelf = (function ()
 
     Shelf.prototype["openFileInNewWindow"] = function ()
     {
-        var item, _279_30_
+        var item, _280_30_
 
         if (item = (this.activeRow() != null ? this.activeRow().item : undefined))
         {
@@ -434,12 +434,12 @@ Shelf = (function ()
 
     Shelf.prototype["removeObject"] = function ()
     {
-        var nextOrPrev, row, _286_27_, _289_36_
+        var nextOrPrev, row, _287_27_, _290_36_
 
-        row = ((_286_27_=this.activeRow()) != null ? _286_27_ : this.selectedRow())
+        row = ((_287_27_=this.activeRow()) != null ? _287_27_ : this.selectedRow())
         if (row)
         {
-            nextOrPrev = ((_289_36_=row.next()) != null ? _289_36_ : row.prev())
+            nextOrPrev = ((_290_36_=row.next()) != null ? _290_36_ : row.prev())
             row.div.remove()
             this.items.splice(row.index(),1)
             this.rows.splice(row.index(),1)

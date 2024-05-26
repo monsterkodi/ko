@@ -6,9 +6,9 @@ fail         ☒ ✗ ✘ ⨉ ⨯ ✖    
 file                            
 folder                  floppy          ﬚ ﴖ 
 gear          漣  ⛭ ⛯ ⚙  煉     search        ⚲     ⌕
-edit                     lock                    key         
+edit                     lock                    key        
 time               ⏱     date               
-info           ℹ               warn              ⟁ 卑 喝                   
+info           ℹ              warn              ⟁ 卑 喝                   
 home           ﮟ ﳎ ﳏ ﳐ         trash          﫧 﫨         legal      ⚖
 tool         ⚒                bug            ﴫ           at         
 keyboard        ⌨             term            ﲵ         mouse                       

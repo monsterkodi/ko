@@ -41,20 +41,6 @@ body
     overflow: hidden;
 }
 
-@keyframes fadein
-{
-   from
-   {
-    opacity: 0;
-   }
-
-   to
-   {
-    opacity: 1;
-   }
-
-}
-
 #titlebar .winicon img
 {
     padding-top: 4px;
@@ -75,7 +61,6 @@ body
 #main
 {
     overflow: hidden;
-    animation: fadein 2.0s;
 }
 
 #split

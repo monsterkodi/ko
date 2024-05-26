@@ -130,6 +130,8 @@ class Flex
         flexPanes = visPanes.filter (p) -> not p.fixed
         avail     = @size()
         
+        ⮐ if avail <= 0
+        
         for h in @handles
             h.update() 
             avail -= h.size() if h.isVisible()
@@ -165,7 +167,7 @@ class Flex
         
         offset = pos - handle.actualPos()
         
-        ⮐ if Math.abs(offset) < 1
+        ⮐ false if Math.abs(offset) < 1
         
         prev  = @prevAllInv(handle) ? @prevVisFlex(handle) ? @prevFlex handle
         next  = @nextAllInv(handle) ? @nextVisFlex(handle) ? @nextFlex handle
@@ -218,6 +220,7 @@ class Flex
         next.setSize nextSize
         @update()
         @onPaneSize?()
+        true
 
     #  0000000  000000000   0000000   000000000  00000000  
     # 000          000     000   000     000     000       
@@ -264,8 +267,8 @@ class Flex
     
     handleStart: handle -> @onDragStart?()
     handleDrag:  handle drag ->
-        @moveHandleToPos handle, drag.pos[@axis] - @pos() - 4
-        @onDrag?()
+        if @moveHandleToPos handle, drag.pos[@axis] - @pos() - 4
+            @onDrag?()
         
     handleEnd: ->
         @update()

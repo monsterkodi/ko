@@ -42,15 +42,18 @@ class Split
                     div:        @editor
             ]
             direction:  'vertical'
-            onDrag:     @onDrag
-            onDragEnd:  @onDrag
-            onPaneSize: @onDrag
+            # onDrag:     @onDrag
+            # onDragEnd:  @onDrag
+            onPaneSize: @onPaneSize
             snapFirst:  20
             snapLast:   100
             
-    onDrag: => if @flex? ➜ @emitSplit()
+    onPaneSize: => if @flex? ➜ @emitSplit()
     
-    emitSplit: => post.emit 'split' @flex.panePositions()
+    emitSplit: =>
+    
+        post.emit 'split' @flex.panePositions()
+        @stash()
     
     #  0000000  000000000   0000000    0000000  000   000  
     # 000          000     000   000  000       000   000  
@@ -64,13 +67,14 @@ class Split
         
     onStashLoaded: =>
 
+        browser = window.stash.get 'split|browser'
         if state = window.stash.get 'split|flex'
             @flex.restoreState state
             @emitSplit()
         else
             @do 'maximize editor'
-            
-        if @flex.panes[0].div != @browser and window.stash.get 'split|browser'
+          
+        if @flex.panes[0].div != @browser and browser
             @raise 'browser'
                 
     # 0000000     0000000 

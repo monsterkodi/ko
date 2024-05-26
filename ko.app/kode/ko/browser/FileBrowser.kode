@@ -307,9 +307,9 @@ function FileBrowser extends Browser
     onFileIndexed: file info =>
 
         @srcCache[file] = info
-
-        if file == @lastUsedColumn()?.parent?.file
-            @loadSourceItem { file:file, type:'file' }, @lastUsedColumn()?.index
+        
+        if file == @lastUsedColumn()?.parent?.path
+            @loadSourceItem { path:file, type:'file' }, @lastUsedColumn().index
 
     loadSourceItem: item col ->
 

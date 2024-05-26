@@ -34,7 +34,7 @@ function QuickMenu
     onTerminal: => @toggle 'terminal' 
     onList:     => post.emit 'menuAction' 'Toggle Func List'
     onDevTools: => post.emit 'menuAction' 'DevTools'
-    onKalk:     => kakao 'win.new' 'kalk.html'
+    onKalk:     => kakao 'window.new' 'kalk.html'
         
     toggle: what ->
         

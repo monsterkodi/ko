@@ -14,7 +14,7 @@ class Split
         this.onStashLoaded = this.onStashLoaded.bind(this)
         this.stash = this.stash.bind(this)
         this.emitSplit = this.emitSplit.bind(this)
-        this.onDrag = this.onDrag.bind(this)
+        this.onPaneSize = this.onPaneSize.bind(this)
         this.commandlineHeight = 30
         this.elem = $('split')
         this.terminal = $('terminal')
@@ -24,12 +24,12 @@ class Split
         post.on('focus',this.focus)
         post.on('stash',this.stash)
         post.on('stashLoaded',this.onStashLoaded)
-        this.flex = new flex({panes:[{div:this.terminal,collapsed:true},{div:this.commandline,fixed:this.commandlineHeight},{div:this.editor}],direction:'vertical',onDrag:this.onDrag,onDragEnd:this.onDrag,onPaneSize:this.onDrag,snapFirst:20,snapLast:100})
+        this.flex = new flex({panes:[{div:this.terminal,collapsed:true},{div:this.commandline,fixed:this.commandlineHeight},{div:this.editor}],direction:'vertical',onPaneSize:this.onPaneSize,snapFirst:20,snapLast:100})
     }
 
-    onDrag ()
+    onPaneSize ()
     {
-        var _51_23_
+        var _51_27_
 
         if ((this.flex != null))
         {
@@ -39,7 +39,8 @@ class Split
 
     emitSplit ()
     {
-        return post.emit('split',this.flex.panePositions())
+        post.emit('split',this.flex.panePositions())
+        return this.stash()
     }
 
     stash ()
@@ -50,8 +51,9 @@ class Split
 
     onStashLoaded ()
     {
-        var state
+        var browser, state
 
+        browser = window.stash.get('split|browser')
         if (state = window.stash.get('split|flex'))
         {
             this.flex.restoreState(state)
@@ -61,7 +63,7 @@ class Split
         {
             this.do('maximize editor')
         }
-        if (this.flex.panes[0].div !== this.browser && window.stash.get('split|browser'))
+        if (this.flex.panes[0].div !== this.browser && browser)
         {
             return this.raise('browser')
         }
@@ -315,7 +317,7 @@ class Split
 
     focus (n)
     {
-        var e, _261_31_, _265_22_
+        var e, _265_31_, _269_22_
 
         if (n === 'commandline')
         {
