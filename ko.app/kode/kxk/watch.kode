@@ -29,9 +29,9 @@ function Watch extends events
         if opt.cb
             fs.isDir path, (stat) ->
                 if stat
-                    opt.cb Watch.dir path, opt
+                    opt.cb Watch.dir(path, opt)
                 else
-                    opt.cb Watch.file path, opt
+                    opt.cb Watch.file(path, opt)
         else
             if fs.isDir path
                 Watch.dir path, opt
@@ -67,7 +67,7 @@ function Watch extends events
             for item in items
                 if item.type == 'dir'
                     if item.file in ['node_modules' '.git']
-                        log b5 item.file
+                        log b5(item.file)
                         continue
                     # log g3(item.file), y5 item.path
                     
@@ -76,7 +76,7 @@ function Watch extends events
                     
                     change = (dir) => (chg, pth) => @onChange chg, pth, dir
                     watch.on 'error' (err) -> error "watch subdir:'#{item.path}' error: #{err}"
-                    watch.on 'change' change item.path
+                    watch.on 'change' change(item.path)
                     
     # 000   0000000   000   000   0000000   00000000   00000000  
     # 000  000        0000  000  000   000  000   000  000       
@@ -146,9 +146,9 @@ function Watch extends events
             if @opt.skipSave
                 @remove =
                     path:  path
-                    timer: setTimeout ((d,p,w)->->
+                    timer: setTimeout(((d,p,w) -> ->
                         delete w.remove 
-                        w.emit 'change' dir:d, path:p, change:'remove', watch:w)(dir,path,@), 100
+                        w.emit 'change' dir:d, path:p, change:'remove', watch:w)(dir,path,@), 100)
             else if @opt.emitRemove
                 @emit 'change' dir:dir, path:path, change:'remove', watch:@
         

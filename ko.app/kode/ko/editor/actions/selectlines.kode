@@ -31,7 +31,7 @@ export
         selectCursorLineAtIndex = (c,i) =>
             range = [i, [0, @do.line(i).length]] 
             newSelections.push range
-            cursorSet c, rangeEndPos range
+            cursorSet c, rangeEndPos(range)
             
         start = false
         for c in newCursors

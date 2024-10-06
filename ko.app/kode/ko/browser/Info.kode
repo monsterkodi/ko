@@ -17,7 +17,7 @@ use ../tools  ◆ File
 
 image = file ->
 
-    img = elem 'img' class:'browserImage' src:slash.fileUrl file
+    img = elem 'img' class:'browserImage' src:slash.fileUrl(file)
     imgdiv = elem class:'browserImageDiv' child:img
     cnt = elem class:'browserImageContainer' child:imgdiv
     
@@ -34,7 +34,7 @@ image = file ->
         
         [size, size_unit] = pretty.bytes(info.size).split ' '
         [time, time_unit] = pretty.age(info.modified).split ' '
-        table.innerHTML = "<tr class='fileRow'><th colspan=2><div class='fileInfoFile #{slash.ext file}'>#{File.span file}</div></th></tr><tr class='dataRow'><th>#{size}</th><td>#{size_unit}</td></tr><tr class='dataRow'><th>#{time}</th><td>#{time_unit}</td></tr>"
+        table.innerHTML = "<tr class='fileRow'><th colspan=2><div class='fileInfoFile #{slash.ext file}'>#{File.span(file)}</div></th></tr><tr class='dataRow'><th>#{size}</th><td>#{size_unit}</td></tr><tr class='dataRow'><th>#{time}</th><td>#{time_unit}</td></tr>"
 
     elem class:'browserImageInfo' children: [ elem(class:'imageInfoSpacer'), cnt, table, elem(class:'imageInfoSpacer') ]
     
@@ -62,11 +62,11 @@ file = file ->
         table.innerHTML = "<tr class='dataRow'><th>#{size}</th><td>#{size_unit}</td></tr><tr class='dataRow'><th>#{time}</th><td>#{time_unit}</td></tr>"
 
     info = elem class:'browserFileInfo' children: [
-        elem class:'fileInfoSpacer'
-        elem class:"fileInfoIcon #{slash.ext file} #{File.iconClassName file}"
-        elem class:"fileInfoFile #{slash.ext file}" html:File.span file
+        elem(class:'fileInfoSpacer')
+        elem(class:"fileInfoIcon #{slash.ext file} #{File.iconClassName(file)}")
+        elem(class:"fileInfoFile #{slash.ext file}" html:File.span(file))
         table
-        elem class:'fileInfoSpacer'
+        elem(class:'fileInfoSpacer')
     ]
 
     if slash.ext(file) in ['html']

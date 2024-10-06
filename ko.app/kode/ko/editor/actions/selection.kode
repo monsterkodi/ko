@@ -109,7 +109,7 @@ export
                             c[1] = sel[0][1]
             
             if not @stickySelection
-                @do.select rangesFromPositions @startSelectionCursors
+                @do.select rangesFromPositions(@startSelectionCursors)
                     
     endSelection: (opt = extend:false) ->
 
@@ -194,10 +194,10 @@ export
         sc = @selectedAndCursorLineIndices()
         for li in [0...@numLines()]
             if li not in sc
-                invertedRanges.push @rangeForLineAtIndex li
+                invertedRanges.push @rangeForLineAtIndex(li)
         if invertedRanges.length
             @do.start()
-            @do.setCursors [rangeStartPos first invertedRanges]
+            @do.setCursors [rangeStartPos(first invertedRanges)]
             @do.select invertedRanges
             @do.end()     
 
@@ -217,7 +217,7 @@ export
             for i in [0...oldCursors.length]
                 c0 = oldCursors[i]
                 c1 = oldCursors[i+1]
-                newSelections = newSelections.concat @rangesForLinesBetweenPositions c0, c1
+                newSelections = newSelections.concat @rangesForLinesBetweenPositions(c0, c1)
                 newCursors.push c1
                 i++
             @do.setCursors newCursors

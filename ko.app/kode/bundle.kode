@@ -12,10 +12,10 @@ class Bundle
 
     @path: window.bundlePath # this is set in win.mm and kakao.init
         
-    @app: p -> Bundle.path + '/'                        + p # absolute path of the .app folder
-    @js:  p -> Bundle.path + '/js/'                     + p # contains js, css and html files
-    @mac: p -> Bundle.path + '/Contents/MacOS/'         + p # contains the application executable
-    @res: p -> Bundle.path + '/Contents/Resources/'     + p # contains images, fonts, etc
-    @img: p -> Bundle.path + '/Contents/Resources/img/' + p # contains images
+    @app: p -> Bundle.path + '/'                        + p # .app folder
+    @js:  p -> Bundle.path + '/js/'                     + p #      js, css and html files
+    @mac: p -> Bundle.path + '/Contents/MacOS/'         + p #      application executable
+    @res: p -> Bundle.path + '/Contents/Resources/'     + p #      fonts, images, etc
+    @img: p -> Bundle.path + '/Contents/Resources/img/' + p #             images
     
 export Bundle

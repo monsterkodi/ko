@@ -42,7 +42,7 @@ export
         @do.start()
         
         if @salterMode
-            newCursors = [rangeEndPos @rangeForLineAtIndex @mainCursor()[1]]
+            newCursors = [rangeEndPos(@rangeForLineAtIndex(@mainCursor()[1]))]
             @setSalterMode false
         else
             newCursors = @do.cursors()
@@ -66,8 +66,8 @@ export
                             indent += @indentString
                  
             else
-                if c[0] <= indentationInLine @do.line c[1]
-                    indent = @do.line(c[1]).slice 0,c[0]
+                if c[0] <= indentationInLine(@do.line(c[1]))
+                    indent = @do.line(c[1]).slice(0,c[0])
                 else
                     indent = ''
 

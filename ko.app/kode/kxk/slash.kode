@@ -92,7 +92,7 @@ class Slash
         if Slash.win()
             
             if p.length >= 3 and p[0] == '/' == p[2] 
-                p = p[1] + ':' + p.slice 2
+                p = p[1] + ':' + p.slice(2)
                 
             reg = new RegExp "/" 'g'
             
@@ -129,13 +129,13 @@ class Slash
             rc.shift()
             tc.shift()
             
-        return dd + rc.join '/' if valid dd
+        return dd + rc.join('/') if valid dd
         
         while valid tc
             tc.shift()
             dd += '../'
             
-        return dd + rc.join '/' if valid dd
+        return dd + rc.join('/') if valid dd
         
         rel
             
@@ -257,7 +257,7 @@ class Slash
             if comp.length == 1 and comp[0] == ''
                 list.unshift Slash.sep
             else
-                list.unshift comp.join Slash.sep
+                list.unshift comp.join(Slash.sep)
             
         list
         

@@ -34,6 +34,7 @@ args = karg(`kk
     spawn      spawn app                      = false -S
     quiet      log nothing                    = false
     debug      log debug                      = false -D
+    verbose    log verbose                    = false -V
     version    log version                    = false`)
 class kk
 {

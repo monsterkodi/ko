@@ -12,7 +12,7 @@ use ./print
 
 class Returner
 
-    @: (@kode) ->
+    @: @kode ->
 
         @verbose = @kode.args.verbose
         @debug   = @kode.args.debug
@@ -23,7 +23,7 @@ class Returner
     # 000       000   000  000      000      000       000          000     
     #  0000000   0000000   0000000  0000000  00000000   0000000     000     
     
-    collect: (tl) -> @scope tl
+    collect: tl -> @scope tl
 
     #  0000000   0000000   0000000   00000000   00000000  
     # 000       000       000   000  000   000  000       
@@ -31,7 +31,7 @@ class Returner
     #      000  000       000   000  000        000       
     # 0000000    0000000   0000000   000        00000000  
     
-    scope: (body) ->
+    scope: body ->
 
         if body?.exps?.length
             @exp e for e in body.exps
@@ -43,7 +43,7 @@ class Returner
     # 000       000   000  000  0000  000       
     # 000        0000000   000   000   0000000  
     
-    func: (f) ->
+    func: f ->
         
         @exp f.args if f.args
         
@@ -70,7 +70,7 @@ class Returner
     # 000  000       
     # 000  000       
     
-    if: (e) ->
+    if: e ->
         
         e.returns = true
         @insert e.then
@@ -85,7 +85,7 @@ class Returner
     #    000     000   000     000     
     #    000     000   000     000     
     
-    try: (e) ->
+    try: e ->
         
         @insert e.exps
         @insert e.catch.exps if valid e.catch.exps
@@ -97,7 +97,7 @@ class Returner
     #      000  000   000  000     000     000       000   000  
     # 0000000   00     00  000     000      0000000  000   000  
     
-    switch: (e) ->
+    switch: e ->
         
         for w in e.whens
             @insert w.when.then if valid w.when.then
@@ -110,7 +110,7 @@ class Returner
     # 000  000  0000       000  000       000   000     000     
     # 000  000   000  0000000   00000000  000   000     000     
     
-    insert: (e) ->
+    insert: e ->
 
         if e is Array
             lst = e[-1]
@@ -131,7 +131,7 @@ class Returner
             else
                 @profilend e
             
-    profilend: (e, offset=0) ->
+    profilend: e offset=0 ->
         
         if @profile
             
@@ -150,7 +150,7 @@ class Returner
     # 000        000 000   000        
     # 00000000  000   000  000        
     
-    exp: (e) ->
+    exp: e ->
 
         ⮐ if not e
             

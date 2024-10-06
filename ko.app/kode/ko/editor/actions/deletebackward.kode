@@ -51,31 +51,34 @@ export
             opt?.singleCharacter    then removeNum = 1
             opt?.ignoreLineBoundary then removeNum = -1 # delete spaces to line start or line end
             opt?.ignoreTabBoundary # delete space columns
-                removeNum = Math.max 1, min newCursors.map (c) =>
-                    t = @do.textInRange [c[1], [0, c[0]]]
-                    n = t.length - t.trimRight().length
-                    n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
-                    Math.max 1, n
+                removeNum = Math.max 1, min(newCursors.map((c) =>
+                            t = @do.textInRange [c[1], [0, c[0]]]
+                            n = t.length - t.trimRight().length
+                            n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
+                            Math.max 1, n
+                        ))
             opt?.swallowWord 
-                removeNum = Math.max 1, min newCursors.map (c) =>
-                    t = @do.textInRange [c[1], [0, c[0]]]
-                    if t.endsWith ' '
-                        n = t.length - t.trimRight().length
-                    else
-                        n = 1
-                        if t[-1] not in '.,:;|/+\'"[]{}()'
-                            while n < t.length and t[t.length-n-1] not in ' .,:;|/+\'"[]{}()'
-                                n++
-
-                    n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
-                    Math.max 1, n
+                removeNum = Math.max 1, min(newCursors.map((c) =>
+                            t = @do.textInRange [c[1], [0, c[0]]]
+                            if t.endsWith ' '
+                                n = t.length - t.trimRight().length
+                            else
+                                n = 1
+                                if t[-1] not in '.,:;|/+\'"[]{}()'
+                                    while n < t.length and t[t.length-n-1] not in ' .,:;|/+\'"[]{}()'
+                                        n++
+        
+                            n += c[0] - @do.line(c[1]).length if @isCursorVirtual c
+                            Math.max 1, n
+                        ))
             ➜ # delete spaces to previous tab column
                 # log 'delete to previous tab column' @indentString.length
-                removeNum = Math.max 1, min newCursors.map (c) =>
-                    n = (c[0] % @indentString.length) or @indentString.length
-                    t = @do.textInRange [c[1], [Math.max(0, c[0]-n), c[0]]]
-                    n -= t.trimRight().length
-                    Math.max 1, n
+                removeNum = Math.max 1, min(newCursors.map((c) =>
+                            n = (c[0] % @indentString.length) or @indentString.length
+                            t = @do.textInRange [c[1], [Math.max(0, c[0]-n), c[0]]]
+                            n -= t.trimRight().length
+                            Math.max 1, n
+                        ))
 
         for c in reversed newCursors
             if c[0] == 0 # cursor at start of line
@@ -99,7 +102,7 @@ export
                 else
                     n = removeNum
                 # log 'deleteCharacterBackward' n
-                @do.change c[1], kstr.splice @do.line(c[1]), c[0]-n, n
+                @do.change c[1], kstr.splice(@do.line(c[1]), c[0]-n, n)
                 for nc in positionsAtLineIndexInPositions c[1], newCursors
                     if nc[0] >= c[0]
                         cursorDelta nc, -n

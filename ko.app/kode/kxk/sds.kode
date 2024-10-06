@@ -50,7 +50,7 @@ collect = (object, filter, map, count=-1, keyPath=[], result=[]) ->
                 v = object[i]
                 keyPath.push i
                 if filter keyPath, i,v
-                    result.push map [].concat(keyPath), v
+                    result.push map([].concat(keyPath), v)
                     return result if count > 0 and result.length >= count
                 if v?.constructor.name in ["Array", "Object"]
                     collect v, filter, map, count, keyPath, result
@@ -60,7 +60,7 @@ collect = (object, filter, map, count=-1, keyPath=[], result=[]) ->
             for k,v of object
                 keyPath.push k
                 if filter keyPath, k,v
-                    result.push map [].concat(keyPath), v
+                    result.push map([].concat(keyPath), v)
                     return result if count > 0 and result.length >= count
                 if v?.constructor.name in ["Array", "Object"]
                     collect v, filter, map, count, keyPath, result
@@ -130,10 +130,10 @@ function find
 # accepts an object and a keypath as a list or string and a value
 # returns the value at keypath or undefined
 
-get = (object, keypath, defaultValue) ->
+get = object keypath defaultValue ->
 
-    return defaultValue if not object
-    return defaultValue if not keypath?.length
+    ⮐ defaultValue if not object
+    ⮐ defaultValue if not keypath?.length
 
     keypath = keypath.split '.' if typeof(keypath) == 'string'
 
@@ -141,7 +141,7 @@ get = (object, keypath, defaultValue) ->
 
     while kp.length
         object = object[kp.shift()]
-        return defaultValue if not object?
+        ⮐ defaultValue if not object?
 
     object
     
@@ -154,7 +154,7 @@ get = (object, keypath, defaultValue) ->
 # accepts an object, a keypath as an array or string and a value
 # returns the object with value set at keypath
 
-set = (object, keypath, value) ->
+set = object keypath value ->
     
     keypath = keypath.split '.' if keypath is str
     throw "invalid keypath: #{JSON.stringify keypath}" if not keypath is arr
@@ -166,7 +166,7 @@ set = (object, keypath, value) ->
     while kp.length > 1
         k = kp.shift()
         if not o[k]?
-            if not Number.isNaN parseInt k
+            if not Number.isNaN parseInt(k)
                 o = o[k] = []
             else
                 o = o[k] = {}
@@ -195,7 +195,7 @@ set = (object, keypath, value) ->
 # accepts an object and a keypath as an array or string
 # returns the object with value removed at keypath
 
-del = (object, keypath) ->
+del = object keypath ->
     
     keypath = keypath.split '.' if typeof(keypath) == 'string'
     throw "invalid keypath: #{JSON.stringify keypath}" if not (keypath instanceof Array)
@@ -210,7 +210,7 @@ del = (object, keypath) ->
             
     if kp.length == 1 and o?
         if o instanceof Array
-            o.splice parseInt kp[0]
+            o.splice parseInt(kp[0])
         else if o instanceof Object
             delete o[kp[0]]
     object

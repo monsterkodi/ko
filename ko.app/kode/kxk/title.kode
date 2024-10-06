@@ -43,9 +43,9 @@ function Title
         @winicon = elem class: 'winicon' dblclick: (event) -> stopEvent event
         
         if @opt.icon
-            @winicon.appendChild elem 'img' src:@opt.icon 
+            @winicon.appendChild elem('img' src:@opt.icon)
         else 
-            @winicon.appendChild elem 'div' class:'noicon'
+            @winicon.appendChild elem('div' class:'noicon')
         
         @elem.appendChild @winicon
         @winicon.addEventListener 'click' -> post.emit 'menuAction' 'Open Menu'   
@@ -198,10 +198,10 @@ function Title
                     text: ''
                 menuOrCombo is num
                     text:text
-                    combo:kstr menuOrCombo
+                    combo:kstr(menuOrCombo)
                 menuOrCombo is str
                     text:text
-                    combo:keyinfo.convertCmdCtrl menuOrCombo
+                    combo:keyinfo.convertCmdCtrl(menuOrCombo)
                 empty menuOrCombo
                     text:text
                     combo: ''
@@ -211,7 +211,7 @@ function Title
                     item
                 else
                     text:text
-                    menu:@makeTemplate menuOrCombo
+                    menu:@makeTemplate(menuOrCombo)
         tmpl
         
     menuVisible: => @menu.elem.style.display != 'none'

@@ -19,7 +19,7 @@ function Popup
         @onClose   = opt.onClose
         @trail     = opt.trail
         
-        @items.classList.add opt.class if opt.class
+        @items.classList.add(opt.class) if opt.class
         
         for item in opt.items
             continue if item.hide
@@ -31,7 +31,7 @@ function Popup
                     div.innerHTML = item.html 
                 else 
                     if item.img
-                        div.appendChild elem 'img' class:'popupImage' src:slash.fileUrl item.img
+                        div.appendChild elem('img' class:'popupImage' src:slash.fileUrl(item.img))
                     if item.child
                         div.appendChild item.child
                     if item.children
@@ -43,9 +43,9 @@ function Popup
                 
                 if item.combo
                     text = keyinfo.short item.combo
-                    div.appendChild elem 'span' class:'popupCombo' text:text
+                    div.appendChild elem('span' class:'popupCombo' text:text)
                 else if item.menu 
-                    div.appendChild elem 'span' class:'popupCombo' text:'▶'
+                    div.appendChild elem('span' class:'popupCombo' text:'▶')
             @items.appendChild div
 
         document.body.appendChild @items
@@ -295,11 +295,11 @@ function Popup
         { mod, key, combo } = keyinfo.forEvent event
         
         switch combo
-            'end' 'page down' ➜ stopEvent event, @select @items.lastChild, selectFirstItem:false 
-            'home' 'page up'  ➜ stopEvent event, @select @items.firstChild, selectFirstItem:false 
+            'end' 'page down' ➜ stopEvent event, @select(@items.lastChild, selectFirstItem:false )
+            'home' 'page up'  ➜ stopEvent event, @select(@items.firstChild, selectFirstItem:false )
             'esc'             ➜ stopEvent event, @close()
-            'down'            ➜ stopEvent event, @select @nextItem(), selectFirstItem:false 
-            'up'              ➜ stopEvent event, @select @prevItem(), selectFirstItem:false 
+            'down'            ➜ stopEvent event, @select(@nextItem(), selectFirstItem:false )
+            'up'              ➜ stopEvent event, @select(@prevItem(), selectFirstItem:false )
             'enter' 'space'   ➜ stopEvent event, @activateOrNavigateRight()
             'left'            ➜ stopEvent event, @navigateLeft()
             'right'           ➜ stopEvent event, @navigateRight()

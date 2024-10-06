@@ -263,6 +263,16 @@ use ./utils ▪ kc ke
                 })
                 """
 
+            kc  "(@a a) -> log @a" ▸
+                """
+                (function (a1, a)
+                {
+                    this.a = a1
+                
+                    console.log(this.a)
+                })
+                """
+                
     # 00000000  000      000      000  00000000    0000000  000   0000000  
     # 000       000      000      000  000   000  000       000  000       
     # 0000000   000      000      000  00000000   0000000   000  0000000   
@@ -277,6 +287,28 @@ use ./utils ▪ kc ke
             """
             
             f = function (a1, ...args)
+            {
+                return 2
+            }
+            """
+
+        kc  """
+            f = (a2 args...) -> 2
+            """ ▸
+            """
+            
+            f = function (a2, ...args)
+            {
+                return 2
+            }
+            """
+            
+        kc  """
+            f = a3 args... -> 2
+            """ ▸
+            """
+            
+            f = function (a3, ...args)
             {
                 return 2
             }

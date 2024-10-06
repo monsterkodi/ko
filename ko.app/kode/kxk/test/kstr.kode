@@ -162,7 +162,7 @@ use .. ◆ kstr
         
     ▸ stripAnsi
          
-        (kstr.stripAnsi g5('green')) ▸ 'green'
+        kstr.stripAnsi(g5('green')) ▸ 'green'
          
     ▸ dissect
          
@@ -211,13 +211,13 @@ use .. ◆ kstr
         
     ▸ time bigint
         
-        kstr.time BigInt 1              ▸ '1 ns'
-        kstr.time BigInt 1000           ▸ '1 μs'
-        kstr.time BigInt 1001           ▸ '1 μs'
-        kstr.time BigInt 6001           ▸ '6 μs'
-        kstr.time BigInt 1000000        ▸ '1 ms'
-        kstr.time BigInt 1000000000     ▸ '1 second'
-        kstr.time BigInt 2000000000     ▸ '2 seconds'
+        kstr.time BigInt(1)             ▸ '1 ns'
+        kstr.time BigInt(1000)          ▸ '1 μs'
+        kstr.time BigInt(1001)          ▸ '1 μs'
+        kstr.time BigInt(6001)          ▸ '6 μs'
+        kstr.time BigInt(1000000)       ▸ '1 ms'
+        kstr.time BigInt(1000000000)    ▸ '1 second'
+        kstr.time BigInt(2000000000)    ▸ '2 seconds'
         
     # 00000000  000  000      000      00000000  000000000  
     # 000       000  000      000      000          000     
@@ -243,7 +243,7 @@ use .. ◆ kstr
         
     ▸ unfillet
     
-        kstr.unfillet kstr.fillet ' a_c.,:__def ' ▸ 'a_c.,:__def'
+        kstr.unfillet kstr.fillet(' a_c.,:__def ') ▸ 'a_c.,:__def'
         
     ▸ blockFillets
     

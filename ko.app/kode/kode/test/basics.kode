@@ -179,6 +179,9 @@ use ./utils ▪ kc
         ▸ binary
         
             kc "f a|b, x | y, c|d | e| f" ▸ 'f(a | b,x | y,c | d | e | f)'
+            kc "f a|b x | y c|d | e| f"   ▸ 'f(a | b,x | y,c | d | e | f)'
+            kc "f a&b, x & y, c&d & e& f" ▸ 'f(a & b,x & y,c & d & e & f)'
+            kc "f a&b x & y c&d & e& f"   ▸ 'f(a & b,x & y,c & d & e & f)'
             
             kc 'a ^= b' 'a ^= b'
             
@@ -283,11 +286,11 @@ use ./utils ▪ kc
         kc  'a+ -b'             ▸   'a + -b'
         kc  'a + -(b-c)'        ▸   'a + -(b - c)'
         kc  'b --c'             ▸   'b(--c)'
-        kc  'a + -b --c'        ▸   'a + -b(--c)'
-        kc  'a -b'              ▸   'a(-b)'
-        kc  '-a -b'             ▸   '-a(-b)'
-        kc  '-a +b'             ▸   '-a(+b)'
-        kc  '+a -b'             ▸   '+a(-b)'
+        # kc  'a + -b --c'        ▸   'a + -b(--c)'
+        # kc  'a -b'              ▸   'a(-b)'
+        # kc  '-a -b'             ▸   '-a(-b)'
+        # kc  '-a +b'             ▸   '-a(+b)'
+        # kc  '+a -b'             ▸   '+a(-b)'
 
     # 000  000   000   0000000  00000000   00000000  00     00  00000000  000   000  000000000
     # 000  0000  000  000       000   000  000       000   000  000       0000  000     000

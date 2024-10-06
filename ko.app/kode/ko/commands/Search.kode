@@ -71,7 +71,7 @@ function Search extends Command
 
         terminal = window.terminal
 
-        terminal.appendMeta clss:'searchHeader' diss:Syntax.dissForTextAndSyntax "▸ Search for '#{opt.text}':" 'ko'
+        terminal.appendMeta clss:'searchHeader' diss:Syntax.dissForTextAndSyntax("▸ Search for '#{opt.text}':" 'ko')
         terminal.appendMeta clss:'spacer'
         terminal.singleCursorAtPos [0, terminal.numLines()-2]
 
@@ -172,7 +172,7 @@ function FileSearcher
         terminal = window.terminal
 
         meta =
-            diss:  Syntax.dissForTextAndSyntax "#{slash.tilde @file}" 'ko'
+            diss:  Syntax.dissForTextAndSyntax("#{slash.tilde @file}" 'ko')
             href:  @file
             list:  @file
             clss:  'gitInfoFile'
@@ -187,7 +187,7 @@ function FileSearcher
             f = @found[fi]
 
             regions = kolor.dissect([f[1]], @syntaxName)[0]
-            dss = matchr.merge regions, matchr.dissect f[2]
+            dss = matchr.merge regions, matchr.dissect(f[2])
 
             meta =
                 diss: dss

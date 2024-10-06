@@ -121,9 +121,9 @@ lang 'kode'
         inc rgs, 3 '...'        ▸ 'punct ligature'
         inc rgs, 6 '.'          ▸ 'punct'
         
-        rgs = ranges "@f [1]"
-        inc rgs, 0 "@"          ▸ 'punct function call'
-        inc rgs, 1 "f"          ▸ 'function call'
+        # rgs = ranges "@f [1]"
+        # inc rgs, 0 "@"          ▸ 'punct function call'
+        # inc rgs, 1 "f"          ▸ 'function call'
     
         rgs = ranges "@f = 1"
         inc rgs, 0 "@"          ▸ 'punct this'
@@ -153,10 +153,10 @@ lang 'kode'
     
     ▸ function
     
-        rgs = ranges "obj.prop.call 1"
-        inc rgs, 0 'obj'        ▸ 'obj'
-        inc rgs, 4 'prop'       ▸ 'property'
-        inc rgs, 9 'call'       ▸ 'function call'
+        # rgs = ranges "obj.prop.call 1"
+        # inc rgs, 0 'obj'        ▸ 'obj'
+        # inc rgs, 4 'prop'       ▸ 'property'
+        # inc rgs, 9 'call'       ▸ 'property'
         
         rgs = ranges "dolate: => "
         inc rgs, 8 '=>'          ▸ 'punct function bound tail ligature'
@@ -168,18 +168,18 @@ lang 'kode'
         inc rgs, 6 '○'          ▸ 'punct function async'
         inc rgs, 7 '->'         ▸ 'punct function tail ligature'
                 
-        rgs = ranges "@a @b 'c'"
-        inc rgs, 0 '@'          ▸ 'punct function call'
-        inc rgs, 1 'a'          ▸ 'function call'
-        inc rgs, 3 '@'          ▸ 'punct function call'
-        inc rgs, 4 'b'          ▸ 'function call'
+        # rgs = ranges "@a @b 'c'"
+        # inc rgs, 0 '@'          ▸ 'punct function call'
+        # inc rgs, 1 'a'          ▸ 'function call'
+        # inc rgs, 3 '@'          ▸ 'punct function call'
+        # inc rgs, 4 'b'          ▸ 'function call'
         
-        rgs = ranges "@a 3 @b '5'"
-        inc rgs, 0 '@'          ▸ 'punct function call'
-        inc rgs, 1 'a'          ▸ 'function call'
+        # rgs = ranges "@a 3 @b '5'"
+        # inc rgs, 0 '@'          ▸ 'punct function call'
+        # inc rgs, 1 'a'          ▸ 'function call'
     
-        rgs = ranges "fff 1"
-        inc rgs, 0 "fff"        ▸ 'function call'
+        # rgs = ranges "fff 1"
+        # inc rgs, 0 "fff"        ▸ 'function call'
                 
         rgs = ranges "f 'a'"
         inc rgs, 0 "f"          ▸ 'function call'

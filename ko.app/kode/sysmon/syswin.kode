@@ -1,0 +1,35 @@
+
+#  0000000  000   000   0000000  000   000  000  000   000  
+# 000        000 000   000       000 0 000  000  0000  000  
+# 0000000     00000    0000000   000000000  000  000 0 000  
+#      000     000          000  000   000  000  000  0000  
+# 0000000      000     0000000   00     00  000  000   000  
+
+use ../kakao
+use ../kxk ▪ absMax win post
+use ◆ sysdish
+
+function SysWin extends sysdish
+
+    onWindowWillShow: ->
+        
+        kakao 'window.setAspectRatio' 1 1
+            
+        post.on 'window.frame' @onWindowFrame
+        post.on 'dishData'     @onDishData
+        post.on 'status.down'  -> kakao 'window.raise'
+        
+    onDishData: @data =>
+        
+        @updateDish()
+                    
+    onWindowKeyDown: info ->
+        
+        switch info.combo
+            'command+q'     ➜ kakao 'app.quit'
+            'w' 'command+w' ➜ kakao 'window.close'
+            'command+alt+i' ➜ kakao 'window.toggleInspector'
+
+kakao.init ->
+    
+    new win new SysWin

@@ -46,7 +46,6 @@ class FileHandler
         {
             file = null
         }
-        editor.saveFilePosition()
         if ((file != null))
         {
             var _a_ = slash.splitFilePos(file); file = _a_[0]; filePos = _a_[1]
@@ -99,13 +98,13 @@ class FileHandler
 
     onOpenDialog (files)
     {
-        var file, options, _93_33_
+        var file, options, _91_33_
 
         if (_k_.empty(files))
         {
             return
         }
-        options = ((_93_33_=this.openDialogOpt) != null ? _93_33_ : {})
+        options = ((_91_33_=this.openDialogOpt) != null ? _91_33_ : {})
         var list = _k_.list(files.slice(0, 30))
         for (var _a_ = 0; _a_ < list.length; _a_++)
         {
@@ -191,7 +190,7 @@ class FileHandler
 
     saveChanges ()
     {
-        var _173_29_
+        var _171_29_
 
         if ((editor.currentFile != null) && editor.do.hasChanges())
         {

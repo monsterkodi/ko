@@ -23,7 +23,7 @@ function CommandLine extends TextEditor
     
     @init: ○->
 
-        files =○ ffs.list slash.path ◆dir, '../commands'
+        files =○ ffs.list slash.path(◆dir, '../commands')
         
         for file in files
             
@@ -135,7 +135,7 @@ function CommandLine extends TextEditor
 
         @setLines [t ? '']
         @selectAll()
-        @selectSingleRange @rangeForLineAtIndex 0
+        @selectSingleRange @rangeForLineAtIndex(0)
 
     setText: t ->
 
@@ -188,7 +188,7 @@ function CommandLine extends TextEditor
             @view.focus()
             @setName name
             # log 'startCommand' name
-            @results @command.start name # <-- command start
+            @results @command.start(name) # <-- command start
 
             if name in ['search' 'find']
                 window.textEditor.highlightTextOfSelectionOrWordAtCursor()
@@ -209,7 +209,7 @@ function CommandLine extends TextEditor
     # 000        000 000   000       000       000   000     000     000
     # 00000000  000   000  00000000   0000000   0000000      000     00000000
 
-    execute: -> @results @command?.execute @line 0
+    execute: -> @results @command?.execute(@line(0))
 
     # 00000000   00000000   0000000  000   000  000      000000000   0000000
     # 000   000  000       000       000   000  000         000     000
@@ -270,7 +270,7 @@ function CommandLine extends TextEditor
                     @hideList()
                     @startCommand name
                     stopEvent event
-                div.addEventListener 'mousedown' start cname
+                div.addEventListener 'mousedown' start(cname)
                 @list.appendChild div
 
     hideList: ->
@@ -365,7 +365,7 @@ function CommandLine extends TextEditor
         split = window.split
         switch combo
             'enter'                ➜ ⮐ @execute()
-            'command+enter'        ➜ ⮐ @execute() + window.split.do "focus #{@command?.focus}"
+            'command+enter'        ➜ ⮐ @execute() + window.split.do("focus #{@command?.focus}")
             'command+shift+enter'  ➜ ⮐ @focusTerminal()
             'up'                   ➜ ⮐ @command?.selectListItem 'up'
             'down'                 ➜ ⮐ @command?.selectListItem 'down'

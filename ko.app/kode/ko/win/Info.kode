@@ -28,7 +28,7 @@ class Info
         @topline = elem class: "info-line top"
         
         @cursorColumn = elem 'span' class: "info-cursor-column"
-        @cursorColumn.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.cursorPos()[1]]
+        @cursorColumn.onclick = => @editor.focus() + @editor.singleCursorAtPos([0, @editor.cursorPos()[1]])
         @topline.appendChild @cursorColumn
         ttip @cursorColumn, 'x'
 
@@ -62,12 +62,12 @@ class Info
         @botline = elem class: "info-line bot"
         
         @cursorLine = elem 'span' class: "info-cursor-line"
-        @cursorLine.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, 0]
+        @cursorLine.onclick = => @editor.focus() + @editor.singleCursorAtPos([0, 0])
         @botline.appendChild @cursorLine
         ttip @cursorLine, 'y'
         
         @lines = elem 'span' class: "info-lines"
-        @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos [0, @editor.numLines()]
+        @lines.onclick = => @editor.focus() + @editor.singleCursorAtPos([0, @editor.numLines()])
         @botline.appendChild @lines
         ttip @lines, 'lines'
 

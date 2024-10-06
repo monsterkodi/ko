@@ -48,29 +48,48 @@ Window = (function ()
 {
     _k_.extend(Window, win.Delegate)
     Window.prototype["onWindowWillShow"] = function (win)
-    {}
+    {
+        window.split.resized()
+        return kakao('window.focus')
+    }
 
     Window.prototype["onWindowAnimationTick"] = function (win, tickInfo)
     {}
 
-    Window.prototype["onWindowResize"] = function (win, event)
-    {}
-
     Window.prototype["onWindowFocus"] = function (win)
-    {}
+    {
+        console.log('onWindowFocus')
+    }
 
     Window.prototype["onWindowBlur"] = function (win)
     {}
 
-    Window.prototype["onWindowKeyDown"] = function (win, keyInfo)
+    Window.prototype["onWindowKeyDown"] = function (keyInfo)
     {}
 
-    Window.prototype["onWindowKeyUp"] = function (win, keyInfo)
+    Window.prototype["onWindowKeyUp"] = function (keyInfo)
     {}
 
     Window.prototype["onWindowMenuTemplate"] = function (win, template)
     {
         return kakao.menuTemplate = Menu(template)
+    }
+
+    Window.prototype["onWindowDidLoadStash"] = function (win)
+    {
+        console.log('onLoadStash')
+    }
+
+    Window.prototype["onWindowResize"] = function (win, event)
+    {
+        var _37_18_
+
+        window.split.resized()
+        ;(window.win != null ? window.win.onMoved(window.win.getBounds()) : undefined)
+        if (window.stash.get('centerText',false))
+        {
+            return window.editor.centerText(true,200)
+        }
     }
 
     function Window ()
@@ -151,7 +170,6 @@ Window = (function ()
             this.editor.centerText(window.stash.get('centerText'),0)
             return post.emit('loadFile',kore.get('editor|file'))
         }).bind(this))
-        window.split.resized()
         window.info.reload()
         kakao('window.new','icon','window.statusIcon = "menu_ko.png"')
         return this.editor.focus()
@@ -164,7 +182,7 @@ Window = (function ()
 
     Window.prototype["onMenuAction"] = function (name, trail)
     {
-        var action, _125_25_
+        var action, _131_25_
 
         if (action = Editor.actionWithName(name))
         {
@@ -345,18 +363,6 @@ window.editorWithName = function (n)
             return editor
     }
 
-}
-
-window.onresize = function ()
-{
-    var _217_14_
-
-    window.split.resized()
-    ;(window.win != null ? window.win.onMoved(window.win.getBounds()) : undefined)
-    if (window.stash.get('centerText',false))
-    {
-        return window.editor.centerText(true,200)
-    }
 }
 post.on('split',function (s)
 {

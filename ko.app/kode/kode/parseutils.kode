@@ -16,7 +16,7 @@ function ParseUtils
     # 000       000   000  000      000      000   000       000       000  000  000   000  000  0000  
     #  0000000  000   000  0000000  0000000  000   000  0000000   0000000   000   0000000   000   000  
     
-    prepareCallAssign: (rhs) ->
+    prepareCallAssign: rhs ->
         
         if rhs?.switch
             rhs =
@@ -58,7 +58,7 @@ function ParseUtils
     
     # rules in parser should use this instead of calling shiftNewline directly
     
-    shiftClose: (rule, text, tokens) ->
+    shiftClose: rule text tokens ->
         
         if tokens[0]?.text == text
             return tokens.shift() 
@@ -81,12 +81,12 @@ function ParseUtils
     # it is very important to keep the newlines as a recursion breaker until the last possible moment
     # using this method makes it much easier to determine when one gets swallwed too early
     
-    shiftNewline: (rule, tokens) ->
+    shiftNewline: rule tokens ->
         
-        if @debug then log M3 y5 " ◂ #{w1 rule}" 
+        if @debug then log M3(y5(" ◂ #{w1(rule)}" ))
         tokens.shift()
         
-    shiftNewlineTok: (rule, tokens, tok, cond) ->
+    shiftNewlineTok: rule tokens tok cond ->
         
         if tokens[0]?.type == 'nl' and cond
            if tokens[1]?.col == tok?.col
@@ -100,7 +100,7 @@ function ParseUtils
 
     # adds name tokens to functions that are values in class objects
     
-    nameMethods: (mthds) ->
+    nameMethods: mthds ->
  
         if mthds?.length
             for m in mthds
@@ -118,7 +118,7 @@ function ParseUtils
     # eats either tokens to the right of 'then' tokens
     # or of the next block
     
-    then: (id, tokens) ->
+    then: id tokens ->
         
         if tokens[0]?.text == 'then'
             
@@ -167,7 +167,7 @@ function ParseUtils
     #   - else
     #   - return
     
-    block: (id, tokens) ->
+    block: id tokens ->
         
         # @verb 'block next token type' tokens[0]?.type 
         
@@ -203,7 +203,7 @@ function ParseUtils
     # converts the list of block tokens into a list of token lists
     # each list in the returned lists contains the tokens for one else(if) or when statement
     
-    subBlocks: (tokens) ->
+    subBlocks: tokens ->
         
         subbs = [[]]
         
@@ -238,7 +238,7 @@ function ParseUtils
     #      000  000   000  000     000     000   000  000   000  000      000       
     # 0000000    0000000   000     000     000   000  0000000    0000000  00000000  
     
-    isSuitableForImplicitCall: (e) ->
+    isSuitableForImplicitCall: e ->
         
         (e.type not in @kode.literals) and
         (e.type not in ['punct' 'comment' 'op' 'section' 'test' 'func']) and 
@@ -250,7 +250,7 @@ function ParseUtils
         not e.incond and
         not e.qmrkop
         
-    ifSuitableForInline: (e) ->
+    ifSuitableForInline: e ->
 
         if e.if
             if e.if.then?.length > 1 ➜ ⮐ false
@@ -285,7 +285,7 @@ function ParseUtils
     # 000  0000  000   000     000     000   000  000       000  0000  000   000  000   000  000       000   000  000   000  
     # 000   000   0000000      000     000   000  00000000  000   000  000   000  000   000  00000000  000   000  0000000    
     
-    noThenAhead: (tokens) ->
+    noThenAhead: tokens ->
         
         ⮐ false if tokens[1]?.type == 'block'
         ti = 0
@@ -296,7 +296,7 @@ function ParseUtils
             ⮐ true  if tokens[ti].type in ['nl' 'block']
         true
 
-    funcAhead: (tokens) ->
+    funcAhead: tokens ->
         
         ti = -1
         while ++ti < tokens.length
@@ -317,12 +317,12 @@ function ParseUtils
     #      000  000   000  000       000   000  000          
     # 0000000   000   000  00000000  000   000  000          
     
-    sheapPush: (type, text) ->
+    sheapPush: type text ->
         
-        @sheap.push type:type, text:text
+        @sheap.push type:type text:text
         print.sheap @sheap if @debug
         
-    sheapPop: (m, t) ->
+    sheapPop: m t ->
         
         popped = @sheap.pop()
         if popped.text != t and popped.text != trim(t, "'") then error 'wrong pop?' popped.text, t
@@ -334,21 +334,21 @@ function ParseUtils
     #      000     000     000   000  000       000  000   
     # 0000000      000     000   000   0000000  000   000  
 
-    push: (node) ->
+    push: node ->
 
-        print.stack @stack, node if @debug
+        print.stack @stack node if @debug
         @stack.push node
         @sheapPush 'stack' node
 
-    pop: (n) ->
+    pop: n ->
         p = @stack.pop()
         @sheapPop 'stack' p
         if p != n
             error "unexpected pop!" p, n
             
         if @debug
-            print.stack @stack, p, (s) -> W1 w1 s
+            print.stack @stack p (s) -> W1(w1(s))
 
-    verb: -> if @debug then console.log.apply console.log, arguments 
+    verb: -> if @debug then console.log.apply console.log arguments 
 
 export ParseUtils

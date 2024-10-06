@@ -14,27 +14,43 @@
 #import "bundle.h"
 
 @interface WinDelegate : NSObject <NSWindowDelegate> {}
+
+@property (readwrite, retain) NSDictionary* previousFrame;
+
 @end
 
 @implementation WinDelegate
 
 - (void) sendFrame:(Win*)win
 { 
-    id msg = [NSMutableDictionary dictionary];
-    [msg setObject:@"window.frame" forKey:@"name"];
-    [msg setObject:[NSArray arrayWithObject:[win frameInfo]] forKey:@"args"];
-    [Route send:msg win:win];
+    NSMutableDictionary* frameInfo = [win frameInfo];
+    
+    [frameInfo setObject:dictForPoint([NSEvent mouseLocation]) forKey:@"mouse"];
+    
+    if (self.previousFrame)
+    {
+        [frameInfo setObject:self.previousFrame forKey:@"previous"];
+        self.previousFrame = nil;
+        
+        [frameInfo setObject:cornerForRectAndPoint([win frame], [NSEvent mouseLocation]) forKey:@"corner"];
+        // NSLog(@"frameInfo %@", frameInfo);
+    }
+    
+    [Route send:@"window.frame" arg:frameInfo win:win];
 }
 
 - (void) sendWillResize:(Win*)win newSize:(NSSize)newSize
 {
-    id msg = [NSMutableDictionary dictionary];
-    [msg setObject:@"window.willResize" forKey:@"name"];        
-    [msg setObject:[NSArray arrayWithObjects:[win frameInfo], dictForSize(newSize), nil] forKey:@"args"];
-    [Route send:msg win:win];
+    [Route send:@"window.willResize" args:[NSArray arrayWithObjects:[win frameInfo], dictForSize(newSize), nil] win:win];
 }
 
-- (NSSize) windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize { [self sendWillResize:(Win*)sender newSize:frameSize]; return frameSize; }
+- (NSSize) windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize 
+{ 
+    [self sendWillResize:(Win*)sender newSize:frameSize];
+    self.previousFrame = dictForRect([sender frame]);
+        
+    return frameSize; 
+}
 - (void)  windowDidResize:    (NSNotification *)notification { [self sendFrame:(Win*)notification.object]; }
 - (void)  windowDidMove:      (NSNotification *)notification { [self sendFrame:(Win*)notification.object]; }
 - (void)  windowDidBecomeKey: (NSNotification *)notification { [Route send:@"window.focus" win:(Win*)notification.object]; }
@@ -44,11 +60,8 @@
 - (void)  windowWillClose:    (NSNotification *)notification 
 { 
     BOOL shouldStash = [[App get] shouldWindowSaveStash:notification.object];
-    id msg = [NSMutableDictionary dictionary];
-    [msg setObject:@"window.close" forKey:@"name"];
-    [msg setObject:[NSArray arrayWithObject:[NSNumber numberWithBool:shouldStash]] forKey:@"args"];
-    
-    [Route send:msg win:(Win*)notification.object];
+    // NSLog(@"windowWillClose %d", shouldStash);
+    [Route send:@"window.close" arg:[NSNumber numberWithBool:shouldStash] win:(Win*)notification.object];
 }
 
 - (BOOL) windowShouldClose:(NSWindow*)window 
@@ -239,6 +252,7 @@
 
 - (Win*) focusNext { return [self focusSibling:+1]; }
 - (Win*) focusPrev { return [self focusSibling:-1]; }
+- (Win*) focus     { [self makeKeyAndOrderFront:self]; return self; }
 - (Win*) focusSibling:(int)offset
 {
     NSArray* windows = [App wins];
@@ -290,12 +304,20 @@
     [self setFrameTopLeftPoint:CGPointMake(x, y)];
 }
 
+- (void) moveBy:(id)delta
+{
+    float x = [[delta objectForKey:@"x"] floatValue];
+    float y = [[delta objectForKey:@"y"] floatValue];
+    NSRect frame = [self frame];
+    [self setFrame:CGRectMake(frame.origin.x+x, frame.origin.y+y, frame.size.width, frame.size.height) display:NO animate:YES];
+}
+
 - (void) setWidth:(unsigned int)width height:(unsigned int)height
 {
     [self setFrame:CGRectMake(0, 0, width, height) display:YES];
 }
 
-- (NSDictionary*) frameInfo
+- (NSMutableDictionary*) frameInfo
 {
     NSMutableDictionary* info = [NSMutableDictionary dictionary];
     

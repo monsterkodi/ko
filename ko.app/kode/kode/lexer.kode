@@ -92,7 +92,7 @@ Patterns =
     
 class Lexer
 
-    @: (@kode) ->
+    @: @kode ->
 
         @debug    = @kode.args.debug
         @verbose  = @kode.args.verbose
@@ -103,13 +103,13 @@ class Lexer
             
             if 
                 pat is 'string'
-                    @regs.push [key, new RegExp pat]
+                    @regs.push [key new RegExp(pat)]
                     
                 pat is Array
                     
                     pat = pat.map (p) -> kstr.escapeRegexp "#{p}"
                     reg = '\\b(' + pat.join('|') + ')\\b'
-                    @regs.push [key, new RegExp reg]
+                    @regs.push [key new RegExp(reg)]
 
     # 000000000   0000000   000   000  00000000  000   000  000  0000000  00000000
     #    000     000   000  000  000   000       0000  000  000     000   000
@@ -126,7 +126,7 @@ class Lexer
             col:  number        # start index in line
     ###
 
-    tokenize: (text) ->
+    tokenize: text ->
 
         linetokens = []
         tokens = []
@@ -148,7 +148,7 @@ class Lexer
                     if value == 'then' and tokens[-2]?.text == 'else' 
                         # skip then after else
                     else
-                        token = type:key, text:value, line:line, col:col
+                        token = type:key text:value line:line col:col
                         tokens.push token
                         linetokens.push token
 
@@ -177,9 +177,9 @@ class Lexer
                                 break
                             else
                                 tokens[-1].type = 'op'
-                                tokens[-1].text = trim tokens[-1].text, ' \n'
+                                tokens[-1].text = trim tokens[-1].text ' \n'
                                 
-                        key.startsWith('prof') and empty pullIf linetokens, (t) -> t.text != 'use'
+                        key.startsWith('prof') and empty pullIf(linetokens, (t) -> t.text != 'use')
                         
                             ni  = text.indexOf '\n'
                             si  = text.indexOf ';'
@@ -203,7 +203,7 @@ class Lexer
             if before == after
                 log "files" @kode.args.files
                 log "stray character ▸#{text[0]}◂ in line #{line} col #{col} text:\n" text
-                tokens.push type:'stray' text:text[0], line:line, col:col
+                tokens.push type:'stray' text:text[0] line:line col:col
                 text = text[1..-1]
         tokens
         
@@ -215,7 +215,7 @@ class Lexer
     
     # left trims triple strings
     
-    tripdent: (tokens) ->
+    tripdent: tokens ->
         
         for tok in tokens
             if tok.type == 'triple'
@@ -231,7 +231,7 @@ class Lexer
                         splt.pop()   if trim(splt[-1]) == ''
                         if splt.length == 1 then tok.text = '"""' + kstr.lstrip(splt[0]) + '"""'
                         else
-                            minind = Math.min.apply 0 splt.map (s) -> if empty(trim(s)) then Infinity else kstr.lcnt s, ' '
+                            minind = Math.min.apply 0 splt.map((s) -> if empty(trim(s)) then Infinity else kstr.lcnt(s ' '))
                             if Infinity > minind > 0 then splt = splt.map (s) -> s[minind..]
                             tok.text = '"""' + splt.join('\n') + '"""'
         tokens
@@ -244,7 +244,7 @@ class Lexer
 
     # joins lines that end with '\'
 
-    unslash: (tokens) ->
+    unslash: tokens ->
 
         newTokens = []
 
@@ -269,7 +269,7 @@ class Lexer
     
     # joins lines that end with operators that operate on a left hand side
     
-    mergeop: (tokens) ->
+    mergeop: tokens ->
 
         newTokens = []
 
@@ -295,7 +295,7 @@ class Lexer
     
     # TODO: keep the swallowed tokens and reinsert them after parsing
     
-    uncomment: (tokens) ->
+    uncomment: tokens ->
         
         newTokens = []
 
@@ -331,7 +331,7 @@ class Lexer
         nl tokens are only kept between lines of the same block
     ###
 
-    blockify: (tokens) ->
+    blockify: tokens ->
 
         tokens = @tripdent  tokens
         tokens = @unslash   tokens
@@ -343,7 +343,7 @@ class Lexer
         block = type:'block' tokens:[] indent:'' line:1 col:0
         blocks.push block
 
-        outdentTo = (depth, line) ->
+        outdentTo = depth line ->
             
             while depth < block.indent.length
                 blocks.pop()
@@ -368,17 +368,17 @@ class Lexer
                             if 
                                 nxt.text.length > block.indent.length
         
-                                    block = type:'block' tokens:[] line:nxt.line, indent:nxt.text, col:nxt.text.length
+                                    block = type:'block' tokens:[] line:nxt.line indent:nxt.text col:nxt.text.length
                                     blocks[-1].tokens.push block
                                     blocks.push block
                                     continue
         
                                 nxt.text.length < block.indent.length
                                     
-                                    outdentTo nxt.text.length, nxt.line
+                                    outdentTo nxt.text.length nxt.line
                             
                         nxt
-                            if block.indent.length ➜ outdentTo 0, nxt.line
+                            if block.indent.length ➜ outdentTo 0 nxt.line
 
                 tok.type == 'ws'
                     continue

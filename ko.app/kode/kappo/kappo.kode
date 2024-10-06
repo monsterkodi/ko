@@ -1,0 +1,447 @@
+###
+000   000   0000000   00000000   00000000    0000000
+000  000   000   000  000   000  000   000  000   000
+0000000    000000000  00000000   00000000   000   000
+000  000   000   000  000        000        000   000
+000   000  000   000  000        000         0000000
+###
+
+use ../kakao
+use ../kxk ▪ win krzl childIndex post popup args setStyle stopEvent keyinfo prefs elem ffs slash kpos $
+use ◆ appfind appicon
+
+appHist      = null
+results      = []
+apps         = {}
+scripts      = {}
+allKeys      = []
+search       = ''
+currentName  = ''
+currentIndex = 0
+
+post.on 'appsFound' (info) -> 
+    # log 'appsFound' info
+    { apps, scripts, allKeys } = info
+    info
+
+# 0000000    00000000  000      00000000   0000000    0000000   000000000  00000000  
+# 000   000  000       000      000       000        000   000     000     000       
+# 000   000  0000000   000      0000000   000  0000  000000000     000     0000000   
+# 000   000  000       000      000       000   000  000   000     000     000       
+# 0000000    00000000  0000000  00000000   0000000   000   000     000     00000000  
+
+function Delegate
+
+    onWindowWillShow: ->
+        
+        kakao 'window.setAspectRatio' 1 1
+        
+        post.emit 'findApps'
+            
+        # { apps, scripts, allKeys } = post.get 'apps'
+    
+        #appHist = new history
+        #    list:      prefs.get 'history' []
+        #    maxLength: prefs.get 'maxHistoryLength' 10
+        
+        #if win?.isVisible()
+        #    if prefs.get 'hideOnDoubleActivation' false
+        #        win.hide()
+        #    else
+        #        post.toWins 'openCurrent'
+        #        # activateApp() if not slash.win()
+        #else
+        #        osascript = require('osascript').eval
+        #        osascript """
+        #            tell application "System Events"
+        #                set n to name of first application process whose frontmost is true
+        #            end tell
+        #            do shell script "echo " & n
+        #            """, type:'AppleScript', (err,name) ->
+        #                appName = String(name).trim()
+        #                klog 'toggleWindow appName' appName
+        #                if not win?
+        #                    createWindow()
+        #                else
+        #                    getActiveApp()
+        #                    win.show()
+        #                    win.focus()
+        
+        # prefs.init defaults:shortcut:'F1'
+        
+        # electron.globalShortcut.register prefs.get('shortcut'), toggleWindow
+        
+    onWindowKeyDown: info -> 
+        
+        combo = info.combo
+        log 'onWindowKeyDown' combo
+        
+        if info.char? and combo.length == 1
+            complete info.key
+            ⮐ 
+    
+        switch combo
+            'f1'                                       ➜ preventKeyRepeat()
+            # 'delete'                                   ➜ blacklist()
+            'backspace'                                ➜ backspace()
+            'command+backspace'       'ctrl+backspace' ➜ doSearch ''
+            'esc'                                      ➜ cancelSearchOrClose()
+            'down' 'right'                             ➜ select currentIndex+1
+            'up'  , 'left'                             ➜ select currentIndex-1
+            'enter'                                    ➜ openCurrent()
+            'command+alt+i'           'ctrl+alt+i'     ➜ kakao 'window.toggleInspector'
+            'command+=' '='                            ➜ biggerWindow()
+            'command+-' '-'                            ➜ smallerWindow()
+            'command+0' '0'                            ➜ sizeWindow -550
+            'command+r'               'ctrl+r'         ➜ post.emit 'findApps'
+            'command+h'               'alt+h'          ➜ listHistory()
+            'command+f'               'ctrl+f'         ➜ openInFinder()
+            'command+t'               'ctrl+t'         ➜ toggleAppToggle()
+            'command+d'               'ctrl+d'         ➜ toggleDoubleActivation()
+            'alt+command+/'           'alt+ctrl+/'     ➜ post.toMain 'about'
+            'command+,'               'ctrl+,'         ➜ open prefs.store.file
+            'command+up'              'ctrl+up'        ➜ moveWindow 0,-20
+            'command+down'            'ctrl+down'      ➜ moveWindow 0, 20
+            'command+left'            'ctrl+left'      ➜ moveWindow -20, 0
+            'command+right'           'ctrl+right'     ➜ moveWindow  20, 0
+        
+    
+winHide = -> log 'window.hide'
+
+#  0000000   00000000   00000000  000   000
+# 000   000  000   000  000       0000  000
+# 000   000  00000000   0000000   000 0 000
+# 000   000  000        000       000  0000
+#  0000000   000        00000000  000   000
+
+openCurrent = ->
+
+    if currentIndex > 0 and search.length
+        prefs.set "search:#{search}:#{currentName}", 1 + prefs.get("search:#{search}:#{currentName}" 0)
+
+    if currentIsApp()
+
+        addToHistory()
+        
+        kakao 'app.sh' '/usr/bin/open' arg:"-a #{apps[currentName]}"
+                
+    else if scripts[currentName]?.exec?
+                
+        log currentName, scripts[currentName].exec
+        kakao 'app.sh' scripts[currentName].exec
+                
+post.on 'openCurrent'  openCurrent
+
+#  0000000  000   000  00000000   00000000   00000000  000   000  000000000
+# 000       000   000  000   000  000   000  000       0000  000     000
+# 000       000   000  0000000    0000000    0000000   000 0 000     000
+# 000       000   000  000   000  000   000  000       000  0000     000
+#  0000000   0000000   000   000  000   000  00000000  000   000     000
+
+currentApp = (appName) ->
+
+    currentName   = 'kappo' if empty currentName
+    appName       = 'kappo' if empty appName
+    lastMatches   = currentName.toLowerCase() == appName.toLowerCase()
+        
+    if lastMatches and appHist.previous() and prefs.get 'appToggle' true
+        listHistory 1
+        search = ''
+    else
+        log "currentApp #{appName} -> #{currentName}" lastMatches
+        name = currentName
+        doSearch ''
+        selectName name if not empty name
+        search = ''
+        $('appname').innerHTML = name
+        
+    $('#main').classList.add 'fade'
+
+post.on 'currentApp' currentApp
+
+currentIsApp = => not currentIsScript()
+currentIsScript = -> results[currentIndex]?.script?
+
+# 000000000   0000000    0000000    0000000   000      00000000  
+#    000     000   000  000        000        000      000       
+#    000     000   000  000  0000  000  0000  000      0000000   
+#    000     000   000  000   000  000   000  000      000       
+#    000      0000000    0000000    0000000   0000000  00000000  
+
+toggleAppToggle = ->
+    
+    prefs.set 'appToggle' not prefs.get 'appToggle' true
+    
+toggleDoubleActivation = ->
+
+    prefs.set 'hideOnDoubleActivation', not prefs.get 'hideOnDoubleActivation', false
+    
+# 000   000  000   0000000  000000000   0000000   00000000   000   000
+# 000   000  000  000          000     000   000  000   000   000 000
+# 000000000  000  0000000      000     000   000  0000000      00000
+# 000   000  000       000     000     000   000  000   000     000
+# 000   000  000  0000000      000      0000000   000   000     000
+
+listHistory = (offset=0) ->
+    
+    log "listHistory #{offset}" appHist.list
+    
+    results = []
+    if valid appHist
+        for h in appHist.list
+            result = _.clone h
+            result.string ?= result.name
+            results.push result
+    index = results.length - 1 - offset
+    log "listHistory index #{index}" results
+    select index
+    showDots()
+
+addToHistory = ->
+    
+    log 'addToHistory' results[currentIndex]
+    
+    # ⮐ if empty results[currentIndex]
+
+    # result = clone results[currentIndex]
+    # delete result.string
+    # appHist.add result
+    # prefs.set 'history' appHist.list
+    
+openInFinder = () ->
+    
+    childp.spawn 'osascript', [
+        '-e', 'tell application "Finder"',
+        '-e', "reveal POSIX file \"#{apps[currentName]}\"",
+        '-e', 'activate',
+        '-e', 'end tell']
+
+#  0000000  000      00000000   0000000   00000000
+# 000       000      000       000   000  000   000
+# 000       000      0000000   000000000  0000000
+# 000       000      000       000   000  000   000
+#  0000000  0000000  00000000  000   000  000   000
+
+clearSearch = ->
+
+    if results.length
+        search = ''
+        results = [results[Math.min(currentIndex, results.length-1)]]
+        results[0].string = currentName
+        $('appname').innerHTML = currentName
+        currentIndex = 0
+        showDots()
+    else
+        doSearch ''
+
+post.on 'clearSearch'  clearSearch
+
+# 000   0000000   0000000   000   000
+# 000  000       000   000  0000  000
+# 000  000       000   000  000 0 000
+# 000  000       000   000  000  0000
+# 000   0000000   0000000   000   000
+
+getIcon = appName ○->
+    
+    if scripts[appName]?.img
+        iconPath = scripts[appName].img
+    else
+        iconPath = ○ appicon.get appPath:apps[appName], size:512
+
+    # log 'getAppIcon' appName, iconPath
+    
+    $('appicon').style.backgroundImage = "url(\"#{slash.fileUrl iconPath}\")"
+
+#  0000000  00000000  000      00000000   0000000  000000000
+# 000       000       000      000       000          000
+# 0000000   0000000   000      0000000   000          000
+#      000  000       000      000       000          000
+# 0000000   00000000  0000000  00000000   0000000     000
+
+select = index =>
+    
+    currentIndex = (index + results.length) % results.length
+    if empty results[currentIndex]
+        log 'dafuk? index:', index, 'results:', results
+        return
+    currentName = results[currentIndex].name
+    $('appname').innerHTML = results[currentIndex].string
+    $('.current')?.classList.remove 'current'
+    $("dot_#{currentIndex}")?.classList.add 'current'
+
+    getIcon currentName
+
+selectName = (name) ->
+    
+    return if empty name
+    select results.findIndex((r) ->
+        r?.name.toLowerCase() == name.toLowerCase())
+
+#   0000000     0000000   000000000   0000000
+#   000   000  000   000     000     000
+#   000   000  000   000     000     0000000
+#   000   000  000   000     000          000
+#   0000000     0000000      000     0000000
+
+showDots = ->
+
+    dots =$ 'appdots'
+    dots.innerHTML = ''
+
+    winWidth = $('main').getBoundingClientRect().width
+    # setStyle '#appname' 'font-size' "#{parseInt 10+2*(winWidth-100)/100}px"
+
+    ⮐ if results.length < 2
+
+    dotr = elem id:'appdotr'
+    dots.appendChild dotr
+
+    s = winWidth / results.length
+    s = clamp 1, winWidth/100, s
+    s = parseInt s
+    
+    setStyle '.appdot' 'width' "#{s}px"
+    setStyle '.appdot' 'height' "#{s}px"
+
+    for i in [0...results.length]
+        dot = elem 'span' class:'appdot' id: "dot_#{i}"
+        if i == currentIndex
+            dot.classList.add 'current'
+        dotr.appendChild dot
+
+# 0000000    000       0000000    0000000  000   000  000      000   0000000  000000000  
+# 000   000  000      000   000  000       000  000   000      000  000          000     
+# 0000000    000      000000000  000       0000000    000      000  0000000      000     
+# 000   000  000      000   000  000       000  000   000      000       000     000     
+# 0000000    0000000  000   000   0000000  000   000  0000000  000  0000000      000     
+
+#blacklist = ->
+#
+#    ignore = prefs.get 'ignore', []
+#    
+#    _.pull ignore, apps[currentName]
+#    _.pull ignore, null
+#    if valid apps[currentName]
+#        ignore.push apps[currentName]
+#    else
+#        log "can't ignore '#{currentName}'"
+#    
+#    prefs.set 'ignore', ignore
+#    
+#    delete apps[currentName]
+#    
+#    results.splice currentIndex, 1
+#    
+#    select currentIndex
+    
+#  0000000  00000000   0000000   00000000    0000000  000   000
+# 000       000       000   000  000   000  000       000   000
+# 0000000   0000000   000000000  0000000    000       000000000
+#      000  000       000   000  000   000  000       000   000
+# 0000000   00000000  000   000  000   000   0000000  000   000
+
+doSearch = s ->
+    
+    search  = s
+    names   = allKeys
+    
+    log 'doSearch' s, names
+    
+    fuzz = new krzl names
+    fuzzied = fuzz.filter s
+    
+    log 'fuzzied' fuzzied
+    
+    #fuzzied = fuzzy.filter search, names, pre: '<b>', post: '</b>'
+    #fuzzied = _.sortBy fuzzied, (o) -> 2 - fuzzaldrin.score o.original, search
+
+    # if search.length
+        # if ps = prefs.get "search:#{search}"
+            # fuzzied = _.sortBy fuzzied, (o) -> Number.MAX_SAFE_INTEGER - (ps[o.original] ? 0)
+
+    results = []
+    for f in fuzzied
+        r = name:f, string:s
+        r.script = scripts[f] if scripts[f]
+        results.push r
+
+    if valid results
+        if s == ''
+            selectName 'Finder'
+        else
+            select 0
+        showDots()
+    else
+        $('appdots').innerHTML = ''
+        $('appname').innerHTML = "<b>#{search}</b>"
+
+complete  = (key) -> doSearch search + key
+backspace =       -> doSearch search.substr(0, search.length-1)
+
+cancelSearchOrClose = ->
+    
+    ipc.send 'closeAbout'
+    
+    if search.length
+        doSearch ''
+    else
+        post.toMain 'cancel'
+
+clickID = downID = 0
+window.onmousedown  = (e) -> clickID += 1 ; downID = clickID
+window.onmouseup    = (e) -> openCurrent() if downID == clickID
+window.onmousemove  = (e) -> if e.buttons then downID = -1
+window.onunload = -> document.onkeydown = null
+window.onblur   = -> winHide()
+window.onresize = -> showDots()
+
+wheelAccu = 0
+window.onwheel  = (event) ->
+    wheelAccu += (event.deltaX + event.deltaY)/44
+    if wheelAccu > 1
+        select currentIndex+1 % results.length
+        while wheelAccu > 1
+            wheelAccu -= 1
+    else if wheelAccu < -1
+        select currentIndex+results.length-1 % results.length
+        while wheelAccu < -1
+            wheelAccu += 1
+
+#  0000000  000  0000000  00000000
+# 000       000     000   000
+# 0000000   000    000    0000000
+#      000  000   000     000
+# 0000000   000  0000000  00000000
+
+clampFrame = f ->
+    
+    f.w = clamp 200, 600, f.w
+    f.h = clamp 200, 600, f.h
+    f
+
+sizeWindow = d ○->
+    
+    info = ○ kakao 'window.frame'
+    
+    frame = info.frame
+    cx = frame.x + frame.w/2
+    frame.w+=d
+    frame.h+=d
+    clampFrame frame
+    frame.x = cx - frame.w/2
+    clampFrame frame
+    kakao 'window.setFrame' frame, true
+    
+moveWindow = dx dy ->
+    
+    kakao 'window.moveBy' x:dx, y:-dy
+
+biggerWindow  = -> sizeWindow 50
+smallerWindow = -> sizeWindow -50
+
+kakao.init ->
+    
+    new win new Delegate
+    @
+    

@@ -45,7 +45,7 @@ function Open extends Command
             if empty file
                 @setText ''
             else if @getText() != slash.file file
-                @setText slash.tilde file
+                @setText slash.tilde(file)
 
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -66,12 +66,12 @@ function Open extends Command
             @krzl.values  = items
             @krzl.extract = (o) -> o.text
 
-            items = @krzl.filter slash.file file
+            items = @krzl.filter slash.file(file)
             
             items.sort (a,b) -> b.weight - a.weight
 
         if items.length
-            @showItems items.slice 0 300
+            @showItems items.slice(0 300)
             @select 0
             @positionList()
         else
@@ -87,7 +87,7 @@ function Open extends Command
 
         log 'complete not implemented!'
 
-        if @commandList? and @commandList.line(@selected).startsWith(slash.file @getText()) and not @getText().trim().endsWith('/')
+        if @commandList? and @commandList.line(@selected).startsWith(slash.file(@getText())) and not @getText().trim().endsWith('/')
             @setText slash.path(slash.dir(@getText()), @commandList.line(@selected))
             if slash.dirExists @getText()
                 @setText @getText() + '/'

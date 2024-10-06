@@ -5,7 +5,7 @@ class Pane
 {
     constructor (opt)
     {
-        var k, v, _16_19_, _17_17_, _17_27_, _17_34_, _19_17_, _19_24_, _19_29_, _21_17_, _21_46_, _21_53_, _21_62_, _22_17_, _22_61_, _22_65_, _23_17_, _23_77_, _23_88_, _24_17_
+        var k, v, _16_19_, _17_17_, _17_27_, _17_34_, _19_17_, _19_24_, _19_29_, _21_17_, _21_46_, _21_53_, _21_62_, _22_17_, _22_61_, _22_65_, _23_17_, _23_78_, _23_89_, _24_17_
 
         for (k in opt)
         {
@@ -27,7 +27,7 @@ class Pane
         {
             this.display = ((_22_17_=this.display) != null ? _22_17_ : getStyle(`#${this.div.id}`,'display'))
         }
-        if (((_23_77_=this.div) != null ? (_23_88_=_23_77_.className) != null ? _23_88_.length : undefined : undefined))
+        if (((_23_78_=this.div) != null ? (_23_89_=_23_78_.className) != null ? _23_89_.length : undefined : undefined))
         {
             this.display = ((_23_17_=this.display) != null ? _23_17_ : getStyle(' .' + this.div.className.split(' ').join(' .')))
         }

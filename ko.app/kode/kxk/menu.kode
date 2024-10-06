@@ -21,7 +21,7 @@ function Menu
             div.item = item
             div.addEventListener 'mousedown' @onMouseDown
             if item.combo?
-                combo = elem 'span' class:'popupCombo' text:keyinfo.short item.combo
+                combo = elem 'span' class:'popupCombo' text:keyinfo.short(item.combo)
                 div.appendChild combo
             @elem.appendChild div
 
@@ -182,9 +182,9 @@ function Menu
         
         switch combo
             
-            'end' 'page down'       ➜ stopEvent event, @select @elem.lastChild,  activate:true, selectFirstItem:false
-            'home' 'page up'        ➜ stopEvent event, @select @elem.firstChild, activate:true, selectFirstItem:false
-            'enter' 'down' 'space'  ➜ stopEvent event, @activate @selected
+            'end' 'page down'       ➜ stopEvent event, @select(@elem.lastChild,  activate:true, selectFirstItem:false)
+            'home' 'page up'        ➜ stopEvent event, @select(@elem.firstChild, activate:true, selectFirstItem:false)
+            'enter' 'down' 'space'  ➜ stopEvent event, @activate(@selected)
             'esc'                   ➜ stopEvent event, @close()
             'right'                 ➜ stopEvent event, @navigateRight()
             'left'                  ➜ stopEvent event, @navigateLeft()

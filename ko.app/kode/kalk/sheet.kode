@@ -43,7 +43,7 @@ class Sheet
         if spaceAbove > 34
             
             add = @view.scrollHeight-@view.getBoundingClientRect().height+4
-            kakao 'window.setFrame' x:info.frame.x, y:info.frame.y, w:476 h:max 656, info.frame.h+add
+            kakao 'window.setFrame' x:info.frame.x, y:info.frame.y, w:476 h:max(656, info.frame.h+add)
         @
         
     clear: =>
@@ -60,11 +60,11 @@ class Sheet
 
             action.text != kstr action.val
                 
-                @calc.appendChild   elem class:'sheet-line calc'   html:color action.text #+ ' ='
-                @result.appendChild elem class:'sheet-line result' html:color action.val
+                @calc.appendChild   elem(class:'sheet-line calc'   html:color(action.text)) #+ ' ='
+                @result.appendChild elem(class:'sheet-line result' html:color(action.val))
             ➜
-                @calc.appendChild   elem class:'sheet-line calc'   html:''
-                @result.appendChild elem class:'sheet-line result' html:color action.val
+                @calc.appendChild   elem(class:'sheet-line calc'   html:'')
+                @result.appendChild elem(class:'sheet-line result' html:color(action.val))
             
         @result.lastChild.scrollIntoView()
         @expand()

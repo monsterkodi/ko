@@ -81,11 +81,11 @@ class Strings
         [opn,cls] = pair
         pair[0].clss = "stringmatch #{@editor.stringCharacters[opn.match]}"
         pair[1].clss = "stringmatch #{@editor.stringCharacters[cls.match]}"
-        @editor.addHighlight [li, [opn.start, opn.start+opn.match.length], pair[0]]
-        @editor.addHighlight [li, [cls.start, cls.start+cls.match.length], pair[1]]
+        @editor.addHighlight [li [opn.start opn.start+opn.match.length] pair[0]]
+        @editor.addHighlight [li [cls.start cls.start+cls.match.length] pair[1]]
         @editor.renderHighlights()
         
     clear: ->
-        @editor.setHighlights @editor.highlights().filter (h) -> not h[2]?.clss?.startsWith 'stringmatch'
+        @editor.setHighlights @editor.highlights().filter((h) -> not h[2]?.clss?.startsWith('stringmatch'))
 
 export Strings

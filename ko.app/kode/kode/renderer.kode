@@ -14,7 +14,7 @@ kolorNames = ['r' 'g' 'b' 'c' 'm' 'y' 'w']
 
 class Renderer
 
-    @: (@kode) ->
+    @: @kode ->
 
         @debug    = @kode.args?.debug
         @verbose  = @kode.args?.verbose
@@ -27,7 +27,7 @@ class Renderer
     # 000   000  000       000  0000  000   000  000       000   000  
     # 000   000  00000000  000   000  0000000    00000000  000   000  
     
-    render: (ast, source) ->
+    render: ast source ->
 
         if @verbose ➜ log noon ast
         
@@ -65,9 +65,9 @@ class Renderer
         s = @header s            
         s
         
-    js: (s, tl) => 
+    js: s tl => 
     
-        @srcmap?.commit s, tl
+        @srcmap?.commit s tl
         s
         
     # 000   000  00000000   0000000   0000000    00000000  00000000   
@@ -149,7 +149,7 @@ class Renderer
     # 000  0000  000   000  000   000  000            000  
     # 000   000   0000000   0000000    00000000  0000000   
     
-    nodes: (nodes, sep=',' tl) ->
+    nodes: nodes sep=',' tl ->
 
         if not nodes?
             log 'no nodes?!?' @stack, @sheap
@@ -177,13 +177,13 @@ class Renderer
     # 000  0000  000   000  000   000  000
     # 000   000   0000000   0000000    00000000
 
-    node: (exp) ->
+    node: exp ->
 
-        return '' if not exp
+        ⮐ '' if not exp
 
-        if exp.type? and exp.text? then return @token exp
+        if exp.type? and exp.text? ➜ ⮐ @token exp
 
-        if exp is Array then return (@node(a) for a in exp).join ';\n'
+        if exp is Array ➜ ⮐ (@node(a) for a in exp).join ';\n'
 
         s = ''
 
@@ -192,7 +192,7 @@ class Renderer
             if @[k] is func
                 s += @[k] v
             else
-                log R4("renderer.node unhandled key #{k} in exp"), exp
+                log R4("renderer.node unhandled key #{k} in exp") exp
         s
 
     #  0000000   000000000   0000000   00     00
@@ -201,22 +201,22 @@ class Renderer
     # 000   000     000     000   000  000 0 000
     # 000   000     000      0000000   000   000
 
-    atom: (exp) ->
+    atom: exp ->
 
-        @fixAsserts @node exp
+        @fixAsserts @node(exp)
         
-    qmrkop: (p) ->
+    qmrkop: p ->
         
         if p.lhs.type == 'var' or not p.qmrk
             lhs = @atom p.lhs
-            "(#{lhs} != null ? #{lhs} : #{@atom p.rhs})"
+            "(#{lhs} != null ? #{lhs} : #{@atom(p.rhs)})"
         else
             vn = @lineVar p.qmrk
-            "((#{vn}=#{@atom p.lhs}) != null ? #{vn} : #{@atom p.rhs})"
+            "((#{vn}=#{@atom(p.lhs)}) != null ? #{vn} : #{@atom(p.rhs)})"
 
-    qmrkcolon: (p) ->
+    qmrkcolon: p ->
         
-        "(#{@atom p.lhs} ? #{@atom p.mid} : #{@atom p.rhs})"
+        "(#{@atom(p.lhs)} ? #{@atom(p.mid)} : #{@atom(p.rhs)})"
         
     # 00000000  000  000   000   0000000    0000000   0000000  00000000  00000000   000000000   0000000
     # 000       000   000 000   000   000  000       000       000       000   000     000     000
@@ -224,29 +224,26 @@ class Renderer
     # 000       000   000 000   000   000       000       000  000       000   000     000          000
     # 000       000  000   000  000   000  0000000   0000000   00000000  000   000     000     0000000
 
-    assert: (p) ->
+    assert: p ->
 
-        # @verb 'fix' p
         if p.obj.type != 'var' and not p.obj.index
             '▾' + @node(p.obj) + "▸#{p.qmrk.line}_#{p.qmrk.col}◂"
         else
             '▾' + @node(p.obj) + "▸#{0}_#{0}◂" # hint fixAssert to not use generated var
     
-    fixAsserts: (s) ->
+    fixAsserts: s ->
 
-        # @verb 'fixAsserts' s
-        
-        return '' if not s? or s.length == 0
-        return s if s in ['▾' "'▾'" '"▾"']
+        ⮐ '' if not s? or s.length == 0
+        ⮐ s if s in ['▾' "'▾'" '"▾"']
         
         while s[0] == '▾' then s = s[1..] # remove any leading ▾
         
         if /(?<!['"\[])[▾]/.test s
             i = s.indexOf '▾'
             if (n = s.indexOf '\n' i) > i
-                return s[...i] + @fixAsserts(s[i+1...n]) + @fixAsserts(s[n..])
+                ⮐ s[...i] + @fixAsserts(s[i+1...n]) + @fixAsserts(s[n..])
             else
-                return s[...i] + @fixAsserts s[i+1..]
+                ⮐ s[...i] + @fixAsserts(s[i+1..])
         
         splt = s.split /▸\d+_\d+◂/
         mtch = s.match /▸\d+_\d+◂/g
@@ -266,7 +263,7 @@ class Renderer
                     t = @fixAsserts t
                 else 
                     t = splt[0]
-                return  "(#{t} != null)"
+                ⮐  "(#{t} != null)"
                 
             s = ''
 
@@ -305,7 +302,7 @@ class Renderer
     # 000   000       000  000       
     #  0000000   0000000   00000000  
     
-    use: (n) ->
+    use: n ->
 
         s = ''
         
@@ -383,11 +380,11 @@ class Renderer
     # 000  000 0 000  000        000   000  000   000     000     
     # 000  000   000  000         0000000   000   000     000     
     
-    import: (n) ->
+    import: n ->
 
         s = ''
         s += 'import '
-        s += @nodes n.args, ' '
+        s += @nodes n.args ' '
         s
 
     # 00000000  000   000  00000000    0000000   00000000   000000000  
@@ -396,7 +393,7 @@ class Renderer
     # 000        000 000   000        000   000  000   000     000     
     # 00000000  000   000  000         0000000   000   000     000     
     
-    export: (n) ->
+    export: n ->
 
         s = ''
         s += 'export '
@@ -407,11 +404,11 @@ class Renderer
             else 
                 s += '{ ' + a + ' };'
         else 
-            s += 'default ' + @node n.args
+            s += 'default ' + @node(n.args)
             s += ';'
         s
         
-    dirFile: (n) ->
+    dirFile: n ->
         
         s = ''
         if n == 'dir'
@@ -422,12 +419,12 @@ class Renderer
             s = "_k_.file()"
         s
         
-    main: (n) ->
+    main: n ->
         
         idt = rpad 4
         s = 'if (((globalThis.process != null ? globalThis.process.argv : undefined) != null) && import.meta.filename === process.argv[1])'
         s += '\n{\n'
-        s += idt + @nodes n, '\n' + idt
+        s += idt + @nodes(n '\n' + idt)
         s += '\n}'
         s
         
@@ -437,13 +434,13 @@ class Renderer
     # 000       000      000   000       000       000
     #  0000000  0000000  000   000  0000000   0000000
 
-    class: (n) ->
+    class: n ->
 
         s = ''
         s += "class #{n.name.text}"
 
         if n.extends
-            s += " extends " + n.extends.map((e) => @node e).join ', '
+            s += " extends " + n.extends.map((e) => @node e).join(', ')
 
         s += '\n{'
 
@@ -484,7 +481,7 @@ class Renderer
     #      000  000   000  000        000       000   000  
     # 0000000    0000000   000        00000000  000   000  
     
-    super: (p) ->
+    super: p ->
         
         if @mthdName # new style class
             if @mthdName == 'constructor'
@@ -492,7 +489,7 @@ class Renderer
             else
                 "#{p.callee.text}.#{@mthdName}(#{@nodes p.args, ','})"
         else if @fncnName and @fncsName # old style function
-            "#{@fncnName}.__super__.#{@fncsName}.call(this#{valid p.args ? (',' + @nodes p.args, ',') : ''})"
+            "#{@fncnName}.__super__.#{@fncsName}.call(this#{valid p.args ? (',' + @nodes(p.args, ',')) : ''})"
         
     # 00     00  000000000  000   000  0000000
     # 000   000     000     000   000  000   000
@@ -500,7 +497,7 @@ class Renderer
     # 000 0 000     000     000   000  000   000
     # 000   000     000     000   000  0000000
 
-    mthd: (n) ->
+    mthd: n ->
 
         # insert super(...arguments) in constructors?
         
@@ -508,11 +505,11 @@ class Renderer
             s  = '\n'
             if n.keyval.val.func?
                 @mthdName = n.keyval.val.func.name.text
-                s += @indent + @func n.keyval.val.func
+                s += @indent + @func(n.keyval.val.func)
                 delete @mthdName
             else
                 if n.keyval.key.text.startsWith '@'
-                    s += @indent + 'static ' + n.keyval.key.text[1..] + ' = ' + @node n.keyval.val
+                    s += @indent + 'static ' + n.keyval.key.text[1..] + ' = ' + @node(n.keyval.val)
                 else
                     log 'what is this?' n
         s
@@ -523,7 +520,7 @@ class Renderer
     # 000       000   000  000  0000  000          000     000  000   000  000  0000  
     # 000        0000000   000   000   0000000     000     000   0000000   000   000  
     
-    function: (n) ->
+    function: n ->
 
         @fncnName = n.name.text
         
@@ -580,27 +577,27 @@ class Renderer
     # 000       000   000  000  0000  000            000  
     # 000        0000000   000   000   0000000  0000000   
     
-    funcs: (n, className) ->
+    funcs: n className ->
 
         s = ''
         if f = n.keyval?.val?.func
             if f.name.text == 'constructor'
                 @fncsName = 'constructor'
-                s = @indent + @func f, 'function ' + className
+                s = @indent + @func(f, 'function ' + className)
                 s += '\n'
             else if f.name.text.startsWith 'static'
                 @fncsName = f.name.text[7..]
-                s = @indent + @func f, "#{className}[\"#{@fncsName}\"] = function"
+                s = @indent + @func(f, "#{className}[\"#{@fncsName}\"] = function")
                 s += '\n'
             else
                 @fncsName = f.name.text
-                s = @indent + @func f, "#{className}.prototype[\"#{@fncsName}\"] = function"
+                s = @indent + @func(f, "#{className}.prototype[\"#{@fncsName}\"] = function")
                 s += '\n'
             delete @fncsName
         else
             if n.keyval?.key?.text?[0] == '@'
                 member = n.keyval.key.text[1..]
-                s = @indent + "#{className}[\"#{member}\"] = " + @node n.keyval.val
+                s = @indent + "#{className}[\"#{member}\"] = " + @node(n.keyval.val)
         s
         
     # 00000000   00000000   00000000  00000000   00     00  00000000  000000000  000   000
@@ -609,7 +606,7 @@ class Renderer
     # 000        000   000  000       000        000 0 000  000          000     000   000
     # 000        000   000  00000000  000        000   000  00000000     000     000   000
 
-    prepareMethods: (mthds) ->
+    prepareMethods: mthds ->
 
         bind = []
         for m in mthds
@@ -644,9 +641,9 @@ class Renderer
     # 000       000   000  000  0000  000
     # 000        0000000   000   000   0000000
 
-    func: (n, name) ->
+    func: n name ->
 
-        return '' if not n
+        ⮐ '' if not n
 
         gi = @ind()
         
@@ -675,7 +672,7 @@ class Renderer
 
         if n.body.exps?[0]?.call?.callee.text == 'super'
             s += '\n'
-            s += @indent + @node n.body.exps.shift()
+            s += @indent + @node(n.body.exps.shift())
             s += '\n' + gi
         
         if valid n.body.vars
@@ -693,7 +690,7 @@ class Renderer
         if valid n.body.exps
 
             s += '\n'
-            s += @indent + @nodes n.body.exps, '\n'+@indent
+            s += @indent + @nodes(n.body.exps, '\n'+@indent)
             s += '\n' + gi
 
         s += '}'
@@ -713,7 +710,7 @@ class Renderer
     # 000   000  000   000  000   000       000
     # 000   000  000   000   0000000   0000000
 
-    args: (args) ->
+    args: args ->
 
         ths  = []
         used = {}
@@ -737,15 +734,15 @@ class Renderer
                             ths.push "this.#{txt} = #{txt+i}"
                             txt += i
                             used[txt] = txt
-                            return "#{txt}" + (t.split('=')[1] ? '')
+                            ⮐ "#{txt}" + (t.split('=')[1] ? '')
                 else
                     ths.push "#{l} = #{txt}"
-                return t[5..]
+                ⮐ t[5..]
             t
                 
         str = args.join ', '
 
-        [str,ths]
+        [str ths]
 
     # 00000000   00000000  000000000  000   000  00000000   000   000
     # 000   000  000          000     000   000  000   000  0000  000
@@ -753,14 +750,14 @@ class Renderer
     # 000   000  000          000     000   000  000   000  000  0000
     # 000   000  00000000     000      0000000   000   000  000   000
 
-    return: (n) ->
+    return: n ->
 
-        s = 'return ' + @node n.val
+        s = 'return ' + @node(n.val)
         trim s
 
-    await: (n) ->
+    await: n ->
 
-        s = 'await ' + @node n.exp
+        s = 'await ' + @node(n.exp)
         trim s
         
     #  0000000   0000000   000      000
@@ -769,7 +766,7 @@ class Renderer
     # 000       000   000  000      000
     #  0000000  000   000  0000000  0000000
 
-    call: (p) ->
+    call: p ->
         
         if p.callee.text in ['log''warn''error']
             p.callee.text = "console.#{p.callee.text}"
@@ -781,12 +778,12 @@ class Renderer
             if callee.length == 2 and /[1-8]/.test(callee[1]) and callee[0].toLowerCase() in kolorNames
                 @hint._k_.k = true
                 @hint._k_[callee] = true
-                return "_k_.#{callee}(#{@nodes p.args, ','})"
+                ⮐ "_k_.#{callee}(#{@nodes p.args, ','})"
 
             if callee.length == 3 and /[1-8]/.test(callee[2]) and callee[0].toLowerCase() in kolorNames and callee[1] in kolorNames
                 @hint._k_.k = true
                 @hint._k_[callee] = true
-                return "_k_.#{callee}(#{@nodes p.args, ','})"
+                ⮐ "_k_.#{callee}(#{@nodes p.args, ','})"
                 
             switch callee
                 
@@ -829,7 +826,7 @@ class Renderer
     # 000        000   000  000   000  000       
     # 000        000   000   0000000   000       
     
-    prof: (p) ->
+    prof: p ->
         
         if p.text in ['●''●▸']
             @hint._k_.profile   = true
@@ -845,13 +842,13 @@ class Renderer
     # 000  000
     # 000  000
 
-    if: (n) ->
+    if: n ->
 
         first = firstLineCol n
         last  = lastLineCol n
 
         if (first.line == last.line and n.else and not n.returns) or n.inline
-            return @ifInline n
+            ⮐ @ifInline n
 
         gi = @ind()
 
@@ -887,7 +884,7 @@ class Renderer
     # 000  000       000  000  0000  000      000  000  0000  000
     # 000  000       000  000   000  0000000  000  000   000  00000000
 
-    ifInline: (n, dontClose) ->
+    ifInline: n dontClose ->
 
         s = ''
 
@@ -905,7 +902,7 @@ class Renderer
             if n.else.length == 1
                 s += @atom n.else[0]
             else
-                s += '(' + (@atom e for e in n.else).join(', ') + ')'
+                s += '(' + (@atom(e) for e in n.else).join(', ') + ')'
         else if not dontClose
             s += ' : undefined'
         s
@@ -916,11 +913,11 @@ class Renderer
     # 000       000   000  000       000   000  
     # 00000000  000   000   0000000  000   000  
     
-    each: (n) ->
+    each: n ->
         
         numArgs = n.fnc.func.args?.parens.exps.length
         
-        rv = 'r'+@makeVar n.each
+        rv = 'r'+@makeVar(n.each)
         
         i = @indent
         if numArgs == 1
@@ -994,9 +991,9 @@ class Renderer
     # 000       000   000  000   000
     # 000        0000000   000   000
 
-    for: (n) ->
+    for: n ->
 
-        if not n.then then @verb 'for expected then' n
+        if not n.then ➜ @verb 'for expected then' n
 
         switch n.inof.text
             'in' ➜ @for_in n
@@ -1009,14 +1006,14 @@ class Renderer
     # 000       000   000  000   000          000  000  0000  
     # 000        0000000   000   000  000000  000  000   000  
     
-    for_in: (n, varPrefix='', lastPrefix='', lastPostfix='', lineBreak) ->
+    for_in: n varPrefix='' lastPrefix='' lastPostfix='' lineBreak ->
 
         if not n.list.qmrkop and not n.list.array and not n.list.slice
             @hint._k_.list = true
             list = "_k_.list(#{@atom n.list})"
         else
             if n.list.array?.items[0]?.slice or n.list.slice
-                return @for_in_range n, varPrefix, lastPrefix, lastPostfix, lineBreak
+                ⮐ @for_in_range n, varPrefix, lastPrefix, lastPostfix, lineBreak
             list = @node n.list
 
         if not list or list == 'undefined'
@@ -1064,7 +1061,7 @@ class Renderer
     # 000       000   000  000   000          000  000  0000          000   000  000   000  000  0000  000   000  000       
     # 000        0000000   000   000  000000  000  000   000  000000  000   000  000   000  000   000   0000000   00000000  
     
-    for_in_range: (n, varPrefix, lastPrefix, lastPostfix, lineBreak) ->
+    for_in_range: n varPrefix lastPrefix lastPostfix lineBreak ->
         
         slice = n.list.array?.items[0]?.slice ? n.list.slice
 
@@ -1129,7 +1126,7 @@ class Renderer
     # 000       000   000  000   000          000   000  000       
     # 000        0000000   000   000  000000   0000000   000       
     
-    for_of: (n, varPrefix='', lastPrefix='', lastPostfix='', lineBreak) ->
+    for_of: n varPrefix='' lastPrefix='' lastPostfix='' lineBreak ->
 
         gi = lineBreak or @ind()
         nl = lineBreak or '\n'
@@ -1161,13 +1158,13 @@ class Renderer
     # 000      000       000   000  000 0 000  000        
     # 0000000   0000000   0000000   000   000  000        
     
-    lcomp: (n) ->
+    lcomp: n ->
 
-        v = 'r'+@makeVar n.for.inof
+        v = 'r'+@makeVar(n.for.inof)
         comp = (f) =>
             switch f.inof.text
-                when 'in' then @for_in f, 'var ' "#{v}.push(" ')' ' '
-                when 'of' then @for_of f, 'var ' "#{v}.push(" ')' ' '
+                'in' ➜ @for_in f 'var ' "#{v}.push(" ')' ' '
+                'of' ➜ @for_of f 'var ' "#{v}.push(" ')' ' '
                 
         "(function () { var #{v} = []; #{comp n.for} return #{v} }).bind(this)()"
 
@@ -1230,7 +1227,7 @@ class Renderer
 
     when: (n) ->
 
-        if not n.vals then return error 'when expected vals' n
+        if not n.vals ➜ ⮐ error 'when expected vals' n
 
         s = ''
         for e in n.vals
@@ -1256,21 +1253,21 @@ class Renderer
         gi = @ind()
         s += 'try\n'
         s += gi+'{\n'
-        s += @indent+@nodes n.exps, '\n'+@indent
+        s += @indent+@nodes(n.exps, '\n'+@indent)
         s += '\n'
         s += gi+'}'
         if n.catch
             s += '\n'
             s += gi+"catch (#{@node(n.catch.errr) or 'err'})\n" 
             s += gi+'{\n'
-            s += @indent+@nodes n.catch.exps, '\n'+@indent
+            s += @indent+@nodes(n.catch.exps, '\n'+@indent)
             s += '\n'
             s += gi+'}'
         if n.finally
             s += '\n'
             s += gi+'finally\n'
             s += gi+'{\n'
-            s += @indent+@nodes n.finally, '\n'+@indent
+            s += @indent+@nodes(n.finally, '\n'+@indent)
             s += '\n'
             s += gi+'}'
         @ded()
@@ -1322,9 +1319,9 @@ class Renderer
     # 000   000  000        000       000   000  000   000     000     000  000   000  000  0000
     #  0000000   000        00000000  000   000  000   000     000     000   0000000   000   000
 
-    operation: (op) ->
+    operation: op ->
 
-        opmap = (o) ->
+        opmap = o ->
             omp =
                 and:    '&&'
                 or:     '||'
@@ -1343,7 +1340,7 @@ class Renderer
         if o in ['<''<=''===''!==''>=''>''_k_.eql']
             ro = opmap op.rhs?.operation?.operator.text
             if ro in ['<''<=''===''!==''>=''>''_k_.eql']
-                return '(' + @atom(op.lhs) + sep + o + sep + @atom(op.rhs.operation.lhs) + ' && ' + kstr.lstrip(@atom(op.rhs)) + ')'
+                ⮐ '(' + @atom(op.lhs) + sep + o + sep + @atom(op.rhs.operation.lhs) + ' && ' + kstr.lstrip(@atom(op.rhs)) + ')'
 
         open = close = ''
         
@@ -1355,7 +1352,7 @@ class Renderer
                     for keyval in op.lhs.object.keyvals
                         ind = if op.lhs.object.keyvals.indexOf(keyval) > 0 then @indent else ''
                         s += ind + "#{keyval.text} = #{@atom(op.rhs)}.#{keyval.text}\n"
-                    return s
+                    ⮐ s
                     
                 
                 if op.lhs.array # lhs is aray, eg. [x,y] = require ''
@@ -1364,12 +1361,12 @@ class Renderer
                     for val in op.lhs.array.items
                         i = op.lhs.array.items.indexOf val
                         s += "; #{val.text} = #{v}[#{i}]"
-                    return s + '\n'
+                    ⮐ s + '\n'
                     
                 if op.lhs and @containsAssert op.lhs
                     # dbg op.lhs
-                    s = "if (" + @atom(@pruneAssert op.lhs) + ") { #{@node(@clearAsserts op.lhs)} = " + @atom(op.rhs) + " }"
-                    return s
+                    s = "if (" + @atom(@pruneAssert(op.lhs)) + ") { #{@node(@clearAsserts(op.lhs))} = " + @atom(op.rhs) + " }"
+                    ⮐ s
         
             o == '!'
 
@@ -1390,21 +1387,21 @@ class Renderer
                 rhs = @node op.rhs
                 if rhs[0] not in '.-+'
                     if rhs[0] == '('
-                        return "_k_.#{op.operator.text}#{@node op.rhs}"
+                        ⮐ "_k_.#{op.operator.text}#{@node op.rhs}"
                     else
-                        return "_k_.#{op.operator.text}(#{@node op.rhs})"
+                        ⮐ "_k_.#{op.operator.text}(#{@node op.rhs})"
                 
             op.operator.text == 'eql'
                 @hint._k_[op.operator.text] = true
-                return "_k_.#{op.operator.text}(#{@node op.lhs}, #{@node op.rhs})"
+                ⮐ "_k_.#{op.operator.text}(#{@node op.lhs}, #{@node op.rhs})"
 
             op.operator.text in ['copy' 'clone']
                 @hint._k_[op.operator.text] = true
-                return "_k_.#{op.operator.text}(#{@node op.rhs})"
+                ⮐ "_k_.#{op.operator.text}(#{@node op.rhs})"
                             
             op.operator.text == 'noon'
                 @hint._k_.noon = true
-                return "_k_.noon(#{@node op.rhs})"
+                ⮐ "_k_.noon(#{@node op.rhs})"
                             
             op.rhs?.operation?.operator.text == '='
                 open = '('
@@ -1412,54 +1409,54 @@ class Renderer
                 
             op.operator.text == 'is'
                 if op.rhs?.type in ['single' 'double' 'triple']
-                    return "typeof(#{@atom op.lhs}) === #{@node op.rhs}"
+                    ⮐ "typeof(#{@atom op.lhs}) === #{@node op.rhs}"
                 else
                     if 
                         op.rhs.text == 'num'
                             lhs = @atom op.lhs
                             @hint._k_.isNum = true
-                            return "_k_.isNum(#{lhs})"
+                            ⮐ "_k_.isNum(#{lhs})"
                             
                         op.rhs.text == 'obj'
                             if op.lhs.type == 'num'
-                                return 'false'
+                                ⮐ 'false'
                             else
                                 lhs = @atom op.lhs
                                 @hint._k_.isObj = true
-                                return "_k_.isObj(#{lhs})"                                
+                                ⮐ "_k_.isObj(#{lhs})"                                
 
                         op.rhs.text == 'arr'
                             if op.lhs.type == 'num'
-                                return 'false'
+                                ⮐ 'false'
                             else
                                 lhs = @atom op.lhs
                                 @hint._k_.isArr = true
-                                return "_k_.isArr(#{lhs})"
+                                ⮐ "_k_.isArr(#{lhs})"
                                 
                         op.rhs.text == 'str'
                             lhs = @atom op.lhs
                             @hint._k_.isStr = true                            
-                            return "_k_.isStr(#{lhs})"
+                            ⮐ "_k_.isStr(#{lhs})"
 
                         op.rhs.text == 'func'
                             lhs = @atom op.lhs
                             @hint._k_.isFunc = true
-                            return "_k_.isFunc(#{lhs})"
+                            ⮐ "_k_.isFunc(#{lhs})"
 
                         op.rhs.text == 'elem'
                             lhs = @atom op.lhs
                             @hint._k_.isElem = true
-                            return "_k_.isElem(#{lhs})"
+                            ⮐ "_k_.isElem(#{lhs})"
                             
                         else
-                            return "#{@atom op.lhs} instanceof #{@atom op.rhs}"
+                            ⮐ "#{@atom op.lhs} instanceof #{@atom op.rhs}"
             
         first = firstLineCol op.lhs
         prfx = if first.col == 0 and op.rhs?.func then '\n' else ''
  
-        lhs = if op.lhs then @atom(op.lhs) + sep else ''
+        lhs = if op.lhs ➜ @atom(op.lhs) + sep else ''
         
-        prfx + lhs + o + sep + open + kstr.lstrip @atom(op.rhs) + close
+        prfx + lhs + o + sep + open + kstr.lstrip(@atom(op.rhs) + close)
 
     # 000  000   000   0000000   0000000   000   000  0000000
     # 000  0000  000  000       000   000  0000  000  000   000
@@ -1467,7 +1464,7 @@ class Renderer
     # 000  000  0000  000       000   000  000  0000  000   000
     # 000  000   000   0000000   0000000   000   000  0000000
 
-    incond: (p) ->
+    incond: p ->
         
         @hint._k_.in = true
         "_k_.in(#{@atom p.lhs},#{@atom p.rhs})"
@@ -1478,7 +1475,7 @@ class Renderer
     # 000        000   000  000   000  000       000  0000       000
     # 000        000   000  000   000  00000000  000   000  0000000
 
-    parens: (p) -> 
+    parens: p -> 
 
         "(#{@nodes p.exps})"
 
@@ -1488,7 +1485,7 @@ class Renderer
     # 000   000  000   000  000   000  000       000          000
     #  0000000   0000000     0000000   00000000   0000000     000
 
-    object: (p) -> 
+    object: p -> 
         nodes = p.keyvals.map (s) => @atom s
         nodes = nodes.map (n) -> if ':' in n then n else "#{n}:#{n}"        
         "{#{nodes.join ','}}"
@@ -1499,7 +1496,7 @@ class Renderer
     # 000  000   000          000        000     000   000  000
     # 000   000  00000000     000         0      000   000  0000000
 
-    keyval: (p) ->
+    keyval: p ->
         key = @node p.key
         if key[0] not in "'\"" and /[\.\,\;\*\+\-\/\=\|]/.test key then key = "'#{key}'"
         "#{key}:#{@atom(p.val)}"
@@ -1510,7 +1507,7 @@ class Renderer
     # 000        000   000  000   000  000
     # 000        000   000   0000000   000
 
-    prop:   (p) ->
+    prop:   p ->
 
         "#{@node(p.obj)}.#{@node p.prop}"
 
@@ -1520,15 +1517,15 @@ class Renderer
     # 000  000  0000  000   000  000        000 000
     # 000  000   000  0000000    00000000  000   000
 
-    index:  (p) ->
+    index:  p ->
 
         if slice = p.slidx.slice
 
-            from = if slice.from? then @node slice.from else '0'
+            from = if slice.from? ➜ @node slice.from else '0'
 
             addOne = slice.dots.text == '..'
 
-            upto = if slice.upto? then @node slice.upto else '-1'
+            upto = if slice.upto? ➜ @node slice.upto else '-1'
 
             if slice.upto?.type == 'num' or slice.upto?.operation or upto == '-1'
                 u = parseInt upto
@@ -1549,9 +1546,9 @@ class Renderer
             if p.slidx.text?[0] == '-'
                 ni = parseInt p.slidx.text
                 if ni == -1
-                    return "#{@node(p.idxee)}.slice(#{ni})[0]"
+                    ⮐ "#{@node(p.idxee)}.slice(#{ni})[0]"
                 else
-                    return "#{@node(p.idxee)}.slice(#{ni},#{ni+1})[0]"
+                    ⮐ "#{@node(p.idxee)}.slice(#{ni},#{ni+1})[0]"
 
             "#{@node(p.idxee)}[#{@node p.slidx}]"
 
@@ -1561,7 +1558,7 @@ class Renderer
     # 000   000  000   000  000   000  000   000     000
     # 000   000  000   000  000   000  000   000     000
 
-    array: (p) ->
+    array: p ->
 
         if p.items[0]?.slice
             @slice p.items[0].slice
@@ -1574,14 +1571,14 @@ class Renderer
     #      000  000      000  000       000
     # 0000000   0000000  000   0000000  00000000
 
-    slice: (p) ->
+    slice: p ->
         
         if p.from.type == 'num' == p.upto?.type
             from = parseInt p.from.text
             upto = parseInt p.upto.text
             if upto-from <= 10
                 if p.dots.text == '...' then upto--
-                '['+((x for x in [from..upto]).join ',')+']'
+                '['+((x for x in [from..upto]).join(','))+']'
             else
                 o = if p.dots.text == '...' then '<' else '<='
                 "(function() { var r = []; for (var i = #{from}; i #{o} #{upto}; i++){ r.push(i); } return r; }).apply(this)"
@@ -1595,7 +1592,7 @@ class Renderer
     #      000     000     000   000  000  000        000   000  000      
     # 0000000      000     000   000  000  000         0000000   0000000  
     
-    stripol: (chunks) ->
+    stripol: chunks ->
 
         s = '`'
         for chunk in chunks
@@ -1617,7 +1614,7 @@ class Renderer
     #      000  000       000          000     000  000   000  000  0000  
     # 0000000   00000000   0000000     000     000   0000000   000   000  
     
-    section: (p) ->
+    section: p ->
         
         @hint.section = true
                 
@@ -1630,7 +1627,7 @@ class Renderer
         @ded()
         s
         
-    subsect: (p) ->
+    subsect: p ->
         
         gi = @ind()
         s = "section(#{p.title.text}, function ()\n"
@@ -1646,7 +1643,7 @@ class Renderer
     # 000       000   000  000 0 000  000        000   000  000   000  000       
     #  0000000   0000000   000   000  000        000   000  000   000  00000000  
     
-    compare: (p) ->
+    compare: p ->
         
         s = 'compare('   \
           + @node(p.lhs) \
@@ -1655,24 +1652,24 @@ class Renderer
           + ')'
         s
         
-    containsAssert: (e) ->
+    containsAssert: e ->
         
-        return false if not e
+        ⮐ false if not e
         if e.assert  ➜ ⮐ true
         if e.prop    ➜ ⮐ @containsAssert e.prop.obj
         if e.index   ➜ ⮐ @containsAssert e.index.idxee
         if e.call    ➜ ⮐ @containsAssert e.call.callee
         false
         
-    pruneAssert: (e) ->
+    pruneAssert: e ->
   
-        return e if not e
+        ⮐ e if not e
         if e.prop  ➜ ⮐ @pruneAssert e.prop.obj
         if e.index ➜ ⮐ @pruneAssert e.index.idxee
         if e.call  ➜ ⮐ @pruneAssert e.call.callee
         e
         
-    clearAsserts: (e) ->
+    clearAsserts: e ->
         
         ⮐ e if not e
         if e.assert ➜ ⮐ @clearAsserts e.assert.obj
@@ -1696,7 +1693,7 @@ class Renderer
     #      000  000   000  000   000     000        000     000   000  000   000       000  
     # 0000000    0000000   000   000     000         0      000   000  000   000  0000000   
     
-    sortVars: (vars) ->
+    sortVars: vars ->
         
         vl = [v.text for v in vars]
         vl.sort (a,b) -> 
@@ -1732,7 +1729,7 @@ class Renderer
         @varcontext[ctx] = @varcontext[ctx] + 1
         "_#{(@varcontext[ctx]+9).toString(16)}_"
         
-    verb: -> if @debug then console.log.apply console.log, arguments
+    verb: -> if @debug ➜ console.log.apply console.log, arguments
     
     ind: ->
 

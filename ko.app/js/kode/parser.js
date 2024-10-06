@@ -453,7 +453,7 @@ Parser = (function ()
             val = this.block('return',tokens)
             if ((val != null ? val.length : undefined) > 1)
             {
-                console.log('unreachable code after return statement?',tok,tokens,_k_.noon(val))
+                console.log('unreachable code after return statement?',tok,tokens,_k_.noon((val)))
             }
             val = (val != null ? val[0] : undefined)
         }
@@ -759,6 +759,8 @@ Parser = (function ()
                 {
                     break
                 }
+                console.log('object ... exps?',key,tokens)
+                break
             }
         }
         this.pop('{')

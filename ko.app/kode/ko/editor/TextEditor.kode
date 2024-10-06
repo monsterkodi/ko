@@ -45,7 +45,7 @@ function TextEditor extends Editor
 
         @config.lineHeight ?= 1.2
 
-        @setFontSize prefs.get "#{@name}FontSize" @config.fontSize ? 19
+        @setFontSize prefs.get("#{@name}FontSize" @config.fontSize ? 19)
         @scroll = new EditorScroll @
         @scroll.on 'shiftLines' @shiftLines
         @scroll.on 'showLines'  @showLines
@@ -133,19 +133,19 @@ function TextEditor extends Editor
     # 000      000   000     000     000       000   000       000
     # 0000000  000   000     000     00000000  000   000  0000000
 
-    initLayers: (layerClasses) ->
+    initLayers: layerClasses ->
 
         @layerDict = {}
         for cls in layerClasses
             @layerDict[cls] = @addLayer cls
 
-    addLayer: (cls) ->
+    addLayer: cls ->
 
         div = elem class: cls
         @layers.appendChild div
         div
 
-    updateLayers: () ->
+    updateLayers: ->
 
         @renderHighlights()
         @renderSelection()
@@ -157,7 +157,7 @@ function TextEditor extends Editor
     # 000      000  000  0000  000            000  
     # 0000000  000  000   000  00000000  0000000   
     
-    setLines: (lines) ->
+    setLines: lines ->
 
         @clearLines()
 
@@ -186,7 +186,7 @@ function TextEditor extends Editor
     # 000   000  000        000        000       000  0000  000   000  
     # 000   000  000        000        00000000  000   000  0000000    
     
-    appendText: (text) ->
+    appendText: text ->
 
         if not text?
             log "#{@name}.appendText - no text?"
@@ -209,7 +209,7 @@ function TextEditor extends Editor
         for li in appended
             @emit 'lineAppended',
                 lineIndex:  li
-                text: @line li
+                text: @line(li)
 
         @emit 'linesAppended' ls
         @emit 'numLines' @numLines()
@@ -220,7 +220,7 @@ function TextEditor extends Editor
     # 000       000   000  000  0000     000
     # 000        0000000   000   000     000
 
-    setFontSize: (fontSize) =>
+    setFontSize: fontSize =>
         
         @layers.style.fontSize = "#{fontSize}px"
         @size.numbersWidth = 'Numbers' in @config.features and 50 or 0
@@ -249,7 +249,7 @@ function TextEditor extends Editor
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000
 
-    changed: (changeInfo) ->
+    changed: changeInfo ->
         
         # log 'TextEditor.changed' changeInfo
         
@@ -262,15 +262,15 @@ function TextEditor extends Editor
             switch ch
                 
                 'changed'
-                    @updateLine li, di
+                    @updateLine li di
                     @emit 'lineChanged' li
                     
                 'deleted'
-                    @spanCache = @spanCache.slice 0, di
+                    @spanCache = @spanCache.slice 0 di
                     @emit 'lineDeleted' di
                     
                 'inserted'
-                    @spanCache = @spanCache.slice 0, di
+                    @spanCache = @spanCache.slice 0 di
                     @emit 'lineInserted' li, di
                             
         if changeInfo.inserts or changeInfo.deletes
@@ -279,7 +279,7 @@ function TextEditor extends Editor
                 @scroll.setNumLines @numLines()
             else
                 num = @scroll.bot - @scroll.top + 1
-                @showLines @scroll.top, @scroll.bot, num
+                @showLines @scroll.top @scroll.bot num
             @updateLinePositions()
 
         if changeInfo.changes.length
@@ -310,7 +310,7 @@ function TextEditor extends Editor
     # 000   000  000        000   000  000   000     000     000
     #  0000000   000        0000000    000   000     000     00000000
 
-    updateLine: (li, oi) ->
+    updateLine: li oi ->
 
         oi = li if not oi?
 
@@ -332,22 +332,22 @@ function TextEditor extends Editor
     #      000  000   000  000   000  000   000     000      000  000  0000  000            000
     # 0000000   000   000   0000000   00     00     0000000  000  000   000  00000000  0000000
 
-    showLines: (top, bot, num) =>
+    showLines: top bot num =>
 
         @lineDivs = {}
         @elem.innerHTML = ''
 
-        for li in [top..bot]
+        for li in top..bot
             @appendLine li
 
         @updateLinePositions()
         @updateLayers()
-        @emit 'linesShown' top, bot, num
+        @emit 'linesShown' top bot num
     
     appendLine: (li) ->
 
         @lineDivs[li] = elem class: 'line'
-        @lineDivs[li].appendChild @cachedSpan li
+        @lineDivs[li].appendChild @cachedSpan(li)
         @elem.appendChild @lineDivs[li]
 
     #  0000000  000   000  000  00000000  000000000     000      000  000   000  00000000   0000000
@@ -356,7 +356,7 @@ function TextEditor extends Editor
     #      000  000   000  000  000          000        000      000  000  0000  000            000
     # 0000000   000   000  000  000          000        0000000  000  000   000  00000000  0000000
 
-    shiftLines: (top, bot, num) =>
+    shiftLines: top bot num =>
 
         oldTop = top - num
         oldBot = bot - num
@@ -384,15 +384,15 @@ function TextEditor extends Editor
         if num > 0
             while oldBot < bot
                 oldBot += 1
-                divInto oldBot, oldTop
+                divInto oldBot oldTop
                 oldTop += 1
         else
             while oldTop > top
                 oldTop -= 1
-                divInto oldTop, oldBot
+                divInto oldTop oldBot
                 oldBot -= 1
 
-        @emit 'linesShifted' top, bot, num
+        @emit 'linesShifted' top bot num
 
         @updateLinePositions()
         @updateLayers()
@@ -403,7 +403,7 @@ function TextEditor extends Editor
     # 000   000  000        000   000  000   000     000     000
     #  0000000   000        0000000    000   000     000     00000000
 
-    updateLinePositions: (animate=0) ->
+    updateLinePositions: animate=0 ->
         
         for li,div of @lineDivs
             if div?.style?
@@ -418,12 +418,12 @@ function TextEditor extends Editor
                     c.style.transition = 'initial'
             setTimeout resetTrans, animate
 
-    updateLines: () ->
+    updateLines: ->
 
         for li in [@scroll.top..@scroll.bot]
             @updateLine li
 
-    clearHighlights: () ->
+    clearHighlights: ->
 
         if @numHighlights()
             $('.highlights' @layers).innerHTML = ''
@@ -435,7 +435,7 @@ function TextEditor extends Editor
     # 000   000  000       000  0000  000   000  000       000   000
     # 000   000  00000000  000   000  0000000    00000000  000   000
 
-    cachedSpan: (li) ->
+    cachedSpan: li ->
 
         if not @spanCache[li]
 
@@ -459,7 +459,7 @@ function TextEditor extends Editor
                 return if mc[1] < 0
 
                 if mc[1] > @numLines()-1
-                    return error "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str @mainCursor()
+                    return error "#{@name}.renderCursors mainCursor DAFUK?", @numLines(), str(@mainCursor())
 
                 ri = mc[1]-@scroll.top
                 cursorLine = @do.line(mc[1]) # not @line(mc[1]) ???
@@ -584,7 +584,7 @@ function TextEditor extends Editor
     # 000        000   000       000
     # 000         0000000   0000000
 
-    widthOfText: (text) =>
+    widthOfText: text =>
             
         w = text.length * @size.charWidth
         
@@ -593,7 +593,7 @@ function TextEditor extends Editor
                 w += @size.charWidth
         w
 
-    widthOfRangeInLine: (firstCharacter, lastCharacter, line) =>
+    widthOfRangeInLine: firstCharacter lastCharacter line =>
         
         if ln = @line line
             
@@ -601,7 +601,7 @@ function TextEditor extends Editor
         
         @size.charWidth  * (lastCharacter-firstCharacter)
     
-    xOffsetAtCharacterInLine: (character, line) =>
+    xOffsetAtCharacterInLine: character line =>
         
         if ln = @line line
             
@@ -610,17 +610,17 @@ function TextEditor extends Editor
             else
                 beyond = 0
             
-            ⮐ @size.offsetX + beyond + @widthOfText ln[0...character]
+            ⮐ @size.offsetX + beyond + @widthOfText(ln[0...character])
         
         character * @size.charWidth + @size.offsetX
 
-    xAtCharacterInLine: (character, line) =>
+    xAtCharacterInLine: character line =>
         
-        log 'xAtCharacterInLine' character, line
+        log 'xAtCharacterInLine' character line
         
         character * @size.charWidth
         
-    posAtXY:(x,y) ->
+    posAtXY: x y ->
 
         sl = @layerScroll.scrollLeft
         st = @scroll.offsetTop
@@ -628,19 +628,19 @@ function TextEditor extends Editor
         
         lx = clamp 0 @layers.offsetWidth,  x - br.left - @size.offsetX + @size.charWidth/3
         ly = clamp 0 @layers.offsetHeight, y - br.top
-        px = parseInt Math.floor (Math.max 0 sl + lx)/@size.charWidth
-        py = parseInt(Math.floor((Math.max 0 st + ly)/@size.lineHeight)) + @scroll.top
-        p  = [px, Math.min @numLines()-1 py]
+        px = parseInt(Math.floor(Math.max(0 sl + lx)/@size.charWidth))
+        py = parseInt(Math.floor(Math.max(0 st + ly)/@size.lineHeight)) + @scroll.top
+        p  = [px, Math.min(@numLines()-1 py)]
         p
 
-    posForEvent: (event) -> @posAtXY event.clientX, event.clientY
+    posForEvent: event -> @posAtXY event.clientX, event.clientY
 
-    lineElemAtXY:(x,y) ->
+    lineElemAtXY: x y ->
 
         p = @posAtXY x,y
         @lineDivs[p[1]]
 
-    lineSpanAtXY:(x,y) ->
+    lineSpanAtXY: x y ->
         
         if lineElem = @lineElemAtXY x,y
             lr = lineElem.getBoundingClientRect()
@@ -648,7 +648,7 @@ function TextEditor extends Editor
                 br = e.getBoundingClientRect()
                 if br.left <= x <= br.left+br.width
                     offset = x-br.left
-                    return span:e, offsetLeft:offset, offsetChar:parseInt offset/@size.charWidth
+                    return span:e, offsetLeft:offset, offsetChar:parseInt(offset/@size.charWidth)
         null
 
     numFullLines: -> @scroll.fullLines
@@ -679,7 +679,7 @@ function TextEditor extends Editor
         @drag = new drag
             target:  @layerScroll
 
-            onStart: (drag, event) =>
+            onStart: (drag event) =>
                 
                 @view.focus()
                     
@@ -721,7 +721,7 @@ function TextEditor extends Editor
                 p = @posForEvent event
                 @clickAtPos p, event
 
-            onMove: (drag, event) =>
+            onMove: (drag event) =>
                 p = @posForEvent event
                 if event.metaKey
                     @addCursorAtPos [@mainCursor()[0], p[1]]
@@ -758,7 +758,7 @@ function TextEditor extends Editor
     # 000       000      000  000       000  000
     #  0000000  0000000  000   0000000  000   000
 
-    clickAtPos: (p, event) ->
+    clickAtPos: p event ->
 
         if event.altKey
             @toggleCursorAtPos p
@@ -773,12 +773,10 @@ function TextEditor extends Editor
     # 000  000   000          000
     # 000   000  00000000     000
 
-    handleModKeyComboCharEvent: (mod, key, combo, char, event) ->
-        
-        # log 'TextEditor.handleModKeyComboCharEvent' combo
+    handleModKeyComboCharEvent: mod key combo char event ->
         
         if @autocomplete?
-            return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod, key, combo, event
+            return if 'unhandled' != @autocomplete.handleModKeyComboEvent mod key combo event
 
         switch combo
             'esc'
@@ -800,7 +798,7 @@ function TextEditor extends Editor
             for actionCombo in combos
                 if combo == actionCombo
                     if action.key? and @[action.key] is func
-                        @[action.key](key, combo: combo, mod: mod, event: event)
+                        @[action.key](key, combo:combo mod:mod event:event)
                         return
 
         if char and mod in ['shift' '']
@@ -809,20 +807,20 @@ function TextEditor extends Editor
 
         'unhandled'
 
-    onKeyDown: (event) =>
+    onKeyDown: event =>
 
         { mod, key, combo, char } = keyinfo.forEvent event
         
-        return if not combo
-        # return if key == 'right click' # weird right command key
+        ⮐ if not combo
         
-        result = @handleModKeyComboCharEvent mod, key, combo, char, event
+        result = @handleModKeyComboCharEvent mod key combo char event
 
         if 'unhandled' != result
             stopEvent event
 
     log: ->
-        return if @name != 'editor'
-        console.log.apply null, [].splice.call arguments, 0
+        
+        ⮐ if @name != 'editor'
+        console.log.apply null, [].splice.call(arguments 0)
 
 export TextEditor

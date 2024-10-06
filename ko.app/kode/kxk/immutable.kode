@@ -1,4 +1,3 @@
-
 ###
     000  00     00  00     00  000   000  000000000   0000000   0000000    000      00000000  
     000  000   000  000   000  000   000     000     000   000  000   000  000      000       
@@ -43,8 +42,8 @@ addImmutabilityTag = (target) -> addPropertyTo target, immutabilityTag, true
 
 isImmutable = (target) ->
     
-    if typeof target == "object"
-        target == null or Boolean Object.getOwnPropertyDescriptor target, immutabilityTag
+    if typeof(target) == "object"
+        target == null or Boolean Object.getOwnPropertyDescriptor(target, immutabilityTag)
     else 
         # In JavaScript, only objects are even potentially mutable.
         # strings, numbers, null, and undefined are all naturally immutable.
@@ -156,7 +155,7 @@ makeMethodReturnImmutable = (obj, methodName) ->
     
     currentMethod = obj[methodName]
 
-    addPropertyTo obj, methodName, -> Immutable currentMethod.apply obj, arguments
+    addPropertyTo obj, methodName, -> Immutable currentMethod.apply(obj, arguments)
 
 arraySet = (idx, value, config) ->
     
@@ -240,7 +239,7 @@ without = (remove) ->
   
     if typeof(remove) != "function"
         # If we weren't given an array, use the arguments list.
-        keysToRemoveArray = Array.isArray(remove) ? remove.slice() : Array.prototype.slice.call arguments
+        keysToRemoveArray = Array.isArray(remove) ? remove.slice() : Array.prototype.slice.call(arguments)
     
         # Convert numeric keys to strings since that's how they'll
         # come from the enumeration of the object.
@@ -263,7 +262,7 @@ asMutableArray = (opts) ->
     result = []
 
     for i in 0...@length
-        result.push asDeepMutable @[i]
+        result.push asDeepMutable(@[i])
 
     result
 
@@ -294,7 +293,7 @@ asObject = (iterator) ->
 
 asDeepMutable = (obj) ->
     
-    ⮐ obj if not obj or (typeof obj != 'object') or not Object.getOwnPropertyDescriptor(obj, immutabilityTag)
+    ⮐ obj if not obj or (typeof(obj) != 'object') or not Object.getOwnPropertyDescriptor(obj, immutabilityTag)
         
     Immutable.asMutable obj
 
@@ -327,8 +326,8 @@ merge = (other, config) ->
     if arguments.length == 0 # Calling merge() with no arguments is a no-op. Don't bother cloning
         return @
   
-    if (other == null) or (typeof other != "object") 
-        throw new TypeError "Immutable#merge can only be invoked with objects or arrays, not " + JSON.stringify other
+    if (other == null) or (typeof(other) != "object") 
+        throw new TypeError "Immutable#merge can only be invoked with objects or arrays, not " + JSON.stringify(other)
   
     receivedArray = Array.isArray other
     deep          = config?.deep
@@ -354,10 +353,10 @@ merge = (other, config) ->
             else 
                 newValue = immutableValue
       
-            if (not isEqual currentValue, newValue) or (not currentObj.hasOwnProperty key)
+            if (not isEqual(currentValue, newValue)) or (not currentObj.hasOwnProperty(key))
                 if result == undefined
                     # Make a shallow clone of the current object.
-                    result = quickCopy currentObj, instantiateEmptyObject currentObj
+                    result = quickCopy currentObj, instantiateEmptyObject(currentObj)
       
                 result[key] = newValue
         null
@@ -368,7 +367,7 @@ merge = (other, config) ->
             if not otherObj.hasOwnProperty key
                 if result == undefined
                     # Make a shallow clone of the current object.
-                    result = quickCopy currentObj, instantiateEmptyObject currentObj
+                    result = quickCopy currentObj, instantiateEmptyObject(currentObj)
                 delete result[key]
             
     if not receivedArray
@@ -399,7 +398,7 @@ objectReplace = (value, config) ->
         return @
 
   if value == null or typeof(value) != "object"
-        throw new TypeError "Immutable#replace can only be invoked with objects or arrays, not " + JSON.stringify value
+        throw new TypeError "Immutable#replace can only be invoked with objects or arrays, not " + JSON.stringify(value)
 
   Immutable.merge @, value, {deep: deep, mode:'replace'}
 
@@ -427,7 +426,7 @@ objectSetIn = (path, value, config) ->
     if @hasOwnProperty(head) and (thisHead == newValue)
         return @
   
-    mutable = quickCopy @, instantiateEmptyObject @
+    mutable = quickCopy @, instantiateEmptyObject(@)
     mutable[head] = newValue
     makeImmutableObject mutable
 
@@ -441,7 +440,7 @@ objectSet = (property, value, config) ->
         if isEqual @[property], value
             return @
   
-    mutable = quickCopy @, instantiateEmptyObject @
+    mutable = quickCopy @, instantiateEmptyObject(@)
     mutable[property] = Immutable value
     makeImmutableObject mutable
 
@@ -449,7 +448,7 @@ update = (property, updater) ->
     
     restArgs = Array.prototype.slice.call arguments, 2
     initialVal = @[property]
-    Immutable.set @, property, updater.apply initialVal, [initialVal].concat restArgs
+    Immutable.set @, property, updater.apply(initialVal, [initialVal].concat(restArgs))
 
 getInPath = (obj, path) ->
   
@@ -464,7 +463,7 @@ updateIn = (path, updater) ->
     restArgs = Array.prototype.slice.call arguments, 2
     initialVal = getInPath @, path
 
-    Immutable.setIn @, path, updater.apply initialVal, [initialVal].concat restArgs
+    Immutable.setIn @, path, updater.apply(initialVal, [initialVal].concat(restArgs))
 
 getIn = (path, defaultValue) ->
     

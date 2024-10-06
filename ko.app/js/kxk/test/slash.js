@@ -334,8 +334,8 @@ toExport["slash"] = function ()
     })
     section("sanitize", function ()
     {
-        compare((slash.sanitize('a.b\n')),'a.b')
-        compare((slash.sanitize('\n\n c . d  \n\n\n')),' c . d  ')
+        compare(slash.sanitize('a.b\n'),'a.b')
+        compare(slash.sanitize('\n\n c . d  \n\n\n'),' c . d  ')
     })
     section("contains", function ()
     {

@@ -7,6 +7,7 @@ import kakao from "../kakao.js"
 import kxk from "../kxk.js"
 let $ = kxk.$
 let win = kxk.win
+let slash = kxk.slash
 let kpos = kxk.kpos
 let post = kxk.post
 let popup = kxk.popup
@@ -71,7 +72,7 @@ Delegate = (function ()
     {
         kakao('window.setMinSize',window.WIN_MIN_WIDTH,window.WIN_MIN_HEIGHT)
         kakao('window.setMaxSize',window.WIN_MIN_WIDTH,6666)
-        return kakao('window.new','icon','window.statusIcon = "menu_kalk.png"')
+        return kakao('window.new','icon')
     }
 
     Delegate.prototype["onWindowResize"] = function ()
@@ -186,11 +187,10 @@ Delegate = (function ()
 
         }
 
-        console.log('onMenuAction',action,args)
         return 'unhandled'
     }
 
-    Delegate.prototype["onWindowKeyDown"] = function (win, info)
+    Delegate.prototype["onWindowKeyDown"] = function (info)
     {
         if ('unhandled' !== window.keys.keyDown(info))
         {
@@ -211,7 +211,7 @@ Delegate = (function ()
 
     }
 
-    Delegate.prototype["onWindowKeyUp"] = function (win, info)
+    Delegate.prototype["onWindowKeyUp"] = function (info)
     {
         return window.keys.keyUp(info)
     }
@@ -268,7 +268,6 @@ Delegate = (function ()
         var text
 
         text = await kakao('clipboard.get')
-        console.log('got clipboard text',text)
         return window.input.setText(window.input.text() + text)
     }
 

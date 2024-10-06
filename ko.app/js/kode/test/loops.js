@@ -124,7 +124,7 @@ for (k = 0; k < list.length; k++)
     val = this.patts[key]
     console.log(key,val)
 }`)
-            compare(kc(`matches = ([k, r.exec t] for k,r of rgs)`),`matches = (function () { var r_a_ = []; for (var k in rgs)  { var r = rgs[k];r_a_.push([k,r.exec(t)])  } return r_a_ }).bind(this)()`)
+            compare(kc(`matches = ([k, r.exec(t)] for k,r of rgs)`),`matches = (function () { var r_a_ = []; for (var k in rgs)  { var r = rgs[k];r_a_.push([k,r.exec(t)])  } return r_a_ }).bind(this)()`)
         })
         section("tail", function ()
         {
@@ -138,7 +138,7 @@ for (var _a_ = 0; _a_ < list.length; _a_++)
     })
     section("list comprehension", function ()
     {
-        compare(kc("m = ([k, r.exec t] for k,r of rgs)"),`m = (function () { var r_a_ = []; for (var k in rgs)  { var r = rgs[k];r_a_.push([k,r.exec(t)])  } return r_a_ }).bind(this)()`)
+        compare(kc("m = ([k, r.exec(t)] for k,r of rgs)"),`m = (function () { var r_a_ = []; for (var k in rgs)  { var r = rgs[k];r_a_.push([k,r.exec(t)])  } return r_a_ }).bind(this)()`)
         compare(kc("m = ([i, k] for k,i in rgs)"),`m = (function () { var r_a_ = []; var list = _k_.list(rgs); for (i = 0; i < list.length; i++)  { var k = list[i];r_a_.push([i,k])  } return r_a_ }).bind(this)()`)
         compare(ke("1"),1)
         compare(ke("'abc'"),'abc')

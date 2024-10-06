@@ -1,6 +1,6 @@
-var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
+var _k_ = {extend: function (c,p) {for (var k in p) { if (Object.prototype.hasOwnProperty(p, k)) c[k] = p[k] } function ctor() { this.constructor = c; } ctor.prototype = p.prototype; c.prototype = new ctor(); c.__super__ = p.prototype; return c;}, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, last: function (o) {return o != null ? o.length ? o[o.length-1] : undefined : o}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
-var Buffer
+var Buffer, cs
 
 import kxk from "../../kxk.js"
 let kstr = kxk.kstr
@@ -49,6 +49,17 @@ Buffer = (function ()
     Buffer.prototype["mainCursor"] = function ()
     {
         return this.do.mainCursor()
+    }
+
+    Buffer.prototype["hasMainCursor"] = function ()
+    {
+        var c
+
+        c = this.mainCursor()
+        if (c[0] || c[1])
+        {
+            return c
+        }
     }
 
     Buffer.prototype["line"] = function (i)
@@ -193,20 +204,7 @@ Buffer = (function ()
         return this.textInRange(this.rangeForRealWordAtPos(c))
     }
 
-    Buffer.prototype["wordsAtCursors"] = function (cs = this.cursors(), opt)
-    {
-        var r
 
-        return (function () { var r_a_ = []; var list = _k_.list(this.rangesForWordsAtCursors(cs,opt)); for (var _b_ = 0; _b_ < list.length; _b_++)  { r = list[_b_];r_a_.push(this.textInRange(r))  } return r_a_ }).bind(this)()
-    }
-
-    Buffer.prototype["rangesForWordsAtCursors"] = function (cs = this.cursors(), opt)
-    {
-        var c, rngs
-
-        rngs = (function () { var r_a_ = []; var list = _k_.list(cs); for (var _b_ = 0; _b_ < list.length; _b_++)  { c = list[_b_];r_a_.push(this.rangeForWordAtPos(c,opt))  } return r_a_ }).bind(this)()
-        return rngs = cleanRanges(rngs)
-    }
 
     Buffer.prototype["selectionTextOrWordAtCursor"] = function ()
     {
@@ -290,10 +288,10 @@ Buffer = (function ()
 
     Buffer.prototype["wordRangesInLineAtIndex"] = function (li, opt = {})
     {
-        var mtch, r, _142_19_, _143_89_
+        var mtch, r, _144_19_, _145_89_
 
-        opt.regExp = ((_142_19_=opt.regExp) != null ? _142_19_ : this.wordRegExp)
-        if ((opt != null ? (_143_89_=opt.include) != null ? _143_89_.length : undefined : undefined))
+        opt.regExp = ((_144_19_=opt.regExp) != null ? _144_19_ : this.wordRegExp)
+        if ((opt != null ? (_145_89_=opt.include) != null ? _145_89_.length : undefined : undefined))
         {
             opt.regExp = new RegExp(`(\\s+|[\\w${opt.include}]+|[^\\s])`,'g')
         }
@@ -422,7 +420,7 @@ Buffer = (function ()
 
     Buffer.prototype["textInRange"] = function (rg)
     {
-        var _223_58_
+        var _225_58_
 
         return (!_k_.empty((rg)) ? (typeof this.line(rg[0]).slice === "function" ? this.line(rg[0]).slice(rg[1][0],rg[1][1]) : undefined) : '')
     }
@@ -527,7 +525,7 @@ Buffer = (function ()
 
     Buffer.prototype["isRangeInString"] = function (r)
     {
-        var _288_59_
+        var _290_59_
 
         return (this.rangeOfStringSurroundingRange(r) != null)
     }
@@ -551,10 +549,11 @@ Buffer = (function ()
         }
     }
 
-    Buffer.prototype["distanceOfWord"] = function (w, pos = this.cursorPos())
+    Buffer.prototype["distanceOfWord"] = function (w, pos)
     {
         var d, la, lb
 
+        pos = (pos != null ? pos : this.cursorPos())
         if (this.line(pos[1]).indexOf(w) >= 0)
         {
             return 0
@@ -645,14 +644,14 @@ Buffer = (function ()
 
     Buffer.prototype["rangesForText"] = function (t, opt)
     {
-        var li, r, _362_43_
+        var li, r, _366_43_
 
         t = t.split('\n')[0]
         r = []
         for (var _a_ = li = 0, _b_ = this.numLines(); (_a_ <= _b_ ? li < this.numLines() : li > this.numLines()); (_a_ <= _b_ ? ++li : --li))
         {
             r = r.concat(this.rangesForTextInLineAtIndex(t,li,opt))
-            if (r.length >= (((_362_43_=(opt != null ? opt.max : undefined)) != null ? _362_43_ : 999)))
+            if (r.length >= (((_366_43_=(opt != null ? opt.max : undefined)) != null ? _366_43_ : 999)))
             {
                 break
             }
@@ -662,10 +661,10 @@ Buffer = (function ()
 
     Buffer.prototype["rangesForTextInLineAtIndex"] = function (t, i, opt)
     {
-        var r, rng, rngs, type, _367_25_
+        var r, rng, rngs, type, _372_25_
 
         r = []
-        type = ((_367_25_=(opt != null ? opt.type : undefined)) != null ? _367_25_ : 'str')
+        type = ((_372_25_=(opt != null ? opt.type : undefined)) != null ? _372_25_ : 'str')
         if (_k_.in(type,['str','Str']))
         {
             t = kstr.escapeRegExp(t)

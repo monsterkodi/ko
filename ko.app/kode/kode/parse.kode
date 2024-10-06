@@ -42,7 +42,7 @@ function Parse extends parseutils
         @sheap = []
 
         vars: [] 
-        exps: @exps 'tl' block.tokens
+        exps: @exps('tl' block.tokens)
 
     # 00000000  000   000  00000000    0000000
     # 000        000 000   000   000  000
@@ -72,6 +72,7 @@ function Parse extends parseutils
         while tokens.length
             
             numTokens = tokens.length
+
             tok = tokens[0]
             
             doBreak = switch @stack[-1]
@@ -137,7 +138,7 @@ function Parse extends parseutils
             if tok.text in ['in''of'] and rule == 'for vals' ➜ @verb 'exps break on in|of' ; break
             if tok.type == 'nl' 
                 
-                @verb 'exps nl stop:' stop, tok, @stack
+                @verb 'exps nl stop:' stop tok @stack
                     
                 if @stack[-1] == '[' and tokens[1]?.text == ']'
                     @shiftNewline 'exps nl ] in array' tokens
@@ -155,7 +156,7 @@ function Parse extends parseutils
                 
                 if tokens[0]?.text == '.' and tokens[1]?.type == 'var'
                     log 'exps nl next line starts with .var!' @stack
-                    es.push @prop es.pop(), tokens
+                    es.push @prop(es.pop() tokens)
                     
                 @verb 'exps nl continue...'
                 continue
@@ -175,6 +176,7 @@ function Parse extends parseutils
                 continue
                 
             e = @exp tokens
+
             last = lastLineCol e
             
             while ( tokens[0]?.text in ['if' 'for' 'while'] and 
@@ -182,18 +184,19 @@ function Parse extends parseutils
                     @stack[-1] not in ['▸args' '▸return'] and
                     last.line == tokens[0].line )
 
-                @verb "exps #{tokens[0].text }Tail" e, @stack
+                @verb "exps #{tokens[0].text }Tail" e @stack
                 switch tokens[0].text
-                    'if'    ➜ e = @ifTail    e, tokens.shift(), tokens
-                    'for'   ➜ e = @forTail   e, tokens.shift(), tokens
-                    'while' ➜ e = @whileTail e, tokens.shift(), tokens
+                    'if'    ➜ e = @ifTail    e tokens.shift() tokens
+                    'for'   ➜ e = @forTail   e tokens.shift() tokens
+                    'while' ➜ e = @whileTail e tokens.shift() tokens
+                    
             
             if tokens[0]?.text == '▸'
                 if @stack[-1] in ['▸args' '{']
                     es.push e
                     break
                 else
-                    e = @compare e, tokens
+                    e = @compare e tokens
                     
             es.push e
             
@@ -236,13 +239,13 @@ function Parse extends parseutils
     # assumes that the handling of newlines is done somewhere else
     # skips over leading semicolons
 
-    exp: (tokens) ->
+    exp: tokens ->
 
         ⮐ if empty tokens
 
         tok = tokens.shift()
 
-        log Y5 w1 tok?.text if @debug
+        log Y5(w1(tok?.text)) if @debug
                 
         switch tok.type
             
@@ -261,27 +264,27 @@ function Parse extends parseutils
                                         break
                                 
                                 switch tok.text
-                                    'return'   ➜ ⮐ @return   tok, tokens
-                                    'switch'   ➜ ⮐ @switch   tok, tokens
-                                    'class'    ➜ ⮐ @class    tok, tokens
-                                    'function' ➜ ⮐ @function tok, tokens                        
-                                    'await'    ➜ ⮐ @await    tok, tokens
-                                    'import'   ➜ ⮐ @import   tok, tokens
-                                    'export'   ➜ ⮐ @export   tok, tokens
-                                    'while'    ➜ ⮐ @while    tok, tokens
-                                    'when'     ➜ ⮐ @when     tok, tokens
-                                    'use'      ➜ ⮐ @use      tok, tokens
-                                    'try'      ➜ ⮐ @try      tok, tokens
-                                    'for'      ➜ ⮐ @for      tok, tokens
+                                    'return'   ➜ ⮐ @return   tok tokens
+                                    'switch'   ➜ ⮐ @switch   tok tokens
+                                    'class'    ➜ ⮐ @class    tok tokens
+                                    'function' ➜ ⮐ @function tok tokens                        
+                                    'await'    ➜ ⮐ @await    tok tokens
+                                    'import'   ➜ ⮐ @import   tok tokens
+                                    'export'   ➜ ⮐ @export   tok tokens
+                                    'while'    ➜ ⮐ @while    tok tokens
+                                    'when'     ➜ ⮐ @when     tok tokens
+                                    'use'      ➜ ⮐ @use      tok tokens
+                                    'try'      ➜ ⮐ @try      tok tokens
+                                    'for'      ➜ ⮐ @for      tok tokens
                                     'if' 
                                         if @stack[-1] not in ['▸return']
                                             @verb 'if' @stack if @stack.length
-                                            ⮐ @if tok, tokens
+                                            ⮐ @if tok tokens
                         ➜   switch tok.text
-                                '○' ➜ ⮐ @await tok, tokens
+                                '○' ➜ ⮐ @await tok tokens
                                 '->' '=>' '○->' '○=>'
                                     if @stack[-1] not in ['{']
-                                        ⮐ @func null, tok, tokens
+                                        ⮐ @func null tok tokens
 
         @sheapPush 'exp' tok.text ? tok.type
         
@@ -298,15 +301,15 @@ function Parse extends parseutils
                     ⮐ @lhs paren, tokens
                     
         e = tok
-        while tokens.length                  # repeatedly call rhs and lhs until all tokens are swallowed
+        while tokens.length                 # repeatedly call rhs and lhs until all tokens are swallowed
             
             numTokens = tokens.length
-
-            e = @rhs e, tokens               # first, try to eat as many tokens as possible to the right
+            
+            e = @rhs e tokens               # first, try to eat as many tokens as possible to the right
             
             print.ast "rhs" e if @debug
 
-            e = @lhs e, tokens               # see if we can use the result as the left hand side of something
+            e = @lhs e tokens               # see if we can use the result as the left hand side of something
             
             print.ast "lhs" e if @debug
 
@@ -332,9 +335,9 @@ function Parse extends parseutils
                         @verb 'exp prop chain block! shift block and continue ...'
                         @push 'propchain' + tokens[0].tokens[0].col
                         block = tokens.shift()
-                        e = @prop e, block.tokens
+                        e = @prop e block.tokens
                         if block.tokens.length
-                            @verb 'dangling prop chain tokens' block.tokens, @stack[-1]
+                            @verb 'dangling prop chain tokens' block.tokens @stack[-1]
                             tokens = block.tokens
                             continue
                         break
@@ -376,14 +379,14 @@ function Parse extends parseutils
     # but also 
     #   - single operand operations
     
-    rhs: (e, tokens) ->
+    rhs: e tokens ->
         
         @sheapPush 'rhs' 'rhs'
         
         while nxt = tokens[0]
             
             numTokens = tokens.length
-
+            
             if not e then return error 'no e?' nxt
             
             unspaced = (llc = lastLineCol(e)).col == nxt.col and llc.line == nxt.line
@@ -400,7 +403,7 @@ function Parse extends parseutils
                 nxt.text == ':' and @stack[-1] in ['class']
                 
                     print.tokens 'rhs is class method' tokens[..20] if @debug
-                    e = @keyval e, tokens
+                    e = @keyval e tokens
                     break
                 
                 nxt.text == ':' and (unspaced or ('?' not in @stack))
@@ -408,28 +411,28 @@ function Parse extends parseutils
                     if @stack[-1] != '{'
                         @verb 'rhs is first key of implicit object' e
                         print.tokens 'rhs is first key of implicit object ...' tokens[..20] if @debug
-                        e = @object e, tokens
+                        e = @object e tokens
                     else
                         @verb 'rhs is key of (implicit) object' e
-                        e = @keyval e, tokens
+                        e = @keyval e tokens
                     
                 nxt.text == 'in' and @stack[-1] != 'for'
                 
-                    @verb 'incond' e, tokens
-                    e = @incond e, tokens
+                    @verb 'incond' e tokens
+                    e = @incond e tokens
                 
                 e.text?
                 
                     if      
-                        e.text == '['   ➜ e = @array  e, tokens
-                        e.text == '('   ➜ e = @parens e, tokens
-                        e.text == '{'   ➜ e = @curly  e, tokens
-                        e.text in ['not'] and (nxt.type not in ['op'] or nxt.text in ['++' '--' '+' '-' ]) ➜ e = @operation null, e, tokens
-                        e.text in ['delete''new''empty''valid''noon''copy''clone'] and (nxt.type not in ['op''nl'] and nxt.text not in ',.}])') ➜ e = @operation null, e, tokens
-                        e.text in ['first''last'] and (nxt.type not in ['op''nl'] and nxt.text[0] not in ',.}])') ➜ e = @operation null, e, tokens
+                        e.text == '['   ➜ e = @array  e tokens
+                        e.text == '('   ➜ e = @parens e tokens
+                        e.text == '{'   ➜ e = @curly  e tokens
+                        e.text in ['not'] and (nxt.type not in ['op'] or nxt.text in ['++' '--' '+' '-' ]) ➜ e = @operation(null, e, tokens)
+                        e.text in ['delete''new''empty''valid''noon''copy''clone'] and (nxt.type not in ['op''nl'] and nxt.text not in ',.}])') ➜ e = @operation(null, e, tokens)
+                        e.text in ['first''last'] and (nxt.type not in ['op''nl'] and nxt.text[0] not in ',.}])') ➜ e = @operation(null, e, tokens)
                         e.text in ['++''--'] and unspaced
                             @verb 'rhs increment'
-                            e = @operation null, e, tokens
+                            e = @operation null e tokens
                         e.text in ['+''-'] and unspaced
                             if nxt.type == 'num'
                                 @verb 'rhs +- num'
@@ -439,11 +442,11 @@ function Parse extends parseutils
                                 e = tokens.shift()
                             else
                                 @verb 'rhs +- operation'
-                                e = @operation null, e, tokens
+                                e = @operation null e tokens
                         nxt.text in ['++''--'] and unspaced
                             if e.type not in ['var']
                                 return error 'wrong rhs increment'
-                            e = @operation e, tokens.shift()
+                            e = @operation e tokens.shift()
                         ➜
                             print.tokens "rhs no nxt match? break! stack:#{@stack} nxt:" [nxt] if @debug
                             break                    
@@ -451,7 +454,7 @@ function Parse extends parseutils
                 ➜ # e is not a token anymore
                 
                     if 
-                        nxt.text in ['++''--']  and unspaced        ➜ e = @operation e, tokens.shift(); break
+                        nxt.text in ['++''--']  and unspaced        ➜ e = @operation e tokens.shift();  break
                         @stack[-1] == 'call'    and nxt.text == ']' ➜ @verb 'rhs call array end';       break
                         @stack[-1] == '{'       and nxt.text == '}' ➜ @verb 'rhs curly end';            break                    
                         @stack[-1] == '['       and nxt.text == ']' ➜ @verb 'rhs array end';            break
@@ -481,14 +484,14 @@ function Parse extends parseutils
     #   - properties
     #   - calls
     
-    lhs: (e, tokens) ->
+    lhs: e tokens ->
         
         @sheapPush 'lhs' 'lhs'
         
         while nxt = tokens[0]
             
             numTokens = tokens.length
-
+            
             if not e then return error 'no e?' nxt
             
             last  = lastLineCol  e
@@ -503,34 +506,34 @@ function Parse extends parseutils
             break if b
             
             if e.text == '@' and unspaced and tokens[0].type in ['var''keyword''op']
-                e = @this e, tokens
+                e = @this e tokens
                 break
                 
             if e.text == '◆' and nxt.text in ['file' 'dir'] 
-                e = @dirFile e, tokens
+                e = @dirFile e tokens
                 break
 
             if e.text == '◆' and nxt.text == 'main'
-                e = @main e, tokens
+                e = @main e tokens
                 break
                 
             if      
-                nxt.text == '.'    ➜ e = @prop   e, tokens
-                nxt.type == 'dots' and not @stack[-1]?.startsWith('op') and @stack[-1] != '(' and '○rgs' not in @stack ➜ e = @slice e, tokens
-                nxt.text == 'each' ➜ e = @each   e, tokens
+                nxt.text == '.'    ➜ e = @prop(e tokens)
+                nxt.type == 'dots' and not @stack[-1]?.startsWith('op') and @stack[-1] != '(' and '○rgs' not in @stack ➜ e = @slice(e tokens)
+                nxt.text == 'each' ➜ e = @each(e tokens)
                 nxt.text == '?' 
                 
                     if unspaced
     
-                        e = @assert e, tokens
+                        e = @assert e tokens
                         
                     else
                         
-                        e = @qmrkop e, tokens
+                        e = @qmrkop e tokens
                     
                 nxt.text == ':' and e.qmrkop
                 
-                    e = @qmrkcolon e.qmrkop, tokens
+                    e = @qmrkcolon e.qmrkop tokens
                 
                 (   nxt.type == 'op' and 
                     nxt.text not in ['++' '--' '+' '-' 'not' 'noon' 'new' 'empty' 'valid'] and 
@@ -539,42 +542,42 @@ function Parse extends parseutils
                     
                     if 
                         @stack[-1]?.startsWith 'op' and @stack[-1] != 'op='
-                            @verb 'lhs stop on operation' e, nxt
+                            @verb 'lhs stop on operation' e nxt
                             break
                         @stack[-1] in ['in?' 'opempty' 'opvalid']
-                            @verb "lhs stop on #{@stack[-1]}" e, nxt
+                            @verb "lhs stop on #{@stack[-1]}" e nxt
                             break
                         nxt.text == '▸'
                             @verb "lhs break on ▸"
                             break
                         ➜
-                            @verb 'lhs is lhs of op' e, nxt
-                            e = @operation e, tokens.shift(), tokens
+                            @verb 'lhs is lhs of op' e nxt
+                            e = @operation e tokens.shift() tokens
                 
                 (   nxt.text in ['+' '-'] and 
                     e.text not in ['[' '('] and
                     spaced and tokens[1]?.col > nxt.col+nxt.text.length)
                     
                     @verb 'lhs is lhs of +-\s' e, nxt
-                    e = @operation e, tokens.shift(), tokens
+                    e = @operation e tokens.shift() tokens
             
                 nxt.type == 'func' and e.parens
                     @verb 'lhs is args for func' e
-                    e = @func e, tokens.shift(), tokens
+                    e = @func e tokens.shift() tokens
                 
                 nxt.text == '(' and unspaced
                     @verb 'lhs is lhs of call'
-                    e = @call e, tokens
+                    e = @call e tokens
                     
                 nxt.text == '[' and unspaced and tokens[1]?.text != ']'
                     @verb 'lhs is lhs of index' e
-                    e = @index e, tokens
+                    e = @index e tokens
                 
                 nxt.text == 'not' and tokens[1]?.text == 'in'
 
                     e = operation:
                         operator:tokens.shift()
-                        rhs:@incond e, tokens
+                        rhs:@incond(e tokens)
 
                 # Probably the most critical point of the whole parsing shenanigans:
                 # Trying to figure out if the current left hand side is a function which is 
@@ -585,27 +588,30 @@ function Parse extends parseutils
                 (   spaced and 
                     (nxt.line == last.line or (nxt.col > first.col and @stack[-1] not in ['if''when'])) and
                     '○rgs' not in @stack and
+                    '[' not in @stack and
+                    @stack[-1] not in ['(' 'call' 'args(' 'op|' 'op&' 'op/' 'op*' 'op+' 'op-'] and
+                    (@stack[-1] not in ['▸args' ':'] or (nxt.line > last.line and nxt.col > first.col)) and
                     nxt.text not in ['then' 'when' 'else' 'break' 'continue' 'in' 'of' 'for' 'while'] and
-                    (nxt.text not in ['if'] or not @noThenAhead tokens) and
+                    (nxt.text not in ['if'] or not @noThenAhead(tokens)) and
                     nxt.text not in ',.;:)}]' and
                     nxt.type not in ['nl'] and
                     (nxt.type != 'op' or nxt.text in ['++''--''noon''new''not'] or nxt.text in ['+''-'] and tokens[1].col == nxt.col+1) and
                     @isSuitableForImplicitCall(e) )
-                    
+
                     @verb 'lhs is lhs of implicit call! e' e, @stack[-1]
                     @verb '    is lhs of implicit call! nxt' nxt
                     @verb '    is lhs first' first 
-                    e = @call e, tokens
+                    e = @call e tokens
                     break
 
                 nxt.text in ['+' '-'] and e.text not in ['[' '(']
                     if spaced and tokens[1]?.col == nxt.col+nxt.text.length
-                        @verb 'lhs op is unbalanced +- break...' e, nxt, @stack
+                        @verb 'lhs op is unbalanced +- break...' e nxt @stack
                         break
-                    @verb 'lhs is lhs of +- op' e, nxt
-                    e = @operation e, tokens.shift(), tokens
+                    @verb 'lhs is lhs of +- op' e nxt
+                    e = @operation e tokens.shift() tokens
                                 
-                ➜                
+                ➜             
                     print.tokens "lhs no nxt match? break! stack:#{@stack} nxt:" [nxt] if @debug
                     print.ast "lhs no nxt match? break! stack:#{@stack}" e if @debug
                     if nxt.type == 'block' 
@@ -613,8 +619,8 @@ function Parse extends parseutils
                             @stackAllowsBlockArg() and
                             nxt.tokens[0]?.text not in ['then' 'when'] and
                             @stack[-1] not in ['if' 'then' 'for' 'while' 'switch' 'when' 'catch' 'in?' '▸args' 'class' 'function' 'op+' 'op-' 'opis' 'opor' 'opand' 'op==' 'opnot' 'op<' 'op>']
-                                @verb 'blocked call arg' @stack, e, nxt
-                                e = @call e, tokens
+                                @verb 'blocked call arg' @stack e nxt
+                                e = @call e tokens
                         # else
                             # log 'suitable?' @isSuitableForImplicitCall(e)
                             # log 'allowblock?' @stackAllowsBlockArg()
@@ -622,7 +628,7 @@ function Parse extends parseutils
                     break                    
             
             if numTokens == tokens.length
-                error 'lhs no token consumed?'
+                # error 'lhs no token consumed?'
                 break
                 
         @sheapPop 'lhs' 'lhs'     

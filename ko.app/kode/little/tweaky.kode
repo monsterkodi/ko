@@ -1,0 +1,81 @@
+# 000000000  000   000  00000000   0000000   000   000  000   000  
+#    000     000 0 000  000       000   000  000  000    000 000   
+#    000     000000000  0000000   000000000  0000000      00000    
+#    000     000   000  000       000   000  000  000      000     
+#    000     00     00  00000000  000   000  000   000     000     
+
+use ../kxk ▪ elem
+
+function tweaky
+
+    @: parent ->
+        
+        @div = elem class:'tweaky'
+        
+        parent.appendChild @div
+    
+    init: obj ->
+        
+        log noon obj
+        for k,v of obj
+            if valid v.info
+                @info k v
+            else if v.max
+                @slider k v
+            else
+                @checkbox k v
+                
+    checkbox: name opt ->
+        
+        input = elem 'input' class:'tweaky-checkbox' type:'checkbox' name:name id:name
+        input.checked = opt.value
+        
+        input.addEventListener 'input' (event) -> opt.cb event.target.checked
+            
+        row = elem 'form' class:'tweaky-row' children: [
+            elem(class:'tweaky-name'  text:name)
+            input
+            ]
+        
+        @div.appendChild row
+        
+    slider: name opt ->
+        
+        range = opt.max - opt.min
+        step  = opt.step
+        step  = range/opt.steps if not step and opt.steps
+        step ?= 1
+        
+        input  = elem 'input' class:'tweaky-value'  value:opt.value type:'number' min:opt.min max:opt.max step:step
+        slider = elem 'input' class:'tweaky-slider' value:opt.value type:'range'  min:opt.min max:opt.max step:step
+        
+        onChange = event -> v = parseFloat event.target.value; input.value = v; slider.value = v; opt.cb v
+
+        input.addEventListener  'input' onChange
+        slider.addEventListener 'input' onChange
+        
+        row = elem class:'tweaky-row' children: [
+            elem(class:'tweaky-name'  text:name)
+            input
+            slider
+            ]
+        
+        @div.appendChild row
+        
+    info: name opt ->
+
+        info = elem class:'tweaky-info'  text:opt.info()
+        row = elem class:'tweaky-row' children: [
+            elem(class:'tweaky-name'  text:name)
+            info
+            ]
+        @infos ?= []
+        @infos.push elem:info info:opt.info
+        @div.appendChild row
+        
+    update: ->
+        
+        for ie in @infos
+            ie.elem.innerHTML = ie.info()
+        
+export tweaky

@@ -67,14 +67,16 @@ lang 'kode'
         inc rgs, 3 '/'          ▸ 'punct regexp start'
         inc rgs, 8 '/'          ▸ 'punct regexp end'
         inc rgs, 9 '.'          ▸ 'punct property'
-        inc rgs, 10 'test'      ▸ 'function call'
+        # inc rgs, 10 'test'      ▸ 'function call'
+        inc rgs, 10 'test'      ▸ 'property'
         inc rgs, 15 's'         ▸ 'text'
         
         rgs = ranges "if / 😡 /.test s"
         inc rgs, 3 '/'          ▸ 'punct regexp start'
         inc rgs, 8 '/'          ▸ 'punct regexp end'
         inc rgs, 9 '.'          ▸ 'punct property'
-        inc rgs, 10 'test'      ▸ 'function call'
+        # inc rgs, 10 'test'      ▸ 'function call'
+        inc rgs, 10 'test'      ▸ 'property'
         inc rgs, 15 's'         ▸ 'text'
                 
     # 000   000   0000000         00000000   00000000   0000000   00000000  000   000  00000000   

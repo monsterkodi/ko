@@ -21,14 +21,16 @@ typedef void (^Callback)(id, NSString*);
 - (Win*) new:(NSString*)urlString script:(NSString*)script;
 - (Win*) focusNext;
 - (Win*) focusPrev;
+- (Win*) focus;
 - (void) reload;
 - (void) framerateDrop:(long)ms;
 - (void) center;
 - (void) setFrame:(id)frame;
 - (void) setFrame:(id)frame immediate:(id)immediate;
 - (void) setTopLeft:(id)topLeft;
+- (void) moveBy:(id)delta;
 - (void) setWidth:(unsigned int)width height:(unsigned int)height;
 - (NSString*) snapshot:(NSString*)pngFilePath;
-- (NSDictionary*) frameInfo;
+- (NSMutableDictionary*) frameInfo;
 
 @end

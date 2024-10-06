@@ -304,11 +304,11 @@ class Operator
         {
             if (i.operation)
             {
-                return (rndr(i.operation.lhs)) + ' ' + _k_.w3(i.operation.operator.text) + ' ' + _k_.b6(precedence(i))
+                return rndr(i.operation.lhs) + ' ' + _k_.w3(i.operation.operator.text) + ' ' + _k_.b6(precedence(i))
             }
             else
             {
-                return (rndr(i.qmrkcolon.lhs)) + ' ? ' + (rndr(i.qmrkcolon.mid)) + ' '
+                return rndr(i.qmrkcolon.lhs) + ' ? ' + rndr(i.qmrkcolon.mid) + ' '
             }
         }).bind(this)).join(' ')
         s += ' ' + ((_206_50_=rndr((chain.slice(-1)[0].operation != null ? chain.slice(-1)[0].operation.rhs : undefined))) != null ? _206_50_ : '...')

@@ -4,7 +4,7 @@ var CMD, FLG, LIB, OUT
 
 CMD = "zig c++"
 OUT = "../../Contents/MacOS/kakao"
-LIB = "-framework WebKit -framework Cocoa -framework JavaScriptCore"
+LIB = "-framework WebKit -framework Carbon -framework Cocoa -framework JavaScriptCore"
 FLG = "-arch arm64 -Os -Wno-nullability-completeness -Wno-objc-method-access"
 import child_process from "child_process"
 
@@ -13,7 +13,7 @@ import fs from "../kxk/fs.js"
 
 export default async function ()
 {
-    var cmd, cwd, opt, SRC, srcDir, srcFiles
+    var cmd, opt, SRC, srcDir, srcFiles
 
     srcDir = slash.path(_k_.dir(),'../../src')
     await fs.mkdir(slash.dir(slash.path(_k_.dir(),OUT)))
@@ -27,8 +27,7 @@ export default async function ()
         return f.file
     }).join(' ')
     cmd = `${CMD} -I . ${SRC} ${LIB} ${FLG} -o ${OUT.slice(3)}`
-    cwd = srcDir
-    opt = {shell:true,cwd:cwd}
+    opt = {shell:true,cwd:srcDir}
     return new Promise(function (resolve, reject)
     {
         return child_process.exec(cmd,opt,function (err, stdout, stderr)

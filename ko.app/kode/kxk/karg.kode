@@ -38,7 +38,7 @@ expand = (l) ->
 
 error = (msg) ->
     
-    s = dim r5 "[" + bold("ERROR") + "] "
+    s = dim r5("[" + bold("ERROR") + "] ")
     s += r5 msg.trim().split('\n').join("\n        ")
     log s
 
@@ -113,7 +113,7 @@ parse = (config, options={}) ->
         if 0 <= k.indexOf ' '
             error """
             wrong karg setup: #{bold "keys can't contain spaces!"}
-            broken key: #{bold y5 k}
+            broken key: #{bold y5(k)}
             """
             process.exit 1
         
@@ -174,14 +174,14 @@ parse = (config, options={}) ->
         lng = long[k]
         if help[k]?
             df = switch result[k]
-                when false then r5 dim '✘'
-                when true  then g5 bold '✔'
+                when false then r5 dim('✘')
+                when true  then g5 bold('✔')
                 else result[k]
-            shtHelp = if sht != '' then "#{w5 '-'}#{sht}" else '  '
-            lngHelp = if lng != '' then "#{w5 '--'}#{kstr.rpad lng, maxLong}" else '  ' + kstr.pad '' maxLong
+            shtHelp = if sht != '' then "#{w5('-')}#{sht}" else '  '
+            lngHelp = if lng != '' then "#{w5('--')}#{kstr.rpad(lng, maxLong)}" else '  ' + kstr.pad('' maxLong)
             optionsText += '\n'
             optionsText += "    #{shtHelp} #{lngHelp}"
-            optionsText += w5 bold "  #{kstr.rpad help[k], maxHelp}"
+            optionsText += w5 bold("  #{kstr.rpad(help[k], maxHelp)}")
             optionsText += m5   "  #{df}" if df?
 
     ###
@@ -193,10 +193,10 @@ parse = (config, options={}) ->
     ###
     
     helpText  = "\n#{w5 'usage:'}  #{bold name} "
-    helpText += "#{w5 '[ '}#{bold y5 param}#{paramList and w5(' ... ]') or w5(']')}"
+    helpText += "#{w5('[ ')}#{bold(y5(param))}#{paramList and w5(' ... ]') or w5(']')}"
     helpText += '\n'
     if cfg[param]?['?']
-        helpText += y5 bold "\n        #{param} #{w5 cfg[param]['?']}"
+        helpText += y5 bold("\n        #{param} #{w5(cfg[param]['?'])}")
         helpText += m5("  #{kstr.pad '', Math.max(0,maxHelp-strip(cfg[param]['?']).length)} #{cfg[param]['=']}") if cfg[param]['=']? and not paramList
         helpText += '\n'
             

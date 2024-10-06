@@ -1,0 +1,108 @@
+###
+ 0000000   0000000   000   000  000   000   0000000    0000000  
+000       000   000  0000  000  000   000  000   000  000       
+000       000000000  000 0 000   000 000   000000000  0000000   
+000       000   000  000  0000     000     000   000       000  
+ 0000000  000   000  000   000      0      000   000  0000000   
+###
+
+use ../kakao
+use ../kxk ▪ $ win fps post elem stopEvent
+use ◆ world
+
+window.WIN_MIN_WIDTH  = 400
+window.WIN_MIN_HEIGHT = 400
+
+function Delegate extends win.Delegate
+    
+    @: ->
+
+        @menuNoon = kakao.bundle.res 'menu_canvas.noon'
+                        
+        post.on 'menuAction' @onMenuAction
+        
+    onWindowAnimationTick: win tickInfo => 
+        
+        ⮐ if not @world
+        
+        @world.tick tickInfo
+        
+        s = ''
+        for k,v of @world.count
+            s += '&nbsp;' + k + '&nbsp;' + v + '&nbsp;'
+            
+        title =$ 'title'
+        title.innerHTML = s
+                
+    onWindowWillShow: ->
+        
+        window.world = @world = new world
+        
+        main =$ 'main'
+        @fps = new fps main, topDown:true
+
+        #⏹ ⏸ ⏯ ⏮ ⏺ ⏵ ⏭ 
+        @quiq = elem class:'quiq' children: [
+            elem(text:'V' class:'quiq-item quiq-values'  click:@world.toggleValues, dblclick: (e) -> stopEvent(e)),                                                                                   
+            elem(text:' ' class:'quiq-item quiq-resart' click:@world.start,        dblclick: (e) -> stopEvent(e)),                                                                                   
+            elem(text:'⏸' class:'quiq-item quiq-pause'   click:@world.togglePause,  dblclick: (e) -> stopEvent(e)),                                                                                   
+            elem(text:'⏯' class:'quiq-item quiq-step'    click:@world.singleStep,   dblclick: (e) -> stopEvent(e))  
+        ]
+        
+        title =$ 'title'
+        title.parentElement.insertBefore @quiq, title
+        
+        post.on 'pause' @onPause
+        
+        document.body.style.display = 'inherit'
+
+    onPause: =>
+        
+        pause =$ '.quiq-pause'
+        pause.innerHTML = @world.pause ? '⏵' : '⏸'
+        
+    onWindowWithoutStash: ->  
+        
+        kakao 'window.setSize' window.WIN_MIN_WIDTH, window.WIN_MIN_HEIGHT
+        kakao 'window.center'
+        
+    onWindowCreated: =>
+        
+        kakao 'window.setMinSize' window.WIN_MIN_WIDTH, window.WIN_MIN_HEIGHT
+        
+    onWindowResize: => post.emit 'resize'
+        
+    # 00     00  00000000  000   000  000   000   0000000    0000000  000000000  000   0000000   000   000  
+    # 000   000  000       0000  000  000   000  000   000  000          000     000  000   000  0000  000  
+    # 000000000  0000000   000 0 000  000   000  000000000  000          000     000  000   000  000 0 000  
+    # 000 0 000  000       000  0000  000   000  000   000  000          000     000  000   000  000  0000  
+    # 000   000  00000000  000   000   0000000   000   000   0000000     000     000   0000000   000   000  
+
+    onMenuAction: action args =>
+
+        switch action
+            
+            'Zoom In'  ➜ ⮐ @world.zoom 1
+            'Zoom Out' ➜ ⮐ @world.zoom -1
+            'Pause'    ➜ ⮐ @world.togglePause()
+            
+        # log 'onMenuAction' action, args
+        'unhandled'
+            
+    # 000   000  00000000  000   000        0000000     0000000   000   000  000   000  
+    # 000  000   000        000 000         000   000  000   000  000 0 000  0000  000  
+    # 0000000    0000000     00000          000   000  000   000  000000000  000 0 000  
+    # 000  000   000          000           000   000  000   000  000   000  000  0000  
+    # 000   000  00000000     000           0000000     0000000   00     00  000   000  
+    
+    # onWindowKeyDown: win info =>
+    # onWindowKeyUp:   win info =>
+        
+    onWindowBlur:  win =>
+    onWindowFocus: win =>
+    
+kakao.init ->
+    
+    new win new Delegate
+    @
+    

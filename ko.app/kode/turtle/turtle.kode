@@ -47,7 +47,7 @@ setWinHeight = h ○->
 
 masterStart = ->
 
-    startTimeout prefs.get 'timeout' 1    
+    startTimeout prefs.get('timeout' 1)
     if stashExists
         $('turtle').disabled = false
         updateSiteFromClipboard()
@@ -90,7 +90,7 @@ masterConfirmed = ○->
                 $('master-timeout')?.style.width = '100%'
                 $('master-timeout')?.style.left = '0%'
             else
-                whisper ['oops?' 'what?' '...?' 'nope!'][randInt 3], 2000
+                whisper ['oops?' 'what?' '...?' 'nope!' 'wtf?'][randInt 6], 2000
         else
             say ['Well chosen!' 'Nice one!' 'Good choice!'][randInt 2],
                 'And your <span class="open" onclick="showHelp();">password pattern?</span>'
@@ -326,7 +326,7 @@ initBody = name ->
     lst    = elem class:'list'   id:name+'list'
     scroll = elem class:'scroll' id:name+'scroll'
     lst.appendChild scroll
-    lst.appendChild initButtons name
+    lst.appendChild initButtons(name)
     document.body.innerHTML = ''
     document.body.appendChild lst
 
@@ -459,15 +459,15 @@ showStash = ○->
         # log 'hash config' hash, config, mstr
         site = ○ cryptools.decrypt config.url, mstr
         item =            elem class: 'stash-item-border border'
-        item.appendChild  elem 'input', id: hash, type: 'button', class: 'stash-item'
-        siteSpan = item.appendChild elem 'span', class: 'site', text:site
+        item.appendChild  elem('input', id: hash, type: 'button', class: 'stash-item')
+        siteSpan = item.appendChild elem('span', class: 'site', text:site)
         lock = elem 'span' class: 'lock'
         item.appendChild lock
         if config.pattern == stash.pattern
             lockClosed lock
         else
             lockOpen lock
-            item.appendChild elem 'span', class:'pattern', text:config.pattern
+            item.appendChild elem('span', class:'pattern', text:config.pattern)
 
         $('stashscroll').appendChild item
 
@@ -541,7 +541,7 @@ vaultValue     = hash -> $(hash)?.parentElement?.nextSibling
 vaultArrow     = hash -> $(hash)?.nextSibling
 openVaultItem  = hash ->
     
-    ⮐ if not elem.isElement vaultValue hash
+    ⮐ if not elem.isElement vaultValue(hash)
     
     vaultValue(hash).style.display = 'block'
     
@@ -550,7 +550,7 @@ openVaultItem  = hash ->
     
 closeVaultItem = hash ->
     
-    ⮐ if not elem.isElement vaultValue hash
+    ⮐ if not elem.isElement vaultValue(hash)
     
     vaultValue(hash).style.display = 'none'
     
@@ -683,14 +683,12 @@ showPrefs = ->
 
     initBody 'prefs'
     
-    border  = elem id:'pattern-border' class:'border' children:
-        [
-            elem 'input' id:'pattern' class:'main-input' type:'input' name:'pattern'
-        ,   elem 'span' children:
-            [
-                elem id:'floppy' class:'ghost'
-            ,   elem id:'pattern-ghost' class:'ghost' text:'pattern'
-            ]
+    border = elem id:'pattern-border' class:'border' children: [
+            elem('input' id:'pattern' class:'main-input' type:'input' name:'pattern')
+            elem('span' children: [
+                elem(id:'floppy' class:'ghost')
+                elem(id:'pattern-ghost' class:'ghost' text:'pattern')
+            ])
         ]
     
     $('.list').insertBefore border, $('buttons')
@@ -708,7 +706,7 @@ showPrefs = ->
         input = elem 'input' id:key, type:'button' class:'pref-item'
         
         item.appendChild input
-        item.appendChild elem 'span' class:'pref' text:pref.text
+        item.appendChild elem('span' class:'pref' text:pref.text)
         
         switch pref.type
             'bool'
@@ -716,9 +714,9 @@ showPrefs = ->
                 item.appendChild bool
                 setBool bool, value
             'int'
-                item.appendChild elem 'span' class:'int' text:value ? value+' min' : 'never'
+                item.appendChild elem('span' class:'int' text:value ? value+' min' : 'never')
             'shortcut'
-                item.appendChild elem 'span' class:'shortcut' text:value
+                item.appendChild elem('span' class:'shortcut' text:value)
 
         $('prefsscroll').appendChild item
 
@@ -732,9 +730,9 @@ showPrefs = ->
                 
                 'bool'
                     
-                    prefs.set key, not prefs.get key
+                    prefs.set key, not prefs.get(key)
                     bool =$ '.bool' event.target.parentElement
-                    setBool bool, prefs.get key
+                    setBool bool, prefs.get(key)
                     
                 'int'
 
@@ -808,14 +806,14 @@ showPrefs = ->
 
                         { mod, key, combo } = keyinfo.forEvent event
                         
-                        input = $('input', event.target.parentElement)
+                        input = $('input' event.target.parentElement)
                         
                         if combo.indexOf('+') >= 0 and key != ''
                             
                             stopEvent event
-                            $('.shortcut', event.target.parentElement).innerHTML = combo
+                            $('.shortcut' event.target.parentElement).innerHTML = combo
                             prefKey = input.id
-                            prefs.set prefKey, combo
+                            prefs.set prefKey combo
                             input.focus()
                             
                         else if not keyinfo.isModifier(key) and key != ''
@@ -825,8 +823,8 @@ showPrefs = ->
                                     stopEvent event
                                     input.focus()
                                 'backspace'
-                                    $('.shortcut', event.target.parentElement).innerHTML = ''
-                                    prefs.set prefKey, ''
+                                    $('.shortcut' event.target.parentElement).innerHTML = ''
+                                    prefs.set prefKey ''
                                     input.focus()
                                 ➜ 
                                     event.target.value = 'no modifier'
@@ -913,11 +911,11 @@ makePassword = hash config -> password.make hash, config.pattern
 
 showPassword = config ○->
     
-    url  = ○ cryptools.decrypt config.url, mstr
+    url  = ○ cryptools.decrypt config.url mstr
     hash = ○ cryptools.genHash url + mstr
-    pass = currentPassword = makePassword hash, config
+    pass = currentPassword = makePassword hash config
     if hasLock() and prefs.get 'mask'
-        pass = rpad currentPassword.length, '' '●'
+        pass = rpad currentPassword.length '' '●'
     if url  ==  trim $("site").value
         setInput 'password' pass
 
@@ -1139,6 +1137,9 @@ function Delegate #extends win.Delegate
         hideSettings()
         resetStash()
         
+        kakao 'window.new' 'icon' 'window.statusIcon = "turtletrans.png"; window.statusIconSize = 30; window.statusIconOffset = -3'
+        post.on 'status.click' -> kakao 'window.raise'
+        
         ffs.exists(stashFile).then (exists) ->
 
             stashExists = exists
@@ -1155,7 +1156,7 @@ function Delegate #extends win.Delegate
         frame = copy stashFrame
         frame.y = frame.y + frame.h - WIN_MIN_HEIGHT
         frame.h = WIN_MIN_HEIGHT
-        kakao 'window.setFrame' frame, true
+        kakao 'window.setFrame' frame true
         true
         
     onWindowCreated: =>
@@ -1171,7 +1172,7 @@ function Delegate #extends win.Delegate
     000   000  00000000     000     0000000     0000000   00     00  000   000
     ###
     
-    onWindowKeyDown: win info ->
+    onWindowKeyDown: info ->
     
         { mod, key, combo, char } = info
     
@@ -1224,7 +1225,7 @@ function Delegate #extends win.Delegate
                     
         'unhandled'
     
-    onWindowKeyUp: win info -> 'unhandled'
+    onWindowKeyUp: info -> 'unhandled'
     
 kakao.init ->
     

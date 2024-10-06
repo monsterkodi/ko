@@ -23,14 +23,21 @@ use ../commandline ◆ CommandLine
 
 function Window extends win.Delegate
 
-    onWindowWillShow:       win          -> #log "onWindowWillShow"      win.id
-    onWindowAnimationTick:  win tickInfo -> #log 'onWindowAnimationTick' win.id
-    onWindowResize:         win event    -> #log 'onWindowResize'        win.id
-    onWindowFocus:          win          -> #log 'onWindowFocus'         win.id
-    onWindowBlur:           win          -> #log 'onWindowBlur'          win.id
-    onWindowKeyDown:        win keyInfo  -> #log 'onWindowKeyDown'       win.id, keyInfo
-    onWindowKeyUp:          win keyInfo  -> #log 'onWindowKeyUp'         win.id, keyInfo
+    onWindowWillShow:       win          -> window.split.resized(); kakao 'window.focus'
+    onWindowAnimationTick:  win tickInfo -> #log 'onWindowAnimationTick'
+    onWindowFocus:          win          -> log 'onWindowFocus'         
+    onWindowBlur:           win          -> #log 'onWindowBlur'          
+    onWindowKeyDown:        keyInfo      -> #log 'onWindowKeyDown'       keyInfo
+    onWindowKeyUp:          keyInfo      -> #log 'onWindowKeyUp'         keyInfo
     onWindowMenuTemplate:   win template -> kakao.menuTemplate = Menu template
+    onWindowDidLoadStash:   win          -> log 'onLoadStash' 
+    onWindowResize:         win event    ->
+        
+        window.split.resized()
+        window.win?.onMoved window.win.getBounds()
+        if window.stash.get 'centerText' false
+            window.editor.centerText true 200
+    
     
     @: ->
         
@@ -89,15 +96,14 @@ function Window extends win.Delegate
                 else
                     window.navigate.addFilePos file: window.editor.currentFile, pos: window.editor.cursorPos()
 
-        post.on 'prefsLoaded' => scheme.set prefs.get 'scheme' 'dark'
+        post.on 'prefsLoaded' => scheme.set prefs.get('scheme' 'dark')
         post.on 'stashLoaded' => 
 
-            @editor.setFontSize window.stash.get 'fontSize' 19
+            @editor.setFontSize window.stash.get('fontSize' 19)
             @editor.centerText  window.stash.get('centerText'), 0
             
-            post.emit 'loadFile' kore.get 'editor|file'
+            post.emit 'loadFile' kore.get('editor|file')
     
-        window.split.resized()
         window.info.reload()
         
         # if empty window.tabs.tabs ➜ log 'not tab! empty tab!'; post.emit 'newEmptyTab'
@@ -142,7 +148,7 @@ function Window extends win.Delegate
             'Arrange Windows'       ➜ ⮐ log "ko.window #{name} unimplemented!"
             'Toggle Scheme'         ➜ ⮐ scheme.toggle()
             'Toggle Center Text'    ➜ ⮐ toggleCenterText()
-            'Toggle Func List'      ➜ ⮐ [prefs.toggle('list|active'), post.emit 'list.toggle']
+            'Toggle Func List'      ➜ ⮐ [prefs.toggle('list|active') post.emit('list.toggle')]
             'Toggle Tab Pinned'     ➜ ⮐ toggleTabPinned()
             'Toggle Tab Extensions' ➜ ⮐ tabs.toggleExtension()
             'Increase'              ➜ ⮐ changeFontSize +1
@@ -161,7 +167,7 @@ function Window extends win.Delegate
             'Save'                  ➜ ⮐ post.emit 'saveFile'
             'Save All'              ➜ ⮐ post.emit 'saveAll'
             'Save As ...'           ➜ ⮐ post.emit 'saveFileAs'
-            'Revert'                ➜ ⮐ post.emit 'reloadFile' kore.get 'editor|file'
+            'Revert'                ➜ ⮐ post.emit 'reloadFile' kore.get('editor|file')
             'Close Tab'             ➜ ⮐ post.emit 'closeTab'
             'Close Other Tabs'      ➜ ⮐ post.emit 'closeOtherTabs'
             'Close Other Windows'   ➜ ⮐ post.toWins 'closeWindow'
@@ -177,8 +183,8 @@ function Window extends win.Delegate
 # 000        000   000       000     000
 # 000         0000000   0000000      000
  
-post.on 'singleCursorAtPos' (pos, opt) -> # browser double click, funclist, newTabWithFile :l:c
-    window.editor.singleCursorAtPos pos, opt 
+post.on 'singleCursorAtPos' (pos opt) -> # browser double click, funclist, newTabWithFile :l:c
+    window.editor.singleCursorAtPos pos opt 
     window.editor.scroll.cursorToTop()
     
 post.on 'focusEditor'  -> window.split.focus 'editor'
@@ -211,13 +217,6 @@ window.editorWithName = n ->
  # 000   000  000            000  000   000     000       
  # 000   000  00000000  0000000   000  0000000  00000000  
  
-window.onresize = ->
-
-    window.split.resized()
-    window.win?.onMoved window.win.getBounds()
-    if window.stash.get 'centerText' false
-        window.editor.centerText true, 200
-
 post.on 'split' (s) ->
 
     filebrowser?.resized()

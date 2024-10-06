@@ -23,10 +23,14 @@ use ./utils ▪ kc ke
     kc '    ○ async 2' ▸ 'await async(2)'
     kc '    ○async 3' ▸ 'await async(3)'
     
-    kc 'list = list.concat ○ fs.list dir' ▸ """
+    # kc 'list = list.concat ○ fs.list dir' ▸ """
+        # list = list.concat(await fs.list(dir))
+        # """
+
+    kc 'list = list.concat ○ fs.list(dir)' ▸ """
         list = list.concat(await fs.list(dir))
         """
-
+        
     kc "if ○ fs.remove 'blah' ➜ 2" ▸ """
         if (await fs.remove('blah'))
         {

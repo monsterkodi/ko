@@ -2,20 +2,12 @@
 body
 {
     overflow: hidden;
-    background-color: black;
     border-radius: 10px;
     box-sizing: border-box;
-    border: 1.5px solid #1a1a1a;
 }
 
 #main
 {
-    border-left: 6px        solid #131313;
-    border-right: 6px        solid #131313;
-    border-bottom: 6px        solid #131313;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    background-color: #000000;
     color: #fff;
     font-size: 40px;
 }

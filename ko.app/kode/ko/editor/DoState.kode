@@ -10,18 +10,16 @@ use ../../kxk ▪ kstr immutable
 
 function DoState
     
-    @: (stateOrLines = []) ->
+    @: stateOrLines=[] ->
         
         if immutable.isImmutable stateOrLines
-            # log 'dostate immutable'
             @s = stateOrLines
         else if stateOrLines is arr
-            # log 'dostate lines'
             @s = @stateForLines stateOrLines
         else
             log 'dostate without array or state?' stateOrLines
             
-    stateForLines: (lineStrings) ->
+    stateForLines: lineStrings ->
         
         numLines = lineStrings.length
         mcy = min 0 numLines-1
@@ -35,7 +33,7 @@ function DoState
             highlights:  []
             main:        0
 
-    dictFromLines: (lines) ->
+    dictFromLines: lines ->
         
         dict = {}
         for line,index in lines
@@ -48,9 +46,9 @@ function DoState
     # 000      000  000  0000  000            000  
     # 0000000  000  000   000  00000000  0000000   
     
-    line: (i) -> @s.lines[i] # detab?
+    line: i -> @s.lines[i] # detab?
     
-    @lines: (s) ->
+    @lines: s ->
         
         l = []
         for index,line of s.lines
@@ -65,14 +63,14 @@ function DoState
     # 000       000   000  000   000  000  0000  000   000  000       
     #  0000000  000   000  000   000  000   000   0000000   00000000  
     
-    changeLine: (i, t) -> 
+    changeLine: i t -> 
 
         ⮐ if i > @s.numLines-1
         ⮐ if i < 0 and -i > @s.numLines
         
         lines = @lines()
         lines.splice i, 1 t
-        @s = @s.set 'lines' @dictFromLines lines
+        @s = @s.set 'lines' @dictFromLines(lines)
         
     # 000  000   000   0000000  00000000  00000000   000000000  
     # 000  0000  000  000       000       000   000     000     
@@ -80,14 +78,14 @@ function DoState
     # 000  000  0000       000  000       000   000     000     
     # 000  000   000  0000000   00000000  000   000     000     
     
-    insertLine: (i, t) -> 
+    insertLine: i t -> 
 
         ⮐ if i > @s.numLines
         ⮐ if i < 0 and -i > @s.numLines
         
         lines = @lines()
         lines.splice i, 0 t
-        @s = @s.set 'lines' @dictFromLines lines
+        @s = @s.set 'lines' @dictFromLines(lines)
         @s = @s.set 'numLines' lines.length
         
     # 0000000    00000000  000      00000000  000000000  00000000  
@@ -96,14 +94,14 @@ function DoState
     # 000   000  000       000      000          000     000       
     # 0000000    00000000  0000000  00000000     000     00000000  
     
-    deleteLine: (i) -> 
+    deleteLine: i -> 
         
         ⮐ if i > @s.numLines-1
         ⮐ if i < 0 and -i > @s.numLines
         
         lines = @lines()
-        lines.splice i, 1
-        @s = @s.set 'lines' @dictFromLines lines
+        lines.splice i 1
+        @s = @s.set 'lines' @dictFromLines(lines)
         @s = @s.set 'numLines' lines.length
         
     #  0000000   00000000   00000000   00000000  000   000  0000000    
@@ -112,34 +110,33 @@ function DoState
     # 000   000  000        000        000       000  0000  000   000  
     # 000   000  000        000        00000000  000   000  0000000    
     
-    appendLine: (t) -> @insertLine @s.numLines, t
+    appendLine: t -> @insertLine @s.numLines t
     
     # read only:
     
-    text: (n='\n') -> @lines().join n
-    tabline:   (i) -> @lines()[i]
+    text:   n='\n' -> @lines().join n
+    tabline:     i -> @lines()[i]
     
     cursors:       -> @s.cursors.asMutable()    
     highlights:    -> @s.highlights.asMutable() 
     selections:    -> @s.selections.asMutable() 
     main:          -> @s.main
 
-    cursor:    (i) -> @s.cursors[i]?.asMutable()    
-    selection: (i) -> @s.selections[i]?.asMutable() 
-    highlight: (i) -> @s.highlights[i]?.asMutable() 
+    cursor:      i -> @s.cursors[i]?.asMutable()    
+    selection:   i -> @s.selections[i]?.asMutable() 
+    highlight:   i -> @s.highlights[i]?.asMutable() 
 
     numLines:      -> @s.numLines
     numCursors:    -> @s.cursors.length
     numSelections: -> @s.selections.length
     numHighlights: -> @s.highlights.length
     mainCursor:    -> @s.cursors[@s.main].asMutable()
-
     # modify:
         
-    setSelections: (s) -> @s = @s.set 'selections' s
-    setHighlights: (h) -> @s = @s.set 'highlights' h
-    setCursors:    (c) -> @s = @s.set 'cursors'    c
-    setMain:       (m) -> @s = @s.set 'main'       m
-    addHighlight:  (h) -> m = @s.highlights.asMutable(); m.push h; @s = @s.set 'highlights' m
+    setSelections: s -> @s = @s.set 'selections' s
+    setHighlights: h -> @s = @s.set 'highlights' h
+    setCursors:    c -> @s = @s.set 'cursors'    c
+    setMain:       m -> @s = @s.set 'main'       m
+    addHighlight:  h -> m = @s.highlights.asMutable(); m.push h; @s = @s.set 'highlights' m
 
 export DoState

@@ -53,7 +53,7 @@ export
                         cursorDelta nc, 0, -1 # move cursors below deleted line up
                 else
                     continue if s[0] >= @do.numLines()
-                    @do.change s[0], kstr.splice @do.line(s[0]), s[1][0], s[1][1]-s[1][0]
+                    @do.change s[0], kstr.splice(@do.line(s[0]), s[1][0], s[1][1]-s[1][0])
                     for nc in positionsAfterLineColInPositions s[0], s[1][1], newCursors
                         cursorDelta nc, -(s[1][1]-s[1][0]) # move cursors after deletion in same line left
         

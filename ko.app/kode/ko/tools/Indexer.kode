@@ -332,7 +332,7 @@ class Indexer
                                     funcInfo = @addFuncInfo m[0].replaceAll('▸ ' ''),
                                         line: li+1
                                         file: file
-                                        test: m[0].replaceAll '▸ ' ''
+                                        test: m[0].replaceAll('▸ ' '')
         
                                     funcStack.push [indent, funcInfo]
                                     funcAdded = true

@@ -133,7 +133,7 @@ ${_k_.g5('green')}`,`<span style="color:#ff0000;">red</span>
     })
     section("stripAnsi", function ()
     {
-        compare((kstr.stripAnsi(_k_.g5('green'))),'green')
+        compare(kstr.stripAnsi(_k_.g5('green')),'green')
     })
     section("dissect", function ()
     {

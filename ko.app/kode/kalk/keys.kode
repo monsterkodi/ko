@@ -30,37 +30,37 @@ class Keys
     numberKeys: ->
                 
         @setKeys 'numbers' [ #              ▾ style
-            @row [
-                    @key symbol.clear,      'tall clear'
-                    @key symbol.sqrt,       'op0 sqrt'
-                    @key '^'                'op0 pow'
-                    @key '/'                'op1 dot divide'
-                    @key '*'                'op1 dot multiply'
-                ]
-            @row [
-                    @key '7'                'digit'
-                    @key '8'                'digit'
-                    @key '9'                'digit'
-                    @key '-'                'op2'
-                ]
-            @row [
-                    @key symbol.backspace,  'backspace'
-                    @key '4'                'digit'
-                    @key '5'                'digit'
-                    @key '6'                'digit'
-                    @key '+'                'op2'
-                ]
-            @row [
-                    @key symbol.func,       'tall bottom func'
-                    @key '1'                'digit'
-                    @key '2'                'digit'
-                    @key '3'                'digit'
-                    @key '='                'tall bottom equals'
-                ]
-            @row [
-                    @key '0'                'wide digit right'
-                    @key '.'                'dot'
-                ]
+            @row([
+                    @key(symbol.clear,      'tall clear')
+                    @key(symbol.sqrt,       'op0 sqrt')
+                    @key('^'                'op0 pow')
+                    @key('/'                'op1 dot divide')
+                    @key('*'                'op1 dot multiply')
+                ])
+            @row([
+                    @key('7'                'digit')
+                    @key('8'                'digit')
+                    @key('9'                'digit')
+                    @key('-'                'op2')
+                ])
+            @row([
+                    @key(symbol.backspace,  'backspace')
+                    @key('4'                'digit')
+                    @key('5'                'digit')
+                    @key('6'                'digit')
+                    @key('+'                'op2')
+                ])
+            @row([
+                    @key(symbol.func,       'tall bottom func')
+                    @key('1'                'digit')
+                    @key('2'                'digit')
+                    @key('3'                'digit')
+                    @key('='                'tall bottom equals')
+                ])
+            @row([
+                    @key('0'                'wide digit right')
+                    @key('.'                'dot')
+                ])
             ]
     
     # 00000000  000   000  000   000   0000000  
@@ -72,38 +72,38 @@ class Keys
     functionKeys: ->
         
         @setKeys 'functions' [ #            ▾ style
-            @row [
-                    @key symbol.clear,      'tall clear'
-                    @key symbol.hex,        'op1 hex'
-                    @key symbol.exp,        'op1 exp'
-                    @key symbol.oneoverx,   'op1 oneoverx'
-                    @key '*'                'dot multiply'
-                ]
-            @row [
-                    @key 'sin'              'function sin'
-                    @key 'cos'              'function cos'
-                    @key 'π'                'constant pi'    
-                    @key '-'                'op2'
-                ]
-            @row [
-                    @key symbol.backspace,  'backspace'
-                    @key 'tan'              'function tan'
-                    @key 'log'              'function log'
-                    @key symbol.euler,      'constant euler'
-                    @key '+'                'op2'
-                ]
-            @row [
-                    @key symbol.numbers,    'tall bottom numbers'
-                    @key 'atan'             'function atan'
-                    @key '∡'                'op1 rad2deg'
-                    @key 'ϕ'                'constant phi'
-                    @key '='                'tall bottom equals'
-                ]
-            @row [
-                    @key '('                'bracket'
-                    @key '°'                'digit deg2rad'
-                    @key ')'                'bracket'
-                ]
+            @row([
+                    @key(symbol.clear,      'tall clear')
+                    @key(symbol.hex,        'op1 hex')
+                    @key(symbol.exp,        'op1 exp')
+                    @key(symbol.oneoverx,   'op1 oneoverx')
+                    @key('*'                'dot multiply')
+                ])
+            @row([
+                    @key('sin'              'function sin')
+                    @key('cos'              'function cos')
+                    @key('π'                'constant pi'    )
+                    @key('-'                'op2')
+                ])
+            @row([
+                    @key(symbol.backspace,  'backspace')
+                    @key('tan'              'function tan')
+                    @key('log'              'function log')
+                    @key(symbol.euler,      'constant euler')
+                    @key('+'                'op2')
+                ])
+            @row([
+                    @key(symbol.numbers,    'tall bottom numbers')
+                    @key('atan'             'function atan')
+                    @key('∡'                'op1 rad2deg')
+                    @key('ϕ'                'constant phi')
+                    @key('='                'tall bottom equals')
+                ])
+            @row([
+                    @key('('                'bracket')
+                    @key('°'                'digit deg2rad')
+                    @key(')'                'bracket')
+                ])
             ]
 
     # 000   000  00000000  000   000  
@@ -115,38 +115,38 @@ class Keys
     hexKeys: ->
         
         @setKeys 'hex' [ #                  ▾ style
-            @row [
-                    @key symbol.clear,      'tall clear'
-                    @key 'a'                'hex letter'
-                    @key 'b'                'hex letter'
-                    @key 'c'                'hex letter'
-                    @key 'd'                'hex letter'
-                ]
-            @row [
-                    @key '7'                'hex digit'
-                    @key '8'                'hex digit'
-                    @key '9'                'hex digit'
-                    @key 'e'                'hex letter'
-                ]
-            @row [
-                    @key symbol.backspace,  'backspace'
-                    @key '4'                'hex digit'
-                    @key '5'                'hex digit'
-                    @key '6'                'hex digit'
-                    @key 'f'                'hex letter'
-                ]
-            @row [
-                    @key symbol.numbers,    'tall bottom numbers'
-                    @key '1'                'hex digit'
-                    @key '2'                'hex digit'
-                    @key '3'                'hex digit'
-                    @key '='                'tall bottom equals'
-                ]
-            @row [
-                    @key symbol.oct,        'op1 oct'
-                    @key '0'                'hex digit'
-                    @key symbol.bin,        'op1 bin'
-                ]
+            @row([
+                    @key(symbol.clear,      'tall clear')
+                    @key('a'                'hex letter')
+                    @key('b'                'hex letter')
+                    @key('c'                'hex letter')
+                    @key('d'                'hex letter')
+                ])
+            @row([
+                    @key('7'                'hex digit')
+                    @key('8'                'hex digit')
+                    @key('9'                'hex digit')
+                    @key('e'                'hex letter')
+                ])
+            @row([
+                    @key(symbol.backspace,  'backspace')
+                    @key('4'                'hex digit')
+                    @key('5'                'hex digit')
+                    @key('6'                'hex digit')
+                    @key('f'                'hex letter')
+                ])
+            @row([
+                    @key(symbol.numbers,    'tall bottom numbers')
+                    @key('1'                'hex digit')
+                    @key('2'                'hex digit')
+                    @key('3'                'hex digit')
+                    @key('='                'tall bottom equals')
+                ])
+            @row([
+                    @key(symbol.oct,        'op1 oct')
+                    @key('0'                'hex digit')
+                    @key(symbol.bin,        'op1 bin')
+                ])
             ]
         
     #  0000000   000   000        000   000  00000000  000   000   0000000  
@@ -195,7 +195,7 @@ class Keys
         
         row = elem 'tr' class:'spacing-row' 
         for i in 0...5
-            row.appendChild elem 'td' class:'spacing-cell' width:'84px'
+            row.appendChild elem('td' class:'spacing-cell' width:'84px')
             
         @table.appendChild row
         
@@ -209,7 +209,7 @@ class Keys
         if txt == '_' 
             elem 'td' class:'key hidden'
         else
-            cfg = class:'key '+ clss, click:@onButton, child: elem class:'key-wrap' text:txt
+            cfg = class:'key '+ clss, click:@onButton, child: elem(class:'key-wrap' text:txt)
             if clss.indexOf('wide') >= 0
                 cfg.colSpan = 2
             if clss.indexOf('tall') >= 0

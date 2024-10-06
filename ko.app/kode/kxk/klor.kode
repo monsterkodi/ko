@@ -63,13 +63,13 @@ exports.FG_NAMES  = []
 for bg in BG_COLORS
     exports[bg] = eval bg
     for i in [1..8]
-        exports[bg+i] = B256 exports[bg] i
+        exports[bg+i] = B256 exports[bg](i)
         exports.BG_NAMES.push bg+i
 
 for fg in FG_COLORS
     exports[fg] = eval fg
     for i in [1..8]
-        exports[fg+i] = F256 exports[fg] i
+        exports[fg+i] = F256 exports[fg](i)
         exports.FG_NAMES.push fg+i
 
 #  0000000   000       0000000   0000000     0000000   000      000  0000000  00000000  
@@ -132,7 +132,7 @@ exports.strip = (s) -> String(s).replace STRIPANSI, ''
             fg = bg.toLowerCase()
             s += exports[fg+i]("#{fg+i} #{bg+i} ")
             for fg in FG_COLORS
-                s += exports[bg+i] exports[fg+(9-i)] ' ' + fg + ' '
+                s += exports[bg+i] exports[fg+(9-i)](' ' + fg + ' ')
             log s + reset
             
     log " "

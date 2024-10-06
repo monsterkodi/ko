@@ -32,13 +32,13 @@ export
         
         rgs = @salterRangesAtPos @cursorPos()
         return if not rgs
-        il     = min (@indentationAtLineIndex r[0] for r in rgs)
+        il     = min (@indentationAtLineIndex(r[0]) for r in rgs)
         indent = lpad il
         @do.start()
         if not @do.line(rgs[0][0]).slice(il).startsWith @lineComment
             # convert to line comments
             for r in rgs
-                @do.change r[0], kstr.splice @do.line(r[0]), il, 0, @lineComment + ' '
+                @do.change r[0], kstr.splice(@do.line(r[0]), il, 0, @lineComment + ' ')
             @do.delete first(rgs)[0]-1
             @do.delete last(rgs)[0]
             @moveCursorsUp()
@@ -46,7 +46,7 @@ export
         else if @multiComment
             # convert to multi comment
             for r in rgs
-                @do.change r[0], kstr.splice @do.line(r[0]), il, @lineComment.length+1
+                @do.change r[0], kstr.splice(@do.line(r[0]), il, @lineComment.length+1)
             @do.insert last( rgs)[0]+1, indent + @multiComment.close
             @do.insert first(rgs)[0],   indent + @multiComment.open
             @moveCursorsDown()
@@ -83,17 +83,17 @@ export
             if uncomment 
                 if cs >= 0 and @do.line(i).substr(0,cs).trim().length == 0
                     # remove comment
-                    @do.change i, kstr.splice @do.line(i), cs, @lineComment.length
+                    @do.change i, kstr.splice(@do.line(i), cs, @lineComment.length)
                     moveInLine i, -@lineComment.length
                     si = indentationInLine @do.line(i)
                     if si % @indentString.length == 1 # remove space after indent
-                        @do.change i, kstr.splice @do.line(i), si-1, 1
+                        @do.change i, kstr.splice(@do.line(i), si-1, 1)
                         moveInLine i, -1
             else # insert comment
                 si = indentationInLine @do.line(i)
                 if @do.line(i).length > si
                     l = (@lineComment + " ").length
-                    @do.change i, kstr.splice @do.line(i), si, 0, @lineComment + " "
+                    @do.change i, kstr.splice(@do.line(i), si, 0, @lineComment + " ")
                     moveInLine i, l
         @do.select newSelections
         @do.setCursors newCursors

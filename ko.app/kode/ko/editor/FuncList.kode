@@ -102,11 +102,11 @@ function FuncList
         
         if file == kore.get 'editor|file'
         
-            items = FuncItems.forIndexerInfo file, info
+            items = FuncItems.forIndexerInfo file info
             @elem.innerHTML = ''
             
             for item in items
-                e = elem class:'funclist-item' parent:@elem, html:Syntax.spanForTextAndSyntax item.text, 'browser'
+                e = elem class:'funclist-item' parent:@elem, html:Syntax.spanForTextAndSyntax(item.text 'browser')
                 e.item = item
 
 export FuncList

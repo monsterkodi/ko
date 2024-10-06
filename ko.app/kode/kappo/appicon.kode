@@ -1,0 +1,71 @@
+###
+ 0000000   00000000   00000000   000   0000000   0000000   000   000  
+000   000  000   000  000   000  000  000       000   000  0000  000  
+000000000  00000000   00000000   000  000       000   000  000 0 000  
+000   000  000        000        000  000       000   000  000  0000  
+000   000  000        000        000   0000000   0000000   000   000  
+###
+
+use ../kxk ▪ slash ffs
+
+class AppIcon
+    
+    @cache: {}
+    
+    @pngPath: opt ->
+        
+        slash.path opt.iconDir, slash.name(opt.appPath) + ".png"
+
+    @get: opt ○->
+        
+        opt.iconDir ?= kakao.bundle.app '.stash/appIcons'
+        
+        ○ ffs.mkdir opt.iconDir
+        
+        pngPath = AppIcon.pngPath opt
+        if AppIcon.cache[pngPath]
+            ⮐ pngPath
+        else
+            if ○ ffs.fileExists pngPath
+                AppIcon.cache[pngPath] = true
+                    ⮐ pngPath
+            else
+                ○ AppIcon.getIcon opt
+         
+    @getIcon: opt ○->
+        
+        appPath = opt.appPath
+        infoPath = slash.path appPath, 'Contents' 'Info.plist'
+        text = ○ ffs.read infoPath
+        idx = text.indexOf 'CFBundleIconFile'
+        if idx > 0
+            text  = text[idx..]
+            open  = text.indexOf '<string>'
+            close = text.indexOf '</string>'
+            text  = text[open+8...close]
+            
+            icnsPath = slash.path slash.dir(infoPath), 'Resources' text
+            icnsPath += ".icns" if not icnsPath.endsWith '.icns'
+            log 'icnsPath' icnsPath
+            if ○ ffs.fileExists icnsPath
+                ○ AppIcon.saveIcon icnsPath, opt
+        else
+            AppIcon.brokenIcon opt
+                
+    @saveIcon: icnsPath opt ○->
+        
+        pngPath = AppIcon.pngPath opt
+        log 'saveIcon' icnsPath, pngPath, opt
+        arg = "-Z #{opt.size} -s format png #{icnsPath} --out #{pngPath}"
+        log "/usr/bin/sips " + arg
+        sips = ○ kakao 'app.sh' '/usr/bin/sips' arg:arg
+        log 'sips' sips
+        pngPath
+        # AppIcon.brokenIcon opt
+     
+    @brokenIcon: (opt) ->
+        
+        brokenPath = slash.join ◆dir, '..' 'img' 'broken.png'
+        opt.cb brokenPath, opt.cbArg
+        
+export AppIcon

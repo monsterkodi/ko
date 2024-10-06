@@ -57,9 +57,6 @@ function FileBrowser extends Browser
 
     dropAction: action sources target ->
 
-        # if slash.isFile target
-            # target = slash.dir target
-
         for source in sources
 
             if action == 'move'
@@ -70,8 +67,8 @@ function FileBrowser extends Browser
         for source in sources
 
             switch action
-                'move' ➜ File.rename source, target
-                'copy' ➜ File.copy source, target
+                'move' ➜ File.rename source target
+                'copy' ➜ File.copy source target
 
     columnForFile: file ->
 
@@ -159,7 +156,7 @@ function FileBrowser extends Browser
 
         if col = @lastDirColumn()
 
-            if row = col.row slash.file file
+            if row = col.row slash.file(file)
                 row.setActive()
 
     refresh: =>
@@ -200,8 +197,8 @@ function FileBrowser extends Browser
     onFileBrowser: action item arg =>
 
         switch action
-            'loadItem'     ➜ @loadItem     item, arg
-            'activateItem' ➜ @activateItem item, arg
+            'loadItem'     ➜ @loadItem     item arg
+            'activateItem' ➜ @activateItem item arg
 
     loadDir: path -> @loadItem type:'dir' path:path
 
@@ -291,12 +288,12 @@ function FileBrowser extends Browser
     imageInfoColumn: col file ->
 
         @columns[col].crumb.hide()
-        @columns[col].table.appendChild Info.image file
+        @columns[col].table.appendChild Info.image(file)
 
     fileInfoColumn: col file ->
         # log 'fileInfoColumn' col, file
         @columns[col].crumb.hide()
-        @columns[col].table.appendChild Info.file file
+        @columns[col].table.appendChild Info.file(file)
 
     #  0000000   0000000   000   000  00000000    0000000  00000000  000  000000000  00000000  00     00
     # 000       000   000  000   000  000   000  000       000       000     000     000       000   000
@@ -371,11 +368,11 @@ function FileBrowser extends Browser
         post.emit 'load' col:col, item:item
 
         if opt.activate
-            if row = @columns[col].row slash.file opt.activate
+            if row = @columns[col].row slash.file(opt.activate)
                 row.activate()
                 post.emit 'load' col:col+1 item:row.item
         else if opt.active
-            @columns[col].row(slash.file opt.active)?.setActive()
+            @columns[col].row(slash.file(opt.active))?.setActive()
 
         @getGitStatus item, col
 

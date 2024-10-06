@@ -219,7 +219,7 @@ class Meta
 
     add: meta ->
 
-        lineMeta = @addLineMeta [meta.line, [meta.start, meta.end], meta]
+        lineMeta = @addLineMeta [meta.line [meta.start meta.end] meta]
 
         if @editor.scroll.top <= meta.line <= @editor.scroll.bot
             @addDiv lineMeta
@@ -238,7 +238,7 @@ class Meta
     addNumberMeta: meta ->
 
         meta.no_x = true
-        lineMeta = @addLineMeta [meta.line, [0, 0], meta]
+        lineMeta = @addLineMeta [meta.line [0 0] meta]
 
         if @editor.scroll.top <= meta.line <= @editor.scroll.bot
             @addDiv lineMeta
@@ -263,15 +263,15 @@ class Meta
 
     append: meta ->
 
-        @addLineMeta [@editor.numLines(), [0, 0], meta]
+        @addLineMeta [@editor.numLines() [0 0] meta]
         
     appendLineMeta: meta ->
         
-        @addLineMeta [@editor.numLines()-1, [meta.start, meta.end], meta]
+        @addLineMeta [@editor.numLines()-1 [meta.start meta.end] meta]
 
     addLineMeta: lineMeta ->
 
-        ⮐ error 'invalid line meta?', lineMeta if not lineMeta?[2]?
+        ⮐ error 'invalid line meta?' lineMeta if not lineMeta?[2]?
 
         @lineMetas[lineMeta[0]] ?= []
         @lineMetas[lineMeta[0]].push lineMeta
@@ -280,7 +280,7 @@ class Meta
 
     moveLineMeta: lineMeta d ->
 
-        ⮐ error 'invalid move?' lineMeta, d if not lineMeta? or d == 0
+        ⮐ error 'invalid move?' lineMeta d if not lineMeta? or d == 0
 
         pull @lineMetas[lineMeta[0]], lineMeta
         delete @lineMetas[lineMeta[0]] if empty @lineMetas[lineMeta[0]]
@@ -323,24 +323,24 @@ class Meta
     onLinesShifted: top bot num =>
 
         if num > 0
-            for meta in rangesFromTopToBotInRanges top-num, top-1, @metas ➜ @delDiv meta
-            for meta in rangesFromTopToBotInRanges bot-num+1, bot, @metas ➜ @addDiv meta
+            for meta in rangesFromTopToBotInRanges top-num top-1 @metas ➜ @delDiv meta
+            for meta in rangesFromTopToBotInRanges bot-num+1 bot @metas ➜ @addDiv meta
         else
-            for meta in rangesFromTopToBotInRanges bot+1, bot-num, @metas ➜ @delDiv meta
-            for meta in rangesFromTopToBotInRanges top, top-num-1, @metas ➜ @addDiv meta
+            for meta in rangesFromTopToBotInRanges bot+1 bot-num @metas ➜ @delDiv meta
+            for meta in rangesFromTopToBotInRanges top top-num-1 @metas ➜ @addDiv meta
 
         @updatePositionsBelowLineIndex top
 
     updatePositionsBelowLineIndex: li ->
 
         size = @editor.size
-        for meta in rangesFromTopToBotInRanges li, @editor.scroll.bot, @metas
+        for meta in rangesFromTopToBotInRanges li @editor.scroll.bot @metas
             @updatePos meta
 
     onLineInserted: li =>
 
-        for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
-            @moveLineMeta meta, 1
+        for meta in rangesFromTopToBotInRanges li @editor.numLines() @metas
+            @moveLineMeta meta 1
 
         @updatePositionsBelowLineIndex li
 
@@ -355,8 +355,8 @@ class Meta
         while meta = last @metasAtLineIndex li
             @delMeta meta
 
-        for meta in rangesFromTopToBotInRanges li, @editor.numLines(), @metas
-            @moveLineMeta meta, -1
+        for meta in rangesFromTopToBotInRanges li @editor.numLines() @metas
+            @moveLineMeta meta -1
 
         @updatePositionsBelowLineIndex li
 
@@ -383,8 +383,8 @@ class Meta
     delMeta: meta ->
         
         ⮐ error 'del no meta?' if not meta?
-        pull @lineMetas[meta[0]], meta
-        pull @metas, meta
+        pull @lineMetas[meta[0]] meta
+        pull @metas meta
         @delDiv meta
 
     delClass: clss ->

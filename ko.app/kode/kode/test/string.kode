@@ -198,6 +198,6 @@ use ./utils ▪ kc ke
         kc '"#{\'a\'}"'                                 ▸   "`${'a'}`"
         kc '"""#{"a"}"""'                               ▸   '`${"a"}`'
         kc '"nullcheck in #{stripol ? 123}"'            ▸   "`nullcheck in ${(stripol != null ? stripol : 123)}`"
-        kc '"""{ok#} #{"well" + "1+\'2\' #{\'omg\'}" + kinda fukked}"""'  ▸  "`{ok#} ${\"well\" + `1+'2' ${'omg'}` + kinda(fukked)}`"
+        kc '"""{ok#} #{"well" + "1+\'2\' #{\'omg\'}" + kinda(fukked)}"""'  ▸  "`{ok#} ${\"well\" + `1+'2' ${'omg'}` + kinda(fukked)}`"
         
         

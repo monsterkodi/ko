@@ -175,7 +175,7 @@ export
                     mainLine = newPos[1] if isSamePos oldMain, c
                     cursorSet c, newPos
         else
-            cursorSet newCursors[0], func newCursors[0]
+            cursorSet newCursors[0], func(newCursors[0])
             mainLine = newCursors[0][1]
             
         main = switch opt.main
@@ -214,7 +214,7 @@ export
             if @mainCursor()[0] == 0 and not @isSelectedLineAtIndex @mainCursor()[1]
                 @do.start()
                 newSelections = @do.selections()
-                newSelections.push @rangeForLineAtIndex @mainCursor()[1]
+                newSelections.push @rangeForLineAtIndex(@mainCursor()[1])
                 @do.select newSelections
                 @do.end()
                 return

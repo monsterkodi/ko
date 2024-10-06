@@ -17,7 +17,7 @@ swtch =
         javascript:   turd:'```' to:'js'     end:'```' add:'code triple'
         
 for ext in exts
-    swtch.md[ext] = turd:'```' to:ext, end:'```' add:'code triple'
+    swtch.md[ext] = turd:'```' to:ext end:'```' add:'code triple'
 
 SPACE   = /\s/
 HEADER  = /^0+$/
@@ -53,7 +53,7 @@ codeTypes = ['interpolation' 'code triple']
         number: n+1
 ###
 
-chunked = (lines, ext) ->
+chunked = lines ext ->
 
     ext = ext[1..] if ext[0] == '.'
     ext = 'txt' if ext not in exts
@@ -96,7 +96,7 @@ chunked = (lines, ext) ->
                     if m.index > 0
                         wl = m.index-(c-sc)
                         w = s[c-sc...m.index]
-                        line.chunks.push start:c, length:wl, match:w, clss:'text'
+                        line.chunks.push start:c length:wl match:w clss:'text'
                         c += wl
 
                     turd = punct = m[0]
@@ -121,7 +121,7 @@ chunked = (lines, ext) ->
                             if pc in [','';''{''}''('')']
                                 clss += ' minor'
                         pi += advance
-                        line.chunks.push start:c, length:advance, match:pc, turd:turd, clss:clss
+                        line.chunks.push start:c length:advance match:pc turd:turd clss:clss
                         c += advance
                         turd = turd[advance..]
 
@@ -134,13 +134,13 @@ chunked = (lines, ext) ->
                             clss = 'punct'
                         if punct[pi..] in [','';''{''}''('')']
                             clss += ' minor'
-                        line.chunks.push start:c, length:advance, match:punct[pi..], clss:clss
+                        line.chunks.push start:c length:advance match:punct[pi..] clss:clss
                         c += advance
 
                 if c < sc+l        # check for remaining non-punct
                     rl = sc+l-c    # length of remainder
                     w = s[l-rl..]  # text   of remainder
-                    line.chunks.push start:c, length:rl, match:w, clss:'text'
+                    line.chunks.push start:c length:rl match:w clss:'text'
                     c += rl
 
         if line.chunks.length
@@ -175,10 +175,10 @@ chunkIndex = 0
 # 000       000   000  000 0 000  000 0 000  000       000  0000     000
 #  0000000   0000000   000   000  000   000  00000000  000   000     000
 
-fillComment = (n) ->
+fillComment = n ->
 
-    for i in [0...n]
-        addValue i, 'comment'
+    for i in 0...n
+        addValue i 'comment'
     if chunkIndex < line.chunks.length-n
         restChunks = line.chunks[chunkIndex+n..]
         mightBeHeader = true
@@ -220,13 +220,13 @@ blockComment = ->
 
     type = 'comment triple'
 
-    ⮐ if topType and topType not in ['interpolation', type]
+    ⮐ if topType and topType not in ['interpolation' type]
 
     if chunk.turd[..2] == '###'
         if topType == type
             popStack()
         else
-            pushStack type:type, strong:true
+            pushStack type:type strong:true
         ⮐ addValues 3 type
 
 starComment = ->
@@ -238,7 +238,7 @@ starComment = ->
     ⮐ if topType and topType != type
 
     if chunk.turd[..1] == '/*' and not topType
-        pushStack type:type, strong:true
+        pushStack type:type strong:true
         ⮐ addValues 2 type
     if chunk.turd[..1] == '*/' and topType == type
         popStack()
@@ -404,12 +404,13 @@ kodePunct = ->
             if chunk.match == '(' and prevEnd == chunk.start
                 ⮐ thisCall()
             else if prevEnd < chunk.start # spaced
-                if chunk.match in '@[({"\''
-                    ⮐ thisCall()
-                else if chunk.match in '+-/'
-                    next = getChunk 1
-                    if not next or next.match != '=' and next.start == chunk.start+1
+                if chunkIndex == 1 or getChunk(-2)?.match in ['⮐' '=' 'return']
+                    if chunk.match in '@[({"\''
                         ⮐ thisCall()
+                    else if chunk.match in '+-/'
+                        next = getChunk 1
+                        if not next or next.match != '=' and next.start == chunk.start+1
+                            ⮐ thisCall()
 
 # 000   000   0000000   0000000    00000000  000   000   0000000   00000000   0000000    
 # 000  000   000   000  000   000  000       000 0 000  000   000  000   000  000   000  
@@ -471,7 +472,8 @@ kodeWord = ->
             ⮐ 1
                                     
         if (prev.clss.startsWith('text') or prev.clss == 'property') and prev.start+prev.length < chunk.start # spaced
-            ⮐ thisCall()
+            if chunkIndex == 1 or getChunk(-2)?.match in ['return' '=' '⮐']
+                ⮐ thisCall()
             
 #  0000000   0000000   00000000  00000000  00000000  00000000
 # 000       000   000  000       000       000       000
@@ -679,7 +681,7 @@ urlPunct = ->
 
         if chunk.match == '/'
 
-            for i in [chunkIndex..0]
+            for i in chunkIndex..0
                 break if line.chunks[i].start+line.chunks[i].length < line.chunks[i+1]?.start
                 break if line.chunks[i].clss.endsWith 'dir'
                 break if line.chunks[i].clss.startsWith 'url'
@@ -747,7 +749,7 @@ jsonPunct = ->
     if chunk.match == ':'
         if prev = getChunk -1
             if prev.match == '"'
-                for i in [Math.max(0,chunkIndex-2)..0]
+                for i in Math.max(0 chunkIndex-2)..0
                     if line.chunks[i]?.clss == 'punct string double'
                         line.chunks[i].clss = 'punct dictionary'
                         break
@@ -1099,7 +1101,7 @@ interpolation = ->
     if topType?.startsWith 'string double'
 
         if chunk.turd?.startsWith "\#{"
-            pushStack type:'interpolation', weak:true
+            pushStack type:'interpolation' weak:true
             setValue 0 'punct string interpolation start'
             setValue 1 'punct string interpolation start'
             ⮐ 2
@@ -1121,10 +1123,9 @@ keyword = ->
 
     ⮐ if notCode
 
-    if not lang[ext]
-        return
+    ⮐ if not lang[ext]
 
-    if lang[ext].hasOwnProperty(chunk.match)
+    if lang[ext].hasOwnProperty(chunk.match) and getChunk(-1)?.match not in ['.']
         chunk.clss = lang[ext][chunk.match]
         ⮐ # give coffeeFunc a chance, number bails for us
 
@@ -1176,7 +1177,7 @@ mmString = ->
     
     if chunk.turd[..1] == '@"'
 
-        log chunk, topType
+        log chunk topType
             
         pushStack strong:true merge:true type:type
 
@@ -1246,7 +1247,7 @@ popExt = ->
     topType = stackTop?.type
     notCode = stackTop and topType not in codeTypes
 
-pushStack = (o) ->
+pushStack = o ->
     stack.push o
     stackTop = o
     topType = o.type
@@ -1258,64 +1259,64 @@ popStack = ->
     topType = stackTop?.type
     notCode = stackTop and topType not in codeTypes
 
-getChunk = (d) -> line.chunks[chunkIndex+d]
-setValue = (d, value) -> 
+getChunk = d -> line.chunks[chunkIndex+d]
+setValue = d value -> 
     if 0 <= chunkIndex+d < line.chunks.length 
         line.chunks[chunkIndex+d].clss = value
-getValue = (d) -> getChunk(d)?.clss ? ''
-getmatch = (d) -> getChunk(d)?.match ? ''
-addValue = (d, value) ->
+getValue = d -> getChunk(d)?.clss ? ''
+getmatch = d -> getChunk(d)?.match ? ''
+addValue = d value ->
     if 0 <= chunkIndex+d < line.chunks.length
         line.chunks[chunkIndex+d].clss += ' ' + value
     1
 
-addValues = (n,value) ->
-    for i in [0...n]
-        addValue i, value
+addValues = n value ->
+    for i in 0...n
+        addValue i value
     n
 
 handlers =
     coffee:
-            punct:[ blockComment, hashComment, tripleRegexp, coffeePunct, tripleString, simpleString, interpolation, dashArrow, regexp, dict ]
-            word: [ keyword, coffeeWord, number, property ]
+            punct:[ blockComment hashComment tripleRegexp coffeePunct tripleString simpleString interpolation dashArrow regexp dict ]
+            word: [ keyword coffeeWord number property ]
     kode:
-            punct:[ blockComment, hashComment, tripleRegexp, kodePunct, tripleString, simpleString, interpolation, funcArgs, dashArrow, regexp, dict ]
-            word: [ keyword, kodeWord, number, property ]
-    noon:   punct:[ noonComment,  noonPunct, urlPunct                                          ], word:[ noonWord, urlWord, number          ]
-    js:     punct:[ starComment,  slashComment, jsPunct, simpleString, dashArrow, regexp, dict ], word:[ keyword, jsWord, number, property  ]
-    ts:     punct:[ starComment,  slashComment, jsPunct, simpleString, dashArrow, regexp, dict ], word:[ keyword, jsWord, number, property  ]
-    iss:    punct:[ starComment,  slashComment, simpleString                                   ], word:[ keyword, number                    ]
-    ini:    punct:[ starComment,  slashComment, simpleString, cppMacro, cppPointer             ], word:[          number                    ]
-    cpp:    punct:[ starComment,  slashComment, simpleString, cppMacro, cppPointer             ], word:[ keyword, number, float, cppWord    ]
-    mm:     punct:[ starComment,  slashComment, simpleString, cppPointer                       ], word:[ keyword, number, float, cppWord    ]
-    frag:   punct:[ starComment,  slashComment, simpleString, cppMacro, cppPointer             ], word:[ keyword, number, float, cppWord    ]
-    vert:   punct:[ starComment,  slashComment, simpleString, cppMacro, cppPointer             ], word:[ keyword, number, float, cppWord    ]
-    hpp:    punct:[ starComment,  slashComment, simpleString, cppMacro, cppPointer             ], word:[ keyword, number, float, cppWord    ]
-    c:      punct:[ starComment,  slashComment, simpleString, cppMacro, cppPointer             ], word:[ keyword, number, float, cppWord    ]
-    h:      punct:[ starComment,  slashComment, simpleString, cppMacro, cppPointer             ], word:[ keyword, number, float, cppWord    ]
-    cs:     punct:[ starComment,  slashComment, simpleString                                   ], word:[ keyword, number                    ]
-    pug:    punct:[ starComment,  slashComment, simpleString                                   ], word:[ keyword, cssWord, number           ]
-    styl:   punct:[ starComment,  slashComment, simpleString                                   ], word:[ keyword, cssWord, number           ]
-    css:    punct:[ starComment,  slashComment, simpleString                                   ], word:[ keyword, cssWord, number           ]
-    sass:   punct:[ starComment,  slashComment, simpleString                                   ], word:[ keyword, cssWord, number           ]
-    scss:   punct:[ starComment,  slashComment, simpleString                                   ], word:[ keyword, cssWord, number           ]
-    swift:  punct:[ starComment,  slashComment, simpleString, dict                             ], word:[ keyword, number, property          ]
-    svg:    punct:[               simpleString, xmlPunct                                       ], word:[ keyword, number                    ]
-    html:   punct:[               simpleString, xmlPunct                                       ], word:[ keyword, number                    ]
-    htm:    punct:[               simpleString, xmlPunct                                       ], word:[ keyword, number                    ]
-    xml:    punct:[               simpleString, xmlPunct                                       ], word:[ number                             ]
-    sh:     punct:[ hashComment,  simpleString, urlPunct, shPunct                              ], word:[ keyword, urlWord, number           ]
-    json:   punct:[               simpleString, jsonPunct, urlPunct                            ], word:[ keyword, jsonWord, urlWord, number ]
-    yml:    punct:[ hashComment,  simpleString, urlPunct, shPunct, dict                        ], word:[ keyword, jsonWord, urlWord, number, property ]
-    yaml:   punct:[ hashComment,  simpleString, urlPunct, shPunct, dict                        ], word:[ keyword, jsonWord, urlWord, number, property ]
-    log:    punct:[               simpleString, urlPunct, dict                                 ], word:[ urlWord, number                    ]
-    md:     punct:[                    mdPunct, urlPunct, xmlPunct                             ], word:[ urlWord, number                    ]
-    fish:   punct:[                hashComment, simpleString                                   ], word:[ keyword, number                    ]
-    py:     punct:[                hashComment, simpleString                                   ], word:[ keyword, number                    ]
+            punct:[ blockComment hashComment tripleRegexp kodePunct tripleString simpleString interpolation funcArgs dashArrow regexp dict ]
+            word: [ keyword kodeWord number property ]
+    noon:   punct:[ noonComment  noonPunct urlPunct                                         ] word:[ noonWord urlWord number        ]
+    js:     punct:[ starComment  slashComment jsPunct simpleString dashArrow regexp dict    ] word:[ keyword jsWord number property ]
+    ts:     punct:[ starComment  slashComment jsPunct simpleString dashArrow regexp dict    ] word:[ keyword jsWord number property ]
+    iss:    punct:[ starComment  slashComment simpleString                                  ] word:[ keyword number                 ]
+    ini:    punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[         number                 ]
+    cpp:    punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
+    mm:     punct:[ starComment  slashComment simpleString cppPointer                       ] word:[ keyword number float cppWord   ]
+    frag:   punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
+    vert:   punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
+    hpp:    punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
+    c:      punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
+    h:      punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
+    cs:     punct:[ starComment  slashComment simpleString                                  ] word:[ keyword number                 ]
+    pug:    punct:[ starComment  slashComment simpleString                                  ] word:[ keyword cssWord number         ]
+    styl:   punct:[ starComment  slashComment simpleString                                  ] word:[ keyword cssWord number         ]
+    css:    punct:[ starComment  slashComment simpleString                                  ] word:[ keyword cssWord number         ]
+    sass:   punct:[ starComment  slashComment simpleString                                  ] word:[ keyword cssWord number         ]
+    scss:   punct:[ starComment  slashComment simpleString                                  ] word:[ keyword cssWord number         ]
+    swift:  punct:[ starComment  slashComment simpleString dict                             ] word:[ keyword number property        ]
+    svg:    punct:[              simpleString xmlPunct                                      ] word:[ keyword number                 ]
+    html:   punct:[              simpleString xmlPunct                                      ] word:[ keyword number                 ]
+    htm:    punct:[              simpleString xmlPunct                                      ] word:[ keyword number                 ]
+    xml:    punct:[              simpleString xmlPunct                                      ] word:[ number                         ]
+    sh:     punct:[ hashComment  simpleString urlPunct shPunct                              ] word:[ keyword urlWord number         ]
+    json:   punct:[              simpleString jsonPunct urlPunct                            ] word:[ keyword jsonWord urlWord number ]
+    yml:    punct:[ hashComment  simpleString urlPunct shPunct dict                         ] word:[ keyword jsonWord urlWord number property ]
+    yaml:   punct:[ hashComment  simpleString urlPunct shPunct dict                         ] word:[ keyword jsonWord urlWord number property ]
+    log:    punct:[              simpleString urlPunct dict                                 ] word:[ urlWord number                 ]
+    md:     punct:[                   mdPunct urlPunct xmlPunct                             ] word:[ urlWord number                 ]
+    fish:   punct:[              hashComment simpleString                                   ] word:[ keyword number                 ]
+    py:     punct:[              hashComment simpleString                                   ] word:[ keyword number                 ]
 
 for ext in exts
     if not handlers[ext]?
-        handlers[ext] = punct:[ simpleString ], word:[ number ]
+        handlers[ext] = punct:[ simpleString ] word:[ number ]
 
 for ext,obj of handlers
     handlers[ext].punct.push stacked
@@ -1335,7 +1336,7 @@ for ext,obj of handlers
     - 'value' changed in chunks that match language patterns
 ###
 
-blocked = (lines) ->
+blocked = lines ->
 
     extStack   = []
     stack      = []
@@ -1405,7 +1406,7 @@ blocked = (lines) ->
 
                 if extTop
                     if extTop.switch.end? and extTop.switch.end == chunk.turd
-                        addValues chunk.turd.length, extTop.switch.add if extTop.switch.add
+                        addValues chunk.turd.length extTop.switch.add if extTop.switch.add
                         popExt() # end of extension block reached that is terminated by turd
 
                 for hnd in handl.punct
@@ -1434,7 +1435,7 @@ blocked = (lines) ->
                 chunkIndex++
     lines
     
-replaceTabs = (s) ->
+replaceTabs = s ->
     
     ⮐ s if not s is str
     
@@ -1457,7 +1458,7 @@ ligatures = (lines) -> # => == != === ... .. // << <= >= >>
         
         if line.ext not in ['kode'] ➜ continue
     
-        for chunk,index in line.chunks
+        for chunk, index in line.chunks
             
             if 
                 chunk.turd?.startsWith '...'
@@ -1489,7 +1490,7 @@ ligatures = (lines) -> # => == != === ... .. // << <= >= >>
 # 000        000   000  000   000       000  000       
 # 000        000   000  000   000  0000000   00000000  
 
-parse = (lines, ext='kode') -> ligatures blocked chunked lines, ext
+parse = lines ext='kode' -> ligatures(blocked(chunked(lines ext)))
 
 # 000   000   0000000   000       0000000   00000000   000  0000000  00000000  
 # 000  000   000   000  000      000   000  000   000  000     000   000       
@@ -1497,7 +1498,7 @@ parse = (lines, ext='kode') -> ligatures blocked chunked lines, ext
 # 000  000   000   000  000      000   000  000   000  000   000     000       
 # 000   000   0000000   0000000   0000000   000   000  000  0000000  00000000  
 
-kolorize = (chunk) -> 
+kolorize = chunk -> 
     
     if cn = kolor.map[chunk.clss]
         if cn is Array
@@ -1514,24 +1515,24 @@ kolorize = (chunk) ->
         w3 chunk.match
     else if chunk.clss.startsWith 'punct'
         if LI.test chunk.clss
-            kolorize match:chunk.match, clss:chunk.clss.replace LI, ' '
+            kolorize match:chunk.match, clss:chunk.clss.replace(LI ' ')
         else
             w2 chunk.match
     else
         if LI.test chunk.clss
-            kolorize match:chunk.match, clss:chunk.clss.replace LI, ' '
+            kolorize match:chunk.match, clss:chunk.clss.replace(LI ' ')
         else
             chunk.match
 
-kolorizeChunks = (chunks=[], number) ->
+kolorizeChunks = chunks=[] number ->
     
     clrzd = ''
     if number
         numstr = String number
-        clrzd += w2(numstr) + rpad 4-numstr.length
+        clrzd += w2(numstr) + rpad(4-numstr.length)
         
     c = 0
-    for i in [0...chunks.length]
+    for i in 0...chunks.length
         while c < chunks[i].start 
             clrzd += ' '
             c++
@@ -1545,21 +1546,21 @@ kolorizeChunks = (chunks=[], number) ->
 #      000     000     000  0000     000     000   000   000 000   
 # 0000000      000     000   000     000     000   000  000   000  
 
-syntax = (arg) ->
+syntax = arg ->
     
     arg ?= {}
     text = arg.text
     ext  = arg.ext ? 'coffee'
     numbers = arg.numers ? false
     lines = text.split NEWLINE
-    rngs  = parse(lines, ext).map (l) -> l.chunks
+    rngs  = parse(lines ext).map (l) -> l.chunks
     
     clines = []
-    for index in [0...lines.length]
+    for index in 0...lines.length
         line = lines[index]
         if ext == 'js' and line.startsWith '//# source'
             continue
-        clines.push kolorizeChunks rngs[index], numbers and index+1
+        clines.push kolorizeChunks(rngs[index] numbers and index+1)
     clines.join '\n'
 
 # 00000000  000   000  00000000    0000000   00000000   000000000   0000000  
@@ -1574,8 +1575,8 @@ export
     exts:       exts
     parse:      parse
     chunked:    chunked
-    ranges:     line  ext='kode' -> parse([line], ext)[0].chunks
-    dissect:    lines ext='kode' -> parse(lines, ext).map (l) -> l.chunks
+    ranges:     line  ext='kode' -> parse([line] ext)[0].chunks
+    dissect:    lines ext='kode' -> parse(lines ext).map (l) -> l.chunks
     kolorize:   kolorize
     kolorizeChunks: kolorizeChunks
     syntax:     syntax

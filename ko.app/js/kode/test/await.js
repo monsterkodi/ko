@@ -14,7 +14,7 @@ toExport["await"] = function ()
     compare(kc('○ async 1'),'await async(1)')
     compare(kc('    ○ async 2'),'await async(2)')
     compare(kc('    ○async 3'),'await async(3)')
-    compare(kc('list = list.concat ○ fs.list dir'),`list = list.concat(await fs.list(dir))`)
+    compare(kc('list = list.concat ○ fs.list(dir)'),`list = list.concat(await fs.list(dir))`)
     compare(kc("if ○ fs.remove 'blah' ➜ 2"),`if (await fs.remove('blah'))
 {
     2

@@ -118,7 +118,7 @@ pepe.depepe = pep cb ->
             r += p
         else
             r += p.start
-            r += cb pepe.depepe p.content, cb
+            r += cb pepe.depepe(p.content, cb)
             r += p.end
     r
     

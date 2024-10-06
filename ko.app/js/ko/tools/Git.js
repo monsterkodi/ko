@@ -76,7 +76,7 @@ Git = (function ()
         while (line = lines.shift())
         {
             rel = line.slice(3)
-            file = slash.path(gitDir,line.slice(3))
+            file = slash.path(gitDir,rel)
             while ((rel = slash.dir(rel)) !== '')
             {
                 dirSet.add(rel)

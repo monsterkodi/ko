@@ -35,12 +35,12 @@ class Diffbar
         return 'unhandled' if event.metaKey
 
         if event.ctrlKey
-            @editor.singleCursorAtPos rangeStartPos meta
+            @editor.singleCursorAtPos rangeStartPos(meta)
             @editor.toggleGitChangesInLines [meta[0]]
         else
             blockIndices = @lineIndicesForBlockAtLine meta[0]
             @editor.do.start()
-            @editor.do.setCursors blockIndices.map (i) -> [0,i]
+            @editor.do.setCursors blockIndices.map((i) -> [0,i])
             @editor.do.end()
             @editor.toggleGitChangesInLines blockIndices
         @
@@ -153,15 +153,15 @@ class Diffbar
 
         if change.mod?
             for c in change.mod
-                return false if not linediff.isBoring c.old, c.new
+                ⮐ false if not linediff.isBoring c.old, c.new
 
         if change.add?
             for c in change.add
-                return false if not empty c.new.trim()
+                ⮐ false if not empty c.new.trim()
 
         if change.del?
             for c in change.del
-                return false if not empty c.old.trim()
+                ⮐ false if not empty c.old.trim()
 
         true
 
@@ -174,7 +174,7 @@ class Diffbar
     onEditorFile: => 
         
         if @editor.currentFile
-            # log 'Diffbar Git.status' @editor.currentFile
+
             Git.status @editor.currentFile
     
     #  0000000   000  000000000   0000000  000000000   0000000   000000000  000   000   0000000  
@@ -188,14 +188,12 @@ class Diffbar
         if status.files[@editor.currentFile] == 'changed'
             Git.diff(@editor.currentFile).then (changes) =>
                 @changes = changes
-                # profile.start 'Diffbar.onGitStatus updateMetas'
+
                 @updateMetas()
-                # profile.end 'Diffbar.onGitStatus updateMetas'
                 @updateScroll()
         else
             @changes = null
             @updateScroll()
-            # @editor.meta.clear()
             @clear()
                 
     #  0000000   0000000  00000000    0000000   000      000
@@ -214,7 +212,7 @@ class Diffbar
         @elem.width  = w
         @elem.height = h
 
-        alpha = (o) -> 0.5 + Math.max 0, (16-o*lh)*(0.5/16)
+        alpha = o -> 0.5 + Math.max(0 (16-o*lh)*(0.5/16))
 
         if @changes
 
@@ -229,18 +227,18 @@ class Diffbar
                 ctx.fillStyle = switch meta[2].git
 
                     'mod'
-                        if boring then "rgba(50, 50,50,#{alpha length})"
-                        else           "rgba( 0,255, 0,#{alpha length})"
+                        if boring ➜ "rgba(50, 50,50,#{alpha length})"
+                        else        "rgba( 0,255, 0,#{alpha length})"
 
                     'del'
-                        if boring then "rgba(50,50,50,#{alpha length})"
-                        else           "rgba(255,0,0,#{alpha length})"
+                        if boring ➜ "rgba(50,50,50,#{alpha length})"
+                        else        "rgba(255,0,0,#{alpha length})"
 
                     'add'
-                        if boring then "rgba(50,50,50,#{alpha length})"
-                        else           "rgba(160,160,255,#{alpha length})"
+                        if boring ➜ "rgba(50,50,50,#{alpha length})"
+                        else        "rgba(160,160,255,#{alpha length})"
 
-                ctx.fillRect 0, li * lh, w, lh
+                ctx.fillRect 0 li * lh w lh
 
     #  0000000  000      00000000   0000000   00000000
     # 000       000      000       000   000  000   000

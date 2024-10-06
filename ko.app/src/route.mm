@@ -29,7 +29,8 @@
     NSString* route = [msg.body valueForKey:@"route"];
     NSArray*  args  = [msg.body valueForKey:@"args"];
 
-         if ([route isEqualToString:@"log"    ]) { NSLog(@"%ld %@ %@", (long)win.windowNumber, msg.name, msg.body); }
+         // if ([route isEqualToString:@"log"    ]) { NSLog(@"%ld %@ %@", (long)win.windowNumber, msg.name, msg.body); }
+         if ([route isEqualToString:@"log"    ]) { NSLog(@"%@", [args componentsJoinedByString:@" "]); }
     else if ([route isEqualToString:@"now"    ]) { reply = [NSNumber numberWithDouble:CFAbsoluteTimeGetCurrent()]; }
     else if ([route isEqualToString:@"open"   ]) { reply = [Route open:[args objectAtIndex:0]]; }
     else if ([route isEqualToString:@"finder" ]) { reply = [Route finder:[args objectAtIndex:0]]; }
@@ -129,17 +130,21 @@
 
     if ([req isEqualToString:@"focusNext"     ]) { return [win focusNext]; }
     if ([req isEqualToString:@"focusPrev"     ]) { return [win focusPrev]; }
+    if ([req isEqualToString:@"focus"         ]) { return [win focus];     }
+    if ([req isEqualToString:@"frame"         ]) { return [win frameInfo]; }
     if ([req isEqualToString:@"frameInfo"     ]) { return [win frameInfo]; }
     if ([req isEqualToString:@"new"           ]) { return [NSNumber numberWithLong:[win new:arg0 script:arg1].windowNumber]; }
     if ([req isEqualToString:@"snapshot"      ]) { return [win snapshot:arg0]; }
     if ([req isEqualToString:@"close"         ]) { [win performClose:nil]; return nil; }
     if ([req isEqualToString:@"reload"        ]) { [win reload];           return nil; }
-    if ([req isEqualToString:@"raise"         ]) { [[NSApplication sharedApplication] activate]; [win orderFrontRegardless]; [win makeKeyAndOrderFront:nil]; NSLog(@"raise"); return nil; }
+    if ([req isEqualToString:@"raise"         ]) { [[NSApplication sharedApplication] activate]; [win orderFrontRegardless]; [win makeKeyAndOrderFront:nil]; return nil; }
     if ([req isEqualToString:@"maximize"      ]) { [win zoom:nil];         return nil; }
     if ([req isEqualToString:@"minimize"      ]) { [win miniaturize:nil];  return nil; }
     if ([req isEqualToString:@"center"        ]) { [win center];           return nil; }
+    if ([req isEqualToString:@"moveBy"        ]) { [win moveBy:arg0];      return nil; }
     if ([req isEqualToString:@"setTopLeft"    ]) { [win setTopLeft:arg0];  return nil; }
     if ([req isEqualToString:@"setFrame"      ]) { [win setFrame:arg0 immediate:arg1];    return nil; }
+    if ([req isEqualToString:@"setAspectRatio"]) { [win setAspectRatio:NSMakeSize([arg0 longValue],[arg1 longValue])];  return nil; }
     if ([req isEqualToString:@"setSize"       ]) { [win setWidth:[arg0 longValue] height:[arg1 longValue]];  return nil; }
     if ([req isEqualToString:@"setMinSize"    ]) { [win setContentMinSize:CGSizeMake([arg0 longValue], [arg1 longValue])]; return nil; }
     if ([req isEqualToString:@"setMaxSize"    ]) { [win setContentMaxSize:CGSizeMake([arg0 longValue], [arg1 longValue])]; return nil; }
@@ -155,18 +160,31 @@
         {
             for (id arg in eventArgs)
             {
-                payload = [payload stringByAppendingString:[NSString stringWithFormat:@", \"%@\"", arg]];
+                if ([arg isKindOfClass:[NSString class]])
+                {
+                    payload = [payload stringByAppendingString:[NSString stringWithFormat:@", \"%@\"", arg]];
+                }
+                else if ([arg isKindOfClass:[NSNumber class]])
+                {
+                    payload = [payload stringByAppendingString:[NSString stringWithFormat:@", %@", arg]];
+                }
+                else
+                {
+                    //NSLog(@"serialize to json %@ %@", arg, args);                    
+                    NSData*  jsonData = [NSJSONSerialization dataWithJSONObject:arg options:NSJSONWritingPrettyPrinted error:nil];    
+                    NSString* jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                    payload = [payload stringByAppendingString:[NSString stringWithFormat:@", %@", jsonStr]];
+                }
             }
         }
-        id script = [NSString stringWithFormat:@"post.emit(%@);", payload];
-        
-        // NSLog(@"post from win %d %@", (long)[NSNumber numberWithLong:win.windowNumber], script);
+                
+        id script = [NSString stringWithFormat:@"kakao.post.emit(%@);", payload];
         
         for (Win* w in [App wins])
         {
             if (w == win) continue;
                         
-            NSLog(@"run script in win %ld %@", (long)[NSNumber numberWithLong:w.windowNumber], script);
+            // NSLog(@"run script in win %lu\n%@", (long)w.windowNumber, script);
             [w.view evaluateJavaScript:script completionHandler:nil];
         }
         
@@ -329,6 +347,19 @@
     // NSLog(@"▸ %@", script);
 
     [win.view evaluateJavaScript:script completionHandler:nil];
+}
+
++ (void) send:(NSString*)name arg:(id)arg win:(Win*)win
+{
+    [Route send:name args:[NSArray arrayWithObject:arg] win:win];
+}
+
++ (void) send:(NSString*)name args:(NSArray*)args win:(Win*)win
+{
+    NSMutableDictionary* msg = [NSMutableDictionary dictionary];
+    [msg setObject:name forKey:@"name"];
+    [msg setObject:args forKey:@"args"];
+    [Route send:msg win:win];
 }
 
 @end

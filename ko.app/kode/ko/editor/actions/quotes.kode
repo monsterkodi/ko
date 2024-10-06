@@ -33,7 +33,7 @@ export
         tmpCursors = @do.cursors() 
         for cc in tmpCursors
             cline = @do.line cc[1]
-            @do.change cc[1], cline.splice cc[0], 0, quote
+            @do.change cc[1], cline.splice(cc[0], 0, quote)
             for nc in positionsAtLineIndexInPositions cc[1], tmpCursors
                 if nc[0] >= cc[0]
                     nc[0] += 1

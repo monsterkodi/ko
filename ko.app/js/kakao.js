@@ -19,7 +19,7 @@ Kakao = (function ()
     {
         while (!window.bundlePath)
         {
-            await sleep(100)
+            await sleep(50)
         }
         bundle.path = window.bundlePath
         if (_k_.isFunc(window.kakao.preInit))
@@ -53,6 +53,7 @@ Kakao = (function ()
 
     Kakao["bundle"] = bundle
     Kakao["ffs"] = ffs
+    Kakao["post"] = post
     return Kakao
 })()
 

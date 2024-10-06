@@ -235,7 +235,7 @@
         }
         else
         {
-            NSLog(@"fs.remove %@", error);
+            // NSLog(@"fs.remove %@", error);
             return nil;
         }
     }

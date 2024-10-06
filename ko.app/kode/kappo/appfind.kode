@@ -1,0 +1,112 @@
+###
+ 0000000   00000000   00000000   00000000  000  000   000  0000000    
+000   000  000   000  000   000  000       000  0000  000  000   000  
+000000000  00000000   00000000   000000    000  000 0 000  000   000  
+000   000  000        000        000       000  000  0000  000   000  
+000   000  000        000        000       000  000   000  0000000    
+###
+
+use ../kxk ▪ post slash walkdir
+                    
+apps    = {}
+allKeys = []
+scripts =
+    sleep:
+        exec:   "pmset sleepnow"
+        img:    kakao.bundle.img('sleep.png')
+    shutdown:
+        exec:   "osascript -e 'tell app \"System Events\" to shut down'"
+        img:    kakao.bundle.img('shutdown.png')
+    restart:
+        exec:   "osascript -e 'tell app \"System Events\" to restart'"
+        img:    kakao.bundle.img('restart.png')
+
+post.on 'runScript' (name) -> scripts[name].cb()
+post.on 'hideWin'  -> win?.hide()
+post.on 'cancel'   -> activateApp()
+post.on 'findApps' -> findApps()
+
+# 00000000  000  000   000  0000000           0000000   00000000   00000000    0000000  
+# 000       000  0000  000  000   000        000   000  000   000  000   000  000       
+# 000000    000  000 0 000  000   000        000000000  00000000   00000000   0000000   
+# 000       000  000  0000  000   000        000   000  000        000             000  
+# 000       000  000   000  0000000          000   000  000        000        0000000   
+
+findApps = ○->
+
+    apps = {}
+    apps['Finder'] = "/System/Library/CoreServices/Finder.app"
+    appFolders = [
+        "/Applications"
+        "/Applications/Utilities"
+        "/System/Applications"
+        "/System/Applications/Utilities"
+        "~/s"
+        ]
+    
+    for appFolder in appFolders
+
+        root = slash.untilde appFolder
+        ○ walkdir root:root, dir: (p) -> 
+            e = slash.ext(p)
+            if e == 'app' 
+                apps[slash.name p] = p
+                ⮐ false 
+            true
+
+    allKeys = Object.keys(apps).concat Object.keys(scripts)
+    allKeys.sort (a,b) -> a.toLowerCase().localeCompare b.toLowerCase()
+    
+    post.emit 'appsFound' apps:apps scripts:scripts allKeys:allKeys
+            
+# 0000000    0000000  000000000  000  000   000  00000000
+#000   000  000          000     000  000   000  000
+#000000000  000          000     000   000 000   0000000
+#000   000  000          000     000     000     000
+#000   000   0000000     000     000      0      00000000
+
+appName   = null
+activeApp = null
+activeWin = null
+
+getActiveApp = ->
+
+    if slash.win()
+        wxw = require 'wxw'
+        top = wxw('info' 'top')[0]
+        if top?.path?
+            appName = activeApp = slash.base top.path
+    else
+        activeApp = childp.execSync "#{◆dir}/../bin/appswitch -P" encoding:'utf8'
+
+    klog 'getActiveApp appName' appName, '-> activeApp' activeApp #? if args.verbose
+        
+    if win?
+        if appName?
+            klog 'getActiveApp post.currentApp' appName #if args.verbose
+            post.toWins 'currentApp' appName
+        else
+            klog 'getActiveApp clearSearch' appName #if args.verbose
+            post.toWins 'clearSearch'
+        # klog 'getActiveApp fade' if args.verbose
+        post.toWins 'fade'
+    else
+        createWindow()
+
+#  0000000    0000000  000000000  000  000   000   0000000   000000000  00000000  
+# 000   000  000          000     000  000   000  000   000     000     000       
+# 000000000  000          000     000   000 000   000000000     000     0000000   
+# 000   000  000          000     000     000     000   000     000     000       
+# 000   000   0000000     000     000      0      000   000     000     00000000  
+
+activateApp = -> log 'activeApp'
+
+    # if activeApp
+        # childp.exec "#{◆dir}/../bin/appswitch -fp #{activeApp}" (err) -> win?.hide()
+        
+export 
+    findApps:       findApps
+    getActiveApp:   getActiveApp
+    activateApp:    activateApp
+    activateApp:    activateApp
+            

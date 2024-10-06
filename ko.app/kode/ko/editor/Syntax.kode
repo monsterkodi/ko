@@ -11,7 +11,7 @@ use ../../kxk ▪ slash matchr elem kstr ffs
 
 class Syntax
     
-    @: (@name, @getLine) ->
+    @: @name @getLine ->
 
         @diss   = []
         @colors = {}
@@ -22,15 +22,15 @@ class Syntax
     # 000   000  000       000       000
     # 0000000    000  0000000   0000000
 
-    newDiss: (li) ->
+    newDiss: li ->
         
-        kolor.dissect([@getLine li], @name)[0]
+        kolor.dissect([@getLine(li)] @name)[0]
 
-    getDiss: (li) ->
+    getDiss: li ->
 
         @diss[li] ?= @newDiss li
 
-    setDiss: (li, dss) ->
+    setDiss: li dss ->
 
         @diss[li] = dss
 
@@ -40,9 +40,9 @@ class Syntax
     #      000  000          000     000      000  000  0000  000            000  
     # 0000000   00000000     000     0000000  000  000   000  00000000  0000000   
     
-    setLines: (lines) ->
+    setLines: lines ->
         
-        @diss = kolor.dissect lines, @name
+        @diss = kolor.dissect lines @name
             
     #  0000000  000   000   0000000   000   000   0000000   00000000  0000000
     # 000       000   000  000   000  0000  000  000        000       000   000
@@ -50,16 +50,16 @@ class Syntax
     # 000       000   000  000   000  000  0000  000   000  000       000   000
     #  0000000  000   000  000   000  000   000   0000000   00000000  0000000
 
-    changed: (changeInfo) ->
+    changed: changeInfo ->
 
         for change in changeInfo.changes
 
-            [di,li,ch] = [change.doIndex, change.newIndex, change.change]
+            [di li ch] = [change.doIndex change.newIndex change.change]
 
             switch ch
                 'changed'  ➜ @diss[di] = @newDiss di
-                'deleted'  ➜ @diss.splice di, 1
-                'inserted' ➜ @diss.splice di, 0, @newDiss di
+                'deleted'  ➜ @diss.splice di 1
+                'inserted' ➜ @diss.splice di 0 @newDiss(di)
 
     #  0000000   0000000   000       0000000   00000000
     # 000       000   000  000      000   000  000   000
@@ -67,7 +67,7 @@ class Syntax
     # 000       000   000  000      000   000  000   000
     #  0000000   0000000   0000000   0000000   000   000
 
-    colorForClassnames: (clss) ->
+    colorForClassnames: clss ->
 
         if not @colors[clss]?
 
@@ -83,7 +83,7 @@ class Syntax
 
         return @colors[clss]
 
-    colorForStyle: (styl) ->
+    colorForStyle: styl ->
 
         if not @colors[styl]?
             div = elem 'div'
@@ -107,11 +107,11 @@ class Syntax
     @matchrConfigs: {}
     @syntaxNames: []
 
-    @spanForText: (text) -> @spanForTextAndSyntax text, 'ko'
-    @spanForTextAndSyntax: (text, n) ->
+    @spanForText: text -> @spanForTextAndSyntax text, 'ko'
+    @spanForTextAndSyntax: text n ->
 
         l = ""
-        diss = @dissForTextAndSyntax text, n
+        diss = @dissForTextAndSyntax text n
         if diss?.length
             last = 0
             for di in 0...diss.length
@@ -127,25 +127,25 @@ class Syntax
                 l += clrzd
         l
 
-    @rangesForTextAndSyntax: (line, n) ->
+    @rangesForTextAndSyntax: line n ->
 
-        matchr.ranges Syntax.matchrConfigs[n], line
+        matchr.ranges Syntax.matchrConfigs[n] line
 
-    @dissForTextAndSyntax: (text, n) ->
+    @dissForTextAndSyntax: text n ->
 
         if n not in ['browser' 'ko' 'commandline' 'macro' 'term' 'git']
-            result = kolor.ranges text, n
+            result = kolor.ranges text n
         else
             if not n? or not Syntax.matchrConfigs[n]?
                 return error "no syntax? #{n}"
-            result = matchr.dissect matchr.ranges Syntax.matchrConfigs[n], text
+            result = matchr.dissect matchr.ranges(Syntax.matchrConfigs[n] text)
         result
 
-    @lineForDiss: (dss) ->
+    @lineForDiss: dss ->
 
         l = ""
         for d in dss
-            l = rpad d.start, l
+            l = rpad d.start l
             l += d.match
         l
 
@@ -155,7 +155,7 @@ class Syntax
     #      000  000   000  000       000   000  000   000  000  0000  000   000
     # 0000000   000   000  00000000  0000000    000   000  000   000   0000000
 
-    @shebang: (line) ->
+    @shebang: line ->
 
         if line.startsWith "#!"
             lastWord = last line.split /[\s\/]/
@@ -181,7 +181,7 @@ class Syntax
 
             syntaxName = slash.name syntaxFile.path
             
-            patterns = JSON.parse ○ ffs.read syntaxFile.path
+            patterns = JSON.parse ○ ffs.read(syntaxFile.path)
             
             patterns['\\w+']       = 'text'   # this ensures that all ...
             patterns['[^\\w\\s]+'] = 'syntax' # non-space characters match

@@ -31,7 +31,7 @@ if lastArg == 'help'
 
 tests = {}; for m in mods ➜ tests[m] = true
 
-hdr = (h) -> log G2 y8 ' ' + rpad(33 h) + ' '
+hdr = (h) -> log G2(y8(' ' + rpad(33 h) + ' '))
 
 if 
     lastArg == 'brief'
@@ -60,7 +60,7 @@ if
 for mod in mods
     if tests[mod]
         hdr mod
-        files =○ fs.list slash.path ◆dir, mod, 'test'
+        files =○ fs.list(slash.path(◆dir, mod, 'test'))
         for file in files
             test =○ import(file.path)
             tester.test test.default

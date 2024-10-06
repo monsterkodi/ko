@@ -16,7 +16,7 @@ class Minimap
 
         # add highlights and cursors at right border
 
-        minimapWidth = parseInt getStyle '.minimap' 'width'
+        minimapWidth = parseInt getStyle('.minimap' 'width')
 
         @editor.layerScroll.style.right = "#{minimapWidth}px"
 
@@ -26,10 +26,10 @@ class Minimap
 
         @elem    = elem class: 'minimap'
         @topbot  = elem class: 'topbot'
-        @selecti = elem 'canvas' class: 'minimapSelections' width: @width, height: @height
-        @lines   = elem 'canvas' class: 'minimapLines'      width: @width, height: @height
-        @highlig = elem 'canvas' class: 'minimapHighlights' width: @width, height: @height
-        @cursors = elem 'canvas' class: 'minimapCursors'    width: @width, height: @height
+        @selecti = elem 'canvas' class: 'minimapSelections' width:@width height:@height
+        @lines   = elem 'canvas' class: 'minimapLines'      width:@width height:@height
+        @highlig = elem 'canvas' class: 'minimapHighlights' width:@width height:@height
+        @cursors = elem 'canvas' class: 'minimapCursors'    width:@width height:@height
 
         @elem.appendChild @topbot
         @elem.appendChild @selecti
@@ -37,7 +37,7 @@ class Minimap
         @elem.appendChild @highlig
         @elem.appendChild @cursors
 
-        @elem.addEventListener 'wheel' @editor.scrollbar?.onWheel, passive:true
+        @elem.addEventListener 'wheel' @editor.scrollbar?.onWheel passive:true
 
         @editor.view.appendChild   @elem
         
@@ -128,7 +128,7 @@ class Minimap
         @cursors.width = @width
         ⮐ if @scroll.exposeBot < 0
         ctx = @cursors.getContext '2d'
-        for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, rangesFromPositions @editor.cursors()
+        for r in rangesFromTopToBotInRanges @scroll.exposeTop, @scroll.exposeBot, rangesFromPositions(@editor.cursors())
             y = (r[0]-@scroll.exposeTop)*@scroll.lineHeight
             if 2*r[1][0] < @width
                 ctx.fillStyle = '#f80'
@@ -237,9 +237,9 @@ class Minimap
         
         st = @elem.scrollTop
         br = @elem.getBoundingClientRect()
-        ly = clamp 0, @elem.offsetHeight, event.clientY - br.top
+        ly = clamp 0 @elem.offsetHeight, event.clientY - br.top
         py = parseInt(Math.floor(2*ly/@scroll.lineHeight)) + @scroll.top
-        li = parseInt Math.min(@scroll.numLines-1, py)
+        li = parseInt Math.min(@scroll.numLines-1 py)
         li
 
     #  0000000   000   000        00000000  0000000    000  000000000   0000000   00000000
@@ -293,7 +293,7 @@ class Minimap
     clearRange: top bot ->
 
         ctx = @lines.getContext '2d'
-        ctx.clearRect 0, (top-@scroll.exposeTop)*@scroll.lineHeight, 2*@width, (bot-top)*@scroll.lineHeight
+        ctx.clearRect 0 (top-@scroll.exposeTop)*@scroll.lineHeight 2*@width (bot-top)*@scroll.lineHeight
 
     clearAll: =>
 

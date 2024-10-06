@@ -49,7 +49,7 @@ function Macro extends Command
 
     listItems: ->
 
-        items = uniq reversed(@history).concat @macros
+        items = uniq reversed(@history).concat(@macros)
 
         ({text: i, line: i in @macros and '◼' or '◆', type:'macro'} for i in items)
 
@@ -82,7 +82,7 @@ function Macro extends Command
                 argl
             else
                 cw = editor.wordsAtCursors positionsNotInRanges(editor.cursors(), editor.selections()), opt
-                ws = uniq cw.concat editor.textsInRanges editor.selections()
+                ws = uniq cw.concat(editor.textsInRanges(editor.selections()))
                 ws.filter (w) -> w.trim().length
 
         switch cmmd
@@ -170,10 +170,10 @@ function Macro extends Command
                     for l,i in t.split '\n'
                         
                         window.terminal.queueMeta
-                            diss:  Syntax.dissForTextAndSyntax l, 'kode'
+                            diss:  Syntax.dissForTextAndSyntax(l, 'kode')
                             text:  l
                             clss:  'clippoResult'
-                            click: ((t) -> -> kakao 'clipboard.set' t) t
+                            click: ((t) -> -> kakao('clipboard.set' t))(t)
                             line:  i+1
                             
                 window.terminal.queueMeta text:'' line:'&nbsp;'
@@ -202,7 +202,7 @@ function Macro extends Command
                 ffs.read(helpFile).then (text) ->
                     window.terminal.clear()
                     for l in text.split '\n'
-                        window.terminal.appendLineDiss l, Syntax.dissForTextAndSyntax l, 'noon'
+                        window.terminal.appendLineDiss l, Syntax.dissForTextAndSyntax(l, 'noon')
 
                     window.terminal.scroll.cursorToTop 1
                     window.split.do 'show terminal'
@@ -251,7 +251,7 @@ function Macro extends Command
                 insert = insert.trimRight()
                 insert += '"'
                 if lst
-                    insert += (", kstr(#{words[ti]})" for ti in [words.length - lst...words.length]).join ''
+                    insert += (", kstr(#{words[ti]})" for ti in [words.length - lst...words.length]).join('')
 
                 editor.do.start()
                 editor.do.insert li, insert
@@ -275,7 +275,7 @@ function Macro extends Command
                 file  = slash.path dir, clss + '.kode'
                 
                 text  = "###\n"
-                text += (s for s in salt(clss).split '\n').join '\n'
+                text += (s for s in salt(clss).split('\n')).join '\n'
                 text += "\n###\n"
                 text += """
 
@@ -344,7 +344,7 @@ function Macro extends Command
 
                 transform = Editor.actionModules.transform.Transform
                 if transform.transformNames and cmmd in transform.transformNames
-                    window.textEditor.transform.do.apply window.textEditor.transform, [cmmd].concat cmds
+                    window.textEditor.transform.do.apply window.textEditor.transform, [cmmd].concat(cmds)
                 else
                     try
                         result = scooter cmmd

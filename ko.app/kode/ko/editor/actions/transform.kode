@@ -43,7 +43,7 @@ class Transform
         @editor.do.start()
         @editor.fillVirtualSpaces()
         cs = @editor.do.cursors()
-        @editor.do.select rangesFromPositions cs
+        @editor.do.select rangesFromPositions(cs)
 
         switch typ
             when 'hex'
@@ -54,7 +54,7 @@ class Transform
                 base = 10
 
         pad = Number(step*(cs.length-1)+offset).toString(base).length
-        numbers = (lpad pad, Number(step*i+offset).toString(base), '0' for i in [0...cs.length])
+        numbers = (lpad(pad, Number(step*i+offset).toString(base), '0') for i in [0...cs.length])
 
         @editor.replaceSelectedText numbers
         @editor.do.end()
@@ -93,7 +93,7 @@ class Transform
         'up'
 
     down: ->
-        @trans (l) -> reversed l.sort (a,b) -> a.localeCompare b
+        @trans (l) -> reversed l.sort((a,b) -> a.localeCompare b)
         'down'
 
     # 000   000  000   000  000   0000000
@@ -215,7 +215,7 @@ class Transform
         if @last not in funcList
             @last = last funcList
 
-        nextIndex = (1 + funcList.indexOf @last) % funcList.length
+        nextIndex = (1 + funcList.indexOf(@last)) % funcList.length
         @do funcList[nextIndex]
 
     # 0000000     0000000
@@ -243,7 +243,7 @@ class Transform
         # t.do.apply t, [transName].concat opts
         log 'static Transform.do' editor.name, transName
         editor.transform ?= new Transform editor
-        editor.transform.do.apply editor.transform, [transName].concat opts
+        editor.transform.do.apply editor.transform, [transName].concat(opts)
 
 export
 

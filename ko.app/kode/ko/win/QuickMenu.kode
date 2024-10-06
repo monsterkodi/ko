@@ -13,15 +13,15 @@ function QuickMenu
     @: ->
         
         @div = elem class:'quickmenu' children: [
-            elem text:'' class:'quickmenu-item quickmenu-browser'  click:@onBrowser,  dblclick: (e)-> stopEvent e  
+            elem(text:'' class:'quickmenu-item quickmenu-browser'  click:@onBrowser,  dblclick: (e)-> stopEvent(e))
         ,
-            elem text:'' class:'quickmenu-item quickmenu-terminal' click:@onTerminal, dblclick: (e)-> stopEvent e  
+            elem(text:'' class:'quickmenu-item quickmenu-terminal' click:@onTerminal, dblclick: (e)-> stopEvent(e))
         ,
-            elem text:'' class:'quickmenu-item quickmenu-devtools' click:@onDevTools, dblclick: (e)-> stopEvent e  
+            elem(text:'' class:'quickmenu-item quickmenu-devtools' click:@onDevTools, dblclick: (e)-> stopEvent(e))
         ,
-            elem text:'' class:'quickmenu-item quickmenu-kalk'     click:@onKalk,     dblclick: (e)-> stopEvent e  
+            elem(text:'' class:'quickmenu-item quickmenu-kalk'     click:@onKalk,     dblclick: (e)-> stopEvent(e))
         ,
-            elem text:'' class:'quickmenu-item quickmenu-list'     click:@onList,     dblclick: (e)-> stopEvent e  
+            elem(text:'' class:'quickmenu-item quickmenu-list'     click:@onList,     dblclick: (e)-> stopEvent(e))
         ]
         
         title =$ 'title'

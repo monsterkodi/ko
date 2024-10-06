@@ -12,7 +12,7 @@ function Viewer
 
     @: parent ->
         
-        @div = elem id:'viewer' parent:$ parent
+        @div = elem id:'viewer' parent:$(parent)
         
         kore.on 'view|file'   @onViewFile
         kore.on 'editor|file' @close
@@ -24,9 +24,9 @@ function Viewer
         @div.classList.add 'active'
         
         if slash.ext(path) in ['html']
-            elem 'embed' type:"text/#{slash.ext path}" class:'viewerEmbed' parent:@div, src:slash.fileUrl path
+            elem 'embed' type:"text/#{slash.ext path}" class:'viewerEmbed' parent:@div, src:slash.fileUrl(path)
         else
-            elem 'img' class:'viewerImage' parent:@div, src:slash.fileUrl path
+            elem 'img' class:'viewerImage' parent:@div, src:slash.fileUrl(path)
         
     close: => 
     

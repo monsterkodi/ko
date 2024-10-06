@@ -57,7 +57,7 @@ class Crumb
     setFile: file ->
 
         if @column.index == 0
-            @elem.innerHTML = File.crumbDirSpan slash.tilde file
+            @elem.innerHTML = File.crumbDirSpan slash.tilde(file)
         else
             @elem.innerHTML = Syntax.spanForTextAndSyntax slash.file(file), 'browser'
 

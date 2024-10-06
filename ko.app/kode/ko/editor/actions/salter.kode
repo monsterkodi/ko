@@ -33,7 +33,7 @@ export
         
         if not opt?.word and rgs = @salterRangesAtPos cp # edit existing header
             
-            cols = @columnsInSalt (@textInRange r for r in rgs)
+            cols = @columnsInSalt (@textInRange(r) for r in rgs)
             ci = 0
             while ci < cols.length and cp[0] > cols[ci]
                 ci += 1
@@ -47,8 +47,8 @@ export
         else # create new header
             
             word = opt?.word ? @selectionTextOrWordAtCursor().trim()
-            if @textInRange(@rangeForLineAtIndex cp[1]).trim().length
-                indt = lpad @indentationAtLineIndex cp[1]
+            if @textInRange(@rangeForLineAtIndex(cp[1])).trim().length
+                indt = lpad @indentationAtLineIndex(cp[1])
             else
                 indt = @indentStringForLineAtIndex cp[1]
                 
@@ -108,7 +108,7 @@ export
         @do.start()
         cp = @do.mainCursor()
         if rgs = @salterRangesAtPos cp
-            slt = (@do.textInRange r for r in rgs)
+            slt = (@do.textInRange(r) for r in rgs)
             cols = @columnsInSalt slt
             ci = cols.length-1
             while ci > 0 and cols[ci-1] >= cp[0]
@@ -116,7 +116,7 @@ export
             if ci > 0
                 length = cols[ci]-cols[ci-1]
                 for r in rgs
-                    @do.change r[0], kstr.splice @do.line(r[0]), cols[ci-1], length
+                    @do.change r[0], kstr.splice(@do.line(r[0]), cols[ci-1], length)
                 @do.setCursors ([cols[ci-1], r[0]] for r in rgs)
         @do.end()
     
@@ -170,7 +170,7 @@ export
     
     columnsInSalt: (slt) ->
         
-        minv = min (s.search /0/ for s in slt)
+        minv = min (s.search(/0/) for s in slt)
         if minv < 0
             minv = min (s.search(/#/)+1 for s in slt)
             return [minv]

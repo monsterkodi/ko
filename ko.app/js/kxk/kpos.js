@@ -315,7 +315,7 @@ Pos = (function ()
 
     Pos["isPos"] = function (o)
     {
-        var _119_29_, _119_38_
+        var _118_29_, _118_38_
 
         return (o != null) && (o.x != null) && (o.y != null) && Number.isFinite(o.x) && Number.isFinite(o.y)
     }

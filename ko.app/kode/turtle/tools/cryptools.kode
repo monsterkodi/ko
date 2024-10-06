@@ -56,7 +56,7 @@ hex2bytes = str ->
 
 genHash = str ○->
 
-    hash = ○ crypto.subtle.digest "SHA-512" str2bytes str
+    hash = ○ crypto.subtle.digest "SHA-512" str2bytes(str)
     bytes2hex hash
     
 #  0000000   00000000  000   000  000   000  00000000  000   000  
@@ -89,7 +89,7 @@ genKey = str ○->
 encrypt = str key ○->
     
     cryptKey = ○ genKey key
-    cipher   = ○ crypto.subtle.encrypt cryptAlgo, cryptKey, str2bytes str
+    cipher   = ○ crypto.subtle.encrypt cryptAlgo, cryptKey, str2bytes(str)
     bytes2hex cipher
     
 # 0000000    00000000   0000000  00000000   000   000  00000000   000000000  
@@ -101,7 +101,7 @@ encrypt = str key ○->
 decrypt = str key ○->
     
     cryptKey = ○ genKey key
-    cipher = ○ crypto.subtle.decrypt cryptAlgo, cryptKey, hex2bytes str
+    cipher = ○ crypto.subtle.decrypt cryptAlgo, cryptKey, hex2bytes(str)
     bytes2str cipher
     
 #test = ○->
@@ -132,7 +132,7 @@ encryptFile = file str key ○->
     
     if decrypted == str
     
-        file = slash.untilde slash.path file
+        file = slash.untilde slash.path(file)
         
         ○ ffs.write file, encrypted
         
@@ -147,7 +147,7 @@ encryptFile = file str key ○->
 
 decryptFile = file key ○->
     
-    file = slash.untilde slash.path file
+    file = slash.untilde slash.path(file)
     
     if ○ ffs.fileExists file
         

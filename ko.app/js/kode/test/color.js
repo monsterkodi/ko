@@ -9,7 +9,7 @@ let ke = utils.ke
 
 toExport["color"] = function ()
 {
-    compare(kc("R1 'Red' + g1 ' green'"),"_k_.R1('Red' + _k_.g1(' green'))")
+    compare(kc("R1 'Red' + g1(' green')"),"_k_.R1('Red' + _k_.g1(' green'))")
     return
     for (c = 8; c >= 1; c--)
     {

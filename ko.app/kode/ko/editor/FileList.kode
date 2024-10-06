@@ -76,7 +76,7 @@ function FileList
     onAdd: path line =>
 
         file = slash.file path
-        e = elem class:'filelist-item' parent:@elem, click:@onClick, html:Syntax.spanForTextAndSyntax file, 'browser'
+        e = elem class:'filelist-item' parent:@elem click:@onClick html:Syntax.spanForTextAndSyntax(file 'browser')
         e.path = path
         e.line = line
         

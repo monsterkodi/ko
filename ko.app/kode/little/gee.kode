@@ -1,0 +1,150 @@
+###
+ 0000000   00000000  00000000  
+000        000       000       
+000  0000  0000000   0000000   
+000   000  000       000       
+ 0000000   00000000  00000000  
+###
+
+use ../kxk ▪ randInt randRange elem post
+use ./geell
+
+function gee extends geell
+
+    number: px py number prop={} =>
+        
+        if Number.isInteger number
+            @int px py number prop
+        else
+            @int px py parseInt(number) prop
+              
+    int: px py number prop={} =>
+            
+        ns = "#{number}"
+        n  = ns.length-1
+        prop.sx ?= 1
+        prop.sx *= 3 / 4
+        xs = (prop.scale ? 1) * prop.sx * 0.8
+        xoff = switch prop.align
+            'left'  ➜ 0
+            'right' ➜ -n*xs
+                    ➜ -n*xs/2
+                    
+        for ni in 0..n
+            @quad xoff+px+ni*xs py @numberUV[ns[ni]] prop 
+            
+    crect: px py prop={} =>
+        
+        @quad px py @quadUV prop
+            
+    rect: x1 y1 x2 y2 prop={} =>
+
+        @quad (x1+x2)/2 (y1+y2)/2 @quadUV prop
+        
+    circle: px py prop =>
+        
+        @quad px py @circleUV prop
+            
+    quad: px py uv prop={} =>
+        
+        sx    = prop.sx ? 1
+        sy    = prop.sy ? 1
+        color = prop.color ? [1 1 1 1]
+        scale = prop.scale ? 1
+        layer = prop.layer ? 0
+        rot   = prop.rot ? 0
+        
+        @addQuad px py sx sy color uv rot layer scale
+            
+    addNumber: px py sz number color=[1 1 1 1] layer=0 =>
+        
+        n = Math.ceil Math.log10(number)
+        for ni in 0..n
+            @addQuad px+ni*sz py 1 1 color @numberUV[1] 0 layer sz
+        
+    addPipe: x1 y1 x2 y2 sz color layer=0 =>
+        
+        @addCircle x1 y1 sz color layer
+        @addCircle x2 y2 sz color layer
+        if y1 == y2
+            @addRect x1 y1-sz/2 x2 y2+sz/2 color layer
+            
+    addTube: px py ti tt color layer=0 scale=1 =>
+        
+        @addQuad px py 1 1 color @tubeUV[ti][tt] 0 layer scale
+            
+    addTubeRect: x1 y1 x2 y2 ti color layer=0 =>
+        
+        [x1, x2] = [min(x1 x2) max(x1 x2)]
+        [y1, y2] = [min(y1 y2) max(y1 y2)]
+        
+        @addTube x2 y2 ti 1 color layer
+        @addTube x2 y1 ti 3 color layer
+        @addTube x1 y1 ti 4 color layer
+        @addTube x1 y2 ti 5 color layer
+        
+        @addQuad (x1+x2)/2 y1 x2-x1-1 1 color @tubeUV[ti][0] 0 layer
+        @addQuad (x1+x2)/2 y2 x2-x1-1 1 color @tubeUV[ti][0] 0 layer
+
+        @addQuad x1 (y1+y2)/2 1 y2-y1-1 color @tubeUV[ti][2] 0 layer
+        @addQuad x2 (y1+y2)/2 1 y2-y1-1 color @tubeUV[ti][2] 0 layer
+        
+    addRoundedFrame: x1 y1 x2 y2 color layer=0 radius=1 ti=4 =>
+        
+        scale = 1/radius
+        
+        [x1 x2] = [min(x1 x2) max(x1 x2)]
+        [y1 y2] = [min(y1 y2) max(y1 y2)]
+        
+        @addTube x2 y2 ti 1 color layer radius
+        @addTube x2 y1 ti 3 color layer radius
+        @addTube x1 y1 ti 4 color layer radius
+        @addTube x1 y2 ti 5 color layer radius
+        
+        @addQuad (x1+x2)/2 y1 scale*(x2-x1-radius) 1 color @tubeUV[ti][0] 0 layer radius
+        @addQuad (x1+x2)/2 y2 scale*(x2-x1-radius) 1 color @tubeUV[ti][0] 0 layer radius
+
+        @addQuad x1 (y1+y2)/2 1 scale*(y2-y1-radius) color @tubeUV[ti][2] 0 layer radius
+        @addQuad x2 (y1+y2)/2 1 scale*(y2-y1-radius) color @tubeUV[ti][2] 0 layer radius
+        
+    addRect: x1 y1 x2 y2 color layer=0 =>
+        
+        [x1 x2] = [min(x1 x2) max(x1 x2)]
+        [y1 y2] = [min(y1 y2) max(y1 y2)]
+        cx = (x1+x2)/2
+        cy = (y1+y2)/2
+        sx = x2-x1
+        sy = y2-y1
+        
+        @addQuad cx cy sx sy color @quadUV 0 layer
+        
+    addCircle: px py sz color layer=0 =>     
+        
+        @addQuad px py sz sz color @circleUV 0 layer
+
+    addQuad: px py sx sy color uv rot=0 layer=0 scale=1 => 
+        
+        ⮐ if @numQuads[layer] >= @quadsPerLayer
+        
+        p = (@layerStart[layer]+@numQuads[layer])*@quadDataLength
+        
+        @data[p++] = px        # position
+        @data[p++] = py
+        @data[p++] = scale*sx  # scale 
+        @data[p++] = scale*sy 
+                
+        @data[p++] = color[0]  # color
+        @data[p++] = color[1]
+        @data[p++] = color[2]
+        @data[p++] = color[3]
+
+        @data[p++] = uv[0]     # uv
+        @data[p++] = uv[1]
+        @data[p++] = uv[2]
+        @data[p++] = uv[3]
+        
+        @data[p++] = rot       # rotation
+                        
+        @numQuads[layer]++
+        
+export gee

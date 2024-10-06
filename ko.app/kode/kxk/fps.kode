@@ -52,8 +52,8 @@ class FPS
         ctx = @canvas.getContext '2d'        
         for i in 0...@history.length
             ms    = Math.max 0, @history[i]-34
-            red   = parseInt 32 + 223 * clamp 0,1, (ms-16)/16
-            green = parseInt 32 + 223 * clamp 0,1, (ms-32)/32
+            red   = parseInt 32 + 223 * clamp(0,1, (ms-16)/16)
+            green = parseInt 32 + 223 * clamp(0,1, (ms-32)/32)
             ctx.fillStyle = "rgb(#{red}, #{green}, 32)"
             h = Math.min ms, @height
             ctx.fillRect @samples-@history.length+i, @height-h, 1, h

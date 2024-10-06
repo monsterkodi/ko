@@ -26,7 +26,7 @@ kakao.init ->
     
     elem 'div' class:'about' id:'about' parent:main, children:
         [
-            elem 'img' class:'image' src:window.aboutImage
-            elem 'div' class:'version' id:'version' text:version, click: -> if window.aboutURL ➜ kakao 'open' window.aboutURL
+            elem('img' class:'image' src:window.aboutImage)
+            elem('div' class:'version' id:'version' text:version, click: -> if window.aboutURL ➜ kakao('open' window.aboutURL))
         ]
     

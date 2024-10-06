@@ -12,11 +12,11 @@ class Keyinfo
                       
         combo = @comboForEvent event
         info =
-            mod:   @modifiersForEvent event
-            key:   @keynameForEvent   event
-            char:  @characterForEvent event
+            mod:   @modifiersForEvent(event)
+            key:   @keynameForEvent(event)
+            char:  @characterForEvent(event)
             combo: combo
-            short: @short combo
+            short: @short(combo)
         info
     
     @modifierNames: ['shift' 'ctrl' 'alt' 'command'] 
@@ -31,13 +31,13 @@ class Keyinfo
         
         mods = []
         char = null
-        for c in combo.split '+'
+        for c in combo.split('+')
             if @isModifier c
                 mods.push c 
             else
                 key = c
                 char = c if c.length == 1 # does this work?
-        mod:   mods.join '+'
+        mod:   mods.join('+')
         key:   key
         combo: combo 
         char:  char

@@ -142,7 +142,7 @@ class AutoComplete extends events
                     matches = toPairs matches
                     for m in matches
                         d = @editor.distanceOfWord m[0]
-                        m[1].distance = 100 - Math.min d, 100
+                        m[1].distance = 100 - Math.min(d, 100)
 
                     matches.sort (a,b) ->
                         (b[1].distance+b[1].count+1/b[0].length) - (a[1].distance+a[1].count+1/a[0].length)
@@ -199,11 +199,11 @@ class AutoComplete extends events
 
         sp = spanInfo.span
         inner = sp.innerHTML
-        @clones.push sp.cloneNode true
-        @clones.push sp.cloneNode true
+        @clones.push sp.cloneNode(true)
+        @clones.push sp.cloneNode(true)
         @cloned.push sp
 
-        ws = @word.slice @word.search /\w/
+        ws = @word.slice @word.search(/\w/)
         wi = ws.length
 
         @clones[0].innerHTML = inner.slice 0 spanInfo.offsetChar + 1
@@ -211,7 +211,7 @@ class AutoComplete extends events
 
         sibling = sp
         while sibling = sibling.nextSibling
-            @clones.push sibling.cloneNode true
+            @clones.push sibling.cloneNode(true)
             @cloned.push sibling
 
         sp.parentElement.appendChild @span
@@ -227,8 +227,8 @@ class AutoComplete extends events
         if @matchList.length
 
             @list = elem class: 'autocomplete-list'
-            @list.addEventListener 'wheel'     @onWheel     , passive:true
-            @list.addEventListener 'mousedown' @onMouseDown , passive:true
+            @list.addEventListener 'wheel'     @onWheel     passive:true
+            @list.addEventListener 'mousedown' @onMouseDown passive:true
 
             index = 0
             for m in @matchList
@@ -291,7 +291,7 @@ class AutoComplete extends events
             @editor.pasteText @selectedCompletion()
 
             c = @editor.mainCursor()
-            if @editor.textInRange([c[1], [c[0], c[0]+1]]) != ' '
+            if @editor.textInRange([c[1] [c[0] c[0]+1]]) != ' '
                 @editor.insertCharacter ' '
         else
             @editor.pasteText @selectedCompletion()
@@ -313,7 +313,7 @@ class AutoComplete extends events
     navigate: delta ->
 
         ⮐ if not @list
-        @select clamp -1, @matchList.length-1, @selected+delta
+        @select clamp(-1, @matchList.length-1, @selected+delta)
 
     select: index ->
         
@@ -364,9 +364,9 @@ class AutoComplete extends events
 
     parseLinesDelayed: lines opt ->
 
-        delay = (l, o) => => @parseLines l, o
+        delay = l o => => @parseLines l o
         if lines.length > 1
-            setTimeout (delay lines, opt), 200
+            setTimeout delay(lines opt) 200
 
     parseLines: lines opt ->
 
@@ -377,7 +377,7 @@ class AutoComplete extends events
         cursorWord = @cursorWord()
         for l in lines
             if not l?.split?
-                ⮐ error "AutoComplete.parseLines -- line has no split? action: #{opt.action} line: #{l}", lines
+                ⮐ error "AutoComplete.parseLines -- line has no split? action: #{opt.action} line: #{l}" lines
 
             if l.length > 240
                 # if l.startsWith '//# sourceMapping'
@@ -390,7 +390,7 @@ class AutoComplete extends events
             words = words.filter (w) =>
                 # return false if not Indexer.testWord w
                 ⮐ false if w == cursorWord
-                ⮐ false if @word == w.slice 0, w.length-1
+                ⮐ false if @word == w.slice 0 w.length-1
                 ⮐ false if @headerRegExp.test w
                 true
 
@@ -417,9 +417,9 @@ class AutoComplete extends events
     cursorWords: ->
 
         cp = @editor.cursorPos()
-        words = @editor.wordRangesInLineAtIndex cp[1], regExp: @specialWordRegExp
-        [befor, cursr, after] = rangesSplitAtPosInRanges cp, words
-        [@editor.textsInRanges(befor), @editor.textInRange(cursr), @editor.textsInRanges(after)]
+        words = @editor.wordRangesInLineAtIndex cp[1] regExp:@specialWordRegExp
+        [befor cursr after] = rangesSplitAtPosInRanges cp words
+        [@editor.textsInRanges(befor) @editor.textInRange(cursr) @editor.textsInRanges(after)]
 
     cursorWord: -> @cursorWords()[1]
 
@@ -429,11 +429,11 @@ class AutoComplete extends events
     # 000   000  000  0000
     #  0000000   000   000
 
-    onLinesAppended:  lines  => @parseLines lines, action: 'append'
-    onLineInserted:   li     => @parseLines [@editor.line(li)], action: 'insert'
-    onLineChanged:    li     => @parseLines [@editor.line(li)], action: 'change', count: 0
-    onWillDeleteLine: line   => @parseLines [line], action: 'delete', count: -1
-    onLinesSet:       lines  => @parseLinesDelayed(lines, action:'set') if lines.length
+    onLinesAppended:  lines  => @parseLines lines action: 'append'
+    onLineInserted:   li     => @parseLines [@editor.line(li)] action: 'insert'
+    onLineChanged:    li     => @parseLines [@editor.line(li)] action: 'change' count: 0
+    onWillDeleteLine: line   => @parseLines [line] action:'delete' count: -1
+    onLinesSet:       lines  => @parseLinesDelayed(lines action:'set') if lines.length
 
     # 000   000  00000000  000   000
     # 000  000   000        000 000

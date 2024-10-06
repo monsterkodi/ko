@@ -10,7 +10,7 @@
 
 use ../kxk ◆ pretty nfs slash 
 
-bundle = path: slash.path ◆dir, '../..'
+bundle = path: slash.path(◆dir '../..')
 
 export (args) ○->
     
@@ -21,20 +21,20 @@ export (args) ○->
     prt  = args[1]
     prt ?= slash.untilde "~/s/#{app}"
     
-    tgt  = slash.path prt, app + '.app'
+    tgt  = slash.path prt app + '.app'
     
-    log b5('ꦌ'), y4(app), b3(' '), pretty.filePath(bundle.path, w8, b3), b3('▸'), pretty.filePath(tgt, y5, y1)
+    log b5('ꦌ') y4(app) b3(' ') pretty.filePath(bundle.path w8 b3) b3('▸') pretty.filePath(tgt y5 y1)
     
     prtExists = ○ nfs.dirExists prt
     
     ⮐ error "parent directory #{tgt} doesn't exist" if not prtExists
     
     tmp = slash.tmpfile()
-    ○ nfs.move slash.path(tgt, '.stash'), tmp # move stash out of the way
+    ○ nfs.move slash.path(tgt '.stash') tmp # move stash out of the way
     
-    if ○ nfs.exists tgt ➜ ○ nfs.remove tgt # nuke target directory
+    if ○ nfs.exists(tgt) ➜ ○ nfs.remove(tgt) # nuke target directory
         
-    cpy = s d ○-> ○ nfs.copy slash.path(bundle.path, s), slash.path(tgt, d)
+    cpy = s d ○-> ○ nfs.copy(slash.path(bundle.path s) slash.path(tgt d))
         
     ○ nfs.copy bundle.path, tgt # copy the whole bundle over
     
@@ -60,7 +60,7 @@ export (args) ○->
             ]
     
         for f in remove
-            ○ nfs.remove slash.path tgt, f
+            ○ nfs.remove slash.path(tgt f)
     
     remove = [ 
         '.stash'
@@ -80,8 +80,8 @@ export (args) ○->
         ]
 
     for f in remove
-        ○ nfs.remove slash.path tgt, f
+        ○ nfs.remove slash.path(tgt f)
         
-    ○ nfs.move tmp, slash.path(tgt, '.stash') # put stash back in place    
+    ○ nfs.move tmp slash.path(tgt '.stash') # put stash back in place    
             
             

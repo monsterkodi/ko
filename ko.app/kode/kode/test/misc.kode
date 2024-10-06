@@ -367,7 +367,7 @@ use ../../kxk ◆ slash
             
                             prime[j] = 1
             
-                prime = prime each (i,p) -> [i, parseInt p ? 0 : i]
+                prime = prime each (i, p) -> [i parseInt(p ? 0 : i)]
                 prime = prime.filter (p) -> p
                             
             eratosthenes 100

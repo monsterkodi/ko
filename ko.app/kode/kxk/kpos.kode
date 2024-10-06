@@ -62,7 +62,7 @@ function Pos
         
     to:  (other) -> other.minus @
     mid: (other) -> @plus(other).scale 0.5
-    interpolate: (other, f) -> @plus @to(other).scale f
+    interpolate: (other, f) -> @plus @to(other).scale(f)
 
     min: (val) ->
         newPos = @clone()
@@ -93,8 +93,7 @@ function Pos
     isClose:    (o,dist=0.1) -> Math.abs(@x-o.x)+Math.abs(@y-o.y) < dist
     isZero:     (e=0.000001) -> Math.abs(@x)<e and Math.abs(@y)<e
     
-    angle: (o=new Pos(0,1)) ->
-        @rad2deg Math.acos @normal().dot o.normal()
+    angle: (o=new Pos(0,1)) -> @rad2deg Math.acos(@normal().dot(o.normal()))
         
     perp: -> new Pos -@y, @x
     
@@ -104,7 +103,7 @@ function Pos
             return 0 if @dot(o) > 0
             return 180
         s = d > 0 and -1 or 1
-        s * @angle o
+        s * @angle(o)
             
     check: ->
         newPos = @clone()

@@ -42,7 +42,7 @@
     }
 
     NSRect buttonRect = [[sender window] convertRectToScreen:[sender bounds]];
-    NSLog(@"%@ %f %f %f %f", name, buttonRect.origin.x, buttonRect.origin.y, buttonRect.size.width, buttonRect.size.height);
+    //NSLog(@"%@ %f %f %f %f", name, buttonRect.origin.x, buttonRect.origin.y, buttonRect.size.width, buttonRect.size.height);
     [Route emit:name arg:dictForRect(buttonRect)];
 }
 

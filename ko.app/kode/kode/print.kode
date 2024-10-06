@@ -16,16 +16,16 @@ class Print
     #    000     000   000  000  000   000       000  0000       000
     #    000      0000000   000   000  00000000  000   000  0000000
 
-    @tokens: (header, tokens) ->
+    @tokens: header tokens ->
         
-        log R3 y5 "\n #{header}"
-        log b6 rpad 80
+        log R3(y5("\n #{header}"))
+        log b6(rpad(80))
         s = ''
         for tok,idx in tokens
             s += @token tok, idx
         log s
 
-    @token: (tok, idx='') ->
+    @token: tok idx='' ->
         
         indent = lpad tok.col
         return red '◂\n' if tok.type == 'nl'
@@ -40,7 +40,7 @@ class Print
                 '\n' + s
             else
                 '???'
-        b6(lpad 4 tok.line) + ' ' + blue(lpad 3 tok.col) + ' ' + w2(lpad 4 idx) + ' ' + gray(rpad 10 tok.type) + ' ' + bold yellow(indent + toktext tok) + '\n'
+        b6(lpad(4 tok.line)) + ' ' + blue(lpad(3 tok.col)) + ' ' + w2(lpad(4 idx)) + ' ' + gray(rpad(10 tok.type)) + ' ' + bold(yellow(indent + toktext(tok)) + '\n')
             
     #  0000000  000000000   0000000    0000000  000   000
     # 000          000     000   000  000       000  000
@@ -48,20 +48,20 @@ class Print
     #      000     000     000   000  000       000  000
     # 0000000      000     000   000   0000000  000   000
 
-    @stack: (stack, node, color=W4) ->
+    @stack: stack node color=W4 ->
 
-        log W2(stack.join(' ') + ' ') + color node ? ''
+        log W2(stack.join(' ') + ' ') + color(node ? '')
         
-    @sheap: (sheap, popped) ->
+    @sheap: sheap popped ->
         
         s = B2 '   '
         for r in sheap
             switch r.type
-                when 'exps'  then s += B5(r.text) + B2 ' '
-                when 'stack' then s += W4(r.text) + W2 ' '
-                when 'rhs'   then s += R3(r1 r.text) + R1 ' '
-                when 'lhs'   then s += G3(g1 r.text) + G1 ' '
-                else              s += Y4 black(r.text) + Y2 ' '
+                when 'exps'  then s += B5(r.text) + B2(' ')
+                when 'stack' then s += W4(r.text) + W2(' ')
+                when 'rhs'   then s += R3(r1(r.text)) + R1(' ')
+                when 'lhs'   then s += G3(g1(r.text)) + G1(' ')
+                else              s += Y4(black(r.text) + Y2(' '))
         if popped
             c = switch popped.type 
                 when 'exps' then B1 
@@ -76,12 +76,12 @@ class Print
     # 000   000  000      000   000  000       000  000
     # 0000000    0000000   0000000    0000000  000   000
 
-    @block: (header, block, legend=false) ->
+    @block: header block legend=false ->
 
-        log R3 y5 "\n #{header}"
+        log R3(y5("\n #{header}"))
         printBlock = (b) ->
             if legend
-                s = b.indent + b6(rpad 3 b.line) + w2(rpad 3 b.col) + yellow(b.tokens.length)
+                s = b.indent + b6(rpad(3 b.line)) + w2(rpad(3 b.col)) + yellow(b.tokens.length)
                 s += '\n' + b.indent
             s = b.indent
             if b.type in ['{}''()''[]'] then s += b.type[0] + ' '
@@ -96,7 +96,7 @@ class Print
                     s += global[cn] (c.text ? '') + ' '
             if b.type in ['{}''()''[]'] then s += b.type[1]
             s
-        log printBlock block
+        log printBlock(block)
 
     #  0000000    0000000  000000000
     # 000   000  000          000
@@ -104,9 +104,9 @@ class Print
     # 000   000       000     000
     # 000   000  0000000      000
 
-    @ast: (header, ast) ->
+    @ast: header ast ->
 
-        log G1 g6 "\n #{header}"
+        log G1(g6("\n #{header}"))
         
         lp = lpad 19
 
@@ -117,34 +117,34 @@ class Print
             return s if not node
             
             if node.type
-                s += b6(lpad 4 node.line ? '') + ' ' + blue(lpad 3 node.col ? '') + ' ' + gray(rpad 10 node.type) + ' ' + bold yellow(indent + node.text) + '\n'
+                s += b6(lpad(4 node.line ? '')) + ' ' + blue(lpad(3 node.col ? '')) + ' ' + gray(rpad(10 node.type)) + ' ' + bold(yellow(indent + node.text)) + '\n'
             else if node is Array
                 
                 return s if node in visited
                 visited.push node
 
                 if node.length
-                    s += lp + ' ' + indent + bold w3('[')
+                    s += lp + ' ' + indent + bold(w3('['))
                     for value in node
                         s += '\n' 
                         s += printNode value, indent, visited
-                    s += lp + ' ' + bold w3(indent + ']\n')
+                    s += lp + ' ' + bold(w3(indent + ']\n'))
                 else
-                    s += lp + ' ' + indent + bold w3('[]\n')
+                    s += lp + ' ' + indent + bold(w3('[]\n'))
             else
                 return s if node in visited
                 visited.push node
                 
                 for name,value of node
-                    s += lp + ' ' + bold b8(indent + name)
+                    s += lp + ' ' + bold(b8(indent + name))
                     s += '\n'  
                     s += printNode value, indent+'  ', visited
             s
 
         if ast is Array
-            log printNode node for node in ast
+            log printNode(node) for node in ast
         else
-            log printNode ast
+            log printNode(ast)
 
     #  0000000    0000000  000000000  00000000   
     # 000   000  000          000     000   000  
@@ -152,9 +152,9 @@ class Print
     # 000   000       000     000     000   000  
     # 000   000  0000000      000     000   000  
     
-    @astr: (ast, scopes) ->
+    @astr: ast scopes ->
 
-        printNode = (node, indent='', visited=[]) ->
+        printNode = node indent='' visited=[] ->
 
             s = ''
 
@@ -184,11 +184,11 @@ class Print
             s
 
         if ast is Array
-            s = (printNode node for node in ast).join ''
+            s = (printNode(node) for node in ast).join ''
         else
             s = printNode ast
             
-        trim s, ' \n'
+        trim s ' \n'
                 
     # 000   000   0000000    0000000   000   000  
     # 0000  000  000   000  000   000  0000  000  
@@ -196,12 +196,12 @@ class Print
     # 000  0000  000   000  000   000  000  0000  
     # 000   000   0000000    0000000   000   000  
     
-    @noon: (msg, arg) ->
+    @noon: msg arg ->
         
         if not arg
             arg = msg
             msg = null
-        log red msg if msg
-        log noon.stringify arg, colors:true
+        log red(msg) if msg
+        log noon.stringify(arg colors:true)
 
 export Print

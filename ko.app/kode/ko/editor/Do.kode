@@ -108,8 +108,7 @@ class Do extends events
     end: opt ->
         @doCount -= 1
         if @doCount == 0
-            # log 'Do.end' @history, @state.s
-            changes = @calculateChanges @history[-1], @state.s
+            changes = @calculateChanges @history[-1] @state.s
             @history.push @state.s
             @emit 'changes' changes if valid changes
         null
@@ -120,8 +119,8 @@ class Do extends events
     # 000 0 000  000   000  000   000  000  000          000
     # 000   000   0000000   0000000    000  000          000
 
-    change: index text -> @state.changeLine index, text
-    insert: index text -> @state.insertLine index, text
+    change: index text -> @state.changeLine index text
+    insert: index text -> @state.insertLine index text
     delete: index      -> @state.deleteLine index
     append:       text -> @state.appendLine text
 
@@ -135,7 +134,7 @@ class Do extends events
 
         if @undos+1 < @history.length
             @undos += 1
-            changes = @calculateChanges @state.s, @history[@history.length-1-@undos]
+            changes = @calculateChanges @state.s @history[@history.length-1-@undos]
             @state = new DoState @history[@history.length-1-@undos]
             @emit 'changes' changes if valid changes
 
@@ -151,7 +150,7 @@ class Do extends events
         
         if @undos-1 < @history.length
             @undos -= 1
-            changes = @calculateChanges @state.s, @history[@history.length-1-@undos]
+            changes = @calculateChanges @state.s @history[@history.length-1-@undos]
             @state = new DoState @history[@history.length-1-@undos]
             @emit 'changes' changes
 
@@ -184,7 +183,7 @@ class Do extends events
             switch opt.main
                 'first'   ➜ mainIndex = 0
                 'last'    ➜ mainIndex = newCursors.length-1
-                'closest' ➜ mainIndex = newCursors.indexOf posClosestToPosInPositions @state.mainCursor(), newCursors
+                'closest' ➜ mainIndex = newCursors.indexOf posClosestToPosInPositions(@state.mainCursor() newCursors)
                           ➜
                             mainIndex = newCursors.indexOf opt.main
                             mainIndex = parseInt opt.main if mainIndex < 0
@@ -193,7 +192,7 @@ class Do extends events
 
         mainCursor = newCursors[mainIndex]
         @cleanCursors newCursors
-        mainIndex = newCursors.indexOf posClosestToPosInPositions mainCursor, newCursors
+        mainIndex = newCursors.indexOf posClosestToPosInPositions(mainCursor newCursors)
 
         @state.setCursors newCursors
         @state.setMain mainIndex
@@ -226,8 +225,8 @@ class Do extends events
     cleanCursors: cs ->
 
         for p in cs
-            p[0] = Math.max p[0], 0
-            p[1] = clamp 0, @state.numLines()-1, p[1]
+            p[0] = Math.max p[0] 0
+            p[1] = clamp 0 @state.numLines()-1 p[1]
 
         sortPositions cs
 
@@ -236,7 +235,7 @@ class Do extends events
                 c = cs[ci]
                 p = cs[ci-1]
                 if c[1] == p[1] and c[0] == p[0]
-                    cs.splice ci, 1
+                    cs.splice ci 1
         cs
         
     #  0000000   0000000   000       0000000  000   000  000       0000000   000000000  00000000
@@ -249,7 +248,7 @@ class Do extends events
         
         ⮐ false if empty @history
         
-        changes = @calculateChanges @history[0], @state.s
+        changes = @calculateChanges @history[0] @state.s
         
         ⮐ false if empty changes
         
@@ -280,7 +279,7 @@ class Do extends events
 
                 if not nl? # new state has not enough lines, mark remaining lines in oldState as deleted
                     deletes += 1
-                    changes.push change: 'deleted' oldIndex: oi, doIndex: oi+dd
+                    changes.push change:'deleted' oldIndex:oi doIndex:oi+dd
                     oi += 1
                     dd -= 1
 
@@ -294,10 +293,10 @@ class Do extends events
 
                     if nl == oldLines[oi+1] and ol == newLines[ni+1]
 
-                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
+                        changes.push change:'changed' oldIndex:oi newIndex:ni doIndex:oi+dd after:nl
                         oi += 1
                         ni += 1
-                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: ol
+                        changes.push change:'changed' oldIndex:oi newIndex:ni doIndex:oi+dd after:ol
                         oi += 1
                         ni += 1
                         ol = oldLines[oi]
@@ -305,7 +304,7 @@ class Do extends events
 
                     else if nl == oldLines[oi+1] and oldLines[oi+1] != newLines[ni+1]
 
-                        changes.push change: 'deleted' oldIndex: oi, doIndex: oi+dd
+                        changes.push change:'deleted' oldIndex:oi doIndex:oi+dd
                         oi += 1
                         dd -= 1
                         deletes += 1
@@ -313,7 +312,7 @@ class Do extends events
 
                     else if ol == newLines[ni+1] and oldLines[oi+1] != newLines[ni+1]
 
-                        changes.push change: 'inserted' newIndex: ni, doIndex: oi+dd, after: nl
+                        changes.push change:'inserted' newIndex:ni doIndex:oi+dd after:nl
                         ni += 1
                         dd += 1
                         inserts += 1
@@ -321,7 +320,7 @@ class Do extends events
 
                     else # change
 
-                        changes.push change: 'changed' oldIndex: oi, newIndex: ni, doIndex: oi+dd, after: nl
+                        changes.push change:'changed' oldIndex:oi newIndex:ni doIndex:oi+dd after:nl
                         oi += 1
                         ol = oldLines[oi]
                         ni += 1
@@ -330,7 +329,7 @@ class Do extends events
             while ni < newLines.length # mark remaining lines in newState as inserted
 
                 inserts += 1
-                changes.push change: 'inserted' newIndex: ni, doIndex: ni, after: nl
+                changes.push change:'inserted' newIndex:ni doIndex:ni after:nl
                 ni += 1
                 nl = newLines[ni]
 
@@ -362,8 +361,8 @@ class Do extends events
     numSelections: -> @state.numSelections()
     numHighlights: -> @state.numHighlights()
 
-    textInRange: r -> @state.line(r[0])?.slice r[1][0], r[1][1]
+    textInRange: r -> @state.line(r[0])?.slice r[1][0] r[1][1]
     mainCursor:    -> @state.mainCursor()
-    rangeForLineAtIndex: i -> [i, [0, @line(i).length]]
+    rangeForLineAtIndex: i -> [i [0 @line(i).length]]
 
 export Do

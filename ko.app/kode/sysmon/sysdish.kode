@@ -1,0 +1,199 @@
+###
+ 0000000  000   000   0000000      0000000    000   0000000  000   000  
+000        000 000   000           000   000  000  000       000   000  
+0000000     00000    0000000       000   000  000  0000000   000000000  
+     000     000          000      000   000  000       000  000   000  
+0000000      000     0000000       0000000    000  0000000   000   000  
+###
+
+use ../kakao
+use ../kxk ▪ kermit sleep win deg2rad prefs elem post $
+use ◆ utils 
+
+digger = utils.digger
+
+R_DISK = 50
+R_NET  = 46
+R_LOAD = 42
+R_MEM  = 20
+
+function SysDish
+    
+    @: ->
+        
+        @dataDelay = 500
+        @animFrames = 30
+        
+        @div = elem class:"sysmon" parent:document.body
+        
+        @dskrOld = @dskrNow = @dskrNew = 0
+        @dskwOld = @dskwNow = @dskwNew = 0
+        
+        @netrOld = @netrNow = @netrNew = 0
+        @nettOld = @nettNow = @nettNew = 0
+                
+        @sysOld  = @sysNow  = @sysNew  = 0
+        @usrOld  = @usrNow  = @usrNew  = 0
+        
+        @memuOld = @memuNow = @memuNew = 0
+        @memaOld = @memaNow = @memaNew = 0
+        
+        @netIn  = @netOut = 0
+        @dskIn  = @dskOut = 0
+        
+        @maxNetIn  = prefs.get 'dish|maxNetIn'  0
+        @maxNetOut = prefs.get 'dish|maxNetOut' 0
+        @maxDskIn  = prefs.get 'dish|maxDskIn'  0
+        @maxDskOut = prefs.get 'dish|maxDskOut' 0
+        
+        @data = 
+            cpu:
+                sys: 0
+                usr: 0
+            mem:
+                used:   0
+                active: 0
+            dsk:
+                in:  0
+                out: 0
+            net:  
+                in:  0
+                out: 0
+
+        post.on 'window.close' @onWindowClose
+        
+        @initDish()
+    
+    # 000  000   000  000  000000000  0000000    000   0000000  000   000  
+    # 000  0000  000  000     000     000   000  000  000       000   000  
+    # 000  000 0 000  000     000     000   000  000  0000000   000000000  
+    # 000  000  0000  000     000     000   000  000       000  000   000  
+    # 000  000   000  000     000     0000000    000  0000000   000   000  
+    
+    initDish: ->
+ 
+        @div.innerHTML = ''
+        
+        svg = utils.svg 100 100 'dish'
+        @div.appendChild svg
+
+        utils.circle R_DISK, 'sysdish_disk_bgr bgr' svg
+        @dskrPie = utils.pie 'sysdish_disk_read'    svg
+        @dskwPie = utils.pie 'sysdish_disk_write'   svg
+                                                    
+        utils.circle R_NET,  'sysdish_net_bgr bgr'  svg
+        @netrPie = utils.pie 'sysdish_net_recv'     svg
+        @nettPie = utils.pie 'sysdish_net_send'     svg
+                                                    
+        utils.circle R_LOAD, 'sysdish_load_bgr bgr' svg
+        @usrPie  = utils.pie 'sysdish_load_usr'     svg
+        @sysPie  = utils.pie 'sysdish_load_sys'     svg
+
+        utils.circle R_MEM, 'sysdish_mem_bgr bgr'   svg
+        @memuPie = utils.pie 'sysdish_mem_used'     svg
+        @memaPie = utils.pie 'sysdish_mem_active'   svg        
+        
+    onWindowClose: save =>
+        
+        @stop = true
+        
+    onWindowAnimationTick: =>
+        
+        ⮐ 'stop' if @stop
+        
+        @animDish()
+                    
+    pie180: pie radius angle start=0 ->
+        
+        angle = clamp 0, 180, angle
+        sx =  radius * Math.sin(deg2rad(start+angle))
+        sy = -radius * Math.cos(deg2rad(start+angle))
+        ex =  radius * Math.sin(deg2rad(start))
+        ey = -radius * Math.cos(deg2rad(start))
+        sx = sx.toFixed 2
+        pie.setAttribute 'd' "M 0 0 L #{sx} #{sy} A #{radius} #{radius} #{start} 0 0 #{ex} #{ey} z"
+    
+    pie360: pie radius angle ->
+        
+        angle = clamp 0, 359, angle
+        sx =  radius * Math.sin(deg2rad(angle))
+        sy = -radius * Math.cos(deg2rad(angle))
+        ex =  0
+        ey = -radius
+        f = angle <= 180 and '0 0' or '1 0'
+        pie.setAttribute 'd' "M 0 0 L #{sx} #{sy} A #{radius} #{radius} 0 #{f} #{ex} #{ey} z"
+                                
+     # 000   000  00000000   0000000     0000000   000000000  00000000  
+     # 000   000  000   000  000   000  000   000     000     000       
+     # 000   000  00000000   000   000  000000000     000     0000000   
+     # 000   000  000        000   000  000   000     000     000       
+     #  0000000   000        0000000    000   000     000     00000000  
+     
+     updateDish: ->
+
+        @animCount = 0
+
+        @dskrOld = @dskrNow
+        @dskwOld = @dskwNow
+
+        @dskrNew = 180*@data.dsk.in
+        @dskwNew = 180*@data.dsk.out
+             
+        @netrOld = @netrNow
+        @nettOld = @nettNow
+
+        @netrNew = 180*@data.net.in
+        @nettNew = 180*@data.net.out
+         
+        @sysOld  = @sysNow
+        @usrOld  = @usrNow
+                 
+        @sysNew  = 360*@data.cpu.sys
+        @usrNew  = 360*(@data.cpu.sys+@data.cpu.usr)
+
+        @memuOld = @memuNow
+        @memaOld = @memaNow
+
+        @memuNew = 360*@data.mem.used
+        @memaNew = 360*@data.mem.active
+         
+    #  0000000   000   000  000  00     00  
+    # 000   000  0000  000  000  000   000  
+    # 000000000  000 0 000  000  000000000  
+    # 000   000  000  0000  000  000 0 000  
+    # 000   000  000   000  000  000   000  
+    
+    animDish: =>
+        
+        steps = @animFrames
+        @animCount += 1
+        
+        if @animCount <= steps
+            
+            @dskrNow += (@dskrNew - @dskrOld) / steps 
+            @dskwNow += (@dskwNew - @dskwOld) / steps
+              
+            @pie180 @dskrPie, R_DISK, @dskrNow
+            @pie180 @dskwPie, R_DISK, @dskwNow, 180
+                              
+            @netrNow += (@netrNew - @netrOld) / steps
+            @nettNow += (@nettNew - @nettOld) / steps 
+              
+            @pie180 @netrPie, R_NET, @netrNow
+            @pie180 @nettPie, R_NET, @nettNow, 180
+            
+            @sysNow += (@sysNew - @sysOld) / steps 
+            @usrNow += (@usrNew - @usrOld) / steps 
+            
+            @pie360 @usrPie, R_LOAD, @usrNow
+            @pie360 @sysPie, R_LOAD, @sysNow
+            
+            @memuNow += (@memuNew - @memuOld) / steps
+            @memaNow += (@memaNew - @memaOld) / steps 
+            
+            @pie360 @memuPie, R_MEM, @memuNow
+            @pie360 @memaPie, R_MEM, @memaNow
+        @
+        
+export SysDish
+    

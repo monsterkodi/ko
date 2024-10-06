@@ -24,13 +24,13 @@ function Git
         
         kakao('fs.git' prjPath).then (gitDir) =>
             if valid gitDir and gitDir not in @gitDirs
-                @gitDirs.push slash.path gitDir, '.git'
+                @gitDirs.push slash.path(gitDir, '.git')
                 
     onFileChanged: file =>
         # log 'Git.fileChanged' file
         for gitDir in @gitDirs
             if file.startsWith gitDir
-                if slash.dir(file).endsWith '.git/refs/heads'
+                if slash.dir(file).endsWith('.git/refs/heads')
                     if slash.name(file) in ['master' 'main']
                         Git.status gitDir
                         ⮐ 
@@ -70,7 +70,7 @@ function Git
         
         while line = lines.shift()
             rel    = line.slice 3
-            file   = slash.path gitDir, line.slice 3
+            file   = slash.path gitDir, rel
             while (rel = slash.dir rel) != ''
                 dirSet.add rel
                 
@@ -119,12 +119,12 @@ function Git
     
                 oldLines = []
                 for i in [0...numOld]
-                    oldLines.push lines.shift().slice 1
+                    oldLines.push lines.shift().slice(1)
                 lines.shift() while first(lines)[0] == '\\'
     
                 newLines = []
                 for i in [0...numNew]
-                    newLines.push lines.shift().slice 1
+                    newLines.push lines.shift().slice(1)
                 lines.shift() while first(lines)[0] == '\\'
     
                 change.old = oldLines if oldLines.length
@@ -132,7 +132,7 @@ function Git
     
                 if numOld and numNew
                     change.mod = []
-                    for i in [0...Math.min numOld, numNew]
+                    for i in [0...Math.min(numOld, numNew)]
                         change.mod.push old:change.old[i], new:change.new[i]
     
                 if numOld > numNew

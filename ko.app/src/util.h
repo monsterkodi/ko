@@ -8,5 +8,7 @@
 
 NSDictionary* dictForRect(NSRect rect);
 NSDictionary* dictForSize(NSSize size);
+NSDictionary* dictForPoint(NSPoint point);
 NSRect rectForDict(NSDictionary* dict);
 NSString* typeForNSFileType(NSString* fileType);
+NSString* cornerForRectAndPoint(NSRect rect, NSPoint point);

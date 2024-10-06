@@ -1,0 +1,56 @@
+###
+000000000  000   000  0000000    00000000
+   000     000   000  000   000  000     
+   000     000   000  0000000    0000000 
+   000     000   000  000   000  000     
+   000      0000000   0000000    00000000
+###
+
+TUBE_H  = 0
+TUBE_TR = 1
+TUBE_V  = 2
+TUBE_BR = 3
+TUBE_BL = 4
+TUBE_TL = 5
+
+function tube
+
+    @path: path func ->
+
+        func path[0][0] path[0][1] path[0][0] == path[1][0] ? TUBE_V : TUBE_H
+        
+        for pi in 1...path.length
+            
+            p = path[pi-1]
+            l = path[pi]
+            
+            if p[0] == l[0]
+                
+                [s e] = [min(p[1] l[1]) max(p[1] l[1])]
+                if s < e
+                    t = TUBE_V
+                    if pi < path.length - 1
+                        n = path[pi+1]
+                        if p[1] < l[1]
+                            t = n[0] > l[0] ? TUBE_TL : TUBE_TR
+                        else
+                            t = n[0] > l[0] ? TUBE_BL : TUBE_BR
+                    func l[0] l[1] t
+                    for y in s+1...e
+                        func p[0] y TUBE_V
+            else
+                
+                [s e] = [min(p[0] l[0]) max(p[0] l[0])]
+                if s < e
+                    t = TUBE_H
+                    if pi < path.length - 1
+                        n = path[pi+1]
+                        if p[0] < l[0]
+                            t = n[1] > l[1] ? TUBE_BR : TUBE_TR
+                        else
+                            t = n[1] > l[1] ? TUBE_BL : TUBE_TL
+                    func l[0] l[1] t
+                    for x in s+1...e
+                        func x p[1] TUBE_H
+
+export tube

@@ -10,7 +10,7 @@ use ../../kxk ▪ slash ffs
 
 icons = {}
 
-ffs.read(slash.path ◆dir, 'icons.json').then (t) -> 
+ffs.read(slash.path(◆dir, 'icons.json')).then (t) -> 
     icons = JSON.parse t
 
 class File
@@ -25,10 +25,10 @@ class File
    
     @rename: from to ○->
         
-        ○ ffs.mkdir slash.dir to
+        ○ ffs.mkdir slash.dir(to)
             
         if ○ ffs.isDir to
-            to = slash.path to, slash.file from
+            to = slash.path to, slash.file(from)
 
         if ○ ffs.move from, to
                 
@@ -46,7 +46,7 @@ class File
     @copy: from to ○->
         
         if ○ ffs.isDir to
-            to = slash.path to, slash.file from
+            to = slash.path to, slash.file(from)
         
         ○ ffs.copy from, to
     

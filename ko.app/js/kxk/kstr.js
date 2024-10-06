@@ -301,7 +301,7 @@ str.detab = function (s)
     {
         if (s[i] === '\t')
         {
-            s = s.slice(0, typeof i === 'number' ? i : -1) + (str.lpad('',4 - (i % 4))) + s.slice(i + 1)
+            s = s.slice(0, typeof i === 'number' ? i : -1) + str.lpad('',4 - (i % 4)) + s.slice(i + 1)
         }
         i += 1
     }

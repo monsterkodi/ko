@@ -40,7 +40,7 @@ class GitInfo
         window.terminal.clear()
         window.terminal.singleCursorAtPos [0 0]
 
-        gitDir  =○ kakao 'fs.git' path
+        gitDir  =○ kakao('fs.git' path)
         history =○ Git.history()
             
         for commit in history
@@ -48,7 +48,7 @@ class GitInfo
             # text = "#{commit.msg} #{commit.commit}"
             text = "#{commit.msg}"
             window.terminal.queueMeta
-                diss:  Syntax.dissForTextAndSyntax text, 'git'
+                diss:  Syntax.dissForTextAndSyntax(text, 'git')
                 text:  text
                 clss:  'gitInfoFile'
                 href:  "macro log #{commit.commit}"
@@ -73,7 +73,7 @@ class GitInfo
                         
                 text = "        #{slash.tilde file.path}"
                 window.terminal.queueMeta
-                    diss:     Syntax.dissForTextAndSyntax text, 'git'
+                    diss:     Syntax.dissForTextAndSyntax(text, 'git')
                     text:     text
                     clss:     'gitInfoFile'
                     href:     "#{gitDir}/#{file.path}"
@@ -95,18 +95,18 @@ class GitInfo
         
         window.split.raise 'terminal'
         window.terminal.clear()
-        window.terminal.appendMeta diss: Syntax.dissForTextAndSyntax "commit #{msg}", 'kode'
+        window.terminal.appendMeta diss: Syntax.dissForTextAndSyntax("commit #{msg}", 'kode')
 
         log 'GitInfo.commit' msg
-        log 'GitInfo.commit editor|file' kore.get 'editor|file'
+        log 'GitInfo.commit editor|file' kore.get('editor|file')
         log 'GitInfo.commit currentFile' window.textEditor.currentFile
         log 'GitInfo.commit Projects.current' Projects.current()
         
-        gitDir  = Projects.dir kore.get 'editor|file'
+        gitDir  = Projects.dir kore.get('editor|file')
         gitDir ?= Projects.current()
         
         if empty gitDir
-            gitDir =○ kakao 'fs.git' kore.get 'editor|file'
+            gitDir =○ kakao('fs.git' kore.get('editor|file'))
         
         if gitDir
             
@@ -121,7 +121,7 @@ class GitInfo
 
             window.terminal.clear()
             for line in out.split '\n'
-                window.terminal.appendMeta diss: Syntax.dissForTextAndSyntax line, 'kode'
+                window.terminal.appendMeta diss: Syntax.dissForTextAndSyntax(line, 'kode')
                 
             window.split.do 'maximize editor'
 
@@ -168,7 +168,7 @@ class GitInfo
             continue if slash.ext(path) in IGNORE_FILE_EXTS
             
             window.terminal.appendMeta
-                diss:       Syntax.dissForTextAndSyntax "#{path}" 'ko'
+                diss:       Syntax.dissForTextAndSyntax("#{path}" 'ko')
                 href:       path
                 list:       path
                 clss:       'gitInfoFile'
@@ -208,7 +208,7 @@ class GitInfo
                 
                 switch line.type
                     '-'
-                        dss = Syntax.dissForTextAndSyntax line.line, slash.ext path
+                        dss = Syntax.dissForTextAndSyntax line.line, slash.ext(path)
                         for ds in dss ➜ ds.clss += ' ' + 'git-deleted'
                         window.terminal.appendMeta
                             diss:       dss
@@ -221,7 +221,7 @@ class GitInfo
     
                     '+' # TODO: add diff line metas like in logDiff 'changed'
                         window.terminal.appendMeta
-                            diss:       Syntax.dissForTextAndSyntax line.line, slash.ext path
+                            diss:       Syntax.dissForTextAndSyntax(line.line, slash.ext(path))
                             href:       path + ':' + aline
                             clss:       'gitInfoAdded'
                             click:      @onMetaClick
@@ -381,7 +381,7 @@ class GitInfo
                 path = slash.relative file, status.gitDir
 
                 window.terminal.appendMeta
-                    diss:       Syntax.dissForTextAndSyntax "#{path}" 'ko'
+                    diss:       Syntax.dissForTextAndSyntax("#{path}" 'ko')
                     href:       file
                     list:       file
                     clss:       'gitInfoFile'
@@ -408,7 +408,7 @@ class GitInfo
                     logDiff lines:lines, line:1, file:file, change:'added'
 
                 
-            for file in status.changed.filter (f) -> slash.ext(f) in SOURCE_FILE_EXTS
+            for file in status.changed.filter((f) -> slash.ext(f) in SOURCE_FILE_EXTS)
                 
                 logFile 'changed' file, status
                     

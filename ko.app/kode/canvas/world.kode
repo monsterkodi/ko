@@ -1,0 +1,245 @@
+###
+000   000   0000000   00000000   000      0000000  
+000 0 000  000   000  000   000  000      000   000
+000000000  000   000  0000000    000      000   000
+000   000  000   000  000   000  000      000   000
+00     00   0000000   000   000  0000000  0000000  
+###
+
+use ../kxk ▪ $ randInt randRange randIntRange elem prefs post
+
+use ◆ tweaky valgrid
+
+function world
+
+    @: -> 
+        
+        @pause          = false
+        @types          = 12
+        @stepsPerFrame  = 1
+        
+        @dt             = 0.025
+        @beta           = 0.3
+        @num            = 1000
+        @friction       = 0.5
+        @maxVelocity    = 0.5
+        @ageVel         = 0.005
+        @showAge        = false
+        
+        @minRadius      = 0.025
+        @maxRadius      = 0.1
+                        
+        @canvas = elem 'canvas' class:'canvas'
+        
+        @main =$ 'main'
+        @main.appendChild @canvas
+                
+        @tweaky  = new tweaky  @main
+        @valgrid = new valgrid @main
+        @valgrrd = new valgrid @main
+        
+        @tweaky.init 
+            
+            num:         min:500    max:2000  step:100   value:@num,         cb: (@num)         => @start()
+            types:       min:2      max:16    step:1     value:@types,       cb: (@types)       => @start()
+            delta:       min:0.01   max:0.1   step:0.001 value:@dt,          cb: (@dt)          =>
+            friction:    min:0.1    max:0.7   step:0.01  value:@friction,    cb: (@friction)    =>
+            beta:        min:0.1    max:0.6   step:0.01  value:@beta,        cb: (@beta)        =>
+            maxVelocity: min:0.1    max:1     step:0.01  value:@maxVelocity, cb: (@maxVelocity) =>   
+            minRadius:   min:0.001  max:0.05  step:0.001 value:@minRadius,   cb: (@minRadius)   =>
+            maxRadius:   min:0.05   max:0.5   step:0.01  value:@maxRadius,   cb: (@maxRadius)   =>
+            ageVel:      min:0.001  max:0.1   step:0.001 value:@ageVel,      cb: (@ageVel)      =>   
+            showAge:     value:@showAge, cb: (@showAge) =>
+        
+        post.on 'resize' @resize
+        
+        @resize()
+        @start()
+        
+    #  0000000  000000000   0000000   00000000   000000000  
+    # 000          000     000   000  000   000     000     
+    # 0000000      000     000000000  0000000       000     
+    #      000     000     000   000  000   000     000     
+    # 0000000      000     000   000  000   000     000     
+    
+    start: =>
+        
+        @matrix = @randomMatrix @types
+        @radii  = @randomRadii  @types
+                
+        @colors         = new Int32Array   @num
+        @ages           = new Float32Array @num
+        @positionsX     = new Float32Array @num
+        @positionsY     = new Float32Array @num
+        @velocitiesX    = new Float32Array @num
+        @velocitiesY    = new Float32Array @num
+        
+        @hsl            = []
+        
+        for i in 0...@num
+            @colors[i]      = randInt @types
+            @positionsX[i]  = Math.random()
+            @positionsY[i]  = Math.random()
+            @velocitiesX[i] = 0
+            @velocitiesY[i] = 0
+            @ages[i]        = 0
+            @hsl[i]         = "hsl(#{360*i/@types},100%,50%)"
+            
+        @valgrid.init @matrix
+        @valgrrd.init @radii, min:0 max:1 colors:@hsl
+        
+    randomMatrix: n ->
+        
+        rows = []
+        for i in 0...n
+            row = []
+            for j in 0...n
+                row.push Math.random()*2-1
+            rows.push row
+        rows
+
+    randomRadii: n ->
+        
+        rows = []
+        for i in 0...n
+            row = []
+            for j in 0...n
+                row.push Math.random()
+            rows.push row
+        rows
+        
+    resize: =>
+        
+        br = @main.getBoundingClientRect()
+        @size = min br.width, br.height
+        @canvas.width  = @size
+        @canvas.height = @size
+        
+        @canvas.style.left = "#{(max(0 br.width-@size))/2}px"
+        @canvas.style.top  = "#{(max(0 br.height-@size))/2}px"
+                
+    togglePause:  => @pause = not @pause; post.emit 'pause'
+    toggleValues: => 
+        
+        @tweaky.div.style.display  = @tweaky.div.style.display  == 'none' ? 'block' : 'none'
+        @valgrid.div.style.display = @valgrid.div.style.display == 'none' ? 'block' : 'none'
+        @valgrrd.div.style.display = @valgrrd.div.style.display == 'none' ? 'block' : 'none'
+    
+    # 00000000   0000000   00000000    0000000  00000000  
+    # 000       000   000  000   000  000       000       
+    # 000000    000   000  0000000    000       0000000   
+    # 000       000   000  000   000  000       000       
+    # 000        0000000   000   000   0000000  00000000  
+    
+    force: r a ->
+        
+        if r < @beta     ➜ ⮐ r / @beta - 1
+        if @beta < r < 1 ➜ ⮐ a * (1 - Math.abs(2*r-1-@beta)/(1-@beta))
+        0
+    
+    #  0000000  000  00     00  000   000  000       0000000   000000000  00000000  
+    # 000       000  000   000  000   000  000      000   000     000     000       
+    # 0000000   000  000000000  000   000  000      000000000     000     0000000   
+    #      000  000  000 0 000  000   000  000      000   000     000     000       
+    # 0000000   000  000   000   0000000   0000000  000   000     000     00000000  
+    
+    simulate: ->
+        
+        ⮐ if @pause and not @oneStep
+        
+        # ● simulate
+        
+        delete @oneStep
+        
+        for i in 0...@num
+            
+            totalForceX = 0
+            totalForceY = 0
+            
+            for j in 0...@num
+                
+                continue if i == j
+                
+                rx = @positionsX[j] - @positionsX[i]
+                ry = @positionsY[j] - @positionsY[i]
+                
+                rx = rx - 1 if rx > 0.5
+                ry = ry - 1 if ry > 0.5
+                
+                rx = rx + 1 if rx < -0.5
+                ry = ry + 1 if ry < -0.5
+                
+                r = Math.hypot rx, ry
+
+                rMax = @minRadius + @radii[@colors[i]][@colors[j]] * (@maxRadius - @minRadius)
+                if r > 0 and r < rMax
+                    f = @force r/rMax, @matrix[@colors[i]][@colors[j]]
+                    totalForceX += rx / r * f
+                    totalForceY += ry / r * f
+                                
+            @velocitiesX[i] += totalForceX * @dt
+            @velocitiesY[i] += totalForceY * @dt
+                        
+            if Math.abs(@velocitiesX[i]) < @ageVel and Math.abs(@velocitiesY[i]) < @ageVel
+                @ages[i] += 0.01
+                if @ages[i] > 1
+                    @colors[i]      = randInt @types
+                    @positionsX[i]  = Math.random()
+                    @positionsY[i]  = Math.random()
+                    @velocitiesX[i] = 2*(2*Math.random()*@ageVel-@ageVel)
+                    @velocitiesY[i] = 2*(2*Math.random()*@ageVel-@ageVel)
+                    @ages[i]        = 0
+            else
+                @ages[i] = 0
+            
+        for i in 0...@num
+          
+            @velocitiesX[i] *= @friction
+            @velocitiesY[i] *= @friction
+            
+            @velocitiesX[i] = clamp -@maxVelocity, @maxVelocity, @velocitiesX[i]
+            @velocitiesY[i] = clamp -@maxVelocity, @maxVelocity, @velocitiesY[i]
+            
+            @positionsX[i] += @velocitiesX[i] * @dt
+            @positionsY[i] += @velocitiesY[i] * @dt
+            
+            @positionsX[i] += 1 if @positionsX[i] < 0 
+            @positionsY[i] += 1 if @positionsY[i] < 0 
+            
+            @positionsX[i] -= 1 if @positionsX[i] > 1 
+            @positionsY[i] -= 1 if @positionsY[i] > 1 
+               
+    # 000000000  000   0000000  000   000  
+    #    000     000  000       000  000   
+    #    000     000  000       0000000    
+    #    000     000  000       000  000   
+    #    000     000   0000000  000   000  
+    
+    singleStep: => @oneStep = true; @pause = true; post.emit 'pause'
+    
+    tick: tickInfo ->
+        
+        for i in 0...@stepsPerFrame
+            @simulate()
+        
+        @canvas.width = @canvas.width
+        ctx = @canvas.getContext '2d'
+         
+        for i in 0...@num
+            
+            screenX = @positionsX[i] * @canvas.width
+            screenY = @positionsY[i] * @canvas.height
+            if @showAge
+                ctx.fillStyle = "hsl(#{360*@ages[i]},100%,50%)"
+            else
+                ctx.fillStyle = @hsl[@colors[i]]
+
+            if @num <= 1000
+                radius = 6*500/@num
+                ctx.beginPath()
+                ctx.arc screenX, screenY, radius, 0 2*Math.PI
+                ctx.fill()
+            else
+                ctx.fillRect screenX, screenY, 4 4
+                    
+export world

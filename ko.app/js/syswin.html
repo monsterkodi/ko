@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <title>syswin</title>
+        <style>
+            body
+            {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                top: 0;
+                margin: 0;
+                padding: 0;
+                background: #202020;
+                overflow: hidden;
+            }
+
+            .sysmon
+            {
+                pointer-events: none;
+                margin: 4%;
+                width: 92%;
+                height: 92%;
+            }
+
+.sysmon svg
+{
+    stroke-width: 0px;
+}
+
+            .bgr
+            {
+                fill: rgba(28,28,28,0.92);
+            }
+
+            .sysdish_disk_read
+            {
+                fill: #88f;
+            }
+
+            .sysdish_disk_write
+            {
+                fill: #66f;
+            }
+
+            .sysdish_net_recv
+            {
+                fill: #080;
+            }
+
+            .sysdish_net_send
+            {
+                fill: #0a0;
+            }
+
+            .sysdish_load_sys
+            {
+                fill: #ff0;
+            }
+
+            .sysdish_load_usr
+            {
+                fill: #f80;
+            }
+
+            .sysdish_mem_used
+            {
+                fill: #00f;
+            }
+
+            .sysdish_mem_active
+            {
+                fill: #88f;
+            }
+        </style>
+    </head>
+    <body class='app-drag-region'></body>
+    <script type="module" src="./sysmon/syswin.js"></script>
+</html>

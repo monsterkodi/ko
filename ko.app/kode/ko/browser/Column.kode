@@ -267,7 +267,7 @@ function Column
 
     removeFile: file =>
 
-        if row = @row slash.file file
+        if row = @row slash.file(file)
             @removeRow row
             @scroll.update()
 
@@ -404,7 +404,7 @@ function Column
     rowHeight:  -> @parent?.type == 'file' ? 19 : 21
     numVisible: -> @rowHeight() and parseInt(@browser.height() / @rowHeight()) or 0
 
-    rowAtPos: pos -> @row @rowIndexAtPos pos
+    rowAtPos: pos -> @row @rowIndexAtPos(pos)
 
     rowIndexAtPos: pos ->
         dy = pos.y - @content.getBoundingClientRect().top
@@ -534,7 +534,7 @@ function Column
     navigateRoot: key ->
         
         switch key
-            'left'  ➜ @browser.browse slash.dir @parent.path
+            'left'  ➜ @browser.browse slash.dir(@parent.path)
             'right' ➜ @browser.browse @activeRow().item.path
         @
 
@@ -749,7 +749,7 @@ function Column
     open: =>
 
         # open @activePath()
-        kakao 'open' slash.fileUrl @activePath()
+        kakao 'open' slash.fileUrl(@activePath())
 
     #  0000000   000  000000000
     # 000        000     000
@@ -768,11 +768,11 @@ function Column
                 icon.remove()
 
             if status?
-                row.div.appendChild elem 'span' class:"git-#{status}-icon browserStatusIcon"
+                row.div.appendChild elem('span' class:"git-#{status}-icon browserStatusIcon")
             else if row.item.type == 'dir'
                 for file, status of files
                     if row.item.file != '..' and file.startsWith row.item.path
-                        row.div.appendChild elem 'span' class:"git-dirs-icon browserStatusIcon"
+                        row.div.appendChild elem('span' class:"git-dirs-icon browserStatusIcon")
                         break
 
     # 00000000    0000000   00000000   000   000  00000000
@@ -792,7 +792,7 @@ function Column
             @unshiftItem
                 file: '..'
                 type: 'dir'
-                path:  slash.dir @parent.path
+                path:  slash.dir(@parent.path)
 
         @crumb.setFile @parent.path
 
@@ -800,7 +800,7 @@ function Column
 
         stopEvent event
 
-        @showContextMenu kpos event
+        @showContextMenu kpos(event)
 
     showContextMenu: absPos =>
 
@@ -908,22 +908,22 @@ function Column
         { mod, key, combo, char } = keyinfo.forEvent event
 
         switch combo
-            'shift+`' '~'                      ➜ ⮐ stopEvent event, @browser.browse '~'
-            '/'                                ➜ ⮐ stopEvent event, @browser.browse '/'
-            'backspace'                        ➜ ⮐ stopEvent event, @browser.onBackspaceInColumn @
-            'delete'                           ➜ ⮐ stopEvent event, @browser.onDeleteInColumn @
-            'alt+left'                         ➜ ⮐ stopEvent event, window.split.focus 'shelf'
+            'shift+`' '~'                      ➜ ⮐ stopEvent event, @browser.browse('~')
+            '/'                                ➜ ⮐ stopEvent event, @browser.browse('/')
+            'backspace'                        ➜ ⮐ stopEvent event, @browser.onBackspaceInColumn(@)
+            'delete'                           ➜ ⮐ stopEvent event, @browser.onDeleteInColumn(@)
+            'alt+left'                         ➜ ⮐ stopEvent event, window.split.focus('shelf')
             'alt+shift+s'                      ➜ ⮐ stopEvent event, @addToShelf()
             'alt+e'                            ➜ ⮐ stopEvent event, @explorer()
             'alt+n'                            ➜ ⮐ stopEvent event, @newFolder()
             'ctrl+x' 'command+x'               ➜ ⮐ stopEvent event, @cutPaths()
             'ctrl+c' 'command+c'               ➜ ⮐ stopEvent event, @copyPaths()
             'ctrl+v' 'command+v'               ➜ ⮐ stopEvent event, @pastePaths()
-            'page up' 'page down' 'home' 'end' ➜ ⮐ stopEvent event, @navigateRows key
-            'enter''alt+up'                    ➜ ⮐ stopEvent event, @navigateCols key
+            'page up' 'page down' 'home' 'end' ➜ ⮐ stopEvent event, @navigateRows(key)
+            'enter''alt+up'                    ➜ ⮐ stopEvent event, @navigateCols(key)
             'command+enter'                    ➜ ⮐ stopEvent event, @openSelected()
-            'command+up' 'ctrl+up'             ➜ ⮐ stopEvent event, @navigateRows 'home'
-            'command+down' 'ctrl+down'         ➜ ⮐ stopEvent event, @navigateRows 'end'
+            'command+up' 'ctrl+up'             ➜ ⮐ stopEvent event, @navigateRows('home')
+            'command+down' 'ctrl+down'         ➜ ⮐ stopEvent event, @navigateRows('end')
             'ctrl+t'                           ➜ ⮐ stopEvent event, @sortByType()
             'ctrl+n'                           ➜ ⮐ stopEvent event, @sortByName()
             'ctrl+a'                           ➜ ⮐ stopEvent event, @sortByDateAdded()
@@ -933,9 +933,9 @@ function Column
             'command+k' 'ctrl+k'               ➜ ⮐ stopEvent event if @browser.cleanUp() # needed?
             'f2'                               ➜ ⮐ stopEvent event, @activeRow()?.editName()
             'shift+up' 'shift+down' 'shift+home' 'shift+end' 'shift+page up' 'shift+page down'
-                ⮐ stopEvent event, @extendSelection key
+                ⮐ stopEvent event, @extendSelection(key)
             'command+left' 'command+right' 'ctrl+left' 'ctrl+right'
-                ⮐ stopEvent event, @navigateRoot key
+                ⮐ stopEvent event, @navigateRoot(key)
             'command+backspace' 'ctrl+backspace' 'command+delete' 'ctrl+delete'
                 ⮐ stopEvent event, @moveToTrash()
             'tab'
@@ -951,8 +951,8 @@ function Column
                 else if @search.length then @clearSearch()
                 ⮐ stopEvent event
 
-        if combo in ['up'   'down']  ➜ ⮐ stopEvent event, @navigateRows key
-        if combo in ['left' 'right'] ➜ ⮐ stopEvent event, @navigateCols key
+        if combo in ['up'   'down']  ➜ ⮐ stopEvent event, @navigateRows(key)
+        if combo in ['left' 'right'] ➜ ⮐ stopEvent event, @navigateCols(key)
 
         if mod in ['shift' ''] and char then @doSearch char
 

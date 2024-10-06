@@ -1,0 +1,473 @@
+###
+00     00   0000000   000000000  00000000   000  000   000
+000   000  000   000     000     000   000  000   000 000 
+000000000  000000000     000     0000000    000    00000  
+000 0 000  000   000     000     000   000  000   000 000 
+000   000  000   000     000     000   000  000  000   000
+###
+
+use ../kxk ▪ fade randRange randInt randIntRange
+
+function matrix
+
+    @: ->
+
+        @PLANT             = 0
+        @EGG               = 1
+        @CRITTER           = 2
+        @CORPSE            = 3
+        @GRINDER           = 4
+        @TUBE              = 5
+        @NUM_TYPES         = 6
+        
+        @anims    = []
+        @eggs     = []
+        @critters = []
+        @plants   = []
+        @tubes    = []
+        @grinders = []
+        
+        @types = []
+        
+        for t in 0...@NUM_TYPES
+            @types.push []
+        
+        @ws = 5
+           
+        @cycles            = 0
+        
+        @eggFadeTime       = 6
+        @eggMoveTime       = 3
+        @critMoveTime      = 4 
+        @critDieTime       = 4
+        @leafEatTime       = 4
+        @botDelta          = 1
+        
+        @numLeaves         = 8
+        @setCritterAge     1000
+        @critterNumEggs    = 2
+        @eggMaxAge         = 100
+        @leafMaxAge        = 50
+        @critterEatPeriod  = 50
+        @critterStarveTime = 50
+                       
+        @tweaky.init                                                    
+            speed:      min: 1    max:100    step:1      value:@speed               cb: (@speed) =>
+            leaves:     min: 4    max:12     step:1      value:@numLeaves           cb: (@numLeaves) =>
+            leafAge:    min: 1    max:100    step:1      value:@leafMaxAge          cb: (@leafMaxAge) =>
+            eggAge:     min: 10   max:200    step:10     value:@eggMaxAge           cb: (@eggMaxAge) =>
+            critterAge: min: 100  max:2400   step:100    value:@critterMaxAge       cb: @setCritterAge
+            eatPeriod:  min: 1    max:100    step:1      value:@critterEatPeriod    cb: (@critterEatPeriod) =>
+            starveTime: min: 1    max:100    step:1      value:@critterStarveTime   cb: (@critterStarveTime) =>
+            botDelta:   min: 1    max:10     step:0.1    value:@botDelta            cb: (@botDelta) =>
+            anims:      info: => @anims.length
+            critters:   info: => @critters.length
+            corpses:    info: => @critters.filter((c) -> c.df >= 1).length
+            plants:     info: => @plants.length
+            cycles:     info: => @cycles.toFixed 2
+                
+    setCritterAge: (@critterMaxAge) =>
+        
+        @critterAdultAge = parseInt @critterMaxAge/3
+        
+    #  0000000  000000000   0000000   00000000   000000000  
+    # 000          000     000   000  000   000     000     
+    # 0000000      000     000000000  0000000       000     
+    #      000     000     000   000  000   000     000     
+    # 0000000      000     000   000  000   000     000     
+    
+    start: =>
+        
+        @cycles = 0
+        
+        @anims = []
+        @grid  = []
+        @types = []
+        
+        for t in 0...@NUM_TYPES
+            @types.push []
+            
+        @eggs     = @types[@EGG]
+        @critters = @types[@CRITTER]
+        @plants   = @types[@PLANT]
+        @tubes    = @types[@TUBE]
+        @grinders = @types[@GRINDER]
+        
+        for x in 0...@ws
+            column = []
+            for y in 0...@ws
+                column.push null
+            @grid.push column
+            
+        @slots[@CORPSE].num = 0
+        @slots[@PLANT].num = 1
+        @slots[@EGG].num = 1
+
+        if 0
+            @addEgg @ws/2 @ws/2
+            
+            for x in 0..@ws/3
+                for y in 0..@ws/3
+                    @addPlant x*3 y*3
+        
+    #  0000000   0000000    000   000   0000000   000   000   0000000  00000000  
+    # 000   000  000   000  000   000  000   000  0000  000  000       000       
+    # 000000000  000   000   000 000   000000000  000 0 000  000       0000000   
+    # 000   000  000   000     000     000   000  000  0000  000       000       
+    # 000   000  0000000        0      000   000  000   000   0000000  00000000  
+    
+    advance: sec =>
+        
+        @cycles += sec/60
+        
+        for e in @eggs
+            
+            e.age += sec
+            
+            if e.age > @eggMaxAge and e.age-sec <= @eggMaxAge
+                @addCritter e.x e.y
+                
+            if e.age > @eggMaxAge+@eggFadeTime
+                @del e
+                
+        for c in @critters
+            
+            c.eat -= sec
+            c.age += sec if not c.df
+                                    
+            if c.age > @critterMaxAge or c.eat < -@critterStarveTime
+                c.df ?= 0
+                c.df += sec / @critDieTime
+                continue
+                
+            if c.eat < 0
+                if l = @neighborLeaf c
+                    c.eat = @critterEatPeriod
+                    l.age = -@leafEatTime
+                    @moveLeafTo l c @leafEatTime
+                # continue
+                
+            continue if c.p
+            continue if c.ox or c.oy
+            
+            if Math.floor((c.age-@critterAdultAge) / @critterEggPeriod(c)) > c.eggs
+                if n = @emptyNeighbor c
+                    e = @addEgg n.x n.y
+                    @moveObjectFrom e @critterWombPos(c) @eggMoveTime
+                    @anim c 'p' 1 0 2
+                c.eggs++
+                    
+            continue if @critterEggFactor(c) > 0.9
+            continue if c.age / @critterMaxAge > 0.98
+                    
+            n = @randomOffset c
+            if @isInWorld(n) and @isEmpty n
+                op = x:c.x y:c.y
+                @grid[c.x][c.y] = null
+                c.x = n[0]
+                c.y = n[1]
+                @grid[c.x][c.y] = c
+                @moveObjectFrom c op @critMoveTime
+                
+        for p in @plants
+                        
+            for l in p.leaves
+                
+                l.age += sec
+                
+        for g in @grinders
+            
+            if not g.bot.c
+                if c = @deadCritterForGrinder g
+                    c.bot = g.bot
+                    @moveBotTo g.bot c
+            else
+                if g.bot.mf <= 0
+                    g.bot.x = g.bot.c.x
+                    g.bot.y = g.bot.c.y
+                    @del g.bot.c
+                    delete g.bot.mf
+                    @returnBot g.bot g
+                else if g.bot.rf <= 0
+                    delete g.bot.rf
+                    delete g.bot.s
+                    delete g.bot.c
+                    g.bot.x = g.x
+                    g.bot.y = g.y
+                    
+        @animate sec
+        
+    neighborsAtDistance: d =>
+        
+        @nd ?= []
+        
+        if @nd[d]
+            ⮐ @nd[d]
+            
+        @nd[d] = []
+        
+        for x in -d...d  ➜ @nd[d].push [ x -d]
+        for y in -d...d  ➜ @nd[d].push [ d  y]
+        for x in  d...-d ➜ @nd[d].push [ x  d]
+        for y in  d...-d ➜ @nd[d].push [-d  y]
+        
+        @nd[d]
+        
+    deadCritterForGrinder: g =>
+        
+        for d in 1...parseInt @ws/2
+            for n in @neighborsAtDistance d
+                if c = @critterAt [g.x+n[0] g.y+n[1]]
+                    if c.df >= 1 and not c.bot
+                        ⮐ c
+        null
+
+    critterEggFactor: c =>
+        
+        f = 0
+        if c.age > @critterAdultAge and c.eggs < @critterNumEggs
+            f = (c.age - @critterAdultAge) / @critterEggPeriod(c)
+            f -= c.eggs
+        f
+        
+    critterEggPeriod: c =>
+        
+        (@critterMaxAge - @critterAdultAge) / (@critterNumEggs + 1)
+                
+    #  0000000   000   000  000  00     00   0000000   000000000  00000000  
+    # 000   000  0000  000  000  000   000  000   000     000     000       
+    # 000000000  000 0 000  000  000000000  000000000     000     0000000   
+    # 000   000  000  0000  000  000 0 000  000   000     000     000       
+    # 000   000  000   000  000  000   000  000   000     000     00000000  
+    
+    animate: sec =>
+        
+        ⮐ if empty @anims
+        
+        for ai in @anims.length-1..0
+            
+            a = @anims[ai]
+
+            d = (sec / a.d) * (a.t - a.s)
+                        
+            a.o[a.m] += d
+            
+            if (d > 0 and a.o[a.m] >= a.t) or (d < 0 and a.o[a.m] <= a.t)
+                a.o[a.m] = a.t
+                
+                @anims.splice ai 1
+                
+    moveObjectFrom: o s d=1 =>
+        
+        @anim o 'ox' s.x-o.x 0 d
+        @anim o 'oy' s.y-o.y 0 d
+
+    moveLeafTo: l t d=1 =>
+
+        l.c = t
+        @anim l 'ef' 1 0 d
+        
+    moveBotTo: b t =>
+        
+        b.c = t
+        
+        d = Math.sqrt (b.x-t.x)*(b.x-t.x) + (b.y-t.y)*(b.y-t.y)
+        d /= @botDelta
+        
+        @anim b 'mf' 1 0 d
+
+    returnBot: b g =>
+        
+        b.s = x:b.x y:b.y
+        
+        d = Math.sqrt (b.x-g.x)*(b.x-g.x) + (b.y-g.y)*(b.y-g.y)
+        d /= @botDelta
+        
+        @anim b 'rf' 1 0 d
+        
+    anim: o m s t d =>
+        
+        ⮐ if d <= 0
+        ⮐ if s == t
+        
+        o[m] = s
+        
+        @anims.push o:o m:m s:s t:t d:d
+                
+    #  0000000   0000000    0000000      
+    # 000   000  000   000  000   000    
+    # 000000000  000   000  000   000    
+    # 000   000  000   000  000   000    
+    # 000   000  0000000    0000000      
+
+    placeObjectOfType: p type =>
+        
+        x = parseInt p[0]
+        y = parseInt p[1]
+        
+        @takeAt [x y]
+        
+        o = switch type
+            @GRINDER ➜ bot: x:x y:y
+            @EGG     ➜ age:0
+            @CRITTER ➜ age:0 sx:0 sy:0 sf:0 eggs:0 eat:@critterEatPeriod
+            @CORPSE  ➜ age:2*@critterMaxAge sx:1 sy:1 df:1 eggs:0
+            @PLANT   ➜ @makePlant x y @numLeaves
+            
+        o.type = type == @CORPSE ? @CRITTER : type
+            
+        @addObject x y o
+    
+    addObject: x y o =>
+    
+        o.x = parseInt x
+        o.y = parseInt y
+        
+        @delAt [o.x o.y]
+        
+        if o.type == @GRINDER
+            for n in @validNeighbors o
+                @delAt n
+                @grid[n[0]][n[1]] = o
+            
+        @grid[o.x][o.y] = o
+        @types[o.type].push o
+        o
+           
+    addGrinder: x y      => @addObject x y type:@GRINDER  bot: x:x  y:y
+    addEgg:     x y      => @addObject x y type:@EGG      age:0
+    addCritter: x y      => @addObject x y type:@CRITTER  age:0 sx:0 sy:0 sf:0 eggs:0 eat:@critterEatPeriod
+    addCorpse:  x y      => @addObject x y type:@CRITTER  age:2*@critterMaxAge sx:1 sy:1 df:1 eggs:0
+    addTube:    x y idx  => @addObject x y type:@TUBE     idx:idx
+    addPlant:   x y      => @addObject x y @makePlant(x y @numLeaves)
+    makePlant:  x y numLeaves leafAge =>
+        
+        leaves = [] 
+        for l in 0...numLeaves
+            leaves.push age:leafAge ? -l*@leafMaxAge/@numLeaves
+        
+        x:x y:y type:@PLANT leaves:leaves
+
+    # 0000000    00000000  000      
+    # 000   000  000       000      
+    # 000   000  0000000   000      
+    # 000   000  000       000      
+    # 0000000    00000000  0000000  
+    
+    takeAt: p =>
+        
+        if o = @objectAt p
+            
+            if @slots[o.type]
+                @slots[o.type].num++
+            else if o.type == @CRITTER
+                @slots[@CORPSE].num++
+            
+            @del o
+    
+    delAt: p =>
+        
+        if o = @objectAt p
+            @del o
+                        
+    del: o =>
+                
+        @types[o.type].splice @types[o.type].indexOf(o) 1
+        @grid[o.x][o.y] = null
+        
+        if o.type == @GRINDER
+            for n in @validNeighbors o
+                @grid[n[0]][n[1]] = null
+            
+    # 00000000    0000000    0000000    
+    # 000   000  000   000  000         
+    # 00000000   000   000  0000000     
+    # 000        000   000       000    
+    # 000         0000000   0000000     
+    
+    objectAt:  p => if @isInWorld p ➜ ⮐ @grid[p[0]][p[1]]
+    isInWorld: p => p[0] >= 0 and p[1] >= 0 and p[0] < @ws and p[1] < @ws
+    isEmpty:   p => not @objectAt p
+                
+    buildingAt: p =>
+        
+        if o = @objectAt p
+            ⮐ o.type in [@PLANT]
+        false
+        
+    emptyNeighbor: o =>
+        
+        en = []
+        
+        for x in -1..1
+            for y in -1..1
+                continue if x == y == 0
+                c = [o.x+x o.y+y]
+                continue if not @isInWorld c
+                if @isEmpty c
+                    en.push x:c[0] y:c[1]
+                    
+        if en.length
+            ⮐ en[randInt(en.length)]
+        null
+    
+    validNeighbors: o =>
+        
+        vn = []
+        for x in -1..1
+            for y in -1..1
+                continue if x == y == 0
+                c = [o.x+x o.y+y]
+                if @isInWorld c
+                    vn.push c
+        vn
+        
+    neighbors: o =>
+        
+        n = [] 
+        for x in -1..1
+            for y in -1..1
+                continue if x == y == 0
+                n.push [o.x+x o.y+y]
+        n
+        
+    objectOfTypeAt: type p =>
+        
+        if o = @objectAt p
+            ⮐ null if o.type != type
+        o
+        
+    critterAt: p => @objectOfTypeAt @CRITTER p
+    plantAt:   p => @objectOfTypeAt @PLANT p
+    tubeAt:    p => @objectOfTypeAt @TUBE p
+                
+    leafToEatAt: p =>
+        
+        if pl = @plantAt p
+            for l in pl.leaves
+                if l.age > @leafMaxAge
+                    ⮐ l
+        null
+                        
+    neighborLeaf: o =>
+        
+        nl = []
+        for vn in @neighbors o
+            if l = @leafToEatAt vn
+                nl.push l
+                    
+        if nl.length
+            ⮐ nl[randInt(nl.length)]
+        null
+        
+    randomOffset: c =>
+        
+        o = [[-1 1] [0 1] [1 1] [-1 0] [1 0] [-1 -1] [0 -1] [1 -1]][randInt 8]
+        [c.x+o[0] c.y+o[1]]
+
+    randomOffsetCross: c =>
+        
+        o = [[0  1] [-1 0] [1 0] [0 -1]][randInt 4]
+        [c.x+o[0] c.y+o[1]]
+            
+export matrix

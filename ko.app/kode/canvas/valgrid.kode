@@ -1,0 +1,40 @@
+###
+000   000   0000000   000       0000000   00000000   000  0000000  
+000   000  000   000  000      000        000   000  000  000   000
+ 000 000   000000000  000      000  0000  0000000    000  000   000
+   000     000   000  000      000   000  000   000  000  000   000
+    0      000   000  0000000   0000000   000   000  000  0000000  
+###
+
+use ../kxk ▪ elem
+
+function valgrid
+
+    @: parent -> 
+        
+        @div = elem class:'valgrid'
+        parent.appendChild @div
+        
+    init: array opt={min:-1 max:1} ->
+        
+        @div.innerHTML = ''
+        
+        if opt.colors
+            rowDiv = elem class:'valgrid-row'
+            @div.appendChild rowDiv
+            for i in 0...array[0].length
+                rowDiv.appendChild elem(class:'valgrid-header' style:"background:#{opt.colors[i]};")
+        
+        for row in array
+            rowDiv = elem class:'valgrid-row'
+            @div.appendChild rowDiv
+            for val in row
+                r = g = b = 0
+                rval = (val - opt.min) / (opt.max - opt.min)
+                if rval > 0.5
+                    r = 255*(rval-0.5)*2
+                else 
+                    b = 255*rval*2
+                rowDiv.appendChild elem(class:'valgrid-cell' style:"background:rgb(#{r},#{g},#{b});")
+
+export valgrid

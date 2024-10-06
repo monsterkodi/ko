@@ -1,0 +1,82 @@
+###
+    000   000   0000000   000      000   000  0000000    000  00000000   
+    000 0 000  000   000  000      000  000   000   000  000  000   000  
+    000000000  000000000  000      0000000    000   000  000  0000000    
+    000   000  000   000  000      000  000   000   000  000  000   000  
+    00     00  000   000  0000000  000   000  0000000    000  000   000  
+###
+
+use ◆ slash ffs
+
+class walkdir
+
+    @: (@cfg) ->
+
+        @cfg.files       = []
+        @cfg.maxDepth    ?= 3
+        @cfg.dotFiles    ?= false
+        @cfg.maxFiles    ?= 15000
+        @cfg.ignore      ?= ['node_modules'] 
+        @cfg.ignoreExt   ?= ['asar']
+        
+        # log 'Walker' @cfg
+        
+    ignore: (p) -> #log 'ignore' p; true
+      
+    #  0000000  000000000   0000000   00000000   000000000
+    # 000          000     000   000  000   000     000   
+    # 0000000      000     000000000  0000000       000   
+    #      000     000     000   000  000   000     000   
+    # 0000000      000     000   000  000   000     000   
+    
+    start: ○->
+        
+        dir = @cfg.root
+        
+        # log 'walkdir.start' dir
+        
+        toWalk = [dir]
+        
+        while valid toWalk
+            
+            listDir = toWalk.shift()
+            
+            # log 'walk dir' listDir
+        
+            items = ○ ffs.list listDir
+            
+            # log 'Walker items' listDir, items.length
+            
+            for item in items
+                # log 'item' item
+                file = item.file
+                ext = slash.ext file
+                p = item.path
+                # log 'file' file, ext, p
+                if 
+                    @cfg.filter?(p) ➜ @ignore p; continue
+                    file in ['.DS_Store' 'Icon\r'] or ext in ['pyc'] ➜ @ignore p; continue
+                    file in @cfg.ignore ➜ @ignore p; continue
+                    file.startsWith '.'
+                        if @cfg.dotFiles
+                            @cfg.files.push item.path
+                        else
+                            @ignore p; continue
+                    ext in @cfg.ignoreExt ➜ @ignore p; continue
+                
+                # @cfg.path item.path if @cfg.path is func
+                
+                if item.type == 'dir'
+                    if @cfg.dir is func
+                        continue if not @cfg.dir item.path 
+                    toWalk.push item.path
+                        
+                if @cfg.files.length > @cfg.maxFiles
+                    log 'maxFiles reached'
+                    break
+                    
+        @cfg.done? @
+        # log 'walkdir done' @cfg
+        @cfg
+                
+export (cfg) ○-> w = new walkdir cfg; ⮐ ○ w.start()

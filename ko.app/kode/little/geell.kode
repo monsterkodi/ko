@@ -1,0 +1,320 @@
+###
+ 0000000   00000000  00000000  000      000    
+000        000       000       000      000    
+000  0000  0000000   0000000   000      000    
+000   000  000       000       000      000    
+ 0000000   00000000  00000000  0000000  0000000
+###
+
+use ../kxk ▪ randInt randRange elem post
+
+function geell
+
+    @: @main ->
+        
+        @textureInfos   = []
+        @quadDataLength = 13
+        
+        @canvas = elem 'canvas' class:'canvas'
+        @main.appendChild @canvas
+        
+        @numLayers = 2
+        @quadsPerLayer = 100000
+        
+        @layerStart = []
+        @numQuads = []
+        for layer in 0...@numLayers
+            @layerStart.push layer*@quadsPerLayer
+            @numQuads.push 0
+                            
+        @maxQuads = @quadsPerLayer*@numLayers
+        @data = new Float32Array @maxQuads*@quadDataLength
+        
+        @camCenter = 'center'
+        @clearColor = [0.1 0.1 0.1 1.0]
+        
+        @camPosX  = 0
+        @camPosY  = 0
+        @camScale = 0.2
+        
+        post.on 'resize' @resize
+        
+        @initGL()        
+        @initUV()
+        @loadTiles()
+                                
+    # 000  000   000  000  000000000  000   000  000   000  
+    # 000  0000  000  000     000     000   000  000   000  
+    # 000  000 0 000  000     000     000   000   000 000   
+    # 000  000  0000  000     000     000   000     000     
+    # 000  000   000  000     000      0000000       0      
+    
+    initUV: ->
+        
+        s = 40.96/2048
+        uv = u uu v vv -> [ s*u s*v s*uu s*vv ]
+        
+        @tubeUV = []
+        for ti in 0..8
+            @tubeUV.push [
+                uv(ti*4+2 ti*4+2  8 10)  # right / left
+                uv(ti*4+2 ti*4+4  8 10)  # right down / up left
+                uv(ti*4+2 ti*4+4 10 10)  # down / up
+                uv(ti*4+2 ti*4+4 10 12)  # down left / right up
+                uv(ti*4 ti*4+2   10 12)  # down right / left up
+                uv(ti*4 ti*4+2    8 10)  # up right / left down
+                ]            
+
+        @ringUV = []
+        for ri in 0..8
+            @ringUV.push uv(ri*4 (ri+1)*4 8 12)
+            
+        @numberUV = []
+        for ni in 0..10
+            @numberUV.push uv(ni*3 (ni+1)*3 0 4)
+        
+        @quadUV       = uv 37 39 9 11 
+        @circleUV     = uv 36 40 8 12 
+        @circleTopUV  = uv 36 40 8 10 
+        @pieUV = [
+            uv(36 38  8 10)
+            uv(38 40  8 10)
+            uv(38 40 10 12)
+            uv(36 38 10 12)
+        ]
+        
+    win2Pos: winPos =>
+        
+        x = (((winPos.x - @br.left) / @br.width  - 0.5) *  2 ) / (@camScale * @aspect) + @bufCamPos[0]
+        y = (((winPos.y - @br.top)  / @br.height - 0.5) * -2 ) /  @camScale            + @bufCamPos[1]
+        
+        [x y]
+        
+    # 000  000   000  000  000000000   0000000   000      
+    # 000  0000  000  000     000     000        000      
+    # 000  000 0 000  000     000     000  0000  000      
+    # 000  000  0000  000     000     000   000  000      
+    # 000  000   000  000     000      0000000   0000000  
+    
+    initGL: ->
+        
+        @gl = @canvas.getContext 'webgl2'
+        
+        vsSource = """
+            #version 300 es
+            precision mediump float;
+            in vec2  aQuadVertex;
+            in vec2  aQuadPosition;
+            in vec2  aQuadScale;
+            in vec4  aQuadColor;
+            in vec4  aQuadUV;
+            in float aQuadRot;
+            uniform vec2 uCamPos;
+            uniform vec2 uCamScale;
+            out vec4 vColor;
+            out vec2 vUV;
+            
+            void main(void) {
+                vec2 vertex = aQuadVertex * aQuadScale;
+                vec2 rotated = vertex*cos(aQuadRot)+vec2(-vertex.y,vertex.x)*sin(aQuadRot);
+                vec2 pos = uCamScale * (rotated + aQuadPosition) - uCamPos * uCamScale;
+                gl_Position = vec4(pos.x, pos.y, 0, 1);
+                vColor = aQuadColor;
+                vUV = mix(aQuadUV.xw,aQuadUV.zy,aQuadVertex+vec2(0.5, 0.5));
+            }
+            
+            """
+            
+        fsSource = """
+            #version 300 es
+            precision mediump float;
+            in vec4 vColor;
+            in vec2 vUV;
+            uniform sampler2D uSampler;
+            out vec4 fragColor;
+        
+            void main(void) {
+                //fragColor = vColor;
+                fragColor = texture(uSampler,vUV)*vColor;
+            }
+            """
+            
+        loadShader = type source =>
+            
+            shader = @gl.createShader type
+
+            @gl.shaderSource shader, source
+            @gl.compileShader shader
+
+            if not @gl.getShaderParameter shader @gl.COMPILE_STATUS
+                error 'Shader compilation failed:' @gl.getShaderInfoLog(shader)
+                @gl.deleteShader shader
+                ⮐ null
+
+            shader
+
+        @shaderProgram = @gl.createProgram()
+        
+        @gl.attachShader @shaderProgram loadShader(@gl.VERTEX_SHADER   vsSource)
+        @gl.attachShader @shaderProgram loadShader(@gl.FRAGMENT_SHADER fsSource)
+        @gl.linkProgram  @shaderProgram
+        
+        if not @gl.getProgramParameter @shaderProgram @gl.LINK_STATUS
+            error 'Shader linking failed:' @gl.getProgramInfoLog(@shaderProgram)
+            
+        @gl.blendFuncSeparate @gl.SRC_ALPHA @gl.ONE_MINUS_SRC_ALPHA @gl.ONE @gl.ONE_MINUS_SRC_ALPHA
+        @gl.enable @gl.BLEND
+        
+        r = 0.5
+        @quadVertices = new Float32Array [ -r -r r -r r r -r r ]
+        @bufCamScale  = new Float32Array 2
+        @bufCamPos    = new Float32Array 2
+        
+        @quadVertexLoc = @gl.getAttribLocation @shaderProgram 'aQuadVertex'
+        @positionLoc   = @gl.getAttribLocation @shaderProgram 'aQuadPosition'
+        @scaleLoc      = @gl.getAttribLocation @shaderProgram 'aQuadScale'
+        @colorLoc      = @gl.getAttribLocation @shaderProgram 'aQuadColor'
+        @uvLoc         = @gl.getAttribLocation @shaderProgram 'aQuadUV'
+        @rotLoc        = @gl.getAttribLocation @shaderProgram 'aQuadRot'
+        
+        @camScaleLoc   = @gl.getUniformLocation @shaderProgram 'uCamScale'
+        @camPosLoc     = @gl.getUniformLocation @shaderProgram 'uCamPos'
+        
+        @quadBuffer = @gl.createBuffer()
+        @gl.bindBuffer @gl.ARRAY_BUFFER @quadBuffer
+        @gl.bufferData @gl.ARRAY_BUFFER @quadVertices @gl.STATIC_DRAW
+        @gl.vertexAttribPointer @quadVertexLoc 2 @gl.FLOAT false 0 0
+        @gl.enableVertexAttribArray @quadVertexLoc
+        
+        @dataBuffer = @gl.createBuffer()
+        
+    # 0000000    00000000    0000000   000   000  
+    # 000   000  000   000  000   000  000 0 000  
+    # 000   000  0000000    000000000  000000000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000  00     00  
+    
+    draw: time =>
+         
+        @gl.useProgram @shaderProgram
+        
+        @gl.bindBuffer @gl.ARRAY_BUFFER @dataBuffer
+        @gl.bufferData @gl.ARRAY_BUFFER @data @gl.DYNAMIC_DRAW
+        
+        stride = @quadDataLength*4
+        offset = 0
+        
+        attrib = loc cnt =>
+            
+            @gl.vertexAttribPointer loc cnt @gl.FLOAT false stride offset
+            @gl.vertexAttribDivisor loc 1
+            @gl.enableVertexAttribArray loc
+            
+            offset += 4 * cnt
+            
+        attrib @positionLoc 2
+        attrib @scaleLoc    2
+        attrib @colorLoc    4
+        attrib @uvLoc       4
+        attrib @rotLoc      1
+                        
+        @gl.uniform2fv @camScaleLoc @bufCamScale
+        @gl.uniform2fv @camPosLoc   @bufCamPos
+                
+        @clearCanvas()
+                
+        @gl.drawArraysInstanced @gl.TRIANGLE_FAN 0 4 @maxQuads
+        
+        @numQuads[0] = 0
+        @numQuads[1] = 0
+        
+        @data.fill 0 0 @data.length
+                
+    updateCamera: ->
+        
+        @bufCamScale[0] = @camScale * @aspect
+        @bufCamScale[1] = @camScale
+                  
+        switch @camCenter 
+            'center'
+                @bufCamPos[0] = @camPosX
+                @bufCamPos[1] = @camPosY 
+            'topleft'
+                @bufCamPos[0] = @camPosX + 1/@bufCamScale[0]
+                @bufCamPos[1] = @camPosY - 1/@bufCamScale[1]
+            
+    # 000000000  000  000      00000000   0000000    
+    #    000     000  000      000       000         
+    #    000     000  000      0000000   0000000     
+    #    000     000  000      000            000    
+    #    000     000  0000000  00000000  0000000     
+        
+    loadTiles:  =>
+        
+        imageSources = ['./tiles0000.png']
+        
+        promises = imageSources.map (src textureIndex) =>
+            new Promise (resolve) => 
+                image = new Image
+                image.onerror = image.onload = () => 
+                    
+                    @textureInfos[textureIndex] = 
+                        image:      image
+                        size:       [image.width image.height]
+                        width:      image.width
+                        height:     image.height
+                        glTexture:  @createTexture(image)
+                        
+                    resolve()
+                image.src = src
+                
+        Promise.all(promises).then @loaded
+        
+    loaded: => 
+    
+        if @textureInfos[0]?.glTexture
+            @gl.activeTexture @gl.TEXTURE0
+            @gl.bindTexture   @gl.TEXTURE_2D @textureInfos[0].glTexture
+        
+        @resize()
+    
+    createTexture: (image) ->
+    
+        ⮐ if not image
+        texture = @gl.createTexture()
+        @gl.bindTexture   @gl.TEXTURE_2D texture
+        @gl.texImage2D    @gl.TEXTURE_2D 0 @gl.RGBA @gl.RGBA @gl.UNSIGNED_BYTE image
+        @gl.texParameteri @gl.TEXTURE_2D @gl.TEXTURE_MIN_FILTER @gl.LINEAR
+        @gl.texParameteri @gl.TEXTURE_2D @gl.TEXTURE_MAG_FILTER @gl.LINEAR
+        texture
+        
+    # 00000000   00000000   0000000  000  0000000  00000000  
+    # 000   000  000       000       000     000   000       
+    # 0000000    0000000   0000000   000    000    0000000   
+    # 000   000  000            000  000   000     000       
+    # 000   000  00000000  0000000   000  0000000  00000000  
+    
+    resize: =>
+        
+        @br = @main.getBoundingClientRect()
+        
+        devicePixelRatio = window.devicePixelRatio or 1
+        
+        @canvas.width  = @br.width  * devicePixelRatio
+        @canvas.height = @br.height * devicePixelRatio
+        @aspect = @canvas.height / @canvas.width
+        maxDim = @gl.getParameter @gl.MAX_VIEWPORT_DIMS
+        
+        @canvas.style.width  = @br.width + "px"
+        @canvas.style.height = @br.height + "px"
+        
+        @gl.viewport 0 0 min(@canvas.width maxDim) min(@canvas.height maxDim)
+        
+        @updateCamera()
+        
+    clearCanvas: =>
+            
+        @gl.clearColor @clearColor[0] @clearColor[1] @clearColor[2] @clearColor[3]
+        @gl.clear @gl.COLOR_BUFFER_BIT
+
+export geell

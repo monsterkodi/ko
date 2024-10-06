@@ -1,0 +1,56 @@
+html
+    head
+        title sysmon
+        styl
+            body
+                position        absolute
+                bottom          0
+                right           0
+                left            0
+                top             0
+                margin          0
+                padding         0
+                cursor          pointer
+                
+            .sysmon
+                pointer-events  none
+                margin-top      8px
+                width           22px
+                height          22px
+                
+                & svg
+                    stroke-width 0px
+                
+            //  0000000  000   000   0000000  0000000    000   0000000  000   000  
+            // 000        000 000   000       000   000  000  000       000   000  
+            // 0000000     00000    0000000   000   000  000  0000000   000000000  
+            //      000     000          000  000   000  000       000  000   000  
+            // 0000000      000     0000000   0000000    000  0000000   000   000  
+            
+            .bgr
+                fill                 #202020
+                
+            .sysdish_disk_read
+                fill                 #88f
+            .sysdish_disk_write
+                fill                 #22f
+               
+            .sysdish_net_recv
+                fill                 #080
+            .sysdish_net_send
+                fill                 #0a0
+                
+            .sysdish_load_sys
+                fill                 #ff0
+            .sysdish_load_usr
+                fill                 #f80
+                    
+            .sysdish_mem_used 
+                fill                 #22f
+            .sysdish_mem_active 
+                fill                 #88f
+                
+    body class='app-drag-region'
+        
+    script type="module" src="./sysmon/sysmon.js"
+    

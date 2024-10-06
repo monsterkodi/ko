@@ -124,7 +124,7 @@ class FS
         {
             while (p.length && !(_k_.in(slash.removeDrive(p),['.','/',''])))
             {
-                if (FS.dirExists(slash.path(p,'.git' || FS.fileExists(slash.path(p,'package.noon' || FS.fileExists(slash.path(p,'package.json')))))))
+                if (FS.dirExists(slash.path(p,'.git')) || FS.fileExists(slash.path(p,'package.noon')) || FS.fileExists(slash.path(p,'package.json')))
                 {
                     return slash.path(p)
                 }

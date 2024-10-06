@@ -67,7 +67,7 @@ world
         compare(kc('"#{\'a\'}"'),"`${'a'}`")
         compare(kc('"""#{"a"}"""'),'`${"a"}`')
         compare(kc('"nullcheck in #{stripol ? 123}"'),"`nullcheck in ${(stripol != null ? stripol : 123)}`")
-        compare(kc('"""{ok#} #{"well" + "1+\'2\' #{\'omg\'}" + kinda fukked}"""'),"`{ok#} ${\"well\" + `1+'2' ${'omg'}` + kinda(fukked)}`")
+        compare(kc('"""{ok#} #{"well" + "1+\'2\' #{\'omg\'}" + kinda(fukked)}"""'),"`{ok#} ${\"well\" + `1+'2' ${'omg'}` + kinda(fukked)}`")
     })
 }
 toExport["string"]._section_ = true

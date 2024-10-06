@@ -14,12 +14,20 @@ use ./utils ▪ kc ke
 
         kc  'a(b)'              ▸ 'a(b)'
         kc  'a(b,c)'            ▸ 'a(b,c)'
+        kc  'a(b c)'            ▸ 'a(b,c)'
+        kc  'a b c'             ▸ 'a(b,c)'
         kc  'a(1,null,"2")'     ▸ 'a(1,null,"2")'
+        kc  'a(1 null "2")'     ▸ 'a(1,null,"2")'
+        kc  'a 1 null "2"'      ▸ 'a(1,null,"2")'
         kc  'a[1](b)'           ▸ 'a[1](b)'
         kc  "f 'b', (a) ->"     ▸ "f('b',function (a)\n{})"
+        kc  "f 'b' (a) ->"      ▸ "f('b',function (a)\n{})"
         kc  "a('1' 2 3.4 true false null undefined NaN Infinity)" ▸
             "a('1',2,3.4,true,false,null,undefined,NaN,Infinity)"
 
+        kc  "a '1' 2 3.4 true false null undefined NaN Infinity" ▸
+            "a('1',2,3.4,true,false,null,undefined,NaN,Infinity)"
+            
         kc  "cb not err"        ▸ "cb(!err)"
             
         kc  """
@@ -30,6 +38,13 @@ use ./utils ▪ kc ke
             """
 
         kc  """
+            a b:c[1] d:2
+            """ ▸
+            """
+            a({b:c[1],d:2})
+            """
+            
+        kc  """
             a b:c[2], d:3
             4
             """ ▸
@@ -38,6 +53,15 @@ use ./utils ▪ kc ke
             4
             """
 
+        kc  """
+            a b:c[2] d:3
+            4
+            """ ▸
+            """
+            a({b:c[2],d:3})
+            4
+            """
+            
         kc  """
             a '1'
             b  2
@@ -56,10 +80,10 @@ use ./utils ▪ kc ke
             c d 2
             """ ▸
             """
-            a(b(1))
-            c(d(2))
+            a(b,1)
+            c(d,2)
             """
-
+            
         kc  "a 'b' -> c" ▸
             """
             a('b',function ()
@@ -118,7 +142,42 @@ use ./utils ▪ kc ke
             a.b({c:2})
             x = y
             """
+            
+        kc  """
+            func c/d w*k
+            """ ▸
+            """
+            func(c / d,w * k)
+            """
 
+        kc  """
+            func w*k c/d 
+            """ ▸
+            """
+            func(w * k,c / d)
+            """
+            
+        kc  """
+            func i++ j--
+            """ ▸
+            """
+            func(i++,j--)
+            """
+
+        kc  """
+            func a+b c-d
+            """ ▸
+            """
+            func(a + b,c - d)
+            """
+
+        kc  """
+            func c-d a+b 
+            """ ▸
+            """
+            func(c - d,a + b)
+            """
+            
     ▸ obj, func
       
         kc  """
@@ -133,6 +192,26 @@ use ./utils ▪ kc ke
 
         kc  """
             j k:1, (l) -> 3
+            """ ▸
+            """
+            j({k:1},function (l)
+            {
+                return 3
+            })
+            """
+
+        kc  """
+            g h:1 -> 2
+            """ ▸
+            """
+            g({h:1},function ()
+            {
+                return 2
+            })
+            """
+
+        kc  """
+            j k:1 (l) -> 3
             """ ▸
             """
             j({k:1},function (l)
@@ -379,13 +458,13 @@ use ./utils ▪ kc ke
 
         kc  """
             for y in [1..10]
-                x   c:1
-                    d:2
+                x   c:3
+                    d:4
             """ ▸
             """
             for (y = 1; y <= 10; y++)
             {
-                x({c:1,d:2})
+                x({c:3,d:4})
             }
             """
             

@@ -39,7 +39,7 @@ export
         newCursors    = @do.cursors()
         for i in @selectedAndCursorLineIndices()
             if @do.line(i).startsWith @indentString
-                @do.change i, @do.line(i).substr @indentString.length
+                @do.change i, @do.line(i).substr(@indentString.length)
                 lineCursors = positionsAtLineIndexInPositions i, newCursors
                 for nc in lineCursors
                     cursorDelta nc, -@indentString.length

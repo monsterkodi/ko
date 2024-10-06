@@ -89,6 +89,9 @@ D = (function ()
     pullAll: (arr, items, cmp=util.isEqual) ->`),`obj = {pullAll:function (arr, items, cmp = util.isEqual)
 {}}`)
         compare(kc(`obj = 
+    pullAll: arr items cmp=util.isEqual ->`),`obj = {pullAll:function (arr, items, cmp = util.isEqual)
+{}}`)
+        compare(kc(`obj = 
     fnc: cmp=util.isEqual ->`),`obj = {fnc:function (cmp = util.isEqual)
 {}}`)
         compare(kc(`obj = 

@@ -120,7 +120,7 @@ extractDomain = str ->
         split = s.split('.')
         tl = last split
         if tl in toplevelDomains
-            ⮐ (split.slice split.length-2).join '.'
+            ⮐ split.slice(split.length-2).join '.'
         else
             log 'not in toplevelDomains:' tl
     undefined

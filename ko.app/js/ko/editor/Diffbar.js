@@ -217,7 +217,7 @@ class Diffbar
 
     updateScroll ()
     {
-        var alpha, boring, ctx, h, length, lh, li, meta, w, _223_45_
+        var alpha, boring, ctx, h, length, lh, li, meta, w, _221_45_
 
         w = 2
         h = this.editor.scroll.viewHeight

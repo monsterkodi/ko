@@ -91,6 +91,7 @@ Drag = (function ()
                 return this
             }
             this.lastPos = p
+            this.button = event.button
             if (this.stopEvent !== false)
             {
                 stopEvent(event)
@@ -120,7 +121,7 @@ Drag = (function ()
 
     Drag.prototype["dragMove"] = function (event)
     {
-        var _101_28_, _102_27_, _108_19_
+        var _102_28_, _103_27_, _109_19_
 
         if (this.dragging)
         {
@@ -129,7 +130,7 @@ Drag = (function ()
             this.deltaSum = this.startPos.to(this.pos)
             if ((this.constrainKey != null) && event[this.constrainKey])
             {
-                this.constrain = ((_102_27_=this.constrain) != null ? _102_27_ : Math.abs(this.delta.x) >= Math.abs(this.delta.y) ? kpos(1,0) : kpos(0,1))
+                this.constrain = ((_103_27_=this.constrain) != null ? _103_27_ : Math.abs(this.delta.x) >= Math.abs(this.delta.y) ? kpos(1,0) : kpos(0,1))
                 this.delta.x *= this.constrain.x
                 this.delta.y *= this.constrain.y
             }
@@ -151,7 +152,7 @@ Drag = (function ()
 
     Drag.prototype["dragStop"] = function (event)
     {
-        var _128_39_
+        var _129_38_
 
         if (this.dragging)
         {

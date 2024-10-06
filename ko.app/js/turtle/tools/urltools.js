@@ -90,7 +90,7 @@ extractDomain = function (str)
         tl = _k_.last(split)
         if (_k_.in(tl,toplevelDomains))
         {
-            return (split.slice(split.length - 2)).join('.')
+            return split.slice(split.length - 2).join('.')
         }
         else
         {

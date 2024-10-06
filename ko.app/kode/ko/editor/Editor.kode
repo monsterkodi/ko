@@ -22,14 +22,14 @@ function Editor extends Buffer
 
     @init: ○->
 
-        filelist =○ ffs.list slash.path ◆dir, 'actions'
+        filelist =○ ffs.list slash.path(◆dir, 'actions')
 
         for item in filelist
             actionFile = item.path
             continue if slash.ext(actionFile) != 'js'
 
             try
-                moduleJS = './' + slash.relative actionFile, ◆dir
+                moduleJS = './' + slash.relative(actionFile, ◆dir)
                 actions =○ import(moduleJS)
             catch err
                 error "import of #{moduleJS} failed" err
@@ -49,7 +49,7 @@ function Editor extends Buffer
         Editor.actions.sort (a,b) -> a.name?.localeCompare b.name
         # log 'Editor.actions' Editor.actions.map((a) -> a.name ? a.key).join '\n'
 
-    @: (name, config) ->
+    @: name config ->
 
         @stringCharacters =
             "'":  'single'
@@ -84,7 +84,7 @@ function Editor extends Buffer
     # 000   000  000          000     000  000   000  000  0000       000
     # 000   000   0000000     000     000   0000000   000   000  0000000
 
-    @actionWithName: (name) ->
+    @actionWithName: name ->
 
         for action in Editor.actions
             if action.name == name
@@ -110,7 +110,7 @@ function Editor extends Buffer
         if oldType != @fileType
             @emit 'fileTypeChanged' @fileType
 
-    setFileType: (@fileType) ->
+    setFileType: @fileType ->
 
         # _______________________________________________________________ strings
 
@@ -171,10 +171,10 @@ function Editor extends Buffer
     #      000  000          000            000      000  000  0000  000            000
     # 0000000   00000000     000            0000000  000  000   000  00000000  0000000
 
-    setText: (text="") =>
+    setText: text="" =>
 
         if @syntax.name == 'txt'
-            @syntax.name = Syntax.shebang text.slice 0, text.search /\r?\n/
+            @syntax.name = Syntax.shebang text.slice(0, text.search(/\r?\n/))
 
         lines = text.split /\n/
 
@@ -186,7 +186,7 @@ function Editor extends Buffer
 
         @setLines lines
 
-    setLines: (lines) ->
+    setLines: lines ->
 
         @syntax.setLines lines
         super lines
@@ -199,7 +199,7 @@ function Editor extends Buffer
         else
             @textInRanges @rangesForCursorLines()
 
-    splitStateLineAtPos: (state, pos) ->
+    splitStateLineAtPos: state pos ->
 
         l = state.line pos[1]
         error "no line at pos #{pos}?" if not l?
@@ -212,7 +212,7 @@ function Editor extends Buffer
     # 000       000 0 000  000     000          000       000   000  000     000
     # 00000000  000   000  000     000          00000000  0000000    000     000
 
-    emitEdit: (action) ->
+    emitEdit: action ->
 
         mc = @mainCursor()
         line = @line mc[1]
@@ -220,8 +220,8 @@ function Editor extends Buffer
         @emit 'edit',
             action: action
             line:   line
-            before: line.slice 0, mc[0]
-            after:  line.slice mc[0]
+            before: line.slice(0, mc[0])
+            after:  line.slice(mc[0])
             cursor: mc
 
     # 000  000   000  0000000    00000000  000   000  000000000   0000000  000000000  00000000
@@ -230,7 +230,7 @@ function Editor extends Buffer
     # 000  000  0000  000   000  000       000  0000     000          000     000     000   000
     # 000  000   000  0000000    00000000  000   000     000     0000000      000     000   000
 
-    indentStringForLineAtIndex: (li) ->
+    indentStringForLineAtIndex: li ->
 
         while empty(@line(li).trim()) and li > 0
             li--
@@ -253,7 +253,7 @@ function Editor extends Buffer
                         il = thisIndent + indentLength
 
             il = thisIndent if il == 0
-            il = Math.max il, @indentationAtLineIndex li+1
+            il = Math.max il, @indentationAtLineIndex(li+1)
 
             lpad il, ""
         else

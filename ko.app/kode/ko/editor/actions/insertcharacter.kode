@@ -33,7 +33,7 @@ export
             if sline
                 @do.change cc[1], sline
             else
-                @do.change cc[1], kstr.splice cline, cc[0], 0, ch
+                @do.change cc[1], kstr.splice(cline, cc[0], 0, ch)
                 for nc in positionsAtLineIndexInPositions cc[1], newCursors
                     if nc[0] >= cc[0]
                         nc[0] += 1
@@ -89,6 +89,6 @@ export
         @do.start() 
         for c in reversed @do.cursors()
             if c[0] > @do.line(c[1]).length
-                @do.change c[1], kstr.splice @do.line(c[1]), c[0], 0, lpad c[0]-@do.line(c[1]).length
+                @do.change c[1], kstr.splice(@do.line(c[1]), c[0], 0, lpad(c[0]-@do.line(c[1]).length))
         @do.end()
         

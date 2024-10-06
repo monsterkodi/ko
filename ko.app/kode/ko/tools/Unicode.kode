@@ -12,8 +12,8 @@ function Unicode
 
     @: ->
         
-        ffs.read( slash.path ◆dir, '../../../kode/ko/tools/Uniko.txt' ).then (@uniko) =>
-        noon.load(slash.path ◆dir, '../../../kode/ko/tools/Uniko.noon').then (@fonts) =>
+        ffs.read( slash.path(◆dir, '../../../kode/ko/tools/Uniko.txt') ).then (@uniko) =>
+        noon.load(slash.path(◆dir, '../../../kode/ko/tools/Uniko.noon')).then (@fonts) =>
         
         post.on 'unicode' @onUnicode
         
@@ -23,7 +23,7 @@ function Unicode
         window.split.do 'maximize terminal'
         window.terminal.clear()
         window.terminal.singleCursorAtPos [0 0]
-        window.terminal.setFontSize Math.round window.terminal.view.getBoundingClientRect().width / 64
+        window.terminal.setFontSize Math.round(window.terminal.view.getBoundingClientRect().width / 64)
 
         if false
             start = 67400

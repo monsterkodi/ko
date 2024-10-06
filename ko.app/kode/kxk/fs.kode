@@ -21,9 +21,9 @@ class FS
     # 000   000  000  000   000  000      000       000     000     
     # 0000000    000  000   000  0000000  000  0000000      000     
     
-    @listdir: (dir, found) ○->
+    @listdir: dir found ○->
             
-        dirents =○ fsp.readdir dir, { withFileTypes: true }
+        dirents =○ fsp.readdir dir { withFileTypes: true }
         
         for dirent in dirents
     
@@ -42,12 +42,12 @@ class FS
             
             if isDir
     
-                ○ FS.listdir absPath, found
+                ○ FS.listdir absPath found
                 
         found
     
-    @list:    (p) ○-> ○ FS.listdir p, []
-    @dirlist: (p) ○-> ○ FS.listdir p, []
+    @list:    p ○-> ○ FS.listdir p []
+    @dirlist: p ○-> ○ FS.listdir p []
 
     # 00000000   00000000   0000000   0000000    
     # 000   000  000       000   000  000   000  
@@ -55,7 +55,7 @@ class FS
     # 000   000  000       000   000  000   000  
     # 000   000  00000000  000   000  0000000    
     
-    @read: (p) ○-> 
+    @read: p ○-> 
         
         try
             ○ fsp.readFile p, 'utf8'
@@ -68,7 +68,7 @@ class FS
     # 000   000  000   000  000     000     000       
     # 00     00  000   000  000     000     00000000  
     
-    @write: (p, text) ○->
+    @write: p text ○->
 
         try
             tmpfile = slash.tmpfile()
@@ -76,13 +76,13 @@ class FS
             try
                 stat =○ fsp.stat p
                 mode = stat.mode
-                ○ fsp.access p, (fs.R_OK | fs.F_OK)
+                ○ fsp.access p (fs.R_OK | fs.F_OK)
             catch err
                 mode = 0o666
-                ○ fsp.mkdir slash.dir(p), recursive: true
+                ○ fsp.mkdir slash.dir(p) recursive: true
                 
-            ○ fsp.writeFile tmpfile, text, mode:mode
-            ○ fsp.rename tmpfile, p
+            ○ fsp.writeFile tmpfile text mode:mode
+            ○ fsp.rename tmpfile p
             p
             
         catch err
@@ -95,7 +95,7 @@ class FS
     # 000  000  0000  000       000   000  
     # 000  000   000  000        0000000   
     
-    @info: (p) ○->
+    @info: p ○->
         
         try
             stat =○ fsp.stat p
@@ -109,10 +109,10 @@ class FS
     # 000 0 000  000  000   000   000  000  000   000  
     # 000   000  000   000  0000000    000  000   000  
     
-    @mkdir: (p) ○->
+    @mkdir: p ○->
         
         try
-            ○ fsp.mkdir p, recursive:true
+            ○ fsp.mkdir p recursive:true
         catch err
             if err.code != 'EEXIST'
                 FS.error "fs.mkdir -- " + String(err)
@@ -124,31 +124,31 @@ class FS
     # 000        000  000   000   000   000     000   000  000     000     
     # 000        000   000   0000000   000       0000000   000     000     
     
-    @pkg: (p) ->
+    @pkg: p ->
     
         if p?.length?
             
-            while p.length and slash.removeDrive(p) not in ['.', '/', '']
+            while p.length and slash.removeDrive(p) not in ['.' '/' '']
                 
-                if  FS.dirExists  slash.path p, '.git'         or
-                    FS.fileExists slash.path p, 'package.noon' or
-                    FS.fileExists slash.path p, 'package.json' ➜ return slash.path p
+                if  FS.dirExists( slash.path(p '.git'))         or
+                    FS.fileExists(slash.path(p 'package.noon')) or
+                    FS.fileExists(slash.path(p 'package.json')) ➜ ⮐ slash.path(p)
                 p = slash.dir p
         null
 
-    @git: (p, cb) ->
+    @git: p cb ->
 
         if p?.length?
             
             if cb is 'function'
-                FS.dirExists slash.path(p, '.git'), (stat) -> 
-                    if stat then cb slash.path p
+                FS.dirExists slash.path(p '.git') (stat) -> 
+                    if stat ➜ cb slash.path(p)
                     else if FS.removeDrive(p) not in ['.' '/' '']
-                        FS.git slash.dir(p), cb
+                        FS.git slash.dir(p) cb
             else
                 while p.length and FS.removeDrive(p) not in ['.' '/' '']
                     
-                    if FS.dirExists slash.path p, '.git' then return slash.path p
+                    if FS.dirExists(slash.path(p '.git')) ➜ ⮐ slash.path(p)
                     p = slash.dir p
         null
         
@@ -158,19 +158,19 @@ class FS
     # 000        000 000   000       000     000          000  
     # 00000000  000   000  000  0000000      000     0000000   
     
-    @exists: (p, cb) ->
+    @exists: p cb ->
         
         if cb is func
             try
                 if not p?
                     cb() 
-                    return
-                p = slash.path slash.removeLinePos p
-                fs.access p, (fs.R_OK | fs.F_OK), (err) ->
+                    ⮐ 
+                p = slash.path slash.removeLinePos(p)
+                fs.access p (fs.R_OK | fs.F_OK) (err) ->
                     if err?
                         cb() 
                     else
-                        fs.stat p, (err, stat) ->
+                        fs.stat p (err stat) ->
                             if err?
                                 cb()
                             else
@@ -180,35 +180,35 @@ class FS
         else
             if p?
                 try
-                    p = slash.path slash.removeLinePos p
+                    p = slash.path slash.removeLinePos(p)
                     if stat = fs.statSync(p)
                         fs.accessSync p, fs.R_OK
-                        return stat
+                        ⮐ stat
                 catch err
-                    if err.code in ['ENOENT', 'ENOTDIR']
-                        return null
+                    if err.code in ['ENOENT' 'ENOTDIR']
+                        ⮐ null
                     FS.error "fs.exists -- " + String(err) 
         null     
                 
-    @fileExists: (p, cb) ->
+    @fileExists: p cb ->
         
         if cb is func
-            FS.exists p, (stat) ->
-                if stat?.isFile() then cb stat
+            FS.exists p (stat) ->
+                if stat?.isFile() ➜ cb stat
                 else cb()
         else
             if stat = FS.exists p
-                return stat if stat.isFile()
+                ⮐ stat if stat.isFile()
                 
-    @dirExists: (p, cb) ->
+    @dirExists: p cb ->
 
         if cb is func
             FS.exists p, (stat) ->
-                if stat?.isDirectory() then cb stat
+                if stat?.isDirectory() ➜ cb stat
                 else cb()
         else
             if stat = FS.exists p
-                return stat if stat.isDirectory()
+                ⮐ stat if stat.isDirectory()
                 
     # 00000000   00000000  00     00   0000000   000   000  00000000  
     # 000   000  000       000   000  000   000  000   000  000       
@@ -216,10 +216,10 @@ class FS
     # 000   000  000       000 0 000  000   000     000     000       
     # 000   000  00000000  000   000   0000000       0      00000000  
     
-    @remove: (p, cb) ->
+    @remove: p cb ->
         
-        if cb is func then fs.remove p, cb
-        else fs.rmSync p, force:true, recursive:true
+        if cb is func ➜ fs.remove p cb
+        else fs.rmSync p force:true recursive:true
             
     # 000000000   0000000   000   000   0000000  000   000  
     #    000     000   000  000   000  000       000   000  
@@ -227,17 +227,17 @@ class FS
     #    000     000   000  000   000  000       000   000  
     #    000      0000000    0000000    0000000  000   000  
     
-    @touch: (p) ->
+    @touch: p ->
 
         try
             dir = slash.dir p
             if not FS.isDir dir
-                fs.mkdirSync dir, recursive:true
+                fs.mkdirSync dir recursive:true
             if not FS.fileExists p
-                fs.writeFileSync p, ''
+                fs.writeFileSync p ''
             else
                 date = new Date
-                fsp.utimes p, date, date
+                fsp.utimes p date date
             return p
         catch err
             FS.error "fs.touch -- " + String(err)
@@ -249,27 +249,27 @@ class FS
     # 000       000  000  000  000  
     # 000  0000000   000  000  000  
     
-    @isDir:  (p, cb) -> FS.dirExists p, cb
-    @isFile: (p, cb) -> FS.fileExists p, cb
+    @isDir:  p cb -> FS.dirExists p cb
+    @isFile: p cb -> FS.fileExists p cb
     
-    @isWritable: (p, cb) ->
+    @isWritable: p cb ->
         
         if cb is 'function'
             try
-                fs.access slash.path(p), (fs.constants.R_OK | fs.constants.W_OK), (err) ->
+                fs.access slash.path(p) (fs.constants.R_OK | fs.constants.W_OK) (err) ->
                     cb not err
             catch err
                 FS.error "fs.isWritable -- " + String(err) 
                 cb false
         else
             try
-                fs.accessSync slash.path(p), (fs.constants.R_OK | fs.constants.W_OK)
-                return true
+                fs.accessSync slash.path(p) (fs.constants.R_OK | fs.constants.W_OK)
+                ⮐ true
             catch err
-                return false
+                ⮐ false
                 
-    @error: (msg) -> 
-        if @logErrors then error msg 
+    @error: msg -> 
+        if @logErrors ➜ error msg 
         ''
         
     @watch: fs.watch

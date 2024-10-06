@@ -133,7 +133,7 @@ class Tabs
     onEditorFocus: editor =>
         
         if editor.name == 'editor'
-            if tab = @koreTabForPath kore.get 'editor|file'
+            if tab = @koreTabForPath kore.get('editor|file')
                 tabs = @setActive tab.path
                 for tab in tabs ➜ delete tab.tmp
                 @setKoreTabs tabs
@@ -163,7 +163,7 @@ class Tabs
             @tab(path)?.div.scrollIntoViewIfNeeded()
             ⮐ 
 
-        @cleanTabs @setActive path
+        @cleanTabs @setActive(path)
         @
         
     #  0000000  000      00000000   0000000   000   000        000000000   0000000   0000000     0000000  
@@ -239,7 +239,7 @@ class Tabs
             
             if tab.type == 'file'
                 
-                @cleanTabs @setActive path
+                @cleanTabs @setActive(path)
                                     
                 post.emit 'jumpToFile' path
             else
@@ -292,7 +292,7 @@ class Tabs
         
         file ?= kore.get 'editor|file'
         tabs = @koreTabs()
-        if tab = @koreTabForPath file, tabs
+        if tab = @koreTabForPath file tabs
             delete tab.dirty
             @cleanTabs tabs
             
@@ -376,8 +376,8 @@ class Tabs
         if @numFileTabs() <= 1
             post.emit 'menuAction' 'close'
         else
-            if @koreTabForPath kore.get 'editor|file'
-                @delTab kore.get 'editor|file'
+            if @koreTabForPath kore.get('editor|file')
+                @delTab kore.get('editor|file')
             else if tab = @activeKoreTab()
                 @delTab tab.path
 
@@ -612,7 +612,7 @@ class Tabs
         if tab = @tab event.target
             @activate tab.path
         stopEvent event
-        @showContextMenu kpos event
+        @showContextMenu kpos(event)
 
     showContextMenu: absPos =>
 

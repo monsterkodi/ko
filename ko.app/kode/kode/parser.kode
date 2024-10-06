@@ -24,7 +24,7 @@ use ./utils ▪ firstLineCol lastLineCol
 
 function Parser extends parse
 
-    scope: (exps) ->
+    scope: exps ->
         
         vars: []
         exps: exps
@@ -35,10 +35,10 @@ function Parser extends parse
     # 000  000
     # 000  000
 
-    if: (tok, tokens) ->
+    if: tok tokens ->
 
         if tokens[0].type == 'block'
-            ⮐ @ifBlock tok, tokens
+            ⮐ @ifBlock tok tokens
 
         @push 'if'
         @lockBlock = true
@@ -50,12 +50,12 @@ function Parser extends parse
                 cond:   cond
                 then:   thn
                 
-        @shiftNewlineTok 'if after then' tokens, tok, tokens[1]?.text == 'else'
+        @shiftNewlineTok 'if after then' tokens tok tokens[1]?.text == 'else'
         
         if tokens[0]?.type == 'block'
             @verb 'block after if then -> switch to block mode' 
             @pop 'if'
-            ⮐ @ifBlock tok, tokens, e
+            ⮐ @ifBlock tok tokens e
         
         while tokens[0]?.text == 'else' and tokens[1]?.text == 'if'
 
@@ -68,7 +68,7 @@ function Parser extends parse
 
             thn = @then 'elif' tokens
 
-            @shiftNewlineTok 'if after elif then' tokens, tok, tokens[1]?.text == 'else'
+            @shiftNewlineTok 'if after elif then' tokens tok tokens[1]?.text == 'else'
             
             e.if.elifs.push
                 elif:
@@ -90,7 +90,7 @@ function Parser extends parse
     # 000  000       000   000  000      000   000  000       000  000   
     # 000  000       0000000    0000000   0000000    0000000  000   000  
     
-    ifBlock: (tok, tokens, e) ->
+    ifBlock: tok tokens e ->
         
         @push 'if'
 
@@ -99,8 +99,8 @@ function Parser extends parse
         if not e
             tokens = subbs.shift()
             e = if:
-                    cond:   @exp tokens
-                    then:   @then 'if' tokens
+                    cond: @exp(tokens)
+                    then: @then('if' tokens)
         
         while subbs.length
             tokens = subbs.shift()
@@ -127,10 +127,10 @@ function Parser extends parse
     # 000  000          000     000   000  000  000      
     # 000  000          000     000   000  000  0000000  
     
-    ifTail: (e, tok, tokens) ->
+    ifTail: e tok tokens ->
         
         if:
-            cond: @exp tokens
+            cond: @exp(tokens)
             then: [e]
             
     # 00000000   0000000   00000000   
@@ -139,7 +139,7 @@ function Parser extends parse
     # 000       000   000  000   000  
     # 000        0000000   000   000  
     
-    for: (tok, tokens) ->
+    for: tok tokens ->
         
         @push 'for'
 
@@ -167,14 +167,14 @@ function Parser extends parse
     # 000       000   000  000       000   000  
     # 00000000  000   000   0000000  000   000  
     
-    each: (e, tokens) ->
+    each: e tokens ->
                 
         ech = tokens.shift()
         
         each:
             lhs:    e
             each:   ech
-            fnc:    @exp tokens 
+            fnc:    @exp(tokens)
             
     # 00000000   0000000   00000000   000000000   0000000   000  000      
     # 000       000   000  000   000     000     000   000  000  000      
@@ -182,7 +182,7 @@ function Parser extends parse
     # 000       000   000  000   000     000     000   000  000  000      
     # 000        0000000   000   000     000     000   000  000  0000000  
     
-    forTail: (e, tok, tokens) ->
+    forTail: e tok tokens ->
         
         @push 'for'
         
@@ -208,7 +208,7 @@ function Parser extends parse
     # 000   000  000   000  000  000      000       
     # 00     00  000   000  000  0000000  00000000  
     
-    while: (tok, tokens) ->
+    while: tok tokens ->
         
         @push 'while'
         
@@ -228,7 +228,7 @@ function Parser extends parse
     # 000   000  000   000  000  000      000          000     000   000  000  000      
     # 00     00  000   000  000  0000000  00000000     000     000   000  000  0000000  
     
-    whileTail: (e, tok, tokens) ->
+    whileTail: e tok tokens ->
         
         # @push 'while'
         
@@ -246,7 +246,7 @@ function Parser extends parse
     #      000  000   000  000     000     000       000   000
     # 0000000   00     00  000     000      0000000  000   000
 
-    switch: (tok, tokens) ->
+    switch: tok tokens ->
         
         @push 'switch'
         
@@ -275,7 +275,7 @@ function Parser extends parse
                     e.switch.else = @block 'else' tokens
                     break
                     
-                whens.push @when null, tokens
+                whens.push @when(null, tokens)
                     
                 if whens[-2]? and empty whens[-2].when.then 
                     whens[-1].when.vals = whens[-2].when.vals.concat whens[-1].when.vals
@@ -283,8 +283,9 @@ function Parser extends parse
         else
             
             while tokens[0]?.text == 'when'
+                
                 lastWhen = tokens[0]
-                whens.push @exp tokens
+                whens.push @exp(tokens)
                 @shiftNewlineTok 'switch after when' tokens, lastWhen, tokens[1]?.text in ['when' 'else']
                         
             if tokens[0]?.text == 'else'
@@ -303,14 +304,15 @@ function Parser extends parse
     # 000   000  000   000  000       000  0000  
     # 00     00  000   000  00000000  000   000  
     
-    when: (tok, tokens) ->
+    when: tok tokens ->
         
         @push 'when'
         
         vals = []
         
         while (tokens[0]? and (tokens[0].type not in ['block''nl']) and tokens[0].text != 'then')
-            vals.push @exp tokens
+            
+            vals.push @exp(tokens)
         
         thn = @then 'when' tokens
         
@@ -328,13 +330,13 @@ function Parser extends parse
     #    000     000   000     000     
     #    000     000   000     000     
     
-    try: (tok, tokens) ->
+    try: tok tokens ->
         
         @push 'try'
         
         exps = @block 'body' tokens
         
-        @shiftNewlineTok 'try body end' tokens, tok, tokens[1].text in ['catch' 'finally']
+        @shiftNewlineTok 'try body end' tokens tok tokens[1].text in ['catch' 'finally']
         
         if tokens[0]?.text == 'catch'
             
@@ -347,11 +349,11 @@ function Parser extends parse
         
             ctch = 
                 errr: errr
-                exps: @block 'body' tokens
+                exps: @block('body' tokens)
         
             @pop  'catch'
 
-            @shiftNewlineTok 'try catch end' tokens, tok, tokens[1]?.text == 'finally'
+            @shiftNewlineTok 'try catch end' tokens tok tokens[1]?.text == 'finally'
             
         if tokens[0]?.text == 'finally'
             tokens.shift()
@@ -370,7 +372,7 @@ function Parser extends parse
     # 000  000 0 000  000        000   000  000   000     000     
     # 000  000   000  000         0000000   000   000     000     
     
-    import: (obj, tokens) ->
+    import: obj tokens ->
 
         toImport = []
             
@@ -389,7 +391,7 @@ function Parser extends parse
     # 000   000       000  000       
     #  0000000   0000000   00000000  
     
-    use: (obj, tokens) ->
+    use: obj tokens ->
         
         toUse = []
         
@@ -487,7 +489,7 @@ function Parser extends parse
     # 000        000 000   000        000   000  000   000     000     
     # 00000000  000   000  000         0000000   000   000     000     
     
-    export: (obj, tokens) ->
+    export: obj tokens ->
         
         toExport = []
         start = tokens.shift()
@@ -513,7 +515,7 @@ function Parser extends parse
     # 000   000  000  000   000  000       000  000      000       
     # 0000000    000  000   000  000       000  0000000  00000000  
     
-    dirFile: (tok, tokens) ->
+    dirFile: tok tokens ->
         
         dirFile: tokens.shift().text
         
@@ -523,10 +525,11 @@ function Parser extends parse
     # 000 0 000  000   000  000  000  0000  
     # 000   000  000   000  000  000   000  
     
-    main: (tok, tokens) ->
+    main: tok tokens ->
         
         tokens.shift()
-        main: @block 'main' tokens
+        
+        main: @block('main' tokens)
             
     #  0000000  000       0000000    0000000   0000000
     # 000       000      000   000  000       000
@@ -534,7 +537,7 @@ function Parser extends parse
     # 000       000      000   000       000       000
     #  0000000  0000000  000   000  0000000   0000000
 
-    class: (tok, tokens, type='class') ->
+    class: tok tokens type='class' ->
 
         @push 'class'
 
@@ -557,9 +560,9 @@ function Parser extends parse
 
         e
 
-    function: (tok, tokens) ->
+    function: tok tokens ->
 
-        @class tok, tokens, 'function'
+        @class tok tokens 'function'
         
     # 00000000  000   000  000   000   0000000
     # 000       000   000  0000  000  000
@@ -567,11 +570,11 @@ function Parser extends parse
     # 000       000   000  000  0000  000
     # 000        0000000   000   000   0000000
 
-    func: (args, arrow, tokens) ->
+    func: args arrow tokens ->
 
         @push 'func'
         
-        body = @scope @block 'body' tokens
+        body = @scope @block('body' tokens)
         
         @pop 'func'
         
@@ -587,12 +590,12 @@ function Parser extends parse
     # 000   000  000          000     000   000  000   000  000  0000  
     # 000   000  00000000     000      0000000   000   000  000   000  
     
-    return: (tok, tokens) ->
+    return: tok tokens ->
         
         if tokens[0]?.type != 'nl'        
             val = @block 'return' tokens
             if val?.length > 1
-                log 'unreachable code after return statement?' tok, tokens, noon val
+                log 'unreachable code after return statement?' tok tokens noon(val)
             val = val?[0]
             
         e = return: ret: tok
@@ -605,9 +608,9 @@ function Parser extends parse
     # 000   000  000   000  000   000  000     000     
     # 000   000  00     00  000   000  000     000     
     
-    await: (tok, tokens) ->
+    await: tok tokens ->
         
-        e = await: exp: @exp tokens
+        e = await: exp: @exp(tokens)
         e
         
     #  0000000   0000000   000      000
@@ -616,10 +619,10 @@ function Parser extends parse
     # 000       000   000  000      000
     #  0000000  000   000  0000000  0000000
 
-    call: (tok, tokens, qmrk) ->
+    call: tok tokens qmrk ->
 
         @push 'call'
-
+        
         tok = tok.token if tok.token
                         
         last = lastLineCol tok
@@ -634,7 +637,7 @@ function Parser extends parse
         else
             if tok.text in ['typeof' 'new']
                 @push '▸arg'
-                args = [@exp tokens]
+                args = [@exp(tokens)]
                 @pop  '▸arg'
             else
                 args = @block 'args' tokens
@@ -650,7 +653,7 @@ function Parser extends parse
 
         @pop 'call'
         
-        args[0] = @prepareCallAssign args[0] if valid args
+        args[0] = @prepareCallAssign(args[0]) if valid args
                 
         e = call: callee: tok
         e.call.open  = open  if open
@@ -665,7 +668,7 @@ function Parser extends parse
     # 000   000  000        000       000   000  000   000     000     000  000   000  000  0000
     #  0000000   000        00000000  000   000  000   000     000     000   0000000   000   000
 
-    operation: (lhs, op, tokens) ->
+    operation: lhs op tokens ->
 
         @push "op#{op.text}"
         
@@ -707,7 +710,7 @@ function Parser extends parse
     # 000  000  0000  000       000   000  000  0000  000   000  
     # 000  000   000   0000000   0000000   000   000  0000000    
     
-    incond: (lhs, tokens) ->
+    incond: lhs tokens ->
         
         intok = tokens.shift()
         
@@ -726,7 +729,7 @@ function Parser extends parse
     # 000   000  000   000  000   000  000   000     000
     # 000   000  000   000  000   000  000   000     000
 
-    array: (open, tokens) ->
+    array: open tokens ->
 
         if tokens[0]?.text == ']'
             return array:
@@ -736,7 +739,7 @@ function Parser extends parse
 
         @push '['
 
-        items = @exps '[' tokens, ']'
+        items = @exps '[' tokens ']'
 
         close = @shiftClose 'array' ']' tokens
 
@@ -756,7 +759,7 @@ function Parser extends parse
     #      000  000      000  000       000       
     # 0000000   0000000  000   0000000  00000000  
     
-    slice: (from, tokens) ->
+    slice: from tokens ->
 
         dots = tokens.shift()
 
@@ -776,14 +779,14 @@ function Parser extends parse
     # 000  000  0000  000   000  000        000 000
     # 000  000   000  0000000    00000000  000   000
 
-    index: (tok, tokens) ->
+    index: tok tokens ->
 
         @push 'idx'
 
         open = tokens.shift()
         
         if tokens[0]?.type == 'dots'
-            slice = @slice null, tokens
+            slice = @slice null tokens
         else
             slice = @exp tokens
 
@@ -803,7 +806,7 @@ function Parser extends parse
     # 000        000   000  000   000  000       000  0000       000
     # 000        000   000  000   000  00000000  000   000  0000000
 
-    parens: (open, tokens) ->
+    parens: open tokens ->
 
         if tokens[0]?.text == ')'
             ⮐ parens:
@@ -813,7 +816,7 @@ function Parser extends parse
         
         @push '('
 
-        exps = @exps '(' tokens, ')'
+        exps = @exps '(' tokens ')'
 
         close = @shiftClose 'parens' ')' tokens
         
@@ -832,7 +835,7 @@ function Parser extends parse
     # 000  0000  000   000        000        000   000  000   000  000       000  0000       000  
     # 000   000   0000000         000        000   000  000   000  00000000  000   000  0000000   
     
-    argsWithoutParens: (firstArg, tokens) ->
+    argsWithoutParens: firstArg tokens ->
         
         @push '○rgs'
         tokens.unshift firstArg
@@ -852,7 +855,7 @@ function Parser extends parse
     # 000      000       000   000  000 0 000  000        
     # 0000000   0000000   0000000   000   000  000        
     
-    lcomp: (exps) ->
+    lcomp: exps ->
         
         ⮐ if not f = exps[0].for
         
@@ -864,7 +867,7 @@ function Parser extends parse
     # 000       000   000  000   000  000         000
     #  0000000   0000000   000   000  0000000     000
 
-    curly: (open, tokens) ->
+    curly: open tokens ->
 
         if tokens[0]?.text == '}'
             ⮐ object:
@@ -874,7 +877,7 @@ function Parser extends parse
 
         @push '{'
 
-        exps = @exps '{' tokens, '}'
+        exps = @exps '{' tokens '}'
 
         close = @shiftClose 'curly' '}' tokens
         if not close 
@@ -894,39 +897,42 @@ function Parser extends parse
     # 000   000  000   000  000   000  000       000          000
     #  0000000   0000000     0000000   00000000   0000000     000
 
-    object: (key, tokens) ->
+    object: key tokens ->
 
         @push '{'
 
         first = firstLineCol key
         
-        exps = [@keyval key, tokens]
+        exps = [@keyval(key tokens)]
         
         literals = @kode.atoms.concat ['keyword''op']
         
         while tokens.length
-
+            
             if tokens[0]?.type == 'nl'
                 break if tokens[1]?.type not in literals
                 break if tokens[2]?.text not in ': ' # ◂ the space checks for newline!
                 
                 if tokens[1]?.col >= first.col and tokens[1].text not in '])'
                     @shiftNewline 'continue implicit object on nl...' tokens
-                    exps.push @exp tokens
+                    exps.push @exp(tokens)
                     continue
                 break
             else if tokens[0]?.type == 'block'
                 if tokens[0].col >= first.col or @stack[-1] == '{' and 'section' in @stack
                     block = tokens.shift()
                     tokens = block.tokens
-                    exps = exps.concat @exps 'object' block.tokens
+                    exps = exps.concat @exps('object' block.tokens)
                 break
             else if tokens[0]?.line == first.line and tokens[0].text not in '])};'
-                exps = exps.concat @exps 'object' tokens, ';'
+                exps = exps.concat @exps('object' tokens, ';')
                 break
             else
                 break if tokens[0].text in '])};'
                 break if tokens[0].type not in literals
+                
+                log 'object ... exps?' key tokens
+                break
                 
         @pop '{'
 
@@ -939,7 +945,7 @@ function Parser extends parse
     # 000  000   000          000        000     000   000  000
     # 000   000  00000000     000         0      000   000  0000000
 
-    keyval: (key, tokens) ->
+    keyval: key tokens ->
 
         colon = tokens.shift()
 
@@ -965,9 +971,9 @@ function Parser extends parse
             
             {line, col} = firstLineCol key
             text = @kode.renderer.node key
-            if text?.startsWith 'this'
+            if text?.startsWith('this')
                 if text == 'this' then text = '@'
-                else if text.startsWith 'this.' then text = '@' + text[5..]
+                else if text.startsWith('this.') then text = '@' + text[5..]
 
             k.text = text
             k.line = line
@@ -987,7 +993,7 @@ function Parser extends parse
     #    000     000   000  000       000  
     #    000     000   000  000  0000000   
     
-    this: (obj, tokens) ->
+    this: obj tokens ->
 
         prop:
             obj:  obj
@@ -1000,7 +1006,7 @@ function Parser extends parse
     # 000        000   000  000   000  000
     # 000        000   000   0000000   000
 
-    prop: (obj, tokens) ->
+    prop: obj tokens ->
 
         dot  = tokens.shift()
         prop = tokens.shift()
@@ -1022,7 +1028,7 @@ function Parser extends parse
     # 000   000       000       000  000       000   000     000     
     # 000   000  0000000   0000000   00000000  000   000     000     
     
-    assert: (obj, tokens) ->
+    assert: obj tokens ->
         
         assert:
             obj:    obj
@@ -1034,7 +1040,7 @@ function Parser extends parse
     # 000 0000   000 0 000  000   000  000  000   000   000  000        
     #  00000 00  000   000  000   000  000   000   0000000   000        
     
-    qmrkop: (lhs, tokens) ->
+    qmrkop: lhs tokens ->
      
         @push '?'
         
@@ -1054,7 +1060,7 @@ function Parser extends parse
     # 000 0000   000 0 000  000   000  000  000   000       000   000  000      000   000  000  0000  
     #  00000 00  000   000  000   000  000   000   0000000   0000000   0000000   0000000   000   000  
     
-    qmrkcolon: (qmrkop, tokens) ->
+    qmrkcolon: qmrkop tokens ->
         
         @push ':'
         
@@ -1077,7 +1083,7 @@ function Parser extends parse
     #      000  000       000          000     000  000   000  000  0000  
     # 0000000   00000000   0000000     000     000   0000000   000   000  
     
-    section: (tok, tokens) ->
+    section: tok tokens ->
         
         title = type:'double' text:'"'+tok.text+'"' line:tok.line, col:tok.col
         
@@ -1102,13 +1108,13 @@ function Parser extends parse
     # 000       000   000  000 0 000  000        000   000  000   000  000       
     #  0000000   0000000   000   000  000        000   000  000   000  00000000  
     
-    compare: (lhs, tokens) ->
+    compare: lhs tokens ->
         
         tokens.shift()
         
         compare:
             lhs: lhs
-            rhs: @exp tokens
+            rhs: @exp(tokens)
 
     error: (o, tokens) ->
         

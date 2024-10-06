@@ -134,7 +134,7 @@ class MapScroll extends events
         if (this.top < this.exposeTop)
         {
             oldTop = this.exposeTop
-            this.exposeTop = Math.max(0,this.top - (Math.min(this.viewLines,this.exposeNum - this.viewLines)))
+            this.exposeTop = Math.max(0,this.top - Math.min(this.viewLines,this.exposeNum - this.viewLines))
             num = oldTop - this.exposeTop
             if (num > 0)
             {

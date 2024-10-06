@@ -37,7 +37,7 @@ function CommandList extends TextEditor
         @clear()
         index = 0
 
-        viewHeight = @size.lineHeight * Math.min @maxLines, items.length
+        viewHeight = @size.lineHeight * Math.min(@maxLines, items.length)
         @view.style.height = "#{viewHeight}px"
         if viewHeight != @scroll.viewHeight
             @resized()
@@ -96,14 +96,14 @@ function CommandList extends TextEditor
 
         ⮐ error 'CommandList.appendMeta -- no meta?' if not meta?
 
-        @meta.addDiv @meta.append meta
+        @meta.addDiv @meta.append(meta)
 
         if meta.diss?
             @appendLineDiss Syntax.lineForDiss(meta.diss), meta.diss
         else if meta.text? and meta.text.trim().length
             r    = meta.rngs ? []
             text = meta.text.trim()
-            rngs = r.concat Syntax.rangesForTextAndSyntax text, meta.type or 'ko'
+            rngs = r.concat Syntax.rangesForTextAndSyntax(text, meta.type or 'ko')
             matchr.sortRanges rngs
             diss = matchr.dissect rngs, join:true
             @appendLineDiss text, diss

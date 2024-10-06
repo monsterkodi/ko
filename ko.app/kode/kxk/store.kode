@@ -83,7 +83,7 @@ function Store extends events
     del: key => 
     
         ⮐ if not @data
-        sds.del @data, @keypath key
+        sds.del @data, @keypath(key)
         @delayedSave()
         post.toWins 'store' @name, 'del' key
         

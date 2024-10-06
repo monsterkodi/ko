@@ -29,7 +29,7 @@ render = block text ->
         args += " id=\"#{block.fillet[fromIndex+1].match}\"" 
         fromIndex += 2
     if block.fillet.length > fromIndex        
-        args += ' ' + unfillet block.fillet[fromIndex..]
+        args += ' ' + unfillet(block.fillet[fromIndex..])
     
     tag = block.fillet[0].match
         
@@ -54,8 +54,8 @@ render = block text ->
     
     if valid block.blocks
         switch tag 
-            'style' ➜ text += '\n' + unfilletBlocks block.blocks
-            'styl'  ➜ text += styl unfilletBlocks block.blocks
+            'style' ➜ text += '\n' + unfilletBlocks(block.blocks)
+            'styl'  ➜ text += styl unfilletBlocks(block.blocks)
             ➜ 
                 text += '\n'
                 for b in block.blocks
@@ -89,7 +89,7 @@ pug = srcText ->
     
     tgtText = ''
     lines   = srcText.split '\n'
-    blocks  = blockFillets lines.map (line) -> kstr.fillet line, '-'
+    blocks  = blockFillets lines.map((line) -> kstr.fillet(line, '-'))
     
     for block in blocks
         tgtText = render block, tgtText

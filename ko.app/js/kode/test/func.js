@@ -156,12 +156,28 @@ b = function ()
 
     console.log(this.a)
 })`)
+            compare(kc("(@a a) -> log @a"),`(function (a1, a)
+{
+    this.a = a1
+
+    console.log(this.a)
+})`)
         })
     })
     section("ellipsis", function ()
     {
         compare(kc(`f = (a1, args...) -> 2`),`
 f = function (a1, ...args)
+{
+    return 2
+}`)
+        compare(kc(`f = (a2 args...) -> 2`),`
+f = function (a2, ...args)
+{
+    return 2
+}`)
+        compare(kc(`f = a3 args... -> 2`),`
+f = function (a3, ...args)
 {
     return 2
 }`)

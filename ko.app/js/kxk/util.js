@@ -1,4 +1,4 @@
-var _k_ = {isArr: function (o) {return Array.isArray(o)}, isObj: function (o) {return !(o == null || typeof o != 'object' || o.constructor.name !== 'Object')}, max: function () { var m = -Infinity; for (var a of arguments) { if (Array.isArray(a)) {m = _k_.max.apply(_k_.max,[m].concat(a))} else {var n = parseFloat(a); if(!isNaN(n)){m = n > m ? n : m}}}; return m }, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}}
+var _k_ = {isArr: function (o) {return Array.isArray(o)}, isObj: function (o) {return !(o == null || typeof o != 'object' || o.constructor.name !== 'Object')}, max: function () { var m = -Infinity; for (var a of arguments) { if (Array.isArray(a)) {m = _k_.max.apply(_k_.max,[m].concat(a))} else {var n = parseFloat(a); if(!isNaN(n)){m = n > m ? n : m}}}; return m }, empty: function (l) {return l==='' || l===null || l===undefined || l!==l || typeof(l) === 'object' && Object.keys(l).length === 0}, list: function (l) {return l != null ? typeof l.length === 'number' ? l : [] : []}, in: function (a,l) {return (typeof l === 'string' && typeof a === 'string' && a.length ? '' : []).indexOf.call(l,a) >= 0}, isStr: function (o) {return typeof o === 'string' || o instanceof String}, clamp: function (l,h,v) { var ll = Math.min(l,h), hh = Math.max(l,h); if (!_k_.isNum(v)) { v = ll }; if (v < ll) { v = ll }; if (v > hh) { v = hh }; if (!_k_.isNum(v)) { v = ll }; return v }, isNum: function (o) {return !isNaN(o) && !isNaN(parseFloat(o)) && (isFinite(o) || o === Infinity || o === -Infinity)}}
 
 var util
 
@@ -116,6 +116,10 @@ util = {isEqual:function (a, b)
                 exc.push(item)
             }
         }
+    }
+    else
+    {
+        console.log('not an array!?',arr)
     }
     return [inc,exc]
 },findIf:function (arr, pred)
@@ -255,12 +259,12 @@ util = {isEqual:function (a, b)
     })
 },defaults:function (obj, def)
 {
-    var key, val, _162_21_
+    var key, val, _166_21_
 
     for (key in def)
     {
         val = def[key]
-        obj[key] = ((_162_21_=obj[key]) != null ? _162_21_ : val)
+        obj[key] = ((_166_21_=obj[key]) != null ? _166_21_ : val)
     }
     return obj
 },pickBy:function (obj, pred)
@@ -351,5 +355,11 @@ util = {isEqual:function (a, b)
 },absMin:function (a, b)
 {
     return ((Math.abs(a) < Math.abs(b)) ? a : b)
+},fade:function (a, b, v)
+{
+    var c
+
+    c = _k_.clamp(0,1,v)
+    return a * (1 - c) + b * c
 }}
 export default util;

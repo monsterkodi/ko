@@ -10,7 +10,7 @@
 
 class Scoper
 
-    @: (@kode) ->
+    @: @kode ->
 
         @verbose = @kode.args.verbose
         @debug   = @kode.args.debug
@@ -22,7 +22,7 @@ class Scoper
     # 000       000   000  000      000      000       000          000     
     #  0000000   0000000   0000000  0000000  00000000   0000000     000     
     
-    collect: (tl) ->
+    collect: tl ->
         
         @maps = []
         @args = []
@@ -36,7 +36,7 @@ class Scoper
     #      000  000       000   000  000        000       
     # 0000000    0000000   0000000   000        00000000  
     
-    scope: (body) ->
+    scope: body ->
 
         @maps.push {}
         @args.push {}
@@ -53,7 +53,7 @@ class Scoper
     # 000       000   000  000  0000  000       
     # 000        0000000   000   000   0000000  
     
-    func: (f) ->
+    func: f ->
 
         @maps.push {}
         @args.push {}
@@ -79,14 +79,14 @@ class Scoper
     # 000        000 000   000        
     # 00000000  000   000  000        
     
-    exp: (e) ->
+    exp: e ->
 
-        if not e then return
+        ⮐ if not e
             
         insert = (v,t) =>
             
-            return if map[v] for map in @maps
-            return if arg[v] for arg in @args
+            ⮐ if map[v] for map in @maps
+            ⮐ if arg[v] for arg in @args
                 
             @verb yellow(v), red(t)
             
@@ -96,8 +96,8 @@ class Scoper
         if e.type 
             if e.type == 'code'
                 @exp e.exps
-            return
-        else if e is Array  then @exp v for v in e if e.length
+            ⮐ 
+        else if e is Array  ➜ @exp v for v in e if e.length
         else if e is Object
                                         
             if op = e.operation
@@ -138,8 +138,8 @@ class Scoper
                 @func e.func
             else
                 @exp val for key,val of e
-        return
+        ⮐ 
         
-    verb: -> if @debug then console.log.apply console.log, arguments 
+    verb: -> if @debug ➜ console.log.apply console.log arguments 
 
 export Scoper

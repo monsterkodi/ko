@@ -11,9 +11,11 @@ toExport["array"] = function ()
         compare(kc('a[1][2]'),'a[1][2]')
         compare(kc('a[1][2]'),'a[1][2]')
         compare(kc('[1,2][1]'),';[1,2][1]')
+        compare(kc('[1 2][1]'),';[1,2][1]')
         compare(kc('{a:1}["a"]'),'{a:1}["a"]')
         compare(kc(';[d,k,v,e] = f'),'var _a_ = f; d = _a_[0]; k = _a_[1]; v = _a_[2]; e = _a_[3]\n')
         compare(kc('[d,k,v,e] = f'),'var _a_ = f; d = _a_[0]; k = _a_[1]; v = _a_[2]; e = _a_[3]\n')
+        compare(kc('[d k v e] = f'),'var _a_ = f; d = _a_[0]; k = _a_[1]; v = _a_[2]; e = _a_[3]\n')
         section("slice", function ()
         {
             compare(kc('a[0..1]'),'a.slice(0, 2)')
@@ -28,6 +30,7 @@ blocks.push(block)`)
         section("call", function ()
         {
             compare(kc('b[Math.floor n/7]'),'b[Math.floor(n / 7)]')
+            compare(kc('b[Math.floor(n/7)]'),'b[Math.floor(n / 7)]')
         })
     })
     section("range", function ()
@@ -69,9 +72,10 @@ blocks.push(block)`)
     section("array", function ()
     {
         compare(kc('[1]'),';[1]')
-        compare(kc('[1 2]'),';[1,2]')
         compare(kc('[1,2]'),';[1,2]')
+        compare(kc('[1 2]'),';[1,2]')
         compare(kc('[a,b]'),';[a,b]')
+        compare(kc('[a b]'),';[a,b]')
         compare(kc('[ "1" ]'),';["1"]')
         compare(kc("[ '1' ]"),";['1']")
         compare(kc('["1" "2"]'),';["1","2"]')
@@ -87,9 +91,11 @@ blocks.push(block)`)
         compare(kc('[[[][]]]'),';[[[],[]]]')
         compare(kc('[[[1]], 1]'),';[[[1]],1]')
         compare(kc('[b(c)]'),';[b(c)]')
-        compare(kc('[b c]'),';[b(c)]')
+        compare(kc('[b c]'),';[b,c]')
         compare(kc("['1' , a, true, false, null, undefined]"),";['1',a,true,false,null,undefined]")
-        compare(kc("a = [1 2 - 3 x 4 + 5 'a' b 'c']"),"a = [1,2 - 3,x(4 + 5,'a',b('c'))]")
+        compare(kc("['1' a true false null undefined]"),";['1',a,true,false,null,undefined]")
+        compare(kc("a = [1 2 - 3 x(4 + 5 'a' b('c'))]"),"a = [1,2 - 3,x(4 + 5,'a',b('c'))]")
+        compare(kc("a = [1 2 - 3 x 4 + 5 'a' b 'c']"),"a = [1,2 - 3,x,4 + 5,'a',b,'c']")
         compare(kc(`['1' "2" 3 4.5 [] {} true false null undefined NaN Infinity yes no]`),`;['1',"2",3,4.5,[],{},true,false,null,undefined,NaN,Infinity,true,false]`)
     })
     section("objects", function ()
@@ -117,22 +123,35 @@ blocks.push(block)`)
     })
     section("function", function ()
     {
-        compare(kc('[a -3]'),';[a(-3)]')
+        compare(kc('[a(-3)]'),';[a(-3)]')
+        compare(kc('[a -3]'),';[a,-3]')
+        compare(kc('[a-3]'),';[a - 3]')
+        compare(kc('[a - 3]'),';[a - 3]')
     })
     section("assign", function ()
     {
         compare(kc('[l, r] = a'),'var _a_ = a; l = _a_[0]; r = _a_[1]\n')
+        compare(kc('[l r] = a'),'var _a_ = a; l = _a_[0]; r = _a_[1]\n')
         compare(ke(`a = [1,2]
 [a, b] = a
 [b,a]`),[2,1])
+        compare(ke(`a = [1 2]
+[a b] = a
+[b a]`),[2,1])
         compare(ke(`a = [1,2,3]
 [a, a, a] = a
 a`),3)
+        compare(ke(`a = [-1 -2 -3]
+[a a a] = a
+a`),-3)
     })
     section("blocks", function ()
     {
         compare(kc(`[
     1,2
+]`),`;[1,2]`)
+        compare(kc(`[
+    1 2
 ]`),`;[1,2]`)
         compare(kc(`[
     1,

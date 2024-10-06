@@ -1,0 +1,82 @@
+
+# 000   000  000000000  000  000       0000000  
+# 000   000     000     000  000      000       
+# 000   000     000     000  000      0000000   
+# 000   000     000     000  000           000  
+#  0000000      000     000  0000000  0000000   
+
+use ../kxk ▪ deg2rad
+
+function Utils
+    
+    @opt: e o ->
+        
+        if o?
+            for k in Object.keys o
+                e.setAttribute k, o[k]
+        e
+
+    @append: p t o ->
+        
+        e = document.createElementNS 'http://www.w3.org/2000/svg' t
+        p.appendChild @opt(e, o)
+        e
+        
+    @svg: width height clss ->
+
+        svg = document.createElementNS 'http://www.w3.org/2000/svg' 'svg'
+        svg.setAttribute 'viewBox' "-#{width/2} -#{width/2} #{width} #{height}"
+        svg.setAttribute 'class' clss if clss
+        svg
+        
+    @rect: x y w h r clss svg ->
+
+        svg ?= @svg w, h
+        g = @append svg, 'g'
+        r = @append g, 'rect' x:x, y:y, width:w, height:h, rx:r, class:clss
+        r
+
+    @circle: radius clss svg ->
+        
+        g = @append svg, 'g'
+        c = @append g, 'circle' cx:0 cy:0 r:radius, class:clss
+        c
+        
+    @pie: clss svg ->
+        
+        g    = @append svg, 'g'
+        pie  = @append g, 'path' class:clss
+        
+# 0000000    000   0000000    0000000   00000000  00000000   
+# 000   000  000  000        000        000       000   000  
+# 000   000  000  000  0000  000  0000  0000000   0000000    
+# 000   000  000  000   000  000   000  000       000   000  
+# 0000000    000   0000000    0000000   00000000  000   000  
+
+class digger
+    
+    @ints: str ints... ->
+        r = {}
+        for int in ints
+            idx = str.search /\d+/
+            str = str[idx..]
+            val = parseInt str
+            r[int] = val
+            idx = str.search /[^\d]/
+            str = str[idx..]
+        r
+        
+    @floats: str floats... ->
+        r = {}
+        for float in floats
+            idx = str.search /\d+\.\d+/
+            str = str[idx..]
+            val = parseFloat str
+            r[float] = val
+            idx = str.search /[^\d\.]/
+            str = str[idx..]
+        r
+
+Utils.digger = digger
+        
+export Utils

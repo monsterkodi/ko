@@ -42,7 +42,7 @@ STYLES =
     b14: '#5FF'
     b15: '#FFF'
 
-toHexString = (num) ->
+toHexString = num ->
     num = num.toString(16)
     while num.length < 2 then num = "0#{num}"
     num
@@ -72,7 +72,7 @@ toHexString = (num) ->
 
 class Ansi
     
-    @html: (s) -> 
+    @html: s -> 
     
         andi = new Ansi()
         lines = []
@@ -89,14 +89,14 @@ class Ansi
             lines.push htmlLine
         lines.join '\n'
         
-    dissect: (@input) ->
+    dissect: @input ->
         
         @diss  = []
         @text  = ""
         @tokenize()
         [@text, @diss]
 
-    tokenize: () ->
+    tokenize: ->
         
         start       = 0
         ansiHandler = 2
@@ -111,21 +111,21 @@ class Ansi
             invert = false
             st = []
             
-        addStyle = (style) -> st.push style if style not in st
-        delStyle = (style) -> st.splice st.indexOf(style), 1
+        addStyle = style -> st.push style if style not in st
+        delStyle = style -> st.splice st.indexOf(style), 1
         
-        setFG = (cs) -> 
+        setFG = cs -> 
             if cs.length == 5
                 fg = "rgb(#{cs[2]},#{cs[3]},#{cs[4]})"
             else
                 fg = STYLES["f#{cs[2]}"] # extended fg 38;5;[0-255]
-        setBG = (cs) -> 
+        setBG = cs -> 
             if cs.length == 5
                 bg = "rgb(#{cs[2]},#{cs[3]},#{cs[4]})"
             else
                 bg = STYLES["b#{cs[2]}"] # extended bg 48;5;[0-255]
         
-        addText = (t) =>
+        addText = t =>
             
             start = @text.length
             
@@ -183,13 +183,13 @@ class Ansi
             start = @text.length
             ''
         
-        toHighIntensity = (c) ->
+        toHighIntensity = c ->
             for i in [0..7]
                 if c == STYLES["f#{i}"]
                     return STYLES["f#{8+i}"]
             c
         
-        ansiCode = (m, c) ->
+        ansiCode = m c ->
             ansiMatch = true
             c = '0' if c.trim().length == 0            
             cs = c.trimRight(';').split(';')
@@ -226,7 +226,7 @@ class Ansi
             {pattern: /^([^\x1b\x08\n]+)/,          sub: addText}
          ]
 
-        process = (handler, i) =>
+        process = handler i =>
             return if i > ansiHandler and ansiMatch # give ansiHandler another chance if it matches
             ansiMatch = false
             @input = @input.replace handler.pattern, handler.sub

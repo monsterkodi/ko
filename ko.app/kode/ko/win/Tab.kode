@@ -54,7 +54,7 @@ class Tab
                 diss.pop()
                 diss.pop()
 
-        name = elem 'span' class:'name app-drag-region' html:Render.line diss, charWidth:0
+        name = elem 'span' class:'name app-drag-region' html:Render.line(diss, charWidth:0)
         @div.appendChild name
 
         if @isPrj()
@@ -66,7 +66,7 @@ class Tab
             else if @tmp
                 html = '<span class="tab-temp"><span class="temp-icon"></span></span>'
                 
-            @div.appendChild elem 'span' class:'tabstate app-drag-region' html:html, click:@togglePinned
+            @div.appendChild elem('span' class:'tabstate app-drag-region' html:html, click:@togglePinned)
 
         @tooltip = new tooltip elem:name, bound:@div, html:@tooltipHtml, x:-2
 

@@ -22,9 +22,11 @@ use ./utils ▪ kc ke
         kc 'a[1][2]'        ▸ 'a[1][2]'
         kc 'a[1][2]'        ▸ 'a[1][2]'
         kc '[1,2][1]'       ▸ ';[1,2][1]'
+        kc '[1 2][1]'       ▸ ';[1,2][1]'
         kc '{a:1}["a"]'     ▸ '{a:1}["a"]'
         kc ';[d,k,v,e] = f' ▸ 'var _a_ = f; d = _a_[0]; k = _a_[1]; v = _a_[2]; e = _a_[3]\n'
         kc '[d,k,v,e] = f'  ▸ 'var _a_ = f; d = _a_[0]; k = _a_[1]; v = _a_[2]; e = _a_[3]\n'
+        kc '[d k v e] = f'  ▸ 'var _a_ = f; d = _a_[0]; k = _a_[1]; v = _a_[2]; e = _a_[3]\n'
 
         ▸ slice
 
@@ -45,7 +47,8 @@ use ./utils ▪ kc ke
                
         ▸ call
             
-            kc 'b[Math.floor n/7]' ▸ 'b[Math.floor(n / 7)]'
+            kc 'b[Math.floor n/7]'  ▸ 'b[Math.floor(n / 7)]'
+            kc 'b[Math.floor(n/7)]' ▸ 'b[Math.floor(n / 7)]'
             
     # 00000000    0000000   000   000   0000000   00000000
     # 000   000  000   000  0000  000  000        000
@@ -120,9 +123,10 @@ use ./utils ▪ kc ke
     ▸ array
 
         kc  '[1]'               ▸ ';[1]'
-        kc  '[1 2]'             ▸ ';[1,2]'
         kc  '[1,2]'             ▸ ';[1,2]'
+        kc  '[1 2]'             ▸ ';[1,2]'
         kc  '[a,b]'             ▸ ';[a,b]'
+        kc  '[a b]'             ▸ ';[a,b]'
         kc  '[ "1" ]'           ▸ ';["1"]'
         kc  "[ '1' ]"           ▸ ";['1']"
         kc  '["1" "2"]'         ▸ ';["1","2"]'
@@ -138,13 +142,19 @@ use ./utils ▪ kc ke
         kc  '[[[][]]]'          ▸ ';[[[],[]]]'
         kc  '[[[1]], 1]'        ▸ ';[[[1]],1]'
         kc  '[b(c)]'            ▸ ';[b(c)]'
-        kc  '[b c]'             ▸ ';[b(c)]'
+        kc  '[b c]'             ▸ ';[b,c]'
         
         kc  "['1' , a, true, false, null, undefined]" ▸
             ";['1',a,true,false,null,undefined]"
+
+        kc  "['1' a true false null undefined]" ▸
+            ";['1',a,true,false,null,undefined]"
             
-        kc  "a = [1 2 - 3 x 4 + 5 'a' b 'c']" ▸
+        kc  "a = [1 2 - 3 x(4 + 5 'a' b('c'))]" ▸
             "a = [1,2 - 3,x(4 + 5,'a',b('c'))]"
+
+        kc  "a = [1 2 - 3 x 4 + 5 'a' b 'c']" ▸
+            "a = [1,2 - 3,x,4 + 5,'a',b,'c']"
             
         kc  """['1' "2" 3 4.5 [] {} true false null undefined NaN Infinity yes no]""" ▸
             """;['1',"2",3,4.5,[],{},true,false,null,undefined,NaN,Infinity,true,false]"""
@@ -199,7 +209,10 @@ use ./utils ▪ kc ke
     
     ▸ function
         
-        kc  '[a -3]'    ▸   ';[a(-3)]'
+        kc  '[a(-3)]' ▸   ';[a(-3)]'
+        kc  '[a -3]'  ▸   ';[a,-3]'
+        kc  '[a-3]'   ▸   ';[a - 3]'
+        kc  '[a - 3]' ▸   ';[a - 3]'
         
     #  0000000    0000000   0000000  000   0000000   000   000  
     # 000   000  000       000       000  000        0000  000  
@@ -210,10 +223,19 @@ use ./utils ▪ kc ke
     ▸ assign
         
         kc  '[l, r] = a'    ▸   'var _a_ = a; l = _a_[0]; r = _a_[1]\n'
+        kc  '[l r] = a'     ▸   'var _a_ = a; l = _a_[0]; r = _a_[1]\n'
+        
         ke  """
             a = [1,2]
             [a, b] = a
             [b,a]
+            """ ▸   
+            [2,1]
+
+        ke  """
+            a = [1 2]
+            [a b] = a
+            [b a]
             """ ▸   
             [2,1]
 
@@ -223,6 +245,13 @@ use ./utils ▪ kc ke
             a
             """ ▸   
             3
+
+        ke  """
+            a = [-1 -2 -3]
+            [a a a] = a
+            a
+            """ ▸   
+            -3
             
     # 0000000    000       0000000    0000000  000   000   0000000  
     # 000   000  000      000   000  000       000  000   000       
@@ -241,6 +270,15 @@ use ./utils ▪ kc ke
             ;[1,2]
             """
 
+        kc  """
+            [
+                1 2
+            ]
+            """ ▸ 
+            """
+            ;[1,2]
+            """
+            
         kc  """
             [
                 1,

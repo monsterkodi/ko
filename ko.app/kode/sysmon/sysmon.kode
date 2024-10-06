@@ -1,0 +1,132 @@
+###
+ 0000000  000   000   0000000  00     00   0000000   000   000    
+000        000 000   000       000   000  000   000  0000  000    
+0000000     00000    0000000   000000000  000   000  000 0 000    
+     000     000          000  000 0 000  000   000  000  0000    
+0000000      000     0000000   000   000   0000000   000   000    
+###
+
+use ../kakao
+use ../kxk ▪ sleep win post prefs 
+use ◆ sysdish utils 
+
+digger = utils.digger
+        
+function SysMon extends sysdish
+
+    animDish: =>
+        
+        super()
+        
+        kakao 'status.icon' x:0 y:0, w:22, h:38
+        
+    onWindowWillShow: =>
+            
+        # this will probably not work if another monitor is positioned to the left:
+        frame = x:-99 y:0 w:100 h:40 # move window offscreen
+        kakao 'window.setFrame' frame, true
+
+        post.on 'status.right_click' -> kakao 'window.new' 'syswin'
+        
+        @requestData()
+            
+    # 0000000     0000000   000000000   0000000   
+    # 000   000  000   000     000     000   000  
+    # 000   000  000000000     000     000000000  
+    # 000   000  000   000     000     000   000  
+    # 0000000    000   000     000     000   000  
+    
+    requestData: ○=>
+        
+        # ○ kakao 'log' 'requestData' window.winID
+                
+        vmstat = ○ kakao 'app.sh' '/usr/bin/vm_stat' arg:'' cwd:kakao.bundle.path
+
+        pages = digger.ints vmstat, 'pagesize' 'free' 'active' 'inactive' 'speculative' 'throttled' 'wired' 'purgeable' 'faults' 'copy' 'zero' 'reactivated' 'purged' 'filebacked' 'anonymous' 'compressed' 'occupied'
+        pages.app = pages.anonymous - pages.purgeable
+        
+        active = pages.app + pages.wired + pages.occupied
+        used   = active + pages.filebacked + pages.purgeable
+        total  = pages.free + pages.active + pages.inactive + pages.wired + pages.occupied + pages.throttled + pages.speculative
+        
+        gb  = 1/(1024*1024*1024)
+        pgb = pages.pagesize*gb
+        
+        @data.mem.active = active/total
+        @data.mem.used   = used/total
+        
+        top = ○ kakao 'app.sh' '/usr/bin/top' arg:"-l 1 -s 0 -n 0"
+        toplines = top.split '\n'
+        cpu = digger.floats toplines[3], 'user' 'sys' 'idle'
+
+        @data.cpu.usr = cpu.user/100
+        @data.cpu.sys = cpu.sys/100
+        
+        netstr  = ○ kakao 'app.sh' '/usr/sbin/netstat' arg:'-bdI en0'
+        netlines  = netstr.split '\n'
+        linesplit = netlines[3].split /\s+/g
+        
+        ibytes = parseInt linesplit[6]
+        obytes = parseInt linesplit[9]
+        
+        # ○ kakao 'log' ibytes, obytes, @netIn, @netOut
+        
+        if @netIn > 0
+            
+            idiff = ibytes - @netIn
+            @maxNetIn = max @maxNetIn, idiff
+            @data.net.in = idiff/@maxNetIn if @maxNetIn > 0
+            
+        if @netOut > 0
+            
+            odiff = obytes - @netOut
+            @maxNetOut = max @maxNetOut, odiff
+            @data.net.out = odiff/@maxNetOut if @maxNetOut > 0
+        
+        @netIn  = ibytes
+        @netOut = obytes
+        
+        dskstr = ○ kakao 'app.sh' '/usr/sbin/ioreg' arg:'-c IOBlockStorageDriver -k Statistics -r -w0'
+        if 0 < idx = dskstr.indexOf '"Bytes (Read)"='
+            dskstr = dskstr[idx+15..]
+            idx = dskstr.indexOf '\n'
+            dskstr = dskstr[0..idx]
+            
+            ibytes = parseInt dskstr
+            idx = dskstr.indexOf '"Bytes (Write)"='
+            dskstr = dskstr[idx+16..]
+            obytes = parseInt dskstr
+
+            if @dskIn > 0
+                
+                idiff = ibytes - @dskIn
+                @maxDskIn  = max @maxDskIn, idiff
+                @data.dsk.in  = idiff/@maxDskIn if @maxDskIn > 0
+    
+            if @dskOut > 0
+                
+                odiff = obytes - @dskOut
+                @maxDskOut = max @maxDskOut, odiff
+                @data.dsk.out = odiff/@maxDskOut if @maxDskOut > 0
+                
+            @dskIn  = ibytes
+            @dskOut = obytes
+            
+        @updateDish()
+        
+        post.toWins 'dishData' @data
+        
+        prefs.set 'dish',
+            maxDskIn:  @maxDskIn
+            maxDskOut: @maxDskOut
+            maxNetIn:  @maxNetIn
+            maxNetOut: @maxNetOut
+        
+        ○ sleep @dataDelay
+                
+        @requestData()
+
+kakao.init ->
+    
+    new win new SysMon
+   

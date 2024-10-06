@@ -19,9 +19,9 @@ use ./utils ▪ kc ke
     ▸ parens
 
         kc  '(b)'                         ▸ ';(b)'
-        kc  '(b c)'                       ▸ ';(b(c))'
-        kc  '(b --c)'                     ▸ ';(b(--c))'
-        kc  'a + (b --c)'                 ▸ 'a + (b(--c))'
+        kc  '(b(c))'                       ▸ ';(b(c))'
+        kc  '(b(--c))'                     ▸ ';(b(--c))'
+        kc  'a + (b(--c))'                 ▸ 'a + (b(--c))'
         
     ▸ close
     

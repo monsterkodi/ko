@@ -134,17 +134,17 @@ function Shelf extends Column
     addDir: dir opt ->
 
         item =
-            name: slash.file slash.tilde dir
+            name: slash.file(slash.tilde(dir))
             type: 'dir'
-            path: slash.path dir
+            path: slash.path(dir)
 
         @addItem item, opt
 
     addFile: file opt ->
 
         item =
-            name: slash.file file
-            path: slash.path file
+            name: slash.file(file)
+            path: slash.path(file)
             type: 'file'
         item.textFile = true if File.isText file
         @addItem item, opt
@@ -175,7 +175,7 @@ function Shelf extends Column
         source = event.dataTransfer.getData 'text/plain'
 
         item = @browser.pathItem source
-        @addItem item, pos:kpos event
+        @addItem item, pos:kpos(event)
 
     isEmpty: -> empty @rows
 
@@ -201,9 +201,9 @@ function Shelf extends Column
             if row.path().startsWith status.gitDir
                 $('.browserStatusIcon', row.div)?.remove()
                 if row.path() in status.dirs
-                    row.div.appendChild elem 'span' class:"git-dirs-icon browserStatusIcon"
+                    row.div.appendChild elem('span' class:"git-dirs-icon browserStatusIcon")
                 else if status.files[row.path()]
-                    row.div.appendChild elem 'span' class:"git-#{status.files[row.path()]}-icon browserStatusIcon"
+                    row.div.appendChild elem('span' class:"git-#{status.files[row.path()]}-icon browserStatusIcon")
         @
 
     loadGitStatus: =>
@@ -333,7 +333,7 @@ function Shelf extends Column
         switch combo
             'command+enter'
             'ctrl+enter'    ➜ ⮐ @openFileInNewWindow()
-            'enter'         ➜ ⮐ stopEvent event, @navigateCols key
+            'enter'         ➜ ⮐ stopEvent event, @navigateCols(key)
             'backspace'
             'delete'        ➜ ⮐ stopEvent event, @clearSearch().removeObject()
             'command+k'
@@ -342,7 +342,7 @@ function Shelf extends Column
             'up' 'down'
             'page up'
             'page down'
-            'home' 'end'    ➜ ⮐ stopEvent event, @navigateRows key
+            'home' 'end'    ➜ ⮐ stopEvent event, @navigateRows(key)
             'right'
             'alt+right'
             'enter'         ➜ ⮐ stopEvent event, @focusBrowser()

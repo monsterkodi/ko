@@ -18,8 +18,10 @@ use ./utils ▪ kc ke
         kc  '{a:3 b:4}'         ▸   '{a:3,b:4}'
         kc  'a:b:c'             ▸   '{a:{b:c}}'
         kc  'a:b:c,d:e:f'       ▸   '{a:{b:c,d:{e:f}}}'
-        kc  'a:b c'             ▸   '{a:b(c)}'
-        kc  'a:b:c d:e:f'       ▸   '{a:{b:c({d:{e:f}})}}'
+        # kc  'a:b c'             ▸   '{a:b,c:c}'
+        kc  'a:b(c)'            ▸   '{a:b(c)}'
+        kc  'a:b:c d:e:f'       ▸   '{a:{b:c,d:{e:f}}}'
+        kc  'a:b:c(d:e:f)'       ▸   '{a:{b:c({d:{e:f}})}}'
 
         kc  'o = { a:1 b:2 c: d:4 e:5 }' ▸ 'o = {a:1,b:2,c:{d:4,e:5}}'
 

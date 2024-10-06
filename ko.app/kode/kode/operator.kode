@@ -16,7 +16,7 @@ use ./print
 # 000        000   000  000       000       000       000   000  000       000  0000  000       000       
 # 000        000   000  00000000   0000000  00000000  0000000    00000000  000   000   0000000  00000000  
 
-precedence = (o) ->
+precedence = o ->
     
     return 12 if o?.qmrkcolon
     
@@ -55,7 +55,7 @@ assign = ['=''+=''-=''*=''/=''%=''^=''&=''|=''&&=''||=']
 
 class Operator
 
-    @: (@kode) ->
+    @: @kode ->
 
         @verbose = @kode.args.verbose
         @debug   = @kode.args.debug
@@ -66,7 +66,7 @@ class Operator
     # 000       000   000  000      000      000       000          000     
     #  0000000   0000000   0000000  0000000  00000000   0000000     000     
     
-    collect: (tl) ->
+    collect: tl ->
         
         if tl?.exps?.length
             @exp e for e in tl.exps
@@ -78,11 +78,11 @@ class Operator
     # 000        000 000   000        
     # 00000000  000   000  000        
     
-    exp: (e) ->
+    exp: e ->
 
         if  
-            not e       ➜ return
-            e.type      ➜ return
+            not e       ➜ ⮐ 
+            e.type      ➜ ⮐ 
             e is Array  ➜ @exp v for v in e if e.length
             e.operation 
                 @op e
@@ -103,7 +103,7 @@ class Operator
     # 000   000  000        
     #  0000000   000        
     
-    op: (e) ->
+    op: e ->
         
         chain = [e]
         
@@ -116,7 +116,7 @@ class Operator
             
             p = chain.map (i) -> precedence i
                         
-            @logChain chain, p if @debug
+            @logChain(chain p) if @debug
             
             for i in 1...p.length
                 if p[i] > p[i-1]
@@ -132,7 +132,7 @@ class Operator
     # 000       000   000 000           000        000   000  000       000     
     # 000       000  000   000          000        000   000  00000000   0000000
     
-    fixPrec: (e) ->
+    fixPrec: e ->
         
         op = e.operation or e.qmrkcolon
         
@@ -189,23 +189,23 @@ class Operator
             if precedence(e) < precedence(op.rhs)
                 @fixPrec e
 
-    logChain: (chain, p) ->
+    logChain: chain p ->
                 
         s = ''
         rndr = (n) => 
             try
-                w2 @kode.renderer.node n
+                w2 @kode.renderer.node(n)
             catch e
                 print.noon e, n
         s += chain.map((i) => 
                 if i.operation
-                    (rndr i.operation.lhs) + ' ' + w3(i.operation.operator.text) + ' ' + b6(precedence i)
+                    rndr(i.operation.lhs) + ' ' + w3(i.operation.operator.text) + ' ' + b6(precedence(i))
                 else
-                    (rndr i.qmrkcolon.lhs) + ' ? ' + (rndr i.qmrkcolon.mid) + ' ' 
+                    rndr(i.qmrkcolon.lhs) + ' ? ' + rndr(i.qmrkcolon.mid) + ' ' 
             ).join ' '
         s += ' ' + rndr(chain[-1].operation?.rhs) ? '...'
-        log w4('▪'), s, g3 p
+        log w4('▪') s g3(p)
         
-    verb: -> if @debug then console.log.apply console.log, arguments 
+    verb: -> if @debug then console.log.apply console.log arguments 
 
 export Operator

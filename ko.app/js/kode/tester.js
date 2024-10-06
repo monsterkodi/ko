@@ -189,7 +189,7 @@ class Tester
         for (var _a_ = 0; _a_ < list.length; _a_++)
         {
             fail = list[_a_]
-            console.log(_k_.R2(_k_.y5(' ' + fail.stack[0] + ' ')) + _k_.R1(_k_.y5(' ' + fail.stack.slice(1).join(_k_.r3(' ▸ ')) + ' ')))
+            console.log(_k_.R2(_k_.y5(' ' + fail.stack[0] + ' ')) + _k_.R1(_k_.y5(' ')) + fail.stack.slice(1).join(_k_.r3(' ▸ ')) + ' ')
             console.log(_k_.r5(this.showSpace(fail.lhs)))
             console.log(_k_.R1(_k_.r3(' ▸ ')))
             console.log(_k_.g3(this.showSpace(fail.rhs)))

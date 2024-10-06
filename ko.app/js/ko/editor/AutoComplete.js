@@ -488,7 +488,7 @@ class AutoComplete extends events
         }).bind(this)
         if (lines.length > 1)
         {
-            return setTimeout((delay(lines,opt)),200)
+            return setTimeout(delay(lines,opt),200)
         }
     }
 

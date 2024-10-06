@@ -33,7 +33,7 @@ elem = (typ, opt) ->
         
     if opt.children? and opt.children is Array
         for c in opt.children
-            e.appendChild c if isElement c
+            e.appendChild(c) if isElement c
         delete opt.children
         
     if opt.parent? and isElement opt.parent

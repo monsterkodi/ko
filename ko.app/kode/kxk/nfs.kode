@@ -125,7 +125,7 @@ class NFS
         try
             ⮐ if not p?
                 
-            p =  slash.path slash.removeLinePos p
+            p =  slash.path slash.removeLinePos(p)
             r =○ fsp.access p, fs.R_OK | fs.F_OK # is this neccessary?
             ⮐ ○ fsp.stat p
                             
@@ -187,7 +187,7 @@ class NFS
     @copy: from to ○-> 
         
         if ○ NFS.isDir to
-            to = slash.path to, slash.file from
+            to = slash.path to, slash.file(from)
           
         ○ fsp.cp from, to, recursive:true
 
@@ -200,7 +200,7 @@ class NFS
     @move: from to ○-> 
         
         if ○ NFS.isDir to
-            to = slash.path to, slash.file from
+            to = slash.path to, slash.file(from)
     
         if ○ NFS.exists from
             ○ fsp.rename from, to

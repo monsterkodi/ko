@@ -10,7 +10,8 @@ use ./utils ▪ kc ke
 
 ▸ color
     
-    kc  "R1 'Red' + g1 ' green'" ▸  "_k_.R1('Red' + _k_.g1(' green'))"
+    # kc  "R1 'Red' + g1 ' green'" ▸  "_k_.R1('Red' + _k_.g1(' green'))"
+    kc  "R1 'Red' + g1(' green')" ▸  "_k_.R1('Red' + _k_.g1(' green'))"
     
     return
     

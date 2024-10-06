@@ -11,7 +11,7 @@ use ./kpos
 
 function Drag
 
-    @: (cfg) ->
+    @: cfg ->
         
         cfg ?= {}
         @target    = cfg.target ? 'titlebar'
@@ -29,7 +29,7 @@ function Drag
             @target = t
             
         if not @target?
-            return error "Drag -- can't find drag target"
+             ⮐ error "Drag -- can't find drag target"
         
         if @target == document.body
             @useScreenPos = true
@@ -52,7 +52,7 @@ function Drag
     #      000     000     000   000  000   000     000     
     # 0000000      000     000   000  000   000     000     
     
-    start: (p, event) ->
+    start: p event ->
         
         if not @dragging and @listening
             
@@ -65,10 +65,11 @@ function Drag
             if 'skip' == @onStart? @, event
                 delete @startPos
                 @dragging = false
-                return @
+                ⮐ @
                 
             @lastPos = p
-                    
+            @button = event.button
+            
             if @stopEvent != false
                 stopEvent event
     
@@ -76,14 +77,14 @@ function Drag
             document.addEventListener 'mouseup'   @dragUp
         @
     
-    eventPos: (event) =>
+    eventPos: event =>
         
         if @useScreenPos
             kpos x:event.screenX, y:event.screenY
         else
             kpos event
         
-    dragStart: (event) => @start @eventPos(event), event
+    dragStart: event => @start @eventPos(event) event
         
     # 00     00   0000000   000   000  00000000  
     # 000   000  000   000  000   000  000       
@@ -91,7 +92,7 @@ function Drag
     # 000 0 000  000   000     000     000       
     # 000   000   0000000       0      00000000  
     
-    dragMove: (event) =>
+    dragMove: event =>
 
         if @dragging
             @pos      = @eventPos event
@@ -99,17 +100,17 @@ function Drag
             @deltaSum = @startPos.to @pos
             
             if @constrainKey? and event[@constrainKey]
-                @constrain ?= if Math.abs(@delta.x) >= Math.abs(@delta.y) then kpos 1,0 else kpos 0,1
+                @constrain ?= if Math.abs(@delta.x) >= Math.abs(@delta.y) ➜ kpos(1 0) else kpos(0 1)
                 @delta.x *= @constrain.x
                 @delta.y *= @constrain.y
             else
                 delete @constrain
                 
-            @onMove? @, event 
+            @onMove? @ event 
             @lastPos = @pos
         @
                 
-    dragUp: (event) => 
+    dragUp: event => 
         
         delete @constrain
         @dragStop event
@@ -120,12 +121,12 @@ function Drag
     #      000     000     000   000  000        
     # 0000000      000      0000000   000        
     
-    dragStop: (event) =>
+    dragStop: event =>
 
         if @dragging
             document.removeEventListener 'mousemove' @dragMove
             document.removeEventListener 'mouseup'   @dragUp
-            @onStop @, event if @onStop? and event?
+            @onStop @ event if @onStop? and event?
             delete @lastPos
             delete @startPos
             @dragging = false

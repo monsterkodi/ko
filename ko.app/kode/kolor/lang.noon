@@ -29,6 +29,7 @@ coffee kode js ts
         extends
         instanceof
         globalThis
+        parseInt
         __dirname
         __filename
         Infinity

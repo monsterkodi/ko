@@ -40,8 +40,8 @@ class Brackets
         [before, after] = @beforeAfterForPos cp
 
         if after.length or before.length
-            if after.length  and first(after).start == cp[0]   and first(after).clss == 'open'  then cp[0] += 1
-            if before.length and last(before).start == cp[0]-1 and last(before).clss == 'close' then cp[0] -= 1
+            if after.length  and first(after).start == cp[0]   and first(after).clss == 'open'  ➜ cp[0] += 1
+            if before.length and last(before).start == cp[0]-1 and last(before).clss == 'close' ➜ cp[0] -= 1
 
         ⮐ if @highlightInside cp
 
@@ -82,7 +82,7 @@ class Brackets
             break if lastOpen?
             ⮐ if pp[1] < 1
             ⮐ if cnt++ > maxLookBeforeAndAhead # maximum number of lines exceeded
-            pp = [@editor.line(pp[1]-1).length, pp[1]-1]
+            pp = [@editor.line(pp[1]-1).length pp[1]-1]
 
         ⮐ if not lastOpen?
 
@@ -130,7 +130,7 @@ class Brackets
         i = rngs.length-1
         while i >= 0 # remove escaped
             if rngs[i].start > 0 and line[rngs[i].start-1] == '\\'
-                rngs.splice i, 1
+                rngs.splice i 1
             i -= 1
 
         i = rngs.length-1
@@ -138,7 +138,7 @@ class Brackets
             if rngs[i-1].clss == 'open' and rngs[i].clss == 'close' and
                 @open[rngs[i-1].match] == rngs[i].match and
                     rngs[i-1].start == rngs[i].start - 1
-                        rngs.splice i-1, 2
+                        rngs.splice i-1 2
                         i -= 1
             i -= 1
 
@@ -146,9 +146,9 @@ class Brackets
             r.line = li for r in rngs
             lst = last rngs
             fst = first rngs
-            for firstAfterIndex in [0...rngs.length]
+            for firstAfterIndex in 0...rngs.length
                 break if rngs[firstAfterIndex].start >= cp
-            before = rngs.slice 0, firstAfterIndex
+            before = rngs.slice 0 firstAfterIndex
             after  = rngs.slice firstAfterIndex
             ⮐ [before, after]
             
@@ -165,8 +165,8 @@ class Brackets
         @clear()
         opn.clss = 'bracketmatch'
         cls.clss = 'bracketmatch'
-        @editor.addHighlight [opn.line, [opn.start, opn.start+opn.match.length], opn]
-        @editor.addHighlight [cls.line, [cls.start, cls.start+cls.match.length], cls]
+        @editor.addHighlight [opn.line [opn.start opn.start+opn.match.length] opn]
+        @editor.addHighlight [cls.line [cls.start cls.start+cls.match.length] cls]
         @editor.renderHighlights()
 
     #  0000000  000      00000000   0000000   00000000
@@ -177,6 +177,6 @@ class Brackets
 
     clear: ->
 
-        @editor.setHighlights @editor.highlights().filter (h) -> h[2]?.clss != 'bracketmatch'
+        @editor.setHighlights @editor.highlights().filter((h) -> h[2]?.clss != 'bracketmatch')
 
 export Brackets

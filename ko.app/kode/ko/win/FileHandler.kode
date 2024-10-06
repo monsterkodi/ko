@@ -36,8 +36,6 @@ class FileHandler
 
         file = null if file? and file.length <= 0
 
-        editor.saveFilePosition()
-
         if file?
             [file, filePos] = slash.splitFilePos file
             if filePos? and (filePos[0] or filePos[1])
@@ -50,9 +48,9 @@ class FileHandler
             @addToRecent file
             
             if editor.currentFile and editor.currentFile != kore.get 'editor|file'
-                log 'WTF!?' editor.currentFile, kore.get 'editor|file'
+                log 'WTF!?' editor.currentFile, kore.get('editor|file')
                 
-            post.emit 'storeState' kore.get('editor|file'), editor.do.tabState() if not opt.reload
+            post.emit 'storeState' kore.get('editor|file') editor.do.tabState() if not opt.reload
 
             editor.setCurrentFile file
             
@@ -110,7 +108,7 @@ class FileHandler
     reloadFile: file =>
 
         if file == kore.get 'editor|file'
-            @loadFile file, reload:true
+            @loadFile file reload:true
         else
             post.emit 'revertFile' file
 
@@ -130,7 +128,7 @@ class FileHandler
 
         editor.saveFilePosition()
             
-        File.save file, editor.text(), (saved) ->
+        File.save file editor.text() (saved) ->
 
             ⮐ error 'File.save failed!' if not saved
             
@@ -160,7 +158,7 @@ class FileHandler
             recent.pop()
 
         window.stash.set 'recentFiles' recent
-        window.commandline.commands.open.setHistory reversed recent
+        window.commandline.commands.open.setHistory reversed(recent)
 
     #  0000000   0000000   000   000  00000000         0000000  000   000   0000000   000   000   0000000   00000000   0000000
     # 000       000   000  000   000  000             000       000   000  000   000  0000  000  000        000       000
@@ -180,7 +178,7 @@ class FileHandler
     #      000  000   000     000     000             000       000  000      000             000   000       000  
     # 0000000   000   000      0      00000000        000       000  0000000  00000000        000   000  0000000   
     
-    saveFileAs: => kakao 'fs.saveDialog' slash.dir kore.get 'editor|file'
+    saveFileAs: => kakao 'fs.saveDialog' slash.dir(kore.get('editor|file'))
         
     onSaveDialog: file =>
         

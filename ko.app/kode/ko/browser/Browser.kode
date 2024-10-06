@@ -86,10 +86,10 @@ function Browser extends events
                     if row = col.activeRow()
                         @loadItem row.item
                     else
-                        @loadItem @dirItem col.path()
+                        @loadItem @dirItem(col.path())
             else
                 if not slash.isRoot @columns[0].path()
-                    @loadItem @fileItem slash.dir @columns[0].path()
+                    @loadItem @fileItem(slash.dir(@columns[0].path()))
         else
             index = @focusColumn()?.index ? 0
             nuidx = index + switch key
@@ -287,8 +287,7 @@ function Browser extends events
 
         col = @emptyColumn opt?.col
         @clearColumnsFrom col.index
-        cnt = elem class:'browserImageContainer' child:
-            elem 'img' class:'browserImage' src:slash.fileUrl file
+        cnt = elem class:'browserImageContainer' child:elem('img' class:'browserImage' src:slash.fileUrl(file))
         col.table.appendChild cnt
 
 export Browser

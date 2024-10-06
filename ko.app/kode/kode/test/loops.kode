@@ -215,7 +215,7 @@ use ./utils ▪ kc ke
                 """
                 
             kc  """
-                matches = ([k, r.exec t] for k,r of rgs)
+                matches = ([k, r.exec(t)] for k,r of rgs)
                 """ ▸ """
                 matches = (function () { var r_a_ = []; for (var k in rgs)  { var r = rgs[k];r_a_.push([k,r.exec(t)])  } return r_a_ }).bind(this)()
                 """
@@ -247,7 +247,7 @@ use ./utils ▪ kc ke
     
     ▸ list comprehension
         
-        kc  "m = ([k, r.exec t] for k,r of rgs)" ▸
+        kc  "m = ([k, r.exec(t)] for k,r of rgs)" ▸
             """
             m = (function () { var r_a_ = []; for (var k in rgs)  { var r = rgs[k];r_a_.push([k,r.exec(t)])  } return r_a_ }).bind(this)()
             """

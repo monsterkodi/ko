@@ -22,7 +22,7 @@ function Browse extends Command
         # log 'Browse'
 
         @cmdID    = 0
-        @browser  = new FileBrowser $ 'browser'
+        @browser  = new FileBrowser $('browser')
 
         @commands = {}
         @names    = ['browse' 'shelf'] # only browse is shown in commandline menu (see CommandList.hideCommands)
@@ -37,7 +37,7 @@ function Browse extends Command
 
         # log 'browse.onFile' file
         if @isActive() and @getText() != slash.tilde file
-            @setText slash.tilde file
+            @setText slash.tilde(file)
 
     clear: ->
         return if @browser.cleanUp()
@@ -59,7 +59,7 @@ function Browse extends Command
                     @setText Projects.current()
                     @browser.loadDir Projects.current()
                 else
-                    @setText slash.tilde window.editor.currentFile
+                    @setText slash.tilde(window.editor.currentFile)
                     @browser.navigateToFile window.editor.currentFile
             else
                 # post.emit 'filebrowser' 'loadItem' file:process.cwd(), type:'dir'
@@ -90,7 +90,7 @@ function Browse extends Command
             matches = files.filter (f) -> f.file.startsWith text
 
             if not empty matches
-                @setText slash.tilde matches[0].file
+                @setText slash.tilde(matches[0].file)
 
             if matches.length > 1
 
@@ -169,7 +169,7 @@ function Browse extends Command
         l = @getText().length
 
         if not empty longestMatch
-            @setText slash.tilde longestMatch
+            @setText slash.tilde(longestMatch)
             @complete()
 
     changedCallback: files =>
@@ -187,7 +187,7 @@ function Browse extends Command
 
         s = slash.tilde(path).length
 
-        text = slash.tilde slash.tilde matches[0].file
+        text = slash.tilde slash.tilde(matches[0].file)
         @setText text
 
         l = text.length
@@ -276,7 +276,7 @@ function Browse extends Command
             @hideList()
             return
 
-        @commandList?.selectSingleRange @commandList.rangeForLineAtIndex @selected
+        @commandList?.selectSingleRange @commandList.rangeForLineAtIndex(@selected)
         @commandList?.do.cursors [[0, @selected]]
 
         text = slash.tilde @commandList.items[@selected].file
@@ -320,8 +320,8 @@ function Browse extends Command
         @cmdID += 1
         cmd = command.trim()
         if cmd.length
-            dirExists  =○ ffs.dirExists  slash.removeLinePos cmd
-            fileExists =○ ffs.fileExists slash.removeLinePos cmd
+            dirExists  =○ ffs.dirExists  slash.removeLinePos(cmd)
+            fileExists =○ ffs.fileExists slash.removeLinePos(cmd)
             if dirExists
                 @browser.loadItem path:cmd, type:'dir'
                 @commandline.setText cmd
@@ -333,7 +333,7 @@ function Browse extends Command
                 return
             else
                 if cmd == 'Browse' ➜ return
-                error 'browse.execute -- neither file nor dir' slash.removeLinePos cmd
+                error 'browse.execute -- neither file nor dir' slash.removeLinePos(cmd)
 
         error 'browse.execute -- unhandled' cmd
 

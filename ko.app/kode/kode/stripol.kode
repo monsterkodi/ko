@@ -12,7 +12,7 @@ use ./print
 
 class Stripol
 
-    @: (@kode) ->
+    @: @kode ->
 
         @verbose = @kode.args.verbose
         @debug   = @kode.args.debug
@@ -24,7 +24,7 @@ class Stripol
     # 000       000   000  000      000      000       000          000     
     #  0000000   0000000   0000000  0000000  00000000   0000000     000     
     
-    collect: (tl) ->
+    collect: tl ->
         
         @scope tl
         tl
@@ -35,7 +35,7 @@ class Stripol
     #      000  000       000   000  000        000       
     # 0000000    0000000   0000000   000        00000000  
     
-    scope: (body) ->
+    scope: body ->
 
         @exp body.exps,k,e for e,k in body.exps
         
@@ -45,7 +45,7 @@ class Stripol
     # 000        000 000   000        
     # 00000000  000   000  000        
     
-    exp: (p, k, e) ->
+    exp: p k e ->
 
         ⮐ if not e
             
@@ -54,7 +54,7 @@ class Stripol
                 p[k] = @string e
             return
             
-        else if e is Array  then @exp e, k, v for v,k in e if e.length
+        else if e is Array  ➜ @exp e, k, v for v,k in e if e.length
         else if e is Object
             
             for key,val of e
@@ -74,7 +74,7 @@ class Stripol
     #      000     000     000   000  000  000  0000  000   000  
     # 0000000      000     000   000  000  000   000   0000000   
     
-    string: (e) ->
+    string: e ->
         
         s = if e.type == 'triple' then e.text[3...-3] else e.text[1...-1]
         
@@ -84,7 +84,7 @@ class Stripol
             if chunks[-1].type != 'close'
                 chunks.push type:'close' text:'' line:e.line, col:e.col+s.length
                 
-            return stripol:chunks
+            ⮐ stripol:chunks
         else
             e.text = e.text.replace '#{}' ''
         e
@@ -95,11 +95,11 @@ class Stripol
     # 000   000  000       000       000  000       000          000     
     # 0000000    000  0000000   0000000   00000000   0000000     000     
     
-    dissect: (s, line, col) ->
+    dissect: s line col ->
 
         c = 0; chunks = []
             
-        push = (type,text) => 
+        push = type text => 
             if type == 'code'
                 if valid text
                     ast = @kode.ast text
@@ -164,6 +164,6 @@ class Stripol
                 
         chunks
                                 
-    verb: -> if @debug then console.log.apply console.log, arguments 
+    verb: -> if @debug ➜ console.log.apply console.log arguments 
 
 export Stripol

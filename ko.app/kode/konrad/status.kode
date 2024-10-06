@@ -22,25 +22,25 @@ report = status opt={} ○->
     
     for gitFile,k of status.files
         
-        relPath = slash.relative gitFile, process.cwd()
+        relPath = slash.relative gitFile process.cwd()
         
-        l =  deleted:r1, created:w2, changed:g1
-        m =  deleted:r4, created:w5, changed:g4
-        b =  deleted:R5, created:W1, changed:G1
+        l =  deleted:r1 created:w2 changed:g1
+        m =  deleted:r4 created:w5 changed:g4
+        b =  deleted:R5 created:W1 changed:G1
         
         if k in Object.keys m
         
             prfx   = b[k] "  "
             prfx  += reset '  '
             lame   = slash.ext(gitFile) in ['js' 'json']
-            change = prfx + pretty.filePath relPath, (lame and l[k] or m[k])
+            change = prfx + pretty.filePath(relPath, (lame and l[k] or m[k]))
             
             if k in ['changed' 'created'] and opt.diff
 
                 continue if lame
 
                 cmd = "git --no-pager diff -U0  --ignore-blank-lines --ignore-space-at-eol --no-color #{gitFile}"
-                res = child_process.execSync(cmd,{encoding:'utf8',cwd:status.gitDir})
+                res = child_process.execSync cmd {encoding:'utf8' cwd:status.gitDir}
                 diff = ""
                 c = w2 '●'
                 start = 0
@@ -48,7 +48,7 @@ report = status opt={} ○->
                 for ls in res.split /\r?\n/
 
                     if 
-                        ls.substr(0,4) in ['+++ ' '--- '] ➜
+                        ls.substr(0 4) in ['+++ ' '--- '] ➜
 
                         ls[0] == '@'
 
@@ -63,17 +63,17 @@ report = status opt={} ○->
 
                             diff += "\n "
                             start++
-                            rgs = kolor.ranges ls.substr(1), slash.ext gitFile
+                            rgs = kolor.ranges ls.substr(1), slash.ext(gitFile)
                             if valid rgs
                                 diff += pretty.ranges rgs
                             else
-                                diff += w8 ls.substr 1
+                                diff += w8(ls.substr(1))
 
                         ls[0] == '-'
                             
-                            diff += "\n " + w3 ls.substr 1
+                            diff += "\n " + w3(ls.substr(1))
                             
-                if diff.length ➜ change += diff + "\n" + w2 '●'
+                if diff.length ➜ change += diff + "\n" + w2('●')
                     
             changes.push change
 
@@ -118,7 +118,7 @@ parseStatus = gitStatus gitDir ->
     while line = lines.shift()
 
         rel = line.slice 3
-        file = slash.path gitDir, line.slice 3
+        file = slash.path gitDir, line.slice(3)
         while (rel = slash.dir(rel)) != ''
             dirSet.add(rel)
 
@@ -128,7 +128,7 @@ parseStatus = gitStatus gitDir ->
             ' M' ➜  status.changed.push file
             '??' ➜  status.created.push file
 
-    status.dirs = Array.from(dirSet).map (d) -> slash.path gitDir, d
+    status.dirs = Array.from(dirSet).map (d) -> slash.path gitDir d
     list = ['deleted' 'created' 'changed']
     
     for key in list
@@ -145,10 +145,10 @@ parseStatus = gitStatus gitDir ->
 
 export (opt={}) ○->
     
-    new Promise (resolve, reject) ->
+    new Promise (resolve reject) ->
 
         shopt = shell:true
-        child_process.exec 'git rev-parse --show-toplevel' shopt, (err, gitDir, stderr) -> 
+        child_process.exec 'git rev-parse --show-toplevel' shopt (err gitDir stderr) -> 
 
             if err
                 # error 'ERROR' err
@@ -157,9 +157,9 @@ export (opt={}) ○->
                 
             else if valid gitDir
 
-                gitDir = trim gitDir,' \n'
+                gitDir = trim gitDir ' \n'
                 
-                child_process.exec '/usr/bin/git status --porcelain' shopt, (err, status, stderr) -> 
+                child_process.exec '/usr/bin/git status --porcelain' shopt (err status stderr) -> 
                     
                     if err
                         error 'ERROR' err
@@ -167,7 +167,7 @@ export (opt={}) ○->
 
                     else if valid status
 
-                        report parseStatus(status,gitDir), opt
+                        report parseStatus(status gitDir) opt
 
                         ⮐ resolve()
                         

@@ -176,7 +176,7 @@ class Print
         lp = _k_.lpad(19)
         printNode = function (node, indent = '', visited = [])
         {
-            var name, s, value, _120_41_, _120_76_
+            var name, s, value, _120_41_, _120_77_
 
             s = ''
             if (!node)
@@ -185,7 +185,7 @@ class Print
             }
             if (node.type)
             {
-                s += _k_.b6(_k_.lpad(4,((_120_41_=node.line) != null ? _120_41_ : ''))) + ' ' + blue(_k_.lpad(3,((_120_76_=node.col) != null ? _120_76_ : ''))) + ' ' + gray(_k_.rpad(10,node.type)) + ' ' + bold(yellow(indent + node.text) + '\n')
+                s += _k_.b6(_k_.lpad(4,((_120_41_=node.line) != null ? _120_41_ : ''))) + ' ' + blue(_k_.lpad(3,((_120_77_=node.col) != null ? _120_77_ : ''))) + ' ' + gray(_k_.rpad(10,node.type)) + ' ' + bold(yellow(indent + node.text)) + '\n'
             }
             else if (node instanceof Array)
             {

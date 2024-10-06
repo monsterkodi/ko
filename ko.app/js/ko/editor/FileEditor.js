@@ -171,8 +171,7 @@ FileEditor = (function ()
         {
             filePositions = {}
         }
-        cursor = this.mainCursor()
-        if (cursor[0] || cursor[1])
+        if (cursor = this.hasMainCursor())
         {
             filePositions[this.currentFile] = `${cursor[0]} ${cursor[1]} ${this.scroll.scroll}`
         }
@@ -240,7 +239,7 @@ FileEditor = (function ()
 
     FileEditor.prototype["jumpToFile"] = function (opt)
     {
-        var file, fpos, _234_21_
+        var file, fpos, _233_21_
 
         opt = (opt != null ? opt : {})
         if (_k_.isStr(opt))
@@ -267,7 +266,7 @@ FileEditor = (function ()
             opt.winID = window.winID
             opt.oldPos = this.cursorPos()
             opt.oldFile = this.currentFile
-            opt.file = ((_234_21_=opt.file) != null ? _234_21_ : opt.path)
+            opt.file = ((_233_21_=opt.file) != null ? _233_21_ : opt.path)
             return window.navigate.gotoFilePos(opt)
         }
         else
@@ -279,7 +278,7 @@ FileEditor = (function ()
 
     FileEditor.prototype["jumpTo"] = function (word, opt)
     {
-        var classes, clss, file, files, find, func, funcs, i, info, infos, type, _257_19_
+        var classes, clss, file, files, find, func, funcs, i, info, infos, type, _252_19_
 
         console.log('FileEditor jumpTo',word,opt)
         if (typeof(word) === 'object' && !(opt != null))
@@ -383,12 +382,12 @@ FileEditor = (function ()
 
     FileEditor.prototype["jumpToCounterpart"] = async function ()
     {
-        var counter, counterparts, cp, currext, ext, file, _348_41_, _354_41_, _363_41_
+        var counter, counterparts, cp, currext, ext, file, _343_41_, _349_41_, _358_41_
 
         cp = this.cursorPos()
         currext = slash.ext(this.currentFile)
         counterparts = {mm:['h'],cpp:['hpp','h'],cc:['hpp','h'],h:['cpp','c','mm'],hpp:['cpp','c'],coffee:['js','mjs'],kode:['js','mjs'],js:['coffee','kode'],mjs:['coffee','kode'],pug:['html'],noon:['json'],json:['noon'],html:['pug'],css:['styl'],styl:['css']}
-        var list = ((_348_41_=counterparts[currext]) != null ? _348_41_ : [])
+        var list = ((_343_41_=counterparts[currext]) != null ? _343_41_ : [])
         for (var _a_ = 0; _a_ < list.length; _a_++)
         {
             ext = list[_a_]
@@ -398,7 +397,7 @@ FileEditor = (function ()
                 return true
             }
         }
-        var list1 = ((_354_41_=counterparts[currext]) != null ? _354_41_ : [])
+        var list1 = ((_349_41_=counterparts[currext]) != null ? _349_41_ : [])
         for (var _b_ = 0; _b_ < list1.length; _b_++)
         {
             ext = list1[_b_]
@@ -410,7 +409,7 @@ FileEditor = (function ()
                 return true
             }
         }
-        var list2 = ((_363_41_=counterparts[currext]) != null ? _363_41_ : [])
+        var list2 = ((_358_41_=counterparts[currext]) != null ? _358_41_ : [])
         for (var _c_ = 0; _c_ < list2.length; _c_++)
         {
             ext = list2[_c_]

@@ -28,7 +28,7 @@ render = (block, text, amps=[]) ->
         
     if block.fillet[1]?.match == '='
         varName = block.fillet[0]?.match
-        varValue = unfillet calculus subvars block.fillet[2..]
+        varValue = unfillet calculus(subvars(block.fillet[2..]))
         vars[varName] = varValue
         return text
         
@@ -67,15 +67,15 @@ render = (block, text, amps=[]) ->
         
     if valid block.blocks
         
-        joinFillets = (lhs, rhs) -> offset = last(lhs).index + last(lhs).length - 1; lhs.concat rhs.map (f) -> c = copy f; c.index += offset; c
+        joinFillets = (lhs, rhs) -> offset = last(lhs).index + last(lhs).length - 1; lhs.concat rhs.map((f) -> c = copy f; c.index += offset; c)
         resetFillet = (f) -> c = copy f; offset = f[0].index; c.map (i) -> i.index -= offset; i
         
         childBlocks = block.blocks.filter (cb) ->
             if cb.fillet[0]?.match[0] == '&'
                 cb.fillet[0].match = cb.fillet[0].match[1..]
                 if valid listAssign 
-                    cb.assign = listAssign.map (la) -> unfillet(la) + unfillet cb.fillet
-                cb.fillet = joinFillets block.fillet, resetFillet cb.fillet
+                    cb.assign = listAssign.map (la) -> unfillet(la) + unfillet(cb.fillet)
+                cb.fillet = joinFillets block.fillet, resetFillet(cb.fillet)
                 amps.push cb
                 false
             else
@@ -85,7 +85,7 @@ render = (block, text, amps=[]) ->
             while assign = listAssign.shift()
                 text += '\n' + unfillet(assign) + ','
                 
-        text += '\n' + idt + unfillet block.fillet
+        text += '\n' + idt + unfillet(block.fillet)
         text += '\n' + idt + '{'
         for b in childBlocks
             text += render b, ''
@@ -96,7 +96,7 @@ render = (block, text, amps=[]) ->
         if idt == ''
             listAssign.push block.fillet
         else
-            text += idt + block.fillet[0].match + ': ' + unfillet calculus subvars block.fillet[1..]
+            text += idt + block.fillet[0].match + ': ' + unfillet(calculus(subvars(block.fillet[1..])))
             text += ';'
     
     while amp = amps.shift()
@@ -178,7 +178,7 @@ styl = (srcText) ->
     
     tgtText = ''
     lines   = srcText.split '\n'
-    blocks  = blockFillets lines.map (line) -> kstr.fillet line, '-.'
+    blocks  = blockFillets lines.map((line) -> kstr.fillet(line, '-.'))
     
     for block in blocks
         tgtText = render block, tgtText

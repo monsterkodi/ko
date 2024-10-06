@@ -20,14 +20,14 @@ class Pane
 
         @display ?= @div.style.display if @div?.style?.display?.length
         @display ?= getStyle "##{@div.id}", 'display' if @div?.id?
-        @display ?= getStyle ' .'+@div.className.split(' ').join ' .' if @div?.className?.length
+        @display ?= getStyle ' .'+@div.className.split(' ').join(' .') if @div?.className?.length
         @display ?= 'initial'
         
     update: ->
 
         ⮐ if not @div
         
-        @size = @collapsed ? -1 : Math.max 0 parseInt @size
+        @size = @collapsed ? -1 : Math.max(0 parseInt(@size))
         @div.style.display = @collapsed ? 'none' : @display
         
         if @fixed

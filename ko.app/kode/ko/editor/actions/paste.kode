@@ -30,9 +30,9 @@ export
     copy: ○-> 
         
         text = @textOfSelectionForClipboard()
-        copied =○ kakao 'clipboard.set' text
+        copied =○ kakao('clipboard.set' text)
 
-    paste: ○-> @pasteText ○ kakao 'clipboard.get'
+    paste: ○-> @pasteText ○ kakao('clipboard.get')
 
     # 00000000   00000000  00000000   000       0000000    0000000  00000000
     # 000   000  000       000   000  000      000   000  000       000
@@ -48,7 +48,7 @@ export
         for ns in newSelections
             insert = lines.shift()
             oldLength = ns[1][1]-ns[1][0]
-            @do.change ns[0], kstr.splice @do.line(ns[0]), ns[1][0], oldLength, insert
+            @do.change ns[0], kstr.splice(@do.line(ns[0]), ns[1][0], oldLength, insert)
             ldiff = insert.length - oldLength
             for os in rangesAfterLineColInRanges ns[0], ns[1][1], newSelections
                 os[1][0] += ldiff
@@ -56,7 +56,7 @@ export
             ns[1][1] += ldiff
 
         @do.select newSelections
-        @do.setCursors endPositionsFromRanges newSelections
+        @do.setCursors endPositionsFromRanges(newSelections)
         @do.end()
 
     # 00000000    0000000    0000000  000000000  00000000
@@ -95,7 +95,7 @@ export
             for ci in [newCursors.length-1..0]
                 c = newCursors[ci]
                 insert = lines[ci % lines.length]
-                @do.change c[1], kstr.splice @do.line(c[1]), c[0], 0, insert
+                @do.change c[1], kstr.splice(@do.line(c[1]), c[0], 0, insert)
                 for c in positionsAfterLineColInPositions c[1], c[0]-1, newCursors
                     cursorDelta c, insert.length # move cursors after insertion
 
@@ -109,7 +109,7 @@ export
                 [before, after] = @splitStateLineAtPos @do, cp
                 after = after.trimLeft()
 
-                indt   = lpad indentationInLine @do.line cp[1]
+                indt   = lpad indentationInLine(@do.line(cp[1]))
                 if before.trim().length
                     @do.change li, before
                     li += 1

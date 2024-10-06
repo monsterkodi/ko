@@ -53,11 +53,11 @@ function Stash
         
         ⮐ error 'stash.set -- invalid key' key if not key is str
         
-        if not isEqual value, sds.get @data, @keypath(key)
+        if not isEqual value, sds.get(@data, @keypath(key))
 
             sds.set @data, @keypath(key), value
 
-            if not isEqual value, sds.get @data, @keypath(key)
+            if not isEqual value, sds.get(@data, @keypath(key))
                 warn 'sds.set fail?' key, value, @data
                 
             clearTimeout @timer if @timer

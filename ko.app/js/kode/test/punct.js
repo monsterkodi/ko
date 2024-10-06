@@ -8,9 +8,9 @@ toExport["punctuation"] = function ()
     section("parens", function ()
     {
         compare(kc('(b)'),';(b)')
-        compare(kc('(b c)'),';(b(c))')
-        compare(kc('(b --c)'),';(b(--c))')
-        compare(kc('a + (b --c)'),'a + (b(--c))')
+        compare(kc('(b(c))'),';(b(c))')
+        compare(kc('(b(--c))'),';(b(--c))')
+        compare(kc('a + (b(--c))'),'a + (b(--c))')
     })
     section("close", function ()
     {

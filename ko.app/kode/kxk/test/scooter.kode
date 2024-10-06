@@ -9,7 +9,7 @@
 use .. ◆ scooter
 
 near  = scooter.near
-scoot = s -> Number.parseFloat scooter s
+scoot = s -> Number.parseFloat scooter(s)
 
 ▸ scooter
 

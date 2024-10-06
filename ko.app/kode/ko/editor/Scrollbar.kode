@@ -10,7 +10,7 @@ use ../../kxk ▪ scheme elem drag
 
 class Scrollbar
 
-    @: (@editor) ->
+    @: @editor ->
 
         @editor.scroll.on 'scroll' @update
         @editor.on 'linesShown'    @update
@@ -46,7 +46,7 @@ class Scrollbar
     #      000     000     000   000  000   000     000
     # 0000000      000     000   000  000   000     000
 
-    onStart: (drag, event) =>
+    onStart: drag event =>
 
         br = @elem.getBoundingClientRect()
         sy = clamp 0, @editor.scroll.viewHeight, event.clientY - br.top
@@ -60,7 +60,7 @@ class Scrollbar
     # 000   000  000   000  000   000  000   000
     # 0000000    000   000  000   000   0000000
 
-    onDrag: (drag) =>
+    onDrag: drag =>
 
         @scrollDelta += (drag.delta.y / (@editor.scroll.viewLines * @editor.scroll.lineHeight)) * @editor.scroll.fullHeight
 
@@ -77,7 +77,7 @@ class Scrollbar
     # 000   000  000   000  000       000       000
     # 00     00  000   000  00000000  00000000  0000000
 
-    onWheel: (event) =>
+    onWheel: event =>
 
         scrollFactor = ->
             f  = 1
@@ -120,7 +120,7 @@ class Scrollbar
             vh           = Math.min (@editor.scroll.viewLines * @editor.scroll.lineHeight), @editor.viewHeight()
             scrollTop    = parseInt (@editor.scroll.scroll / bh) * vh
             scrollHeight = parseInt ((@editor.scroll.viewLines * @editor.scroll.lineHeight) / bh) * vh
-            scrollHeight = Math.max scrollHeight, parseInt @editor.size.lineHeight/4
+            scrollHeight = Math.max scrollHeight, parseInt(@editor.size.lineHeight/4)
             scrollTop    = Math.min scrollTop, @editor.viewHeight()-scrollHeight
             scrollTop    = Math.max 0, scrollTop
 
@@ -128,7 +128,7 @@ class Scrollbar
             @handle.style.height = "#{scrollHeight}px"
             @handle.style.width  = "2px"
 
-            cf = 1 - clamp 0, 1, (scrollHeight-10)/200
+            cf = 1 - clamp(0, 1, (scrollHeight-10)/200)
             longColor  = scheme.colorForClass 'scrollbar long'
             shortColor = scheme.colorForClass 'scrollbar short'
             cs = scheme.fadeColor longColor, shortColor, cf

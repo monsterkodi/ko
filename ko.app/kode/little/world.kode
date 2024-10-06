@@ -1,0 +1,621 @@
+ ###
+000   000   0000000   00000000   000      0000000  
+000 0 000  000   000  000   000  000      000   000
+000000000  000   000  0000000    000      000   000
+000   000  000   000  000   000  000      000   000
+00     00   0000000   000   000  0000000  0000000  
+###
+
+use ../kxk ▪ $ drag stopEvent prefs post kpos fade randRange randInt randIntRange
+
+use ◆ gee tweaky tube matrix
+
+{cos, sin, PI} = Math
+TAU = 2*PI
+PHI = 1.618
+
+clr = r g b a=10 -> [r/10 g/10 b/10 a/10]
+gry = g     a=10 -> [g/10 g/10 g/10 a/10]
+
+COL_SHADOW  = gry 0 1
+COL_BG      = gry 1.5
+COL_GRID    = gry 0 5
+COL_TUBE    = gry 5
+COL_PLANT   = clr 0 5 0
+COL_LEAF    = clr 0 5 0
+COL_EGG     = gry 10
+COL_CRITTER = clr 5 5 10
+COL_STARVE  = gry 2.5
+COL_DEAD    = gry 1
+COL_EGG_DOT = gry 0 5
+COL_GRINDER = clr 10 0 0 
+COL_HOOVER  = clr 10 6 0
+
+threshMold  = p n m -> parseInt(p/m) != parseInt(n/m)
+sort        = a b => [min(a b) max(a b)]
+posInCircle = p cx cy cr => (p[0]-cx)*(p[0]-cx)+(p[1]-cy)*(p[1]-cy) < cr*cr
+posInRect   = p x1 y1 x2 y2 => [x1 x2] = sort(x1 x2); [y1 y2] = sort(y1 y2); x1 <= p[0] <= x2 and y1 <= p[1] <= y2
+posInCRect  = p cx cy w h => (cx-w/2) <= p[0] <= (cx+w/2) and (cy-h/2) <= p[1] <= (cy+h/2)
+posInPipeH  = p x y w r => posInCircle(p x y r) or posInCircle(p x+w y r) or posInRect(p x y-r x+w y+r)
+valuePipeH  = p x y w r => if posInPipeH(p x y w r) ➜ (p[0] - x) / w 
+
+function world extends matrix
+
+    @: ->
+        
+        @main =$ 'main'
+        @pause = false
+        
+        @speed = 10
+                
+        @tweaky = new tweaky @main
+        
+        super()
+                
+        @inventory  = x:0  y:-1 s:0.5 slots:[
+            {type:@CORPSE num:0} 
+            {type:@EGG    num:1} 
+            {type:@PLANT  num:1} 
+            {type:@HOOVER tool:true} ] 
+        @speedGauge = x:0  y:0  s:0.5 sx:0.3125 sw:1 sh:0.125 sb:0.25
+        
+        @slots = {}
+        for slot,si in @inventory.slots
+            @slots[slot.type] = slot
+            slot.x = @inventory.x+@inventory.s*si
+            slot.y = @inventory.y
+            slot.w = @inventory.s
+            slot.h = @inventory.s
+                        
+        @activeSlot = @slots[@PLANT]
+        
+        @main.focus()
+                                
+        @g = new gee @main
+        @h = new gee @main
+        
+        @g.camScale = 0.08
+        @g.camPosX  = 1 / @g.camScale
+        @g.camPosY  = 1 / @g.camScale
+        @g.updateCamera()
+
+        @h.camCenter  = 'topleft'
+        @h.clearColor = [0 0 0 0]
+        @hudGridY     = 10
+        @h.camScale   = 2 / @hudGridY
+        @h.camPosX    = -0.5
+        @h.camPosY    =  0.5
+        @h.updateCamera()
+                    
+        window.addEventListener 'wheel'       @onWheel
+        @main.addEventListener  'mousemove'   @onMouseMove
+        @main.addEventListener  'contextmenu' @onContextMenu
+        
+        s = 40.96/2048
+        uv = u uu v vv -> [ s*u s*v s*uu s*vv ]
+        
+        @tubeUV = []
+        for ti in 0..8
+            @tubeUV.push [
+                uv(ti*4+2 ti*4+2  8 10)  # right / left
+                uv(ti*4+2 ti*4+4  8 10)  # right down / up left
+                uv(ti*4+2 ti*4+4 10 10)  # down / up
+                uv(ti*4+2 ti*4+4 10 12)  # down left / right up
+                uv(ti*4 ti*4+2   10 12)  # down right / left up
+                uv(ti*4 ti*4+2    8 10)  # up right / left down
+                ]
+
+        @ringUV = []
+        for ri in 0..8
+            @ringUV.push uv(ri*4 (ri+1)*4 8 12)
+        
+        @quadUV       = uv(37 39 9 11)
+        @circleUV     = uv(36 40 8 12)
+        @circleTopUV  = uv(36 40 8 10)
+        @pieUV = [
+            uv(36 38  8 10)
+            uv(38 40  8 10)
+            uv(38 40 10 12)
+            uv(36 38 10 12)
+        ]
+        
+        @eggUV = @circleUV
+        
+        @mouse = pos: [0 0]
+        
+        @drag = new drag 
+            target:     @main
+            onStart:    @onDragStart
+            onMove:     @onDragMove
+            onStop:     @onDragStop
+            cursor:     'pointer'
+            stopEvent:  false
+            
+        @start()
+            
+    # 000   000  000   000  00000000  00000000  000      
+    # 000 0 000  000   000  000       000       000      
+    # 000000000  000000000  0000000   0000000   000      
+    # 000   000  000   000  000       000       000      
+    # 00     00  000   000  00000000  00000000  0000000  
+    
+    onWheel: event =>
+
+        if event.ctrlKey or event.metaKey
+            
+            @g.camScale -= event.deltaY/(event.metaKey ? 20000 : 4000)
+            @g.camScale = clamp 0.01 0.2 @g.camScale
+            
+        else
+            
+            @g.camPosX += event.deltaX / (4000 * @g.camScale) 
+            @g.camPosY -= event.deltaY / (4000 * @g.camScale) 
+            
+        @g.camPosX = clamp 0 @ws @g.camPosX
+        @g.camPosY = clamp 0 @ws @g.camPosY
+        
+        @g.updateCamera()
+        
+    # 00     00   0000000   000   000   0000000  00000000  
+    # 000   000  000   000  000   000  000       000       
+    # 000000000  000   000  000   000  0000000   0000000   
+    # 000 0 000  000   000  000   000       000  000       
+    # 000   000   0000000    0000000   0000000   00000000  
+        
+    onMouseMove: event =>
+        
+        winPos = @eventPos event
+        
+        @mouse = 
+            grid: @win2Grid(winPos)
+            pos:  @win2Pos(winPos)
+            win:  winPos
+            
+        hp = @h.win2Pos winPos
+
+        @hoverSlot = null
+        for slot in @inventory.slots
+            if posInCRect hp slot.x slot.y slot.w slot.h
+                @hoverSlot = slot
+                ⮐ 
+
+        if posInCircle hp @speedGauge.x @speedGauge.y @speedGauge.s/2
+            @speedGauge.hover = 'gauge'
+        else if posInPipeH hp @speedGauge.sx @speedGauge.y @speedGauge.sw @speedGauge.sb/2
+            @speedGauge.hover = 'slider'
+        else
+            delete @speedGauge.hover
+        
+    win2Pos: winPos => @g.win2Pos winPos
+            
+    win2Grid: winPos =>
+        
+        [x y] = @win2Pos winPos
+        
+        x = clamp 0 @ws-1 Math.round(x)
+        y = clamp 0 @ws-1 Math.round(y)
+        
+        [x y]
+    
+    eventPos: event => kpos event
+    mouseInWorld: => @isInWorld @mouse.pos
+        
+    # 0000000    00000000    0000000    0000000   
+    # 000   000  000   000  000   000  000        
+    # 000   000  0000000    000000000  000  0000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000   0000000   
+        
+    onDragStart: drag event =>
+        
+        hp = @h.win2Pos drag.pos
+        
+        if @hoverSlot
+            @activeSlot = @hoverSlot
+            ⮐ 
+        
+        if posInCircle hp @speedGauge.x @speedGauge.y @speedGauge.s/2
+            @togglePause()
+            ⮐ 
+            
+        if v = valuePipeH hp @speedGauge.sx @speedGauge.y @speedGauge.sw @speedGauge.sb/2
+            @speed = fade 1 100 v
+            ⮐ 
+        
+        ⮐ if not @mouseInWorld()
+        
+        p = @win2Grid drag.pos
+        
+        if event.button == 2
+            @takeAt p
+            ⮐ 
+        
+        if event.metaKey
+            @dragPath = [@win2Grid(drag.pos) @win2Grid(drag.pos)]
+        else if event.shiftKey
+            @addGrinder p[0] p[1]
+        else
+            @placeActiveSlotObject p
+            
+    placeActiveSlotObject: p =>
+        
+        ⮐ if not @activeSlot
+        
+        if @activeSlot.tool
+            switch @activeSlot.type
+                @HOOVER ➜ @takeAt p
+            ⮐ 
+        
+        ⮐ if @slots[@activeSlot.type].num <= 0
+        ⮐ if @buildingAt p
+        
+        @slots[@activeSlot.type].num--
+        
+        @placeObjectOfType p @activeSlot.type
+        
+        if @activeSlot.type == @PLANT and @slots[@activeSlot.type].num == 0
+            if @slots[@EGG].num ➜ @activeSlot = @slots[@EGG]
+
+        if @activeSlot.type == @EGG and @slots[@activeSlot.type].num == 0
+            @activeSlot = @slots[@HOOVER]
+                
+    onDragMove: drag event =>
+        
+        hp = @h.win2Pos drag.pos
+                
+        if v = valuePipeH hp @speedGauge.sx @speedGauge.y @speedGauge.sw @speedGauge.sb/2
+            @speed = fade 1 100 v
+            ⮐ 
+
+        p = @win2Grid drag.pos
+        
+        ⮐ if not @mouseInWorld()
+                
+        if event.button == 2
+            @takeAt p
+            ⮐ 
+            
+        ⮐ if event.shiftKey
+        
+        if not event.metaKey
+            @placeActiveSlotObject p 
+        
+        ⮐ if not @dragPath
+        
+        l = @dragPath[-1]
+        k = @dragPath[-2]
+        
+        if k[0] == l[0] == p[0] and k[1] == l[1] == p[1] and @dragPath.length > 2
+            @dragPath.pop()
+        else if k[0] == l[0] == p[0]
+            l[1] = p[1]
+        else if k[1] == l[1] == p[1]
+            l[0] = p[0]
+        else
+            @dragPath.push p
+            if l[0] != k[0] and l[1] != k[1]
+                if l[0] == k[0]
+                    l[1] = p[1]
+                else
+                    l[0] = p[0]
+                    
+    onDragStop: drag event =>
+        
+        if @dragPath
+            tube.path @dragPath @addTube
+            delete @dragPath
+            
+    onContextMenu: (event) => stopEvent event
+        
+    togglePause:  => @pause = not @pause; post.emit 'pause'
+    toggleValues: => 
+                    
+    # 0000000    00000000    0000000   000   000  
+    # 000   000  000   000  000   000  000 0 000  
+    # 000   000  0000000    000000000  000000000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000  00     00  
+    
+    drawPlant: p g=@g scale=1 =>
+        
+        s = scale * 0.25
+        g.addQuad p.x p.y s s COL_PLANT @circleUV 0 0
+        
+        s = scale * 0.15
+        r = scale * 0.2
+        for li in 0...p.leaves.length
+            l   = p.leaves[li]
+            af  = l.age/@leafMaxAge
+            ls  = s*clamp(0 1 af)
+            col = [((af>1) ? 1 : 0) ((af>1) ? 1 : COL_LEAF[1]) COL_LEAF[2] COL_LEAF[3]]
+            
+            lx = p.x+cos(-li*TAU/@numLeaves+PI)*r
+            ly = p.y+sin(-li*TAU/@numLeaves+PI)*r
+            
+            if l.ef
+                lx = fade l.c.x + l.c.ox - 0.25 lx l.ef
+                ly = fade l.c.y + l.c.oy ly l.ef
+                ls = s
+                col = [1 1 0 1]
+                
+            g.addQuad lx ly ls ls col @circleUV 0 1
+    
+    drawTube: x y idx =>
+        
+        if empty y
+            t   = x
+            x   = t.x 
+            y   = t.y
+            idx = t.idx
+        
+        @g.addQuad x y 1 1 COL_TUBE @tubeUV[2][idx] 0 1
+        
+    drawEgg: e g=@g scale=1 =>
+        
+        ageFac = e.age / @eggMaxAge
+        s = scale * fade(0.1 0.3 ageFac)
+        a = 1
+        if e.age > @eggMaxAge
+            a = fade 1.0 0.0 (e.age-@eggMaxAge)/@eggFadeTime
+            
+        ox = e.ox ? 0
+        oy = e.oy ? 0
+        
+        g.addQuad e.x+ox e.y+oy s s [COL_EGG[0] COL_EGG[1] COL_EGG[2] a] @eggUV 0 1
+        
+    drawGrinder: gr =>
+        
+        gs = 1.25
+        @g.addTubeRect gr.x-gs gr.y-gs gr.x+gs gr.y+gs 2 COL_GRINDER 1
+        
+        bot = gr.bot
+        if bot.mf
+            bot.x = fade bot.c.x gr.x bot.mf
+            bot.y = fade bot.c.y gr.y bot.mf
+        else if bot.rf
+            bot.x = fade gr.x bot.s.x bot.rf
+            bot.y = fade gr.y bot.s.y bot.rf
+        
+        @g.addQuad bot.x bot.y 1 1 COL_GRINDER @circleTopUV 0 1 
+        
+    drawHoover: hv g=@g scale=1 =>
+        
+        s = scale * 0.7
+        g.quad hv.x-s*0.2 hv.y+s*0.1 @circleTopUV color:COL_HOOVER scale:s sy:0.5 rot:PI*0.3
+        g.quad hv.x+s*0.2 hv.y+s*0.1 @circleTopUV color:COL_HOOVER scale:s sy:0.5 rot:-PI*0.3
+
+    drawCritter: c g=@g scale=1 ccl=null =>
+        
+        sx = sy = scale * fade(0.2 1 c.age / @critterAdultAge)
+        
+        rot  = 0
+        rcos = 1
+        rsin = 0
+        
+        col = COL_CRITTER
+        
+        if c.eat < 0
+            h = clamp 0 1 -c.eat / @critterStarveTime
+            col = [
+                fade(col[0] COL_STARVE[0] h) 
+                fade(col[1] COL_STARVE[1] h)
+                fade(col[2] COL_STARVE[2] h) 1
+                ]
+        
+        if c.df
+            rot = min PI c.df * PI
+            rcos = cos rot
+            rsin = sin rot
+            h = clamp 0 1 c.df
+            col = [
+                fade(col[0] COL_DEAD[0] h) 
+                fade(col[1] COL_DEAD[1] h)
+                fade(col[2] COL_DEAD[2] h) 1
+                ]
+                
+        col = ccl if ccl
+               
+        ox = c.ox ? 0
+        oy = c.oy ? 0
+                
+        cx = c.x + ox 
+        cy = c.y + oy 
+
+        g.addQuad cx-rsin*0.25*sx cy+rcos*0.25*sy sx sy*0.5 col @circleTopUV rot 1
+        
+        g.addQuad cx-rcos*(1/4 )*sx cy-rsin*(1/4 )*sy   0.5*sx   0.5*sy col @circleUV 0 1    
+        g.addQuad cx+rcos*(1/12)*sx cy+rsin*(1/12)*sy (1/6)*sx (1/6)*sy col @circleUV 0 1    
+        g.addQuad cx+rcos*(3/12)*sx cy+rsin*(3/12)*sy (1/6)*sx (1/6)*sy col @circleUV 0 1    
+        g.addQuad cx+rcos*(5/12)*sx cy+rsin*(5/12)*sy (1/6)*sx (1/6)*sy col @circleUV 0 1    
+            
+        thrd = 1/3
+        se = 0.6
+        for e in 0...c.eggs
+            xo = [-thrd 0 thrd][e]*se*sx
+            yo = [0.15 0.25 0.15][e]*sy
+            
+            rxo = rcos*xo-rsin*yo
+            ryo = rsin*xo+rcos*yo
+            
+            g.addQuad cx+rxo cy+ryo [1 1.25 1][e]*thrd*sx*se [1 1.25 1][e]*thrd*se*sy COL_EGG_DOT @circleUV 0 1    
+            
+        if c.age > @critterAdultAge and not c.df
+            f = min 1 @critterEggFactor(c)
+            wp = @critterWombPos c
+            g.addQuad wp.x wp.y [1 1.25 1][e]*thrd*sx*se*f [1 1.25 1][e]*thrd*se*sy*f COL_EGG @circleUV 0 1    
+            
+    critterWombPos: c e=c.eggs =>
+        
+        cx = c.x + (c.ox ? 0)
+        cy = c.y + (c.oy ? 0)
+        
+        xo = [-0.2 0 0.2][e]
+        yo = [0.15 0.25 0.15][e]
+        x:cx+xo y:cy+yo
+        
+    roundedQuadRect: x0 y0 x1 y1 color layer=0 =>
+        
+        [x0 x1] = [min(x0 x1) max(x0 x1)]
+        [y0 y1] = [min(y0 y1) max(y0 y1)]
+        
+        @g.addQuad x0 y0 1 1  color @pieUV[3] 0 layer
+        @g.addQuad x1 y0 1 1  color @pieUV[2] 0 layer
+        @g.addQuad x1 y1 1 1  color @pieUV[1] 0 layer
+        @g.addQuad x0 y1 1 1  color @pieUV[0] 0 layer
+        
+        @g.addQuad (x0+x1)/2 (y0+y1)/2 (x1-x0)-1 (y1-y0)+1 color @quadUV 0 layer 
+        @g.addQuad  x0       (y0+y1)/2 1         (y1-y0)-1 color @quadUV 0 layer 
+        @g.addQuad  x1       (y0+y1)/2 1         (y1-y0)-1 color @quadUV 0 layer 
+        
+    gridQuadRect: x0 y0 x1 y1 color layer=0 w=0.02 =>
+        
+        [x0 x1] = [min(x0 x1) max(x0 x1)]
+        [y0 y1] = [min(y0 y1) max(y0 y1)]
+        
+        sx = x1 - x0
+        sy = y1 - y0
+        
+        for x in 0..sx
+            @g.addQuad x sx/2 w sx [0 0 0 0.15] @quadUV 0 layer
+
+        for y in 0..sy
+            @g.addQuad sy/2 y sy w [0 0 0 0.15] @quadUV 0 layer 
+        
+    # 000000000  000   0000000  000   000  
+    #    000     000  000       000  000   
+    #    000     000  000       0000000    
+    #    000     000  000       000  000   
+    #    000     000   0000000  000   000  
+    
+    tick: @tickInfo ->
+        
+        @simulate @tickInfo
+        @tweaky.update()
+        
+        @roundedQuadRect  0    -0.5  @ws-0.5  @ws-1    COL_SHADOW
+        @roundedQuadRect -0.25 -0.25 @ws-0.75 @ws-0.75 COL_BG
+        @gridQuadRect     0     0    @ws-1    @ws-1    COL_GRID
+                
+        if @dragPath ➜ tube.path @dragPath @drawTube
+            
+        for t in @types[@TUBE]    ➜ @drawTube t
+        for p in @types[@PLANT]   ➜ @drawPlant p
+        for c in @types[@CRITTER] ➜ @drawCritter c
+        for e in @types[@EGG]     ➜ @drawEgg e
+        for g in @types[@GRINDER] ➜ @drawGrinder g
+                    
+        @g.draw @tickInfo.time
+        
+        # @h.addQuad 0 -1 1 1 COL_EGG     @quadUV 0 0
+        # @h.addQuad 1 -1 1 1 COL_CRITTER @quadUV 0 0
+        
+        @drawSpeedGauge()
+        @drawInventory()
+        
+        @h.draw @tickInfo.time
+        
+        delete @oneStep
+            
+    #  0000000  00000000   00000000  00000000  0000000     0000000    0000000   000   000   0000000   00000000  
+    # 000       000   000  000       000       000   000  000        000   000  000   000  000        000       
+    # 0000000   00000000   0000000   0000000   000   000  000  0000  000000000  000   000  000  0000  0000000   
+    #      000  000        000       000       000   000  000   000  000   000  000   000  000   000  000       
+    # 0000000   000        00000000  00000000  0000000     0000000   000   000   0000000    0000000   00000000  
+    
+    drawSpeedGauge: =>
+        
+        x  = @speedGauge.x
+        y  = @speedGauge.y
+        s  = @speedGauge.s
+        sx = @speedGauge.sx
+        sb = @speedGauge.sb
+        sh = @speedGauge.sh
+        sw = @speedGauge.sw
+        
+        bc = [0.2 0.2 0.2 1]
+        
+        knobX = x + fade(sx sx+sw (@speed-1)/99)
+        
+        @h.addPipe  x y sx+sw y sb bc
+        
+        @h.addPipe sx y sx+sw y sh [0.1 0.1 0.1 1]
+        
+        @h.addCircle knobX y sh [0.5 0.5 0.5 1]
+        
+        @h.addCircle x y s bc
+                
+        gc = @speedGauge.hover == 'gauge' ? clr(1 1 1) : clr(0 0 0)
+        @h.addQuad x y s s gc @ringUV[4] 0 1
+        
+        pc = @pause ? [1 0 0 1] : [0 0 0 0]
+        @h.addCircle x y s/4 pc 1
+        
+        if not @pause
+            wave = hz ph=0 => sin hz*ph*TAU + hz*TAU*@cycles
+            sz = s * fade(0.125 0.28 @speed/100)
+            for ri in 0..8
+                phs = (@speed/60)*(ri/16)
+                gv = ri/32
+                @h.addQuad x+wave(1 phs)*s/4 y-wave(1 phs-0.25)*s/4 sz sz [gv gv gv 1] @circleUV 0 1
+           
+        if @speedGauge.hover == 'slider'
+            @h.number knobX y+sb*0.85 @speed scale:s/3.5 layer:1 color:clr(5 5 5)
+            
+    # 000  000   000  000   000  00000000  000   000  000000000   0000000   00000000   000   000  
+    # 000  0000  000  000   000  000       0000  000     000     000   000  000   000   000 000   
+    # 000  000 0 000   000 000   0000000   000 0 000     000     000   000  0000000      00000    
+    # 000  000  0000     000     000       000  0000     000     000   000  000   000     000     
+    # 000  000   000      0      00000000  000   000     000      0000000   000   000     000     
+    
+    drawInventory: =>
+        
+        x = @inventory.x 
+        y = @inventory.y 
+        s = @inventory.s
+        sh = s/2
+        fr = s/4
+        
+        frcol = clr(2 2 2)
+        
+        @h.addRoundedFrame x-sh y-PHI*sh x+s*@inventory.slots.length-sh y+sh frcol 1 fr 4
+        
+        for slot,si in @inventory.slots
+            
+            sx = x+s*si
+            
+            # bgcol = (slot == @activeSlot) ? clr(2 2 2) : (slot == @hoverSlot) ? clr(0 0 0 ) : clr(1 1 1)
+            bgcol = (slot == @activeSlot) ? gry(0) : (slot == @hoverSlot) ? gry(1) : gry(1.6)
+            
+            @h.crect  slot.x slot.y sx:s sy:s           layer:0 color:bgcol
+            @h.crect  slot.x slot.y-s*0.6 sx:s sy:s*0.3 layer:0 color:bgcol
+            
+            if not slot.tool
+                @h.number slot.x slot.y-s*0.57 slot.num scale:s/4 layer:1 color:slot.num == 0 ? gry(3) : gry(10)
+            
+            switch slot.type
+                
+                @CORPSE  ➜ @drawCritter {x:sx y:y+s/12 age:@critterAdultAge/2 df:1} @h s gry(5)
+                @EGG     ➜ @drawEgg     {x:sx y:y age:@eggMaxAge} @h s*1.5
+                @PLANT   ➜ @drawPlant   @makePlant(sx y 8 @leafMaxAge+1) @h s
+                @HOOVER  ➜ @drawHoover  {x:sx y:y} @h s
+        
+    #  0000000  000  00     00  000   000  000       0000000   000000000  00000000  
+    # 000       000  000   000  000   000  000      000   000     000     000       
+    # 0000000   000  000000000  000   000  000      000000000     000     0000000   
+    #      000  000  000 0 000  000   000  000      000   000     000     000       
+    # 0000000   000  000   000   0000000   0000000  000   000     000     00000000  
+    
+    simulate: tickInfo ->
+        
+        ⮐ if @pause and not @oneStep
+        ⮐ if isNaN tickInfo.delta
+        
+        # ● simulate
+                
+        sec = @speed * tickInfo.delta / 1000
+        
+        @advance sec
+                        
+    singleStep: => @oneStep = true; @pause = true; post.emit 'pause'
+        
+export world

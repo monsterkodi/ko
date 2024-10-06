@@ -28,19 +28,19 @@ class Tester
     #      000  000       000          000     000  000   000  000  0000  
     # 0000000   00000000   0000000     000     000   0000000   000   000  
     
-    section: (t, f) =>
+    section: t f =>
 
         stack.push t
         comps = 0
         depth = stack.length
         if @logSections != false
-            log W1 lpad(depth*3-1) + ' ' + global["g#{max 1, 8-2*depth}"] rpad(34-depth*3 t) + ' '
+            log W1(lpad(depth*3-1) + ' ' + global["g#{max(1, 8-2*depth)}"](rpad(34-depth*3 t) + ' '))
         try
             f()
         catch err
             log err
             fails.push
-                stack: stack.concat [comps]
+                stack: stack.concat([comps])
                 comps: comps
                 lhs:   "#{err}"
                 rhs:   ''
@@ -53,7 +53,7 @@ class Tester
     # 000       000   000  000 0 000  000        000   000  000   000  000       
     #  0000000   0000000   000   000  000        000   000  000   000  00000000  
     
-    sameObjects: (a, b, keystack) ->
+    sameObjects: a b keystack ->
         
         if 
             Object.is a, b # simple types
@@ -76,8 +76,8 @@ class Tester
             a is str and b is str
                 
                 if a != b
-                    log r5 @showSpace a
-                    log g3 @showSpace b
+                    log r5(@showSpace(a))
+                    log g3(@showSpace(b))
                     ⮐ false 
                 ⮐ true
             
@@ -90,7 +90,7 @@ class Tester
         
         a == b
     
-    compare: (a, b) =>
+    compare: a b =>
         
         comps++
                         
@@ -105,10 +105,10 @@ class Tester
 
         ind = lpad (stack.length+1)*3
             
-        log R1(black(ind + comps + ' ')) + ' ' + r5(@short a) + ' ' + R1(r4 ' ▸ ') + ' ' + g1(@short b)
+        log R1(black(ind + comps + ' ')) + ' ' + r5(@short(a)) + ' ' + R1(r4(' ▸ ')) + ' ' + g1(@short(b))
         
         fails.push
-            stack: stack.concat [comps]
+            stack: stack.concat([comps])
             comps: comps
             lhs:   a
             rhs:   b
@@ -119,7 +119,7 @@ class Tester
     #    000     000            000     000     
     #    000     00000000  0000000      000     
     
-    test: (testModule) =>
+    test: testModule =>
         
         # return if not /\n\s*▸\s\w+/gm.test text
         ⮐ if testModule?._test_ != true
@@ -139,13 +139,13 @@ class Tester
             if v._section_
                 stack.push k
                 if logModules != false
-                    log G1 y8 ' ' + rpad(33 k) + ' '
+                    log G1(y8(' ' + rpad(33 k) + ' '))
                 try
                     v()
                 catch err
                     log err
                     fails.push
-                        # stack: stack.concat [comps]
+                        # stack: stack.concat([comps])
                         comps: comps
                         lhs:   "#{err}"
                         rhs:   ''
@@ -162,19 +162,19 @@ class Tester
     #      000  000   000  000 0 000  000 0 000  000   000  000   000  000   000     000       
     # 0000000    0000000   000   000  000   000  000   000  000   000  000  0000000  00000000  
     
-    showSpace: (s) ->
+    showSpace: s ->
         
         if not s is str
-            return noon s
+            ⮐ noon s
         s.split('\n').map((l) -> l+w2('◂')).join '\n'
     
     summarize: ->
         
         for fail in allfails
-            log R2(y5 ' ' + fail.stack[0] + ' ') + R1 y5 ' ' + fail.stack[1..].join(r3 ' ▸ ') + ' '
-            log r5 @showSpace fail.lhs
-            log R1 r3(' ▸ ') 
-            log g3 @showSpace fail.rhs
+            log R2(y5(' ' + fail.stack[0] + ' ')) + R1(y5(' ')) + fail.stack[1..].join(r3(' ▸ ')) + ' '
+            log r5(@showSpace(fail.lhs))
+            log R1(r3(' ▸ '))
+            log g3(@showSpace(fail.rhs))
              
             # if "[object Object]" in ''+fail.lhs
                 # print.noon 'lhs' fail.lhs            
@@ -198,9 +198,9 @@ class Tester
     #      000  000   000  000   000  000   000     000     
     # 0000000   000   000   0000000   000   000     000     
     
-    short: (s) ->
+    short: s ->
         
-        return s if empty s
+        ⮐ s if empty s
         
         split = (''+s).split '\n'
         
@@ -214,7 +214,7 @@ class Tester
          
         split = split.filter (s) -> s.length
             
-        ss = split.join w2 '➜ '
+        ss = split.join w2('➜ ')
         # if l >= 100 then ss += w2 '...'
         ss
         
@@ -222,7 +222,7 @@ export new Tester
 
 ◆main
     
-    files =○ fs.list slash.path ◆dir, 'test'
+    files =○ fs.list slash.path(◆dir, 'test')
     fail = false
     for file in files
         continue if slash.name(file.path) == 'utils'
