@@ -9,7 +9,7 @@ import slash from "../kxk/slash.js"
 bundle = {path:slash.path(_k_.dir(),'../..')}
 export default async function (args)
 {
-    var app, cpy, f, prt, prtExists, remove, tgt, tmp
+    var app, cpy, f, item, list, prt, prtExists, remove, tgt, tmp
 
     app = args[0]
     if (_k_.empty(app))
@@ -43,10 +43,10 @@ export default async function (args)
     if (app !== 'ko')
     {
         remove = ['js/ko','kode/ko','pyg/ko','pyg/ko.pug','js/css/ko','Contents/Resources/img/ko.icns','Contents/Resources/img/ko.png','Contents/Resources/img/ko.pxm','Contents/Resources/img/menu_ko.png','Contents/Resources/menu_ko.noon']
-        var list = _k_.list(remove)
-        for (var _a_ = 0; _a_ < list.length; _a_++)
+        var list1 = _k_.list(remove)
+        for (var _a_ = 0; _a_ < list1.length; _a_++)
         {
-            f = list[_a_]
+            f = list1[_a_]
             await nfs.remove(slash.path(tgt,f))
         }
     }
@@ -55,10 +55,23 @@ export default async function (args)
     {
         remove = remove.concat(['Contents/Resources/font/Lilex-Bold.woff2','Contents/Resources/font/devopicons.woff2','Contents/Resources/font/fa-regular-400.woff2','Contents/Resources/font/fa-solid-900.woff2','Contents/Resources/font/file-icons.woff2','Contents/Resources/font/fontawesome.woff2','Contents/Resources/font/mfixx.woff2','Contents/Resources/font/octicons.woff2'])
     }
-    var list1 = _k_.list(remove)
-    for (var _b_ = 0; _b_ < list1.length; _b_++)
+    list = await nfs.list(slash.path(tgt,'Contents'))
+    var list2 = _k_.list(list)
+    for (var _b_ = 0; _b_ < list2.length; _b_++)
     {
-        f = list1[_b_]
+        item = list2[_b_]
+        if (slash.ext(item.path) === 'plist')
+        {
+            if (slash.name(item.path) !== app)
+            {
+                await nfs.remove(item.path)
+            }
+        }
+    }
+    var list3 = _k_.list(remove)
+    for (var _c_ = 0; _c_ < list3.length; _c_++)
+    {
+        f = list3[_c_]
         await nfs.remove(slash.path(tgt,f))
     }
     return await nfs.move(tmp,slash.path(tgt,'.stash'))

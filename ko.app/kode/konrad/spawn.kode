@@ -78,6 +78,12 @@ export (args) ○->
             'Contents/Resources/font/mfixx.woff2'
             'Contents/Resources/font/octicons.woff2'
         ]
+        
+    list = ○ nfs.list slash.path(tgt 'Contents')
+    for item in list
+        if slash.ext(item.path) == 'plist'
+            if slash.name(item.path) != app
+                ○ nfs.remove item.path
 
     for f in remove
         ○ nfs.remove slash.path(tgt f)
