@@ -1,0 +1,44 @@
+###
+000  000   000  00000000   000   000  000000000
+000  0000  000  000   000  000   000     000   
+000  000 0 000  00000000   000   000     000   
+000  000  0000  000        000   000     000   
+000  000   000  000         0000000      000   
+###
+
+function input
+
+    @: @actor ->
+        
+        @downKeys  = {}
+        @actionMap = {}
+        @keyMap    = {}
+        @action    = {}
+        
+    init: @actionMap =>
+        
+        for action,keys of @actionMap
+            if keys is arr
+                for key in keys
+                    @keyMap[key] = action
+            else
+                @keyMap[keys] = action
+                
+    onKeyDown: keyInfo =>
+        
+        @downKeys[keyInfo.combo] = true
+        
+        if not keyInfo.event.repeat
+            if action = @keyMap[keyInfo.combo]
+                @action[action] = true
+                @actor.startAction action
+                            
+    onKeyUp: keyInfo =>
+        
+        delete @downKeys[keyInfo.combo]
+
+        if action = @keyMap[keyInfo.combo]
+            delete @action[action] 
+            @actor.stopAction action
+        
+export input

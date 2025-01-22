@@ -13,11 +13,11 @@ ffs.read(slash.path(_k_.dir(),'icons.json')).then(function (t)
 })
 class File
 {
-    static sourceFileExtensions = ['kode','coffee','styl','swift','pug','md','noon','txt','json','sh','py','cpp','mm','cc','c','cs','h','hpp','ts','js','mjs','frag','vert']
+    static sourceFileExtensions = ['kode','coffee','styl','swift','pug','md','noon','txt','json','sh','py','cpp','mm','zig','cc','c','cs','h','hpp','ts','js','mjs','frag','vert']
 
     static isCode (file)
     {
-        return _k_.in(slash.ext(file),['coffee','kode','py','cpp','cc','mm','c','cs','ts','js','mjs','h','hpp','frag','vert'])
+        return _k_.in(slash.ext(file),['coffee','kode','py','cpp','cc','mm','zig','c','cs','ts','js','mjs','h','hpp','frag','vert'])
     }
 
     static isImage (file)

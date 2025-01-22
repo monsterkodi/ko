@@ -101,6 +101,39 @@ class Do extends events
         return this
     }
 
+    static applyStateToText (tabState, text)
+    {
+        var changes, index, key, lines, tmpDo, type, value
+
+        lines = text.split(/\r?\n/)
+        tmpDo = new Do(lines)
+        var list = _k_.list(tabState)
+        for (var _a_ = 0; _a_ < list.length; _a_++)
+        {
+            changes = list[_a_]
+            for (key in changes)
+            {
+                value = changes[key]
+                var _b_ = key.split(' '); type = _b_[0]; index = _b_[1]
+
+                switch (type)
+                {
+                    case '○':
+                        tmpDo.delete(index)
+                        break
+                    case '●':
+                        tmpDo.insert(index,value.slice(1, value.length - 1))
+                        break
+                    case '■':
+                        tmpDo.change(index,value.slice(1, value.length - 1))
+                        break
+                }
+
+            }
+        }
+        return tmpDo.text()
+    }
+
     setLines (lines)
     {
         this.state = new DoState(lines)
@@ -474,7 +507,7 @@ class Do extends events
 
     textInRange (r)
     {
-        var _364_39_
+        var _386_39_
 
         return (this.state.line(r[0]) != null ? this.state.line(r[0]).slice(r[1][0],r[1][1]) : undefined)
     }

@@ -6,9 +6,9 @@
     00000000  0000000  00000000  000   000  
 ###
 
-isElement = (value) -> value?.nodeType == 1 and not value is obj
+isElement = value -> value?.nodeType == 1 and not value is obj
 
-elem = (typ, opt) ->
+elem = typ opt ->
     
     if typ and typeof(typ) == 'object'
         opt = typ 
@@ -49,27 +49,27 @@ elem = (typ, opt) ->
         e.setAttribute k, opt[k]
     e
 
-elem.containsPos = (div, pos) ->
+elem.containsPos = div pos ->
     
     br = div.getBoundingClientRect()
     br.left <= pos.x <= br.left+br.width and br.top <= pos.y <= br.top+br.height
 
-elem.childIndex = (e) -> Array.prototype.indexOf.call e.parentNode.childNodes, e 
+elem.childIndex = e -> Array.prototype.indexOf.call e.parentNode.childNodes, e 
 
-elem.upAttr = (element, attr) ->
+elem.upAttr = element attr ->
     
     ⮐ null if not element?
     a = element.getAttribute? attr
     ⮐ a if a != null and a != ''
     elem.upAttr element.parentNode, attr
 
-elem.upProp = (element, prop) ->
+elem.upProp = element prop ->
     
     ⮐ null if not element?
     ⮐ element[prop] if element[prop]?
     elem.upProp element.parentNode, prop
     
-elem.upElem = (element, opt) ->
+elem.upElem = element opt ->
     
     ⮐ null if not element?
     
@@ -81,7 +81,7 @@ elem.upElem = (element, opt) ->
     ⮐ element if opt?.class? and element.classList?.contains opt.class
     elem.upElem element.parentNode, opt
 
-elem.downElem = (element, opt) ->
+elem.downElem = element opt ->
     
     ⮐ null if not element?
     ⮐ element if opt?.tag? and opt.tag == element.tagName

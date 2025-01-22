@@ -1,0 +1,229 @@
+###
+000000000  000000000  000   0000000   
+   000        000     000  000   000  
+   000        000     000  000   000  
+   000        000     000  000   000  
+   000        000     000   0000000   
+###
+
+use ../kxk ◆ events
+
+function TTIO extends events
+
+    @: ->
+        
+        if process.stdin.isTTY ➜ process.stdin.setRawMode true
+
+        @write '\x1b[?45h'   # origin mode (no wrap?)
+        @write '\x1b[?1000h' # mouse events
+        @write '\x1b[?1002h' # cell motion tracking
+        @write '\x1b[?1003h' # mouse move events
+        @write '\x1b[?1004h' # focus
+        @write '\x1b[?1006h' # mouse SGR mode
+        @write '\x1b[?1049h' # alternate screen buffer
+        @write '\x1b[>4;2m'  # modify other keys
+        @write '\x1b[6 q'    # cursor solid bar
+        
+        process.stdout.on 'resize' @onResize
+        process.stdin.on  'data'   @onData
+        
+    write: str => process.stdout.write str
+    
+    clear: =>
+        @write '\x1b[2J' # clear screen
+        @write '\x1b[H'  # cursor home
+        
+    hideCursor: => @write '\x1b[?25l'
+    showCursor: => @write '\x1b[?25h'
+        
+    cols: => process.stdout.columns
+    rows: => process.stdout.rows
+    
+    store:   => @write '\x1b7'
+    restore: => @write '\x1b8'
+    
+    setCursor: x y => @write "\x1b[#{y+1};#{x+1}H"
+        
+    onResize: => @emit 'resize' @cols() @rows()
+    
+    emitMousePress: col row button mods='' =>
+        
+        @lastClick ?= 
+            row:    row
+            col:    col
+            count:  0
+            time:   process.hrtime()
+        
+        if @lastClick.col == col and @lastClick.row == row
+            diff = process.hrtime(@lastClick.time)
+            @lastClick.time = process.hrtime()
+            if diff[0] < 1 and diff[1] < 500000000
+                @lastClick.count += 1
+            else    
+                @lastClick.count = 1
+        else
+           @lastClick.col   = col 
+           @lastClick.row   = row
+           @lastClick.count = 1
+           @lastClick.time  = process.hrtime()
+                
+        @emit 'mouse' 'press' col row button mods @lastClick.count
+        
+    onData: data =>
+        
+        if data[0] == 0x1b
+            seq = data[1..].toString 'utf8'
+            
+            if seq.startsWith '[<'
+                
+                [code col row] = seq[2..-2].split(';').map (s) -> parseInt s
+                x = col-1
+                y = row-1
+                if seq.endsWith 'M'
+                    # log code
+                    switch code
+                        0  ➜ ⮐ @emitMousePress x y 'left' 
+                        2  ➜ ⮐ @emitMousePress x y 'right'
+                        4  ➜ ⮐ @emitMousePress x y 'left' 'shift'
+                        8  ➜ ⮐ @emitMousePress x y 'left' 'alt'
+                        16 ➜ ⮐ @emitMousePress x y 'left' 'ctrl'
+                        24 ➜ ⮐ @emitMousePress x y 'left' 'ctrl+alt'
+                        
+                        32 ➜ ⮐ @emit 'mouse' 'drag'  x y 'left'  
+                        34 ➜ ⮐ @emit 'mouse' 'drag'  x y 'right' 
+                        36 ➜ ⮐ @emit 'mouse' 'drag'  x y 'left'  'shift'
+                        40 ➜ ⮐ @emit 'mouse' 'drag'  x y 'left'  'alt'
+                        48 ➜ ⮐ @emit 'mouse' 'drag'  x y 'left'  'ctrl'
+                        
+                        35 ➜ ⮐ @emit 'mouse' 'move'  x y '' 
+                        39 ➜ ⮐ @emit 'mouse' 'move'  x y '' 'shift'
+                        51 ➜ ⮐ @emit 'mouse' 'move'  x y '' 'ctrl'
+                        43 ➜ ⮐ @emit 'mouse' 'move'  x y '' 'alt'
+                        47 ➜ ⮐ @emit 'mouse' 'move'  x y '' 'shift+alt'
+                        55 ➜ ⮐ @emit 'mouse' 'move'  x y '' 'shift+ctrl'
+                        59 ➜ ⮐ @emit 'mouse' 'move'  x y '' 'ctrl+alt'
+                        63 ➜ ⮐ @emit 'mouse' 'move'  x y '' 'shift+ctrl+alt'
+                        
+                        64 ➜ ⮐ @emit 'wheel' 'up'   
+                        68 ➜ ⮐ @emit 'wheel' 'up' 'shift'  
+                        72 ➜ ⮐ @emit 'wheel' 'up' 'alt'  
+                        76 ➜ ⮐ @emit 'wheel' 'up' 'shift+alt'  
+                        84 ➜ ⮐ @emit 'wheel' 'up' 'shift+ctrl'  
+                        88 ➜ ⮐ @emit 'wheel' 'up' 'ctrl+alt'  
+                        92 ➜ ⮐ @emit 'wheel' 'up' 'shift+ctrl+alt'
+                        
+                        65 ➜ ⮐ @emit 'wheel' 'down' 
+                        69 ➜ ⮐ @emit 'wheel' 'down' 'shift'  
+                        73 ➜ ⮐ @emit 'wheel' 'down' 'alt'  
+                        77 ➜ ⮐ @emit 'wheel' 'down' 'shift+alt'  
+                        85 ➜ ⮐ @emit 'wheel' 'down' 'shift+ctrl'  
+                        89 ➜ ⮐ @emit 'wheel' 'down' 'ctrl+alt'  
+                        93 ➜ ⮐ @emit 'wheel' 'down' 'shift+ctrl+alt'
+                        
+                        66 ➜ ⮐ @emit 'wheel' 'left' 
+                        70 ➜ ⮐ @emit 'wheel' 'left' 'shift'  
+                        74 ➜ ⮐ @emit 'wheel' 'left' 'alt'  
+                        78 ➜ ⮐ @emit 'wheel' 'left' 'shift+alt'  
+                        86 ➜ ⮐ @emit 'wheel' 'left' 'shift+ctrl'  
+                        90 ➜ ⮐ @emit 'wheel' 'left' 'ctrl+alt'  
+                        94 ➜ ⮐ @emit 'wheel' 'left' 'shift+ctrl+alt'
+                        
+                        67 ➜ ⮐ @emit 'wheel' 'right'
+                        71 ➜ ⮐ @emit 'wheel' 'right' 'shift'  
+                        75 ➜ ⮐ @emit 'wheel' 'right' 'alt'   
+                        79 ➜ ⮐ @emit 'wheel' 'right' 'shift+alt'   
+                        87 ➜ ⮐ @emit 'wheel' 'right' 'shift+ctrl'   
+                        91 ➜ ⮐ @emit 'wheel' 'right' 'ctrl+alt'  
+                        95 ➜ ⮐ @emit 'wheel' 'right' 'shift+ctrl+alt'
+                        
+                    log 'mouse press?' seq
+                    ⮐ 
+                else if seq.endsWith 'm'
+                    switch code
+                        0  ➜ ⮐ @emit 'mouse' 'release' x y 'left'
+                        2  ➜ ⮐ @emit 'mouse' 'release' x y 'right'
+                        4  ➜ ⮐ @emit 'mouse' 'release' x y 'left' 'shift'
+                        8  ➜ ⮐ @emit 'mouse' 'release' x y 'left' 'alt'
+                        16 ➜ ⮐ @emit 'mouse' 'release' x y 'left' 'ctrl'
+                        24 ➜ ⮐ @emit 'mouse' 'release' x y 'left' 'ctrl+alt'
+                    log 'mouse release?' seq
+                    ⮐ 
+                    
+            else if seq.startsWith '['
+                
+                switch seq[1]
+                    'O' ➜ ⮐ @emit 'blur'
+                    'I' ➜ ⮐ @emit 'focus'
+                    'A' ➜ ⮐ @emit 'key' 'up'    
+                    'B' ➜ ⮐ @emit 'key' 'down'  
+                    'D' ➜ ⮐ @emit 'key' 'left'  
+                    'C' ➜ ⮐ @emit 'key' 'right' 
+                    
+                switch seq[0..]
+                    '[1;3A'         ➜ ⮐ @emit 'key' 'alt+up'
+                    '[1;3B'         ➜ ⮐ @emit 'key' 'alt+down'
+                    '[1;2A'         ➜ ⮐ @emit 'key' 'shift+up'
+                    '[1;2B'         ➜ ⮐ @emit 'key' 'shift+down'
+                    '[1;2C'         ➜ ⮐ @emit 'key' 'shift+right'
+                    '[1;2D'         ➜ ⮐ @emit 'key' 'shift+left'
+                    '[1;4A'         ➜ ⮐ @emit 'key' 'shift+alt+up'
+                    '[1;4B'         ➜ ⮐ @emit 'key' 'shift+alt+down'
+                    '[1;4C'         ➜ ⮐ @emit 'key' 'shift+alt+right'
+                    '[1;4D'         ➜ ⮐ @emit 'key' 'shift+alt+left'
+                    '[1;5A'         ➜ ⮐ @emit 'key' 'ctrl+up'
+                    '[1;5B'         ➜ ⮐ @emit 'key' 'ctrl+down'
+                    '[1;5C'         ➜ ⮐ @emit 'key' 'ctrl+right'
+                    '[1;5D'         ➜ ⮐ @emit 'key' 'ctrl+left'
+                    '[1;6A'         ➜ ⮐ @emit 'key' 'shift+ctrl+up'
+                    '[1;6B'         ➜ ⮐ @emit 'key' 'shift+ctrl+down'
+                    '[1;6C'         ➜ ⮐ @emit 'key' 'shift+ctrl+right'
+                    '[1;6D'         ➜ ⮐ @emit 'key' 'shift+ctrl+left'
+                    '[1;7A'         ➜ ⮐ @emit 'key' 'ctrl+alt+up'
+                    '[1;7B'         ➜ ⮐ @emit 'key' 'ctrl+alt+down'
+                    '[1;7C'         ➜ ⮐ @emit 'key' 'ctrl+alt+right'
+                    '[1;7D'         ➜ ⮐ @emit 'key' 'ctrl+alt+left'
+                    '[1;8A'         ➜ ⮐ @emit 'key' 'shift+ctrl+alt+up'
+                    '[1;8B'         ➜ ⮐ @emit 'key' 'shift+ctrl+alt+down'
+                    '[1;8C'         ➜ ⮐ @emit 'key' 'shift+ctrl+alt+right'
+                    '[1;8D'         ➜ ⮐ @emit 'key' 'shift+ctrl+alt+left'
+                    '[1;15A'        ➜ ⮐ @emit 'key' 'ctrl+alt+cmd+up'
+                    '[1;15B'        ➜ ⮐ @emit 'key' 'ctrl+alt+cmd+down'
+                    '[1;15C'        ➜ ⮐ @emit 'key' 'ctrl+alt+cmd+right'
+                    '[1;15D'        ➜ ⮐ @emit 'key' 'ctrl+alt+cmd+left'
+                    '[27;9;120~'    ➜ ⮐ @emit 'key' 'cmd+x'
+                    '[27;9;121~'    ➜ ⮐ @emit 'key' 'cmd+y'
+                    '[27;9;122~'    ➜ ⮐ @emit 'key' 'cmd+z'
+                    '[27;5;72~'     ➜ ⮐ @emit 'key' 'shift+ctrl+h'
+                    
+                log 'DATA' data, seq, seq[1..]
+                ⮐ 
+            else if data.length == 1
+                ⮐ emit 'key' 'esc'  
+            else
+                switch seq[0]
+                    'b' ➜ ⮐ @emit 'key' 'alt+left'
+                    'f' ➜ ⮐ @emit 'key' 'alt+right'
+                    
+                log 'seq?' seq, data
+        else
+            switch data[0]
+                0x01 ➜ ⮐ @emit 'key' 'ctrl+a'
+                0x03 ➜ ⮐ @emit 'key' 'ctrl+c'
+                0x05 ➜ ⮐ @emit 'key' 'ctrl+e'
+                0x11 ➜ ⮐ @emit 'key' 'ctrl+q'
+                0x08 ➜ ⮐ @emit 'key' 'ctrl+h'
+                0x0a ➜ ⮐ @emit 'key' 'ctrl+j'
+                0x0b ➜ ⮐ @emit 'key' 'ctrl+k' 
+                0x0d ➜ ⮐ @emit 'key' 'return' 
+                0x7f ➜ ⮐ @emit 'key' 'delete' 
+                0x20 ➜ ⮐ @emit 'key' 'space'
+                0x09 ➜ ⮐ @emit 'key' 'tab'
+                
+            key = data.toString 'utf8'
+                
+            if key and data[0] >= 0x21
+                @emit 'key' key
+            else
+                log 'key>' key, data, data.length, data[0]
+                
+export TTIO

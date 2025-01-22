@@ -1,7 +1,7 @@
 doctype html
 html lang="en"
     head
-        title little
+        title digger
         meta charset="utf-8"
         link rel="stylesheet" href="./css/style.css" type="text/css"
         link rel="stylesheet" href="./css/dark.css"  type="text/css"
@@ -54,7 +54,7 @@ html lang="en"
                 padding             10px
                 top                 0
                 right               0
-                z-index             1
+                z-index             1000
             
             .tweaky-row
                 display             flex
@@ -90,31 +90,9 @@ html lang="en"
                 display             inline-block
                 border              0
                 
-            .canvas
-                fill-xy()
-            
-            .quiq
-            
-                flex                0 1
-                display             inline-block
-                box-sizing          border-box
-                font-size           24px
-                font-family         fontMono
-            
-            .quiq-item
-            
-                height              titlebarHeight - 0.5px
-                width               titlebarHeight * 1.25
-                box-sizing          border-box
-                display             inline-block
-                text-align          center
-                vertical-align      top
-                cursor              pointer
-                color               #666
-                
-                &:active
-                    padding-top     2px
-                
+            //.canvas
+            //    fill-xy()
+                            
             ::-webkit-scrollbar-corner
                 background-color        transparent
             
@@ -135,6 +113,14 @@ html lang="en"
     body
         #titlebar
         #main tabindex=0
+        
+    script type="importmap"
+        {
+            "imports": {
+                "three": "./three/build/three.module.js",
+                "three/addons/": "./three/examples/jsm/"
+            }
+        }
     
-    script type="module" src="./little/little.js"
+    script type="module" src="./digger/digger.js"
     

@@ -16,7 +16,7 @@ function tweaky
     
     init: obj ->
         
-        log noon obj
+        # log noon obj
         for k,v of obj
             if valid v.info
                 @info k v

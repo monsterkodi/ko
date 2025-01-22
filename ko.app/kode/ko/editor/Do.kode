@@ -63,6 +63,28 @@ class Do extends events
                     '■' ➜ @change index, value[1...value.length-1]
             @end()
         @
+        
+    #  0000000   00000000   00000000   000      000   000   0000000  000000000   0000000   000000000  00000000  
+    # 000   000  000   000  000   000  000       000 000   000          000     000   000     000     000       
+    # 000000000  00000000   00000000   000        00000    0000000      000     000000000     000     0000000   
+    # 000   000  000        000        000         000          000     000     000   000     000     000       
+    # 000   000  000        000        0000000     000     0000000      000     000   000     000     00000000  
+    
+    @applyStateToText: tabState text->
+        
+        lines = text.split /\r?\n/
+        tmpDo = new Do lines
+        
+        for changes in tabState
+
+            for key,value of changes
+                [type, index] = key.split ' '
+                switch type
+                    '○' ➜ tmpDo.delete index
+                    '●' ➜ tmpDo.insert index, value[1...value.length-1]
+                    '■' ➜ tmpDo.change index, value[1...value.length-1]
+
+        tmpDo.text()        
     
     #  0000000  00000000  000000000        000      000  000   000  00000000   0000000  
     # 000       000          000           000      000  0000  000  000       000       

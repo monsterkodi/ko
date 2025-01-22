@@ -1,0 +1,96 @@
+###
+00000000    0000000   000       0000000   00000000 
+000   000  000   000  000      000   000  000   000
+00000000   000   000  000      000000000  0000000  
+000        000   000  000      000   000  000   000
+000         0000000   0000000  000   000  000   000
+###
+
+import * as three from 'three'
+
+use ../../kxk ▪ deg2rad rad2deg
+use ./quat
+
+vec   = new three.Vector3
+v0    = new three.Vector3
+v1    = new three.Vector3
+v2    = new three.Vector3
+v3    = new three.Vector3
+v4    = new three.Vector3
+v5    = new three.Vector3
+v6    = new three.Vector3
+tqt   = new three.Quaternion
+unitX = new three.Vector3 1 0 0
+unitY = new three.Vector3 0 1 0
+unitZ = new three.Vector3 0 0 1
+
+function Polar
+
+    @zero: new Polar()
+    @pole: unitX
+
+    @: cfg={} ->
+        
+        @quat = switch cfg.dir
+            '-x' ➜ new quat new three.Vector3 -1 0 0
+            '-y' ➜ new quat new three.Vector3 0 -1 0
+            '-z' ➜ new quat new three.Vector3 0 0 -1
+            'x'  ➜ new quat new three.Vector3 1 0 0
+            'y'  ➜ new quat new three.Vector3 0 1 0
+                 ➜ new quat new three.Vector3 0 0 1
+
+        @dist = cfg.dist ? 1
+        @tgt  = new three.Vector3
+        
+    rotAxis: deg axis -> 
+    
+        tqt.setFromAxisAngle axis deg2rad(deg) 
+        @quat.multiply tqt 
+        @quat.normalize()
+        
+    rotU: deg -> @rotAxis deg unitY
+    rotV: deg -> @rotAxis deg unitZ
+    
+    slerp: o t -> 
+        
+        @quat.slerp o.quat t
+        # @tgt.lerp o.tgt t
+    
+    target: p deltaSec -> 
+        
+        @tgt.copy p
+
+        v4.copy(p).normalize()
+        v5.copy(@pos()).normalize()
+        v6.crossVectors v5 v4
+        ⮐ if v6.length() < 0.00001
+        v6.normalize()
+        tqt.setFromAxisAngle v6 deltaSec*0.4
+        @quat.premultiply tqt
+        @quat.normalize()
+        
+    orient: q -> 
+        
+        p = @pos()
+        v1.subVectors(@tgt p).normalize()
+        p.normalize()
+        v0.crossVectors p v1
+        v0.normalize()
+        v1.crossVectors v0 p
+        
+        q.setFromUnitVectors unitY v1
+        q.normalize()
+    
+    up: -> 
+        
+        v2.copy(unitY).applyQuaternion @quat
+        v2
+        
+    pos: ->
+        
+        v3.copy Polar.pole
+        v3.applyQuaternion @quat
+        v3.multiplyScalar @dist
+        v3
+
+export Polar

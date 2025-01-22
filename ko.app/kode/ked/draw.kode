@@ -1,0 +1,29 @@
+###
+0000000    00000000    0000000   000   000  
+000   000  000   000  000   000  000 0 000  
+000   000  0000000    000000000  000000000  
+000   000  000   000  000   000  000   000  
+0000000    000   000  000   000  00     00  
+###
+
+class draw
+
+    @bg_rect: t x1 y1 x2 y2 c ->
+    
+        x1 = t.cols() + x1 + 1 if x1 < 0
+        x2 = t.cols() + x2 + 1 if x2 < 0
+
+        y1 = t.rows() + y1 + 1 if y1 < 0
+        y2 = t.rows() + y2 + 1 if y2 < 0
+        
+        t.store()
+        
+        for y in y1..y2
+        
+            t.setCursor x1 y
+            t.write color.bg_rgb(c)
+            t.write rpad(x2-x1+1 ' ')
+        
+        t.restore()
+
+export draw

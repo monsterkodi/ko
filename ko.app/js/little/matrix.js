@@ -109,6 +109,15 @@ matrix = (function ()
         }).bind(this)},botDelta:{min:1,max:10,step:0.1,value:this.botDelta,cb:(function (botDelta)
         {
             this.botDelta = botDelta
+        }).bind(this)},bloomSpread:{min:1,max:32,step:1,value:this.g.bloomSpread,cb:(function (v)
+        {
+            return this.g.bloomSpread = v
+        }).bind(this)},bllomIntens:{min:0.1,max:2,step:0.1,value:this.g.bloomIntensity,cb:(function (v)
+        {
+            return this.g.bloomIntensity = v
+        }).bind(this)},fbo:{value:false,cb:(function (useFBO)
+        {
+            return this.g.useFBO = useFBO
         }).bind(this)},anims:{info:(function ()
         {
             return this.anims.length
@@ -181,7 +190,7 @@ matrix = (function ()
 
     matrix.prototype["advance"] = function (sec)
     {
-        var c, e, g, l, n, op, p, _139_21_
+        var c, e, g, l, n, op, p, _142_21_
 
         this.cycles += sec / 60
         var list = _k_.list(this.eggs)
@@ -209,7 +218,7 @@ matrix = (function ()
             }
             if (c.age > this.critterMaxAge || c.eat < -this.critterStarveTime)
             {
-                c.df = ((_139_21_=c.df) != null ? _139_21_ : 0)
+                c.df = ((_142_21_=c.df) != null ? _142_21_ : 0)
                 c.df += sec / this.critDieTime
                 continue
             }
@@ -307,9 +316,9 @@ matrix = (function ()
 
     matrix.prototype["neighborsAtDistance"] = function (d)
     {
-        var x, y, _202_12_
+        var x, y, _205_12_
 
-        this.nd = ((_202_12_=this.nd) != null ? _202_12_ : [])
+        this.nd = ((_205_12_=this.nd) != null ? _205_12_ : [])
         if (this.nd[d])
         {
             return this.nd[d]

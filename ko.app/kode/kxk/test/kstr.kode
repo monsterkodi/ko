@@ -281,5 +281,119 @@ use .. ◆ kstr
         
             r = kstr.unfilletBlocks blockFillets
             r ▸ text + '\n'
+
+    #  0000000  000   000  000   000  000   000  000   000    
+    # 000       000   000  000   000  0000  000  000  000     
+    # 000       000000000  000   000  000 0 000  0000000      
+    # 000       000   000  000   000  000  0000  000  000     
+    #  0000000  000   000   0000000   000   000  000   000    
+    
+    ▸ indexOfClosestNonWS    
+    
+        kstr.indexOfClosestNonWS ''         0       ▸ -1
+        kstr.indexOfClosestNonWS '     '    2       ▸ -1
+        kstr.indexOfClosestNonWS null       2       ▸ -1
+        kstr.indexOfClosestNonWS undefined  2       ▸ -1
+        kstr.indexOfClosestNonWS 'hello  '  0       ▸ 0
+        kstr.indexOfClosestNonWS '  llo  '  0       ▸ 2
+        kstr.indexOfClosestNonWS '  llo  '  2       ▸ 2
+        kstr.indexOfClosestNonWS '  llo  '  3       ▸ 3
+        kstr.indexOfClosestNonWS '  llo  '  4       ▸ 4
+        kstr.indexOfClosestNonWS '  llo  '  5       ▸ 4
+        kstr.indexOfClosestNonWS '  llo  '  6       ▸ 4
+        kstr.indexOfClosestNonWS '  l  '    0       ▸ 2
+        kstr.indexOfClosestNonWS '  l  '    -1      ▸ 2
+        kstr.indexOfClosestNonWS '  l  '    2       ▸ 2
+        kstr.indexOfClosestNonWS '  l  '    100     ▸ 2
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 0  ▸ 1
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 1  ▸ 1
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 2  ▸ 1
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 3  ▸ 1
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 4  ▸ 6
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 5  ▸ 6
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 6  ▸ 6
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 7  ▸ 6
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 8  ▸ 10
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 9  ▸ 10
+        kstr.indexOfClosestNonWS ' 1    6   a  ' 10 ▸ 10
         
+    ▸ rangeOfClosestChunk
+    
+        kstr.rangeOfClosestChunk ''         0    ▸ [-1 -1]
+        kstr.rangeOfClosestChunk '     '    2    ▸ [-1 -1]
+        kstr.rangeOfClosestChunk null       2    ▸ [-1 -1]
+        kstr.rangeOfClosestChunk undefined  2    ▸ [-1 -1]
+        
+        kstr.rangeOfClosestChunk '  word '  -2   ▸ [2 5]
+        kstr.rangeOfClosestChunk '  word '  0    ▸ [2 5]
+        kstr.rangeOfClosestChunk '  word '  1    ▸ [2 5]
+        kstr.rangeOfClosestChunk '  word '  2    ▸ [2 5]
+        kstr.rangeOfClosestChunk '  word '  5    ▸ [2 5]
+        kstr.rangeOfClosestChunk '  word '  7    ▸ [2 5]
+        kstr.rangeOfClosestChunk '  word '  100  ▸ [2 5]
+        
+        kstr.rangeOfClosestChunk '  hello   word !'  0    ▸ [2 6]
+        kstr.rangeOfClosestChunk '  hello   word !'  2    ▸ [2 6]
+        kstr.rangeOfClosestChunk '  hello   word !'  7    ▸ [2 6]
+        kstr.rangeOfClosestChunk '  hello   word !'  8    ▸ [10 13]
+        kstr.rangeOfClosestChunk '  hello   word !'  9    ▸ [10 13]
+        kstr.rangeOfClosestChunk '  hello   word !'  14   ▸ [15 15]
+        kstr.rangeOfClosestChunk '  hello   word !'  15   ▸ [15 15]
+        kstr.rangeOfClosestChunk '  hello   word !'  100  ▸ [15 15]
+        
+    # 000   000   0000000   00000000   0000000      
+    # 000 0 000  000   000  000   000  000   000    
+    # 000000000  000   000  0000000    000   000    
+    # 000   000  000   000  000   000  000   000    
+    # 00     00   0000000   000   000  0000000      
+    
+    ▸ isAlphaNumeric
+    
+        kstr.isAlphaNumeric 'A'     ▸ true
+        kstr.isAlphaNumeric 'a'     ▸ true
+        kstr.isAlphaNumeric '1'     ▸ true
+        kstr.isAlphaNumeric '0'     ▸ true
+        kstr.isAlphaNumeric '_'     ▸ true
+        kstr.isAlphaNumeric ' '     ▸ false
+        kstr.isAlphaNumeric '@'     ▸ false
+        kstr.isAlphaNumeric "#"     ▸ false
+        kstr.isAlphaNumeric "{"     ▸ false
+        kstr.isAlphaNumeric "+"     ▸ false
+        kstr.isAlphaNumeric "-"     ▸ false
+        kstr.isAlphaNumeric "="     ▸ false
+        kstr.isAlphaNumeric '.'     ▸ false
+        kstr.isAlphaNumeric 'a_1'   ▸ true
+        kstr.isAlphaNumeric '981'   ▸ true
+        kstr.isAlphaNumeric '9.1'   ▸ false
+        kstr.isAlphaNumeric 'a.1'   ▸ false
+        kstr.isAlphaNumeric ' a_1 ' ▸ false
+        
+    ▸ rangeOfClosestWord 
+    
+        kstr.rangeOfClosestWord ''         0    ▸ [-1 -1]
+        kstr.rangeOfClosestWord '     '    2    ▸ [-1 -1]
+        kstr.rangeOfClosestWord null       2    ▸ [-1 -1]
+        kstr.rangeOfClosestWord undefined  2    ▸ [-1 -1]
+    
+        kstr.rangeOfClosestWord '  word '  -2   ▸ [2 5]
+        kstr.rangeOfClosestWord '  word '  0    ▸ [2 5]
+        kstr.rangeOfClosestWord '  word '  1    ▸ [2 5]
+        kstr.rangeOfClosestWord '  word '  2    ▸ [2 5]
+        kstr.rangeOfClosestWord '  word '  5    ▸ [2 5]
+        kstr.rangeOfClosestWord '  word '  7    ▸ [2 5]
+        kstr.rangeOfClosestWord '  word '  100  ▸ [2 5]
+        
+        kstr.rangeOfClosestWord '  hello   word !'  0    ▸ [2 6]
+        kstr.rangeOfClosestWord '  hello   word !'  2    ▸ [2 6]
+        kstr.rangeOfClosestWord '  hello   word !'  7    ▸ [2 6]
+        kstr.rangeOfClosestWord '  hello   word !'  8    ▸ [10 13]
+        kstr.rangeOfClosestWord '  hello   word !'  9    ▸ [10 13]
+        kstr.rangeOfClosestWord '  hello   word !'  14   ▸ [10 13]
+        kstr.rangeOfClosestWord '  hello   word !'  15   ▸ [10 13]
+        # kstr.rangeOfClosestWord '  hello   word !'  100  ▸ [10 13]
+        
+    ▸ indexOfClosestAlphaNumeric
+    
+        kstr.indexOfClosestAlphaNumeric '  hello   word !'  8  ▸ 10
+        kstr.indexOfClosestAlphaNumeric '  hello   word !'  15 ▸ 13
         

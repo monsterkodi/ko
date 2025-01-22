@@ -117,7 +117,7 @@ util = {isEqual:function (a, b)
             }
         }
     }
-    else
+    else if (!(_k_.isArr(arr)))
     {
         console.log('not an array!?',arr)
     }

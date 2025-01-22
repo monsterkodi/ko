@@ -1,0 +1,136 @@
+###
+ 0000000  000   000   0000000   00000000   00     00
+000       000 0 000  000   000  000   000  000   000
+0000000   000000000  000000000  0000000    000000000
+     000  000   000  000   000  000   000  000 0 000
+0000000   00     00  000   000  000   000  000   000
+###
+
+import * as three from 'three'
+
+use ./hash
+use ./lib/geom
+
+function Swarm
+
+    @: @scene @player ->
+        
+        @count = 500
+        # sphere = geom.sphere radius:0.5 sgmt:6 material:'shinywhite'
+        sphere = geom.sphere radius:0.5 sgmt:6 material:'flatwhite'
+        @dummy = new three.Object3D()
+        @color = new three.Color()
+        @playerPos = new three.Vector3()
+        @pos   = new three.Vector3()
+        @norm  = new three.Vector3()
+        @orig  = new three.Vector3()
+        @rot   = new three.Quaternion()
+        @rotd  = new three.Quaternion()
+        @scale = new three.Vector3()
+        @mesh  = new three.InstancedMesh(sphere.geometry sphere.material @count)
+        @mesh.instanceMatrix.setUsage three.DynamicDrawUsage
+        @mesh.castShadow = true
+        @scene.scene.add @mesh
+        
+        @hash = new hash @scene
+                        
+        @rotAxis = []
+        @rotAngle = []
+        for i in 0...@count
+            ra = new three.Vector3 
+            ra.randomDirection()
+            @rotAxis.push ra
+            @rotAngle.push 0.01+Math.random()*0.05
+        
+    spawn: ->
+        
+        @scale.set 1 1 1
+        @orig.set 0 0 0
+        
+        i = 0
+        while i < @count
+            
+            @pos.randomDirection()
+            @pos.projectOnPlane @rotAxis[i]
+            @pos.normalize()
+            @rot.setFromAxisAngle @pos 0
+            @pos.multiplyScalar 50
+            @dummy.matrix.compose @pos @rot @scale
+
+            @mesh.setMatrixAt i @dummy.matrix
+            
+            @color.set 0 0 1
+            @mesh.setColorAt i @color
+            
+            i++
+        
+        @mesh.instanceMatrix.needsUpdate = true
+        @mesh.instanceColor.needsUpdate = true
+        
+                
+    update: deltaSec ->
+        
+        @playerPos.copy @player.mesh.position
+        @playerPos.normalize()
+        
+        for i in 0...@count
+            
+            @mesh.getMatrixAt i @dummy.matrix
+            @dummy.matrix.decompose @pos @rot @scale
+            
+            if 1
+                @rotd.setFromAxisAngle @rotAxis[i] @rotAngle[i] * deltaSec
+                @pos.applyQuaternion @rotd
+                @rot.multiply @rotd
+                @rot.normalize()
+                        
+            @norm.copy @pos
+            @norm.normalize()
+            
+            dtn = @playerPos.dot @norm
+                        
+            if dtn > 0.98
+                @rotAxis[i].lerp @norm.cross(@playerPos) dtn * dtn * dtn
+                @rotAxis[i].normalize()
+                 
+                @rotd.setFromAxisAngle @rotAxis[i] deltaSec * 0.5
+                @pos.applyQuaternion @rotd
+                @rot.multiply @rotd
+                @rot.normalize()
+            
+            dot = Math.max 0 dtn - 0.7
+            dot = dot * dot
+                
+            if dot > 0.0897
+                @player.eat++
+                @pos.multiplyScalar -1
+                @scale.set 0 0 0 
+
+            if dtn > 0.98
+                @color.set 0.36 0.36 0
+            else
+                @color.set dot dot 0
+            
+            # if 
+                # dot > 0.99 ➜ @color.set 1 1 0
+                # dot > 0.9  ➜ @color.set 1 0 0
+                # dot > 0.7  ➜ @color.set 0 0 1
+                           # ➜ @color.set 0 0 0
+            
+            # switch hash.normal @norm
+                # 'n' ➜ @color.set 0 1 0
+                # 'e' ➜ @color.set 1 0 0
+                # 'f' ➜ @color.set 0 0 1
+                # 's' ➜ @color.set 0 0.1 0
+                # 'w' ➜ @color.set 0.1 0 0
+                # 'b' ➜ @color.set 0 0 0.1
+
+            @mesh.setColorAt i @color
+            
+            @dummy.matrix.compose @pos @rot @scale
+            @mesh.setMatrixAt i @dummy.matrix
+
+        @mesh.instanceMatrix.needsUpdate = true
+        @mesh.instanceColor.needsUpdate = true
+            
+export Swarm

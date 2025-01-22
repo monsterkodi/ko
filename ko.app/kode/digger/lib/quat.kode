@@ -1,0 +1,33 @@
+###
+ 0000000   000   000   0000000   000000000
+000   000  000   000  000   000     000   
+000 00 00  000   000  000000000     000   
+000 0000   000   000  000   000     000   
+ 00000 00   0000000   000   000     000   
+###
+
+import * as three from 'three'
+
+class Quat extends three.Quaternion
+    
+    @tmp: new Quat
+    @counter: 0
+    @zero: new Quat new three.Quaternion
+    @unitZ: new three.Vector3 0 0 1
+
+    @: x=0 y=0 z=0 w=1 ->
+        
+        Quat.counter++
+        
+        if x instanceof three.Vector3
+            super()
+            @setFromUnitVectors Quat.unitZ x
+        else if x instanceof Quat or x instanceof three.Quaternion
+            super x.x x.y x.z x.w
+        else
+            super x y z w
+            
+        if Number.isNaN @x
+            throw new Error
+
+export Quat

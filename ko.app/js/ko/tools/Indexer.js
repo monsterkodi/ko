@@ -199,7 +199,6 @@ class Indexer
 
         if (!funcName)
         {
-            console.log(`addFuncInfo ${funcName}`,funcInfo)
             return
         }
         if (funcName.length > 1 && funcName.startsWith('@'))

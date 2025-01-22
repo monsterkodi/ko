@@ -141,6 +141,148 @@ str.unfilletBlocks = blocks ->
         s += rpad(b.indent, '') + str.unfilletBlock(b)
     s
     
+    # 000   000  000   000  000  000000000  00000000   0000000  00000000    0000000    0000000  00000000    
+    # 000 0 000  000   000  000     000     000       000       000   000  000   000  000       000         
+    # 000000000  000000000  000     000     0000000   0000000   00000000   000000000  000       0000000     
+    # 000   000  000   000  000     000     000            000  000        000   000  000       000         
+    # 00     00  000   000  000     000     00000000  0000000   000        000   000   0000000  00000000    
+
+str.indexOfClosestNonWS = s x ->
+    
+    ⮐ -1 if empty s
+    x = clamp 0 s.length-1 x
+    ⮐ x if s[x] not in '\n\t\r '
+    
+    dl = dr = 0
+    
+    while s[x-dl] in '\r\n\t ' ➜ dl += 1
+        
+    if x-dl < 0 ➜ dl = Infinity
+        
+    while s[x+dr] in '\r\n\t ' ➜ dr += 1
+        
+    if x+dr >= s.length ➜ dr = Infinity
+        
+    ⮐ -1 if dl == dr == Infinity
+    
+    if dl < dr
+        x-dl
+    else
+        x+dr
+        
+str.indexOfPreviousWS = s x ->
+    
+    ⮐ -1 if empty s
+    
+    x = clamp 0 s.length-1 x
+    
+    while x >= 0 and s[x] not in '\r\n\t '
+        x--
+    x
+
+str.indexOfNextWS = s x ->
+    
+    ⮐ -1 if empty s
+    
+    x = clamp 0 s.length-1 x
+    
+    while x < s.length and s[x] not in '\r\n\t '
+        x++
+    x
+    
+    #  0000000   000      00000000   000   000   0000000   000   000  000   000  00     00    
+    # 000   000  000      000   000  000   000  000   000  0000  000  000   000  000   000    
+    # 000000000  000      00000000   000000000  000000000  000 0 000  000   000  000000000    
+    # 000   000  000      000        000   000  000   000  000  0000  000   000  000 0 000    
+    # 000   000  0000000  000        000   000  000   000  000   000   0000000   000   000    
+    
+str.isAlphaNumeric = s -> 
+
+    for c in s 
+        ⮐ false if not /\w+/.test c
+    true
+    
+str.indexOfClosestAlphaNumeric = s x ->
+    
+    ⮐ -1 if empty s
+    x = clamp 0 s.length-1 x
+    ⮐ x if str.isAlphaNumeric s[x]
+    
+    dl = dr = 0
+    
+    while not str.isAlphaNumeric s[x-dl] ➜ dl += 1
+        
+    if x-dl < 0 ➜ dl = Infinity
+        
+    while not str.isAlphaNumeric s[x+dr] ➜ dr += 1
+        
+    if x+dr >= s.length ➜ dr = Infinity
+        
+    ⮐ -1 if dl == dr == Infinity
+    
+    if dl < dr
+        x-dl
+    else
+        x+dr
+        
+str.indexOfPreviousNonAlphaNumeric = s x ->
+    
+    ⮐ -1 if empty s
+    
+    x = clamp 0 s.length-1 x
+    
+    while x >= 0 and str.isAlphaNumeric s[x]
+        x--
+    x
+
+str.indexOfNextNonAlphaNumeric = s x ->
+    
+    ⮐ -1 if empty s
+    
+    x = clamp 0 s.length-1 x
+    
+    while x < s.length and str.isAlphaNumeric s[x]
+        x++
+    x
+    
+#  0000000  000       0000000    0000000  00000000   0000000  000000000     000   000   0000000   00000000   0000000    
+# 000       000      000   000  000       000       000          000        000 0 000  000   000  000   000  000   000  
+# 000       000      000   000  0000000   0000000   0000000      000        000000000  000   000  0000000    000   000  
+# 000       000      000   000       000  000            000     000        000   000  000   000  000   000  000   000  
+#  0000000  0000000   0000000   0000000   00000000  0000000      000        00     00   0000000   000   000  0000000    
+
+str.rangeOfClosestWord = s x ->
+    
+    ⮐ [-1 -1] if empty str
+    
+    x = str.indexOfClosestAlphaNumeric s x
+    
+    ⮐ [-1 -1] if x < 0
+    
+    rs = str.indexOfPreviousNonAlphaNumeric s x
+    re = str.indexOfNextNonAlphaNumeric s x
+    
+    [rs+1 re-1]
+
+#  0000000  000       0000000    0000000  00000000   0000000  000000000   0000000  000   000  000   000  000   000  000   000  
+# 000       000      000   000  000       000       000          000     000       000   000  000   000  0000  000  000  000   
+# 000       000      000   000  0000000   0000000   0000000      000     000       000000000  000   000  000 0 000  0000000    
+# 000       000      000   000       000  000            000     000     000       000   000  000   000  000  0000  000  000   
+#  0000000  0000000   0000000   0000000   00000000  0000000      000      0000000  000   000   0000000   000   000  000   000  
+
+str.rangeOfClosestChunk = s x ->
+    
+    ⮐ [-1 -1] if empty str
+    
+    x = str.indexOfClosestNonWS s x
+    
+    ⮐ [-1 -1] if x < 0
+    
+    rs = str.indexOfPreviousWS s x
+    re = str.indexOfNextWS s x
+    
+    [rs+1 re-1]
+    
 #  0000000  00000000   000      000   0000000  00000000
 # 000       000   000  000      000  000       000
 # 0000000   00000000   000      000  000       0000000

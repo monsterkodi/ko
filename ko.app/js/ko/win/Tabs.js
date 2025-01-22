@@ -8,12 +8,15 @@ let slash = kxk.slash
 let drag = kxk.drag
 let popup = kxk.popup
 let stopEvent = kxk.stopEvent
+let ffs = kxk.ffs
 let $ = kxk.$
 
 import Projects from "../tools/Projects.js"
 import File from "../tools/File.js"
 
 import Tab from "./Tab.js"
+
+import Do from "../editor/Do.js"
 
 class Tabs
 {
@@ -268,7 +271,7 @@ class Tabs
 
     addTab (path)
     {
-        var prjPath, tab, tabs, _163_22_
+        var prjPath, tab, tabs, _164_22_
 
         if (_k_.empty(path))
         {
@@ -304,7 +307,7 @@ class Tabs
 
     cleanTabs (tabs)
     {
-        var i, k, prjPath, prjTabs, remain, sorted, tab, v, _189_29_
+        var i, k, prjPath, prjTabs, remain, sorted, tab, v, _190_29_
 
         sorted = tabs.filter(function (t)
         {
@@ -329,7 +332,7 @@ class Tabs
             {
                 prjPath = kakao.bundle.path
             }
-            prjTabs[prjPath] = ((_189_29_=prjTabs[prjPath]) != null ? _189_29_ : [{type:'prj',path:prjPath}])
+            prjTabs[prjPath] = ((_190_29_=prjTabs[prjPath]) != null ? _190_29_ : [{type:'prj',path:prjPath}])
             prjTabs[prjPath].push(tab)
         }
         for (k in prjTabs)
@@ -409,7 +412,7 @@ class Tabs
 
     setActive (path)
     {
-        var tab, tabs, _264_26_, _264_31_
+        var tab, tabs, _265_26_, _265_31_
 
         tabs = this.koreTabs()
         var list = _k_.list(tabs)
@@ -420,7 +423,7 @@ class Tabs
             if (slash.samePath(tab.path,path))
             {
                 tab.active = true
-                ;((_264_26_=this.tab(path)) != null ? (_264_31_=_264_26_.div) != null ? _264_31_.scrollIntoViewIfNeeded() : undefined : undefined)
+                ;((_265_26_=this.tab(path)) != null ? (_265_31_=_265_26_.div) != null ? _265_31_.scrollIntoViewIfNeeded() : undefined : undefined)
             }
         }
         return tabs
@@ -866,7 +869,7 @@ class Tabs
 
     onSaveAll ()
     {
-        var state, tab
+        var state, tab, tabStates, unsavedTabPath
 
         var list = _k_.list(this.koreTabs())
         for (var _a_ = 0; _a_ < list.length; _a_++)
@@ -884,23 +887,33 @@ class Tabs
                     {
                         continue
                     }
-                    if (state = tab.state)
+                    tabStates = kore.get('tabStates')
+                    if (state = tabStates[tab.path])
                     {
-                        File.save(state.file,state.state.text(),(function (file)
+                        unsavedTabPath = tab.path
+                        ffs.read(tab.path).then((function (textOnDisk)
                         {
-                            var tabs
+                            var textWithChangesApplied
 
-                            if (!file)
+                            textWithChangesApplied = Do.applyStateToText(state,textOnDisk)
+                            return ffs.write(unsavedTabPath,textWithChangesApplied).then((function (file)
                             {
-                                return console.error(`Tabs.onSaveAll failed to save ${state.file}`)
-                            }
-                            tabs = this.koreTabs()
-                            if (tab = this.koreTabForPath(file,tabs))
-                            {
-                                delete tab.state
-                                delete tab.dirty
-                                return this.setKoreTabs(tabs)
-                            }
+                                var tabs
+
+                                if (!file)
+                                {
+                                    return console.error(`Tabs.onSaveAll failed to save ${file}`)
+                                }
+                                tabs = this.koreTabs()
+                                if (tab = this.koreTabForPath(file,tabs))
+                                {
+                                    delete tab.dirty
+                                    tabStates = kore.get('tabStates')
+                                    delete tabStates[file]
+                                    kore.set('tabStates',tabStates)
+                                    return this.setKoreTabs(tabs)
+                                }
+                            }).bind(this))
                         }).bind(this))
                     }
                 }

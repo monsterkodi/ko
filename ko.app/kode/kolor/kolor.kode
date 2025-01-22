@@ -1289,6 +1289,7 @@ handlers =
     ini:    punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[         number                 ]
     cpp:    punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
     mm:     punct:[ starComment  slashComment simpleString cppPointer                       ] word:[ keyword number float cppWord   ]
+    zig:    punct:[ starComment  slashComment simpleString                                  ] word:[ keyword number float cppWord   ]
     frag:   punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
     vert:   punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]
     hpp:    punct:[ starComment  slashComment simpleString cppMacro cppPointer              ] word:[ keyword number float cppWord   ]

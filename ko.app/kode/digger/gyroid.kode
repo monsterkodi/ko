@@ -1,0 +1,148 @@
+###
+ 0000000   000   000  00000000    0000000   000  0000000  
+000         000 000   000   000  000   000  000  000   000
+000  0000    00000    0000000    000   000  000  000   000
+000   000     000     000   000  000   000  000  000   000
+ 0000000      000     000   000   0000000   000  0000000  
+###
+
+use ../kxk ▪ fade
+use ./lib/material
+use ./lib/noise ▪ simplex3
+
+import * as three from 'three'
+import { MarchingCubes }        from 'three/addons/objects/MarchingCubes.js'
+import { MeshSurfaceSampler }   from 'three/addons/math/MeshSurfaceSampler.js'
+
+function Gyroid
+
+    @: @scene ->
+        
+        @num    = 11
+        @skin   = 0.7        
+        @resolution = 80
+        
+        @initMarchingCubes()
+        
+    start: => @initMarchingCubes()
+        
+    # 00     00   0000000   00000000    0000000  000   000  000  000   000   0000000 
+    # 000   000  000   000  000   000  000       000   000  000  0000  000  000      
+    # 000000000  000000000  0000000    000       000000000  000  000 0 000  000  0000
+    # 000 0 000  000   000  000   000  000       000   000  000  000  0000  000   000
+    # 000   000  000   000  000   000   0000000  000   000  000  000   000   0000000 
+    
+    initMarchingCubes: =>
+        
+        if @mc
+            @mc.removeFromParent()
+        
+        mat = material.vertex
+        enableUvs = false
+        enableColors = true
+        maxPolyCount = 500000
+        @mc = new MarchingCubes @resolution mat enableUvs enableColors maxPolyCount
+        @mc.isolation = 1
+        @mc.scale.set 50 50 50
+        @mc.receiveShadow = true
+        @mc.castShadow = true
+        
+        @scene.scene.add @mc
+                 
+        @sampler = new MeshSurfaceSampler @mc        
+                
+        @initGyroidSphere()
+        
+    #  0000000   000   000  00000000    0000000   000  0000000    
+    # 000         000 000   000   000  000   000  000  000   000  
+    # 000  0000    00000    0000000    000   000  000  000   000  
+    # 000   000     000     000   000  000   000  000  000   000  
+    #  0000000      000     000   000   0000000   000  0000000    
+    
+    initGyroidSphere: =>
+        
+        gyroid = x y z -> Math.sin(x)*Math.cos(y)+Math.sin(y)*Math.cos(z)+Math.sin(z)*Math.cos(x)
+        
+        @mc.reset()
+        
+        for x in 0...@resolution
+            for y in 0...@resolution
+                for z in 0...@resolution
+                    
+                    rf = Math.sqrt((x/@resolution-0.5)*(x/@resolution-0.5) + (y/@resolution-0.5)*(y/@resolution-0.5) + (z/@resolution-0.5)*(z/@resolution-0.5))
+                    ff = 1-1.41*rf
+                    
+                    ss = @resolution/(Math.PI*@num)
+                    nx = x/ss
+                    ny = y/ss
+                    nz = z/ss
+                    
+                    cx = nx-0.5
+                    cy = ny-0.5
+                    cz = nz-0.5
+                    
+                    fo = Math.sqrt cx*cx + cz*cz
+                    beta = fo*0.01
+                    rx = cx*Math.cos(beta)-cz*Math.sin(beta)
+                    ry = cy 
+                    rz = cx*Math.sin(beta)+cz*Math.cos(beta)
+                    
+                    nx = rx+0.5
+                    ny = ry+0.5
+                    nz = rz+0.5
+                    
+                    if rf < 0.5
+                        fo = 0.08
+                        fv = fade 1 0 max(0 rf - (0.5-fo))/fo
+                        @mc.setCell x y z Math.max(0 fv*@skin*(gyroid(nx ny nz)+1))
+                    else
+                        @mc.setCell x y z 0
+                        
+                    yn = y/@resolution 
+
+                    b = ff * ff
+                    b = b * b * b
+                    b = clamp 0 1 b
+                    ss = 0.8*@resolution
+                    r = 4*Math.max(0 simplex3(x/ss y/ss z/ss)+0.05)
+                    r = r * r * b
+                    g = r/2
+                    @mc.setColor x y z r g Math.max(0 b-r)
+            
+        @mc.update()
+        
+        @sampler.build()
+        
+    color: pos color -> 
+        
+        c = @getColor pos
+        color.set c[0] c[1] c[2]
+        color
+        
+    getColor: pos ->
+        
+        cx = pos.x+@resolution/2
+        cy = pos.y+@resolution/2
+        cz = pos.z+@resolution/2
+
+        x = clamp 0 @resolution-1 Math.floor(cx)
+        y = clamp 0 @resolution-1 Math.floor(cy)
+        z = clamp 0 @resolution-1 Math.floor(cz)
+
+        c1 = @mc.getColor x y z
+        
+        x = clamp 0 @resolution-1 Math.ceil(cx)
+        y = clamp 0 @resolution-1 Math.ceil(cy)
+        z = clamp 0 @resolution-1 Math.ceil(cz)
+        
+        c2 = @mc.getColor x y z
+        
+        lerp = a b t -> a + ( b - a ) * t
+        
+        r = lerp c1[0] c2[0] cx - Math.floor(cx)
+        g = lerp c1[1] c2[1] cy - Math.floor(cy)
+        b = lerp c1[2] c2[2] cz - Math.floor(cz)
+        
+        [r g b]
+
+export Gyroid

@@ -610,7 +610,6 @@ asMutableObject = function (opts)
     var key, result
 
     result = instantiateEmptyObject(this)
-    key
     for (key in this)
     {
         if (this.hasOwnProperty(key))

@@ -1,0 +1,62 @@
+###
+00     00   0000000   000000000  00000000  00000000   000   0000000   000    
+000   000  000   000     000     000       000   000  000  000   000  000    
+000000000  000000000     000     0000000   0000000    000  000000000  000    
+000 0 000  000   000     000     000       000   000  000  000   000  000    
+000   000  000   000     000     00000000  000   000  000  000   000  0000000
+###
+
+import * as three from 'three'
+
+mat = cfg ->
+
+    clss = switch cfg.typ
+        'lambert' ➜ three.MeshLambertMaterial
+        'line'    ➜ three.LineBasicMaterial
+        'basic'   ➜ three.MeshBasicMaterial
+        'shadow'  ➜ three.ShadowMaterial
+        'toon'    ➜ three.MeshToonMaterial
+                  ➜ three.MeshStandardMaterial
+    delete cfg.typ
+    new clss cfg
+
+function Material
+
+    @transparent:    mat(color:0x888888 typ:'lambert' depthWrite:false transparent:true opacity:0.1)
+    @flat:           mat(color:0xffffff metalness: 0.5 roughness: 0.7 flatShading:true dithering:true)
+    @toon:           mat(color:0x110000 typ:'toon' dithering:true)
+    @white:          mat(color:0xffffff typ:'lambert' dithering:true) 
+    @player:         mat(color:0x666666 typ:'lambert' dithering:true) 
+    @vertex:         mat(color:0xffffff typ:'lambert' dithering:true vertexColors:true) 
+    @flatwhite:      mat(color:0xffffff typ:'lambert' flatShading:true dithering:true)
+    @shinyblack:     mat(color:0x000000 metalness: 0.6 roughness: 0.1 flatShading:true)
+    @shinyblue:      mat(color:0x000088 metalness: 0.6 roughness: 0.5 flatShading:true emissive:0x4444ff)
+    @shinyred:       mat(color:0x330000 metalness: 0.6 roughness: 0.5 flatShading:true)
+    @shinywhite:     mat(color:0xffffff metalness: 0.6 roughness: 0.5 flatShading:true)
+    @wireframe:      mat(color:0xffffff typ:'basic' wireframe:true)
+    @debugred:       mat(color:0xff0000 typ:'basic' wireframe:true depthTest:false)
+    @debugblue:      mat(color:0x0000ff typ:'basic' wireframe:true depthTest:false)
+    @linered:        mat(color:0xff0000 typ:'line' depthTest:false)
+
+    @setWire: wire ->
+        
+        for k,m of Material
+            if m instanceof three.Material
+                m.wireframe = wire
+        
+    @toggleWire: -> Material.setWire not Material.getWire()
+
+    @setFlat: flat ->
+        
+        for k,m of Material
+            if m instanceof three.Material
+                m.flatShading = flat
+                m.needsUpdate = true
+            
+    @toggleFlat: -> Material.setFlat not Material.getFlat()
+    
+# for k,m of Material
+    # if m instanceof three.Material
+        # log 'k' k
+
+export Material

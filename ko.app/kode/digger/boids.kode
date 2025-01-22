@@ -1,0 +1,165 @@
+###
+0000000     0000000   000  0000000     0000000
+000   000  000   000  000  000   000  000     
+0000000    000   000  000  000   000  0000000 
+000   000  000   000  000  000   000       000
+0000000     0000000   000  0000000    0000000 
+###
+
+import * as three from 'three'
+
+use ../kxk ▪ rad2deg deg2rad
+use ./lib/geom
+
+function Boids
+
+    @: @scene @player @gyroid ->
+        
+        sphere = geom.sphere radius:0.2 sgmt:6 material:'flatwhite'
+        
+        @m4  = new three.Matrix4
+        @pos = new three.Vector3
+        @rot = new three.Quaternion
+        @scl = new three.Vector3
+                
+        @count = 10000
+        
+        @statiks = {}
+        
+        @init 'unitScale' three.Vector3 (v) -> v.set 1 1 1
+        @init 'unitX'     three.Vector3 (v) -> v.set 1 0 0
+        
+        @mesh  = new three.InstancedMesh sphere.geometry sphere.material @count
+        @mesh.instanceMatrix.setUsage three.DynamicDrawUsage
+        # @mesh.castShadow = true
+        @scene.scene.add @mesh
+        
+    init: name clss cb -> @statik name clss; cb @statiks[name]
+    statik: name clss -> 
+        @statiks[name] ?= new clss 
+        @statiks[name]
+        
+    posAt: i p ->
+        
+        if boid = @boids[i]
+            # p.set 1 0 0
+            # p.applyQuaternion boid.q
+            # p.multiplyScalar  boid.d
+            p.copy boid.n
+            p.multiplyScalar boid.d
+        p
+    
+    matrixAt: i m ->
+        
+        p = @statik 'matrixAt.pos' three.Vector3 
+        m.compose @posAt(i p) @boids[i].q @statiks.unitScale
+        m
+        
+    spawn: ->
+        
+        @boids = []
+        
+        p = @statik 'spawn.pos'   three.Vector3
+        t = @statik 'spawn.norm'  three.Vector3
+        f = @statik 'spawn.color' three.Color
+        
+        i = 0
+        while i < @count
+            
+            @gyroid.sampler.sample p t
+            p.multiplyScalar 50
+            d = p.length()
+            continue if d < 20
+            
+            @gyroid.color p f
+            
+            continue if Math.random() < f.b*50
+            continue if f.r > 0.0
+            
+            p.normalize()
+            continue if Math.random() > t.dot(p)
+            continue if t.dot(p) < 0.5
+            
+            q = new three.Quaternion 
+            c = new three.Color
+            n = new three.Vector3
+                        
+            n.copy p
+            c.copy f
+            c.multiplyScalar 200
+            q.setFromUnitVectors @statiks.unitX n
+            
+            @boids.push 
+                q: q
+                n: n
+                d: d
+                r: 0
+                c: c
+                        
+            @mesh.setColorAt i c
+            @mesh.setMatrixAt i @matrixAt(i @m4)
+            
+            i++
+            
+        @mesh.instanceMatrix.needsUpdate = true
+        @mesh.instanceColor.needsUpdate = true
+        
+    rotToAt: i tgt angle offset ->
+        
+        if boid = @boids[i]
+            
+            rot  = @statik 'rotToAt.rot' three.Quaternion
+            axis = @statik 'rotToAt.axis' three.Vector3
+            
+            axis.crossVectors boid.n tgt
+            rot.setFromAxisAngle axis angle
+            @posAt i offset 
+            offset.applyQuaternion rot
+            # boid.n.applyQuaternion rot
+            # boid.q.multiply rot
+            # boid.q.normalize()
+        @
+        
+    update: deltaSec timeMs ->
+        
+        color = @statik 'update.color' three.Color
+        scale = @statik 'update.scale' three.Vector3
+        playerOffset = @statik 'update.playerOffset' three.Vector3
+        
+        playerNorm = @statik 'update.playerNorm' three.Vector3
+        playerNorm.copy @player.mesh.position
+        playerNorm.normalize()
+        
+        for i in 0...@count
+                        
+            dot = playerNorm.dot @boids[i].n
+            # ang = Math.abs rad2deg(Math.acos(dot))
+            ang = rad2deg(Math.acos(dot))
+
+            color.copy @boids[i].c
+            
+            cs = if 
+                ang < 10 ➜ (2-ang/10)
+                ang < 20 ➜ (1-ang/20)+0.02
+                         ➜ 0.02 * (1-(ang-20)/70)
+                         
+            color.multiplyScalar cs
+            @mesh.setColorAt i color
+                         
+            # @boids[i].d = 50 * (1-ang/180) * (1-ang/180) * (1-ang/180) * (1-ang/180) * (1-ang/180) * (1-ang/180) * (1-ang/180) * (1-ang/180)
+            
+            if ang < 10
+            
+                @rotToAt i playerNorm -deg2rad((1-ang/10)*20) playerOffset
+                # scale.copy @statiks.unitScale
+                # scale.multiplyScalar 1-(ang/10)
+                @m4.compose playerOffset @boids[i].q @statiks.unitScale
+                @mesh.setMatrixAt i @m4
+                
+            else
+                @mesh.setMatrixAt i @matrixAt(i @m4)
+                                     
+        @mesh.instanceMatrix.needsUpdate = true
+        @mesh.instanceColor.needsUpdate  = true
+
+export Boids

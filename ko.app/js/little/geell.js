@@ -23,8 +23,11 @@ geell = (function ()
         this["loadTiles"] = this["loadTiles"].bind(this)
         this["draw"] = this["draw"].bind(this)
         this["win2Pos"] = this["win2Pos"].bind(this)
+        this.useFBO = false
         this.textureInfos = []
         this.quadDataLength = 13
+        this.bloomSpread = 3
+        this.bloomIntensity = 0.3
         this.canvas = elem('canvas',{class:'canvas'})
         this.main.appendChild(this.canvas)
         this.numLayers = 2
@@ -90,7 +93,7 @@ geell = (function ()
 
     geell.prototype["initGL"] = function ()
     {
-        var fsSource, loadShader, r, vsSource
+        var fsPost, fsSource, loadShader, r, vsPost, vsSource
 
         this.gl = this.canvas.getContext('webgl2')
         vsSource = `#version 300 es
@@ -123,8 +126,60 @@ uniform sampler2D uSampler;
 out vec4 fragColor;
 
 void main(void) {
-    //fragColor = vColor;
     fragColor = texture(uSampler,vUV)*vColor;
+}`
+        vsPost = `#version 300 es
+precision mediump float;
+in vec4  aVertex;
+out vec2 vUV;
+
+void main(void) {
+    gl_Position = vec4(aVertex.x, aVertex.y, 0, 1);
+    vUV = vec2(aVertex.z, aVertex.w);
+}`
+        fsPost = `#version 300 es
+precision mediump float;
+in vec2 vUV;
+uniform sampler2D uSampler;
+
+uniform float bloom_spread;
+uniform float bloom_intensity;
+
+out vec4 fragColor;
+
+void main(void) {
+
+    fragColor = texture(uSampler,vUV);
+    
+    if (true) 
+    {
+        ivec2 size = textureSize(uSampler, 0);
+        
+        float uv_x = vUV.x * float(size.x);
+        float uv_y = vUV.y * float(size.y);
+        
+        vec4 sum = vec4(0.0);
+        
+        for (int n = 0; n < 9; ++n) 
+        {
+            uv_y = (vUV.y * float(size.y)) + (bloom_spread * float(n - 4));
+            vec4 h_sum = vec4(0.0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x - (4.0 * bloom_spread), uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x - (3.0 * bloom_spread), uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x - (2.0 * bloom_spread), uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x - bloom_spread, uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x, uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x + bloom_spread, uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x + (2.0 * bloom_spread), uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x + (3.0 * bloom_spread), uv_y), 0);
+            h_sum += texelFetch(uSampler, ivec2(uv_x + (4.0 * bloom_spread), uv_y), 0);
+            sum += h_sum / 9.0;
+        }
+        
+        sum = sum / 9.0;
+        
+        fragColor = texture(uSampler,vUV) + (sum * bloom_intensity);
+    }
 }`
         loadShader = (function (type, source)
         {
@@ -149,10 +204,19 @@ void main(void) {
         {
             console.error('Shader linking failed:',this.gl.getProgramInfoLog(this.shaderProgram))
         }
+        this.postProgram = this.gl.createProgram()
+        this.gl.attachShader(this.postProgram,loadShader(this.gl.VERTEX_SHADER,vsPost))
+        this.gl.attachShader(this.postProgram,loadShader(this.gl.FRAGMENT_SHADER,fsPost))
+        this.gl.linkProgram(this.postProgram)
+        if (!this.gl.getProgramParameter(this.postProgram,this.gl.LINK_STATUS))
+        {
+            console.error('Shader linking failed:',this.gl.getProgramInfoLog(this.postProgram))
+        }
         this.gl.blendFuncSeparate(this.gl.SRC_ALPHA,this.gl.ONE_MINUS_SRC_ALPHA,this.gl.ONE,this.gl.ONE_MINUS_SRC_ALPHA)
         this.gl.enable(this.gl.BLEND)
         r = 0.5
         this.quadVertices = new Float32Array([-r,-r,r,-r,r,r,-r,r])
+        this.screenVertices = new Float32Array([0,0,0,1,1,0,1,1,1,1,1,0,0,1,0,0])
         this.bufCamScale = new Float32Array(2)
         this.bufCamPos = new Float32Array(2)
         this.quadVertexLoc = this.gl.getAttribLocation(this.shaderProgram,'aQuadVertex')
@@ -163,19 +227,39 @@ void main(void) {
         this.rotLoc = this.gl.getAttribLocation(this.shaderProgram,'aQuadRot')
         this.camScaleLoc = this.gl.getUniformLocation(this.shaderProgram,'uCamScale')
         this.camPosLoc = this.gl.getUniformLocation(this.shaderProgram,'uCamPos')
+        this.bloomSpreadLoc = this.gl.getUniformLocation(this.postProgram,'bloom_spread')
+        this.bloomIntensityLoc = this.gl.getUniformLocation(this.postProgram,'bloom_intensity')
         this.quadBuffer = this.gl.createBuffer()
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.quadBuffer)
-        this.gl.bufferData(this.gl.ARRAY_BUFFER,this.quadVertices,this.gl.STATIC_DRAW)
-        this.gl.vertexAttribPointer(this.quadVertexLoc,2,this.gl.FLOAT,false,0,0)
-        this.gl.enableVertexAttribArray(this.quadVertexLoc)
-        return this.dataBuffer = this.gl.createBuffer()
+        this.dataBuffer = this.gl.createBuffer()
+        this.postBuffer = this.gl.createBuffer()
+        this.fbo = this.gl.createFramebuffer()
+        this.renderTexture = this.gl.createTexture()
+        this.gl.bindTexture(this.gl.TEXTURE_2D,this.renderTexture)
+        this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGBA,4096,4096,0,this.gl.RGBA,this.gl.UNSIGNED_BYTE,null)
+        this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MAG_FILTER,this.gl.NEAREST)
+        this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MIN_FILTER,this.gl.NEAREST)
+        return this.gl.bindTexture(this.gl.TEXTURE_2D,null)
     }
 
     geell.prototype["draw"] = function (time)
     {
-        var attrib, offset, stride
+        var attrib, offset, screenVertices, stride, u, v, vertexPosition
 
+        if (this.useFBO)
+        {
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,this.fbo)
+            this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER,this.gl.COLOR_ATTACHMENT0,this.gl.TEXTURE_2D,this.renderTexture,0)
+        }
+        if ((this.textureInfos[0] != null ? this.textureInfos[0].glTexture : undefined))
+        {
+            this.gl.activeTexture(this.gl.TEXTURE0)
+            this.gl.bindTexture(this.gl.TEXTURE_2D,this.textureInfos[0].glTexture)
+        }
         this.gl.useProgram(this.shaderProgram)
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.quadBuffer)
+        this.gl.bufferData(this.gl.ARRAY_BUFFER,this.quadVertices,this.gl.STATIC_DRAW)
+        this.gl.vertexAttribPointer(this.quadVertexLoc,2,this.gl.FLOAT,false,0,0)
+        this.gl.enableVertexAttribArray(this.quadVertexLoc)
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.dataBuffer)
         this.gl.bufferData(this.gl.ARRAY_BUFFER,this.data,this.gl.DYNAMIC_DRAW)
         stride = this.quadDataLength * 4
@@ -195,7 +279,33 @@ void main(void) {
         this.gl.uniform2fv(this.camScaleLoc,this.bufCamScale)
         this.gl.uniform2fv(this.camPosLoc,this.bufCamPos)
         this.clearCanvas()
+        this.gl.viewport(0,0,this.canvas.width,this.canvas.height)
         this.gl.drawArraysInstanced(this.gl.TRIANGLE_FAN,0,4,this.maxQuads)
+        this.gl.flush()
+        if (this.useFBO)
+        {
+            this.gl.useProgram(this.postProgram)
+            this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER,this.gl.COLOR_ATTACHMENT0,this.gl.TEXTURE_2D,null,0)
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,null)
+            this.gl.uniform1f(this.bloomSpreadLoc,this.bloomSpread)
+            this.gl.uniform1f(this.bloomIntensityLoc,this.bloomIntensity)
+            this.gl.disable(this.gl.DEPTH_TEST)
+            this.gl.disable(this.gl.CULL_FACE)
+            this.gl.clearColor(0,0,0,1)
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT)
+            this.gl.viewport(0,0,this.canvas.width,this.canvas.height)
+            this.gl.bindTexture(this.gl.TEXTURE_2D,this.renderTexture)
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.postBuffer)
+            u = this.canvas.width / 4096
+            v = this.canvas.height / 4096
+            screenVertices = new Float32Array([-1,-1,0,0,1,-1,u,0,1,1,u,v,-1,1,0,v])
+            this.gl.bufferData(this.gl.ARRAY_BUFFER,screenVertices,this.gl.STATIC_DRAW)
+            vertexPosition = this.gl.getAttribLocation(this.postProgram,'aVertex')
+            this.gl.vertexAttribPointer(vertexPosition,4,this.gl.FLOAT,false,0,0)
+            this.gl.enableVertexAttribArray(vertexPosition)
+            this.gl.drawArrays(this.gl.TRIANGLE_FAN,0,4)
+            this.gl.flush()
+        }
         this.numQuads[0] = 0
         this.numQuads[1] = 0
         return this.data.fill(0,0,this.data.length)
@@ -270,17 +380,16 @@ void main(void) {
 
     geell.prototype["resize"] = function ()
     {
-        var devicePixelRatio, maxDim
+        var devicePixelRatio
 
         this.br = this.main.getBoundingClientRect()
         devicePixelRatio = window.devicePixelRatio || 1
-        this.canvas.width = this.br.width * devicePixelRatio
-        this.canvas.height = this.br.height * devicePixelRatio
-        this.aspect = this.canvas.height / this.canvas.width
-        maxDim = this.gl.getParameter(this.gl.MAX_VIEWPORT_DIMS)
+        this.aspect = this.br.height / this.br.width
+        this.canvas.width = _k_.min(4096,this.br.width * devicePixelRatio)
+        this.canvas.height = this.canvas.width * this.aspect
         this.canvas.style.width = this.br.width + "px"
         this.canvas.style.height = this.br.height + "px"
-        this.gl.viewport(0,0,_k_.min(this.canvas.width,maxDim),_k_.min(this.canvas.height,maxDim))
+        this.gl.viewport(0,0,this.canvas.width,this.canvas.height)
         return this.updateCamera()
     }
 

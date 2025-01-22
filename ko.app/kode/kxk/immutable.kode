@@ -11,20 +11,20 @@
     translated into kode
 ###
 
-isObject     = (obj) -> (obj != null) and (typeof(obj) == 'object') and (not Array.isArray obj)
-isFileObject = (obj) -> (typeof(File) != 'undefined') and (obj instanceof File)
-isBlobObject = (obj) -> (typeof(Blob) != 'undefined') and (obj instanceof Blob)
-isPromise    = (obj) -> (typeof(obj) == 'object') and typeof(obj.then) == 'function'
-isError      = (obj) -> obj instanceof Error
+isObject     = obj -> (obj != null) and (typeof(obj) == 'object') and (not Array.isArray obj)
+isFileObject = obj -> (typeof(File) != 'undefined') and (obj instanceof File)
+isBlobObject = obj -> (typeof(Blob) != 'undefined') and (obj instanceof Blob)
+isPromise    = obj -> (typeof(obj) == 'object') and typeof(obj.then) == 'function'
+isError      = obj -> obj instanceof Error
     
-instantiateEmptyObject = (obj) ->
+instantiateEmptyObject = obj ->
     
     if prototype = Object.getPrototypeOf obj
         Object.create prototype
     else 
         {}
 
-addPropertyTo = (target, methodName, value) ->
+addPropertyTo = target methodName value ->
     
     Object.defineProperty target, methodName,
         enumerable: false,
@@ -32,15 +32,16 @@ addPropertyTo = (target, methodName, value) ->
         writable: false,
         value: value
 
-banProperty = (target, methodName) ->
+banProperty = target methodName ->
+    
     addPropertyTo target, methodName, ->
         throw new ImmutableError "The #{methodName} method cannot be invoked on an Immutable data structure."
 
 immutabilityTag = "__immutable__"
 
-addImmutabilityTag = (target) -> addPropertyTo target, immutabilityTag, true
+addImmutabilityTag = target -> addPropertyTo target immutabilityTag true
 
-isImmutable = (target) ->
+isImmutable = target ->
     
     if typeof(target) == "object"
         target == null or Boolean Object.getOwnPropertyDescriptor(target, immutabilityTag)
@@ -51,7 +52,7 @@ isImmutable = (target) ->
 
 isEqual = (a, b) -> a == b or (a != a and b != b) # Avoid false positives due to (NaN != NaN) evaluating to true
 
-isMergableObject = (target) -> (target != null) and typeof(target) == "object" and (not Array.isArray target) #and not (target instanceof Date)
+isMergableObject = target -> (target != null) and typeof(target) == "object" and (not Array.isArray target) #and not (target instanceof Date)
 
 mutatingObjectMethods    = [ "setPrototypeOf" ]
 nonMutatingObjectMethods = [ "keys" ];
@@ -63,7 +64,8 @@ nonMutatingArrayMethods = nonMutatingObjectMethods.concat [
         'map' 'filter' 'slice' 'concat' 'reduce' 'reduceRight'
     ]
 
-ImmutableError = (message) ->
+ImmutableError = message ->
+    
     @name = 'ImmutableError'
     @message = message
     @stack = (new Error()).stack
@@ -71,7 +73,7 @@ ImmutableError = (message) ->
 ImmutableError.prototype = new Error()
 ImmutableError.prototype.constructor = Error
 
-makeImmutable = (obj, bannedMethods) ->
+makeImmutable = obj bannedMethods ->
     
     addImmutabilityTag obj # Tag it so we can quickly tell it's immutable later
   
@@ -82,41 +84,41 @@ makeImmutable = (obj, bannedMethods) ->
     Object.freeze obj
     obj
     
-makeImmutableObject = (obj) ->
+makeImmutableObject = obj ->
 
-    addPropertyTo obj, "merge"      merge
-    addPropertyTo obj, "replace"    objectReplace
-    addPropertyTo obj, "without"    without
-    addPropertyTo obj, "asMutable"  asMutableObject
-    addPropertyTo obj, "set",       objectSet
-    addPropertyTo obj, "setIn"      objectSetIn
-    addPropertyTo obj, "update"     update
-    addPropertyTo obj, "updateIn"   updateIn
-    addPropertyTo obj, "getIn"      getIn
+    addPropertyTo obj "merge"      merge
+    addPropertyTo obj "replace"    objectReplace
+    addPropertyTo obj "without"    without
+    addPropertyTo obj "asMutable"  asMutableObject
+    addPropertyTo obj "set"        objectSet
+    addPropertyTo obj "setIn"      objectSetIn
+    addPropertyTo obj "update"     update
+    addPropertyTo obj "updateIn"   updateIn
+    addPropertyTo obj "getIn"      getIn
 
-    makeImmutable obj, mutatingObjectMethods
+    makeImmutable obj mutatingObjectMethods
     
-makeImmutableArray = (array) ->
+makeImmutableArray = array ->
     # Don't change their implementations, but wrap these functions to make sure
     # they always return an immutable value.
     for methodName in nonMutatingArrayMethods
-        makeMethodReturnImmutable array, methodName
+        makeMethodReturnImmutable array methodName
   
-    addPropertyTo array, "flatMap"   flatMap
-    addPropertyTo array, "asObject"  asObject
-    addPropertyTo array, "asMutable" asMutableArray
-    addPropertyTo array, "set"       arraySet
-    addPropertyTo array, "setIn"     arraySetIn
-    addPropertyTo array, "update"    update
-    addPropertyTo array, "updateIn"  updateIn
-    addPropertyTo array, "getIn"     getIn
+    addPropertyTo array "flatMap"   flatMap
+    addPropertyTo array "asObject"  asObject
+    addPropertyTo array "asMutable" asMutableArray
+    addPropertyTo array "set"       arraySet
+    addPropertyTo array "setIn"     arraySetIn
+    addPropertyTo array "update"    update
+    addPropertyTo array "updateIn"  updateIn
+    addPropertyTo array "getIn"     getIn
   
     for i in 0...array.length
         array[i] = Immutable array[i]
   
-    makeImmutable array, mutatingArrayMethods
+    makeImmutable array mutatingArrayMethods
     
-Immutable = (obj, options, stackRemaining) ->
+Immutable = obj options stackRemaining ->
     
     if 
         isImmutable(obj) or isFileObject(obj) or isBlobObject(obj) or isError(obj)
@@ -151,13 +153,13 @@ Immutable = (obj, options, stackRemaining) ->
   
             makeImmutableObject theClone
 
-makeMethodReturnImmutable = (obj, methodName) ->
+makeMethodReturnImmutable = obj methodName ->
     
     currentMethod = obj[methodName]
 
     addPropertyTo obj, methodName, -> Immutable currentMethod.apply(obj, arguments)
 
-arraySet = (idx, value, config) ->
+arraySet = idx value config ->
     
     deep = config and config.deep
     
@@ -174,12 +176,12 @@ arraySet = (idx, value, config) ->
 
 immutableEmptyArray = Immutable []
 
-arraySetIn = (pth, value, config) ->
+arraySetIn = pth value config ->
     
     head = pth[0]
     
     if pth.length == 1
-        arraySet.call @, head, value, config
+        arraySet.call @ head value config
     else 
         tail = pth.slice 1
         thisHead = @[head]
@@ -192,9 +194,9 @@ arraySetIn = (pth, value, config) ->
             nextHead = tail[0];
             # If the next path part is a number, then we are setting into an array, else an object.
             if (nextHead != '' and isFinite(nextHead)) 
-              newValue = arraySetIn.call immutableEmptyArray, tail, value
+              newValue = arraySetIn.call immutableEmptyArray tail value
             else
-              newValue = objectSetIn.call immutableEmptyObject, tail, value
+              newValue = objectSetIn.call immutableEmptyObject tail value
       
         if @[head] and thisHead == newValue
             return @
@@ -209,7 +211,7 @@ arraySetIn = (pth, value, config) ->
 #
 # @param {function} iterator - The iterator that will be invoked on each element in the array. It will receive three arguments: the current value, the current index, and the current object.
 
-flatMap = (iterator) ->
+flatMap = iterator ->
     
     if arguments.length == 0 # Calling flatMap() with no arguments is a no-op. Don't bother cloning
         return @
@@ -232,7 +234,7 @@ flatMap = (iterator) ->
 # 
 # @param {array} keysToRemove - A list of strings representing the keys to exclude in the return value. Instead of providing a single array, this method can also be called by passing multiple strings as separate arguments.
 
-without = (remove) ->
+without = remove ->
     
     if typeof(remove) == "undefined" and arguments.length == 0 # Calling without() with no arguments is a no-op. Don't bother cloning
         return @
@@ -257,7 +259,7 @@ without = (remove) ->
   
     makeImmutableObject result
 
-asMutableArray = (opts) ->
+asMutableArray = opts ->
     
     result = []
 
@@ -272,7 +274,7 @@ asMutableArray = (opts) ->
 
 # iterator - A function which should return an array of two elements - the first representing the desired key, the other the desired value
 
-asObject = (iterator) ->
+asObject = iterator ->
     
     # If no iterator was provided, assume the identity function
     # suggesting this array is already a list of key/value pairs
@@ -291,13 +293,13 @@ asObject = (iterator) ->
   
     makeImmutableObject result
 
-asDeepMutable = (obj) ->
+asDeepMutable = obj ->
     
     ⮐ obj if not obj or (typeof(obj) != 'object') or not Object.getOwnPropertyDescriptor(obj, immutabilityTag)
         
     Immutable.asMutable obj
 
-quickCopy = (src, dest) ->
+quickCopy = src dest ->
     
     for key of src
         if Object.getOwnPropertyDescriptor src, key
@@ -321,7 +323,7 @@ quickCopy = (src, dest) ->
              {mode: 'replace'|'merge'}
 ###
 
-merge = (other, config) ->
+merge = other config ->
     
     if arguments.length == 0 # Calling merge() with no arguments is a no-op. Don't bother cloning
         return @
@@ -338,7 +340,7 @@ merge = (other, config) ->
     # Use the given key to extract a value from the given object, then place
     # that value in the result object under the same key. If that resulted
     # in a change from this object's value at that key, set anyChanges = true.
-    addToResult = (currentObj, otherObj, key) ->
+    addToResult = currentObj otherObj key ->
         
         immutableValue = Immutable otherObj[key]
         mergerResult = merger and merger currentObj[key], immutableValue, config
@@ -361,7 +363,7 @@ merge = (other, config) ->
                 result[key] = newValue
         null
 
-    clearDroppedKeys = (currentObj, otherObj) ->
+    clearDroppedKeys = currentObj otherObj ->
         
         for key of currentObj
             if not otherObj.hasOwnProperty key
@@ -390,7 +392,7 @@ merge = (other, config) ->
     else
         makeImmutableObject result
 
-objectReplace = (value, config) ->
+objectReplace = value config ->
     
   deep = config and config.deep
 
@@ -404,7 +406,7 @@ objectReplace = (value, config) ->
 
 immutableEmptyObject = Immutable {}
 
-objectSetIn = (path, value, config) ->
+objectSetIn = path value config ->
     
     if (not Array.isArray path) or (path.length == 0)
         throw new TypeError "The first argument to Immutable#setIn must be an array containing at least one \"key\" string."
@@ -426,11 +428,11 @@ objectSetIn = (path, value, config) ->
     if @hasOwnProperty(head) and (thisHead == newValue)
         return @
   
-    mutable = quickCopy @, instantiateEmptyObject(@)
+    mutable = quickCopy @ instantiateEmptyObject(@)
     mutable[head] = newValue
     makeImmutableObject mutable
 
-objectSet = (property, value, config) ->
+objectSet = property value config ->
     
     deep = config and config.deep
   
@@ -440,17 +442,17 @@ objectSet = (property, value, config) ->
         if isEqual @[property], value
             return @
   
-    mutable = quickCopy @, instantiateEmptyObject(@)
+    mutable = quickCopy @ instantiateEmptyObject(@)
     mutable[property] = Immutable value
     makeImmutableObject mutable
 
-update = (property, updater) ->
+update = property updater ->
     
     restArgs = Array.prototype.slice.call arguments, 2
     initialVal = @[property]
     Immutable.set @, property, updater.apply(initialVal, [initialVal].concat(restArgs))
 
-getInPath = (obj, path) ->
+getInPath = obj path ->
   
     for i in 0...path.length
         obj = obj[path[i]]
@@ -458,14 +460,14 @@ getInPath = (obj, path) ->
   
     (i == path.length) ? obj : undefined
 
-updateIn = (path, updater) ->
+updateIn = path updater ->
     
     restArgs = Array.prototype.slice.call arguments, 2
     initialVal = getInPath @, path
 
     Immutable.setIn @, path, updater.apply(initialVal, [initialVal].concat(restArgs))
 
-getIn = (path, defaultValue) ->
+getIn = path defaultValue ->
     
     value = getInPath @, path
     
@@ -474,9 +476,9 @@ getIn = (path, defaultValue) ->
     else
         value
 
-asMutableObject = (opts) ->
+asMutableObject = opts ->
     
-    result = instantiateEmptyObject(@), key
+    result = instantiateEmptyObject(@) # key
   
     for key of @
         if @hasOwnProperty key
@@ -485,27 +487,27 @@ asMutableObject = (opts) ->
     result
     
 # Wrapper to allow the use of object methods as static methods of Immutable.
-toStatic = (fn) ->
+toStatic = fn ->
     
     staticWrapper = ->
         args = [].slice.call arguments
         self = args.shift()
-        fn.apply self, args
+        fn.apply self args
 
     staticWrapper
 
 # Wrapper to allow the use of object methods as static methods of Immutable.
 # with the additional condition of choosing which to call depending
 # if argument is an array or an object.
-toStaticObjectOrArray = (fnObject, fnArray) ->
+toStaticObjectOrArray = fnObject fnArray ->
     
     staticWrapper = ->
         args = [].slice.call arguments
         self = args.shift()
         if Array.isArray self
-                fnArray.apply self, args
+                fnArray.apply self args
         else 
-            fnObject.apply self, args
+            fnObject.apply self args
   
     staticWrapper
 
@@ -515,9 +517,9 @@ Immutable.ImmutableError = ImmutableError
 Immutable.merge          = toStatic merge
 Immutable.replace        = toStatic objectReplace
 Immutable.without        = toStatic without
-Immutable.asMutable      = toStaticObjectOrArray asMutableObject, asMutableArray
-Immutable.set            = toStaticObjectOrArray objectSet, arraySet
-Immutable.setIn          = toStaticObjectOrArray objectSetIn, arraySetIn
+Immutable.asMutable      = toStaticObjectOrArray asMutableObject asMutableArray
+Immutable.set            = toStaticObjectOrArray objectSet arraySet
+Immutable.setIn          = toStaticObjectOrArray objectSetIn arraySetIn
 Immutable.update         = toStatic update
 Immutable.updateIn       = toStatic updateIn
 Immutable.getIn          = toStatic getIn

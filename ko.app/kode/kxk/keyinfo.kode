@@ -8,7 +8,7 @@
 
 class Keyinfo
     
-    @forEvent: (event) =>
+    @forEvent: event =>
                       
         combo = @comboForEvent event
         info =
@@ -27,7 +27,7 @@ class Keyinfo
     # @iconKeyChars:['⌂'     '⌃'    '⌥'   '⌘'       '⌫'         '⌦'      '↖'    '↘'   '⇞'       '⇟'         '↩'      '↩'     '↑'  '↓'    '←'    '→'     '⤠'    '␣'     '⍝']
 
     # ▶▲▼◀ ▸▴▾◂
-    @forCombo: (combo) ->
+    @forCombo: combo ->
         
         mods = []
         char = null
@@ -42,9 +42,9 @@ class Keyinfo
         combo: combo 
         char:  char
     
-    @isModifier: (keyname) -> keyname in @modifierNames
+    @isModifier: keyname -> keyname in @modifierNames
 
-    @modifiersForEvent: (event) -> 
+    @modifiersForEvent: event -> 
 
         mods = []
         mods.push 'command' if event.metaKey  or event.key == 'Meta'
@@ -53,7 +53,7 @@ class Keyinfo
         mods.push 'shift'   if event.shiftKey or event.key == 'Shift'
         return mods.join '+'
                     
-    @comboForEvent: (event) =>
+    @comboForEvent: event =>
         
         join = -> 
             args = [].slice.call arguments, 0
@@ -65,7 +65,7 @@ class Keyinfo
             return join @modifiersForEvent(event), key
         return ''
 
-    @convertCmdCtrl: (combo) ->
+    @convertCmdCtrl: combo ->
         
         index = combo.indexOf 'cmdctrl'
         if index >= 0
@@ -73,7 +73,7 @@ class Keyinfo
             combo = combo.replace 'alt+command' 'command+alt'
         combo
                 
-    @keynameForEvent: (event) ->
+    @keynameForEvent: event ->
         
         switch event.code
             'IntlBackslash' 
@@ -105,14 +105,14 @@ class Keyinfo
                     @characterForEvent(event)?.length == 1 ➜ @characterForEvent(event).toLowerCase()
                     else event.key.toLowerCase()        
 
-    @characterForEvent: (event) ->
+    @characterForEvent: event ->
 
         if event.key?.length == 1 
             event.key
         else if event.code == 'NumpadEqual' 
             '='
         
-    @short: (combo) ->
+    @short: combo ->
         
         short = @convertCmdCtrl combo.toLowerCase()
         for i in 0...@iconKeyNames.length

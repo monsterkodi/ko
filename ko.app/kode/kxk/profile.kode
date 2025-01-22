@@ -10,14 +10,14 @@ function profile
 
     @hrtime: {}
 
-    @start: (id) ○-> 
+    @start: id ○-> 
         
         if globalThis.kakao
             profile.hrtime[id] =○ kakao 'now'
         else
             profile.hrtime[id] = performance.now()
         
-    @end: (id, threshold=0) ○->
+    @end: id threshold=0 ○->
         
         if globalThis.kakao
             t =○ kakao 'now'

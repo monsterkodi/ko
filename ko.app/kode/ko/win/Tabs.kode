@@ -6,9 +6,10 @@
    000     000   000  0000000    0000000
 ###
 
-use ../../kxk ▪ post elem kpos slash drag popup stopEvent $ 
+use ../../kxk ▪ post elem kpos slash drag popup stopEvent ffs $ 
 use ../tools  ◆ Projects File
 use           ◆ Tab
+use ../editor ◆ Do
 
 class Tabs
 
@@ -587,19 +588,32 @@ class Tabs
     onSaveAll: =>
 
         for tab in @koreTabs()
+
             if tab.dirty
                 if tab.active
+                    # log 'save' tab.path window.editor.currentFile
                     post.emit 'saveFile'
                 else
                     continue if tab.path.startsWith 'untitled'
-                    if state = tab.state
-                        File.save state.file, state.state.text(), (file) =>
-                            ⮐ error "Tabs.onSaveAll failed to save #{state.file}" if not file
-                            tabs = @koreTabs()
-                            if tab = @koreTabForPath file, tabs
-                                delete tab.state
-                                delete tab.dirty
-                                @setKoreTabs tabs
+                    tabStates = kore.get 'tabStates'
+                    if state = tabStates[tab.path]
+                        
+                        unsavedTabPath = tab.path
+                        
+                        ffs.read(tab.path).then (textOnDisk) =>
+                            
+                            textWithChangesApplied = Do.applyStateToText state textOnDisk
+                            
+                            ffs.write(unsavedTabPath textWithChangesApplied).then (file) =>
+                                
+                                ⮐ error "Tabs.onSaveAll failed to save #{file}" if not file
+                                tabs = @koreTabs()
+                                if tab = @koreTabForPath file, tabs
+                                    delete tab.dirty
+                                    tabStates = kore.get 'tabStates'
+                                    delete tabStates[file]
+                                    kore.set 'tabStates' tabStates
+                                    @setKoreTabs tabs
 
     #  0000000   0000000   000   000  000000000  00000000  000   000  000000000
     # 000       000   000  0000  000     000     000        000 000      000

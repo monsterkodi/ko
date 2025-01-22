@@ -1,0 +1,71 @@
+###
+000   000   0000000   00000000   000      0000000  
+000 0 000  000   000  000   000  000      000   000
+000000000  000   000  0000000    000      000   000
+000   000  000   000  000   000  000      000   000
+00     00   0000000   000   000  0000000  0000000  
+###
+
+use ../kxk ▪ drag stopEvent prefs post kpos fade randRange randInt randIntRange
+
+use ./lib/noise
+use ◆ tweaky swarm weed gyroid boids
+
+function world
+
+    @: @scene @player @camera ->
+        
+        @pause = false
+        @scene.preRender = @simulate
+
+        @gyroid = new gyroid @scene
+        @swarm  = new swarm  @scene @player
+        @weed   = new weed   @scene @gyroid
+        @boids  = new boids  @scene @player @gyroid
+        
+        if 1
+            @tweaky = new tweaky @scene.view
+    
+            @tweaky.init
+                speed: min:0.5 max:2 step:0.1 value:1  cb: (v) => @player.speed = v
+                seed: min:1 max:100 step:1 value:50  cb: (v) => noise.seed(v); @start()
+                gyro: min:7 max:14 step:1 value:@gyroid.num  cb: (v) => @gyroid.num = v; @start()
+                skin: min:0.5 max:2 step:0.1 value:@gyroid.skin  cb: (v) => @gyroid.skin = v; @start()
+                axes: value:0  cb: (v) => @scene.axesHelper.visible = v
+                post: value:1  cb: (v) => @scene.doPostProcess = v
+                
+    start: ->
+        
+        @camera.start()
+        @player.start()
+        @gyroid.start()
+        
+        @weed.spawn()
+        @swarm.spawn()
+        @boids.spawn()
+                
+    togglePause:  => @pause = not @pause; post.emit 'pause'        
+        
+    #  0000000  000  00     00  000   000  000       0000000   000000000  00000000  
+    # 000       000  000   000  000   000  000      000   000     000     000       
+    # 0000000   000  000000000  000   000  000      000000000     000     0000000   
+    #      000  000  000 0 000  000   000  000      000   000     000     000       
+    # 0000000   000  000   000   0000000   0000000  000   000     000     00000000  
+    
+    simulate: tickInfo ○=>
+                
+        ⮐ if @pause and not @oneStep
+
+        sec = 1/60
+        
+        @player.update sec
+        @camera.update sec
+        @swarm.update  sec
+        @weed.update   sec tickInfo.time
+        @boids.update  sec tickInfo.time
+        
+        @tweaky?.update()
+        
+    singleStep: => @oneStep = true; @pause = true; post.emit 'pause'
+
+export world

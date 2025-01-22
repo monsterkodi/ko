@@ -197,6 +197,7 @@ Editor = (function ()
 
                 case 'styl':
                 case 'cpp':
+                case 'zig':
                 case 'mm':
                 case 'c':
                 case 'h':
@@ -231,6 +232,7 @@ Editor = (function ()
 
                 case 'styl':
                 case 'cpp':
+                case 'zig':
                 case 'mm':
                 case 'c':
                 case 'h':
@@ -277,6 +279,10 @@ Editor = (function ()
                 this.newlineCharacters = '\r\n'
             }
         }
+        lines = lines.map(function (l)
+        {
+            return kstr.detab(l)
+        })
         return this.setLines(lines)
     }
 
@@ -326,7 +332,7 @@ Editor = (function ()
 
     Editor.prototype["indentStringForLineAtIndex"] = function (li)
     {
-        var e, il, indentLength, line, thisIndent, _245_33_, _246_50_, _252_52_
+        var e, il, indentLength, line, thisIndent, _247_33_, _248_50_, _254_52_
 
         while (_k_.empty((this.line(li).trim())) && li > 0)
         {

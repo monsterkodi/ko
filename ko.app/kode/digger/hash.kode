@@ -1,0 +1,85 @@
+###
+000   000   0000000    0000000  000   000
+000   000  000   000  000       000   000
+000000000  000000000  0000000   000000000
+000   000  000   000       000  000   000
+000   000  000   000  0000000   000   000
+###
+
+import * as three from 'three'
+
+use ./lib/geom
+use ./lib/material
+
+COS45 = 0.7071067811865476
+
+function Hash
+
+    @: @scene ->
+        
+        icosa = geom.icosa radius:50 material:'debugblue' detail:0
+        icosa.renderOrder = 100
+        
+        posattr = icosa.geometry.getAttribute 'position'
+        
+        ctr = new three.Vector3
+        
+        tri = new three.Triangle
+        
+        points = []
+        eulers = []
+        quat = new three.Quaternion
+        
+        for i in 0...posattr.count/3
+            tri.a.set posattr.getX(i*3) posattr.getY(i*3) posattr.getZ(i*3i)
+            tri.b.set posattr.getX(i*3+1) posattr.getY(i*3+1) posattr.getZ(i*3+1)
+            tri.c.set posattr.getX(i*3+2) posattr.getY(i*3+2) posattr.getZ(i*3+2)
+            
+            pc = new three.Vector3
+            tri.getMidpoint pc
+
+            points.push ctr
+            points.push pc
+            
+            quat.set pc.x pc.y pc.z 0 
+            quat.normalize()
+            eul = new three.Euler
+            eul.setFromQuaternion quat
+            eulers.push eul
+            
+        points = []
+        euler = new three.Euler
+        for u in 0...8
+            for v in 0..2
+                euler.set 0 (u/8) * Math.PI * 2 ((v-1)/4) * Math.PI 'XYZ'
+                pc = new three.Vector3 50 0 0
+                pc.applyEuler euler
+                points.push ctr
+                points.push pc
+            
+        mat = material['linered']
+        geo = new three.BufferGeometry
+        
+        geo.setFromPoints points
+        lines = new three.LineSegments geo mat
+        lines.renderOrder = 1000
+        
+    @normal: n -> 
+        
+        if 
+            n.x >  COS45 ➜ 'e'
+            n.x < -COS45 ➜ 'w'
+            n.y >  COS45 ➜ 'n'
+            n.y < -COS45 ➜ 's'
+            n.z >  COS45 ➜ 'f'
+            n.z < -COS45 ➜ 'b'
+                         
+            n.x > Math.max(n.y, n.z) ➜ 'e' 
+            n.y > Math.max(n.x, n.y) ➜ 'n' 
+            n.z > Math.max(n.x, n.y) ➜ 'f' 
+            n.x < Math.min(n.y, n.z) ➜ 'w' 
+            n.y < Math.min(n.x, n.y) ➜ 's' 
+            n.z < Math.min(n.x, n.y) ➜ 'b' 
+                                     ➜ '?'
+
+export Hash

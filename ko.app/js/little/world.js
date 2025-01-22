@@ -42,7 +42,7 @@ COL_TUBE = gry(5)
 COL_PLANT = clr(0,5,0)
 COL_LEAF = clr(0,5,0)
 COL_EGG = gry(10)
-COL_CRITTER = clr(5,5,10)
+COL_CRITTER = clr(4,4,10)
 COL_STARVE = gry(2.5)
 COL_DEAD = gry(1)
 COL_EGG_DOT = gry(0,5)
@@ -127,6 +127,9 @@ world = (function ()
         this.pause = false
         this.speed = 10
         this.tweaky = new tweaky(this.main)
+        this.g = new gee(this.main)
+        this.h = new gee(this.main)
+        this.g.useFBO = true
         world.__super__.constructor.call(this)
         this.inventory = {x:0,y:-1,s:0.5,slots:[{type:this.CORPSE,num:0},{type:this.EGG,num:1},{type:this.PLANT,num:1},{type:this.HOOVER,tool:true}]}
         this.speedGauge = {x:0,y:0,s:0.5,sx:0.3125,sw:1,sh:0.125,sb:0.25}
@@ -143,8 +146,6 @@ world = (function ()
         }
         this.activeSlot = this.slots[this.PLANT]
         this.main.focus()
-        this.g = new gee(this.main)
-        this.h = new gee(this.main)
         this.g.camScale = 0.08
         this.g.camPosX = 1 / this.g.camScale
         this.g.camPosY = 1 / this.g.camScale
@@ -472,7 +473,7 @@ world = (function ()
 
     world.prototype["drawEgg"] = function (e, g = this.g, scale = 1)
     {
-        var a, ageFac, ox, oy, s, _361_18_, _362_18_
+        var a, ageFac, ox, oy, s, _363_18_, _364_18_
 
         ageFac = e.age / this.eggMaxAge
         s = scale * fade(0.1,0.3,ageFac)
@@ -481,8 +482,8 @@ world = (function ()
         {
             a = fade(1.0,0.0,(e.age - this.eggMaxAge) / this.eggFadeTime)
         }
-        ox = ((_361_18_=e.ox) != null ? _361_18_ : 0)
-        oy = ((_362_18_=e.oy) != null ? _362_18_ : 0)
+        ox = ((_363_18_=e.ox) != null ? _363_18_ : 0)
+        oy = ((_364_18_=e.oy) != null ? _364_18_ : 0)
         return g.addQuad(e.x + ox,e.y + oy,s,s,[COL_EGG[0],COL_EGG[1],COL_EGG[2],a],this.eggUV,0,1)
     }
 
@@ -517,7 +518,7 @@ world = (function ()
 
     world.prototype["drawCritter"] = function (c, g = this.g, scale = 1, ccl = null)
     {
-        var col, cx, cy, e, f, h, ox, oy, rcos, rot, rsin, rxo, ryo, se, sx, sy, thrd, wp, xo, yo, _418_18_, _419_18_
+        var col, cx, cy, e, f, h, ox, oy, rcos, rot, rsin, rxo, ryo, se, sx, sy, thrd, wp, xo, yo, _420_18_, _421_18_
 
         sx = sy = scale * fade(0.2,1,c.age / this.critterAdultAge)
         rot = 0
@@ -541,8 +542,8 @@ world = (function ()
         {
             col = ccl
         }
-        ox = ((_418_18_=c.ox) != null ? _418_18_ : 0)
-        oy = ((_419_18_=c.oy) != null ? _419_18_ : 0)
+        ox = ((_420_18_=c.ox) != null ? _420_18_ : 0)
+        oy = ((_421_18_=c.oy) != null ? _421_18_ : 0)
         cx = c.x + ox
         cy = c.y + oy
         g.addQuad(cx - rsin * 0.25 * sx,cy + rcos * 0.25 * sy,sx,sy * 0.5,col,this.circleTopUV,rot,1)
@@ -570,10 +571,10 @@ world = (function ()
 
     world.prototype["critterWombPos"] = function (c, e = c.eggs)
     {
-        var cx, cy, xo, yo, _449_25_, _450_25_
+        var cx, cy, xo, yo, _451_25_, _452_25_
 
-        cx = c.x + (((_449_25_=c.ox) != null ? _449_25_ : 0))
-        cy = c.y + (((_450_25_=c.oy) != null ? _450_25_ : 0))
+        cx = c.x + (((_451_25_=c.ox) != null ? _451_25_ : 0))
+        cy = c.y + (((_452_25_=c.oy) != null ? _452_25_ : 0))
         xo = [-0.2,0,0.2][e]
         yo = [0.15,0.25,0.15][e]
         return {x:cx + xo,y:cy + yo}
@@ -616,12 +617,12 @@ world = (function ()
 
     world.prototype["tick"] = function (tickInfo)
     {
-        var c, e, g, p, t
+        var c, e, g, p, t, _495_15_
 
         this.tickInfo = tickInfo
     
         this.simulate(this.tickInfo)
-        this.tweaky.update()
+        ;(this.tweaky != null ? this.tweaky.update() : undefined)
         this.roundedQuadRect(0,-0.5,this.ws - 0.5,this.ws - 1,COL_SHADOW)
         this.roundedQuadRect(-0.25,-0.25,this.ws - 0.75,this.ws - 0.75,COL_BG)
         this.gridQuadRect(0,0,this.ws - 1,this.ws - 1,COL_GRID)

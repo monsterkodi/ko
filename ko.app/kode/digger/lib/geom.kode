@@ -1,0 +1,114 @@
+###
+ 0000000   00000000   0000000   00     00
+000        000       000   000  000   000
+000  0000  0000000   000   000  000000000
+000   000  000       000   000  000 0 000
+ 0000000   00000000   0000000   000   000
+###
+
+import * as three from 'three'
+
+use ./material
+
+function Geom
+
+    @pill: cfg={} ->
+
+        l = cfg.length ? 1
+        r = cfg.radius ? 0.5
+        s = cfg.sgmt ? 8
+        
+        top = new three.SphereGeometry r s s/2 0 2*Math.PI 0 Math.PI/2
+        top.translate 0 l/2 0
+        mid = new three.CylinderGeometry r r l s 1 true
+        bot = new three.SphereGeometry r s s/2 0 2*Math.PI Math.PI/2 Math.PI/2
+        bot.translate 0 -l/2 0
+        
+        mat = cfg.material ? new three.MeshStandardMaterial
+        mat = material[mat] if mat is str
+        
+        group = new three.Group
+        group.add new three.Mesh top mat
+        group.add new three.Mesh mid mat
+        group.add new three.Mesh bot mat
+        
+        if cfg.pos
+            group.translateX cfg.pos.x 
+            group.translateY cfg.pos.y 
+            group.translateZ cfg.pos.z
+        
+        group
+
+    #  0000000  000   000  000      000  000   000  0000000    00000000  00000000   
+    # 000        000 000   000      000  0000  000  000   000  000       000   000  
+    # 000         00000    000      000  000 0 000  000   000  0000000   0000000    
+    # 000          000     000      000  000  0000  000   000  000       000   000  
+    #  0000000     000     0000000  000  000   000  0000000    00000000  000   000  
+    
+    @cylinder: cfg={} ->
+        
+        height = cfg.height ? cfg.length ? 1 
+        radius = cfg.radius ? 0.5 
+        sgmt   = cfg.sgmt ? 24
+        
+        geom = new three.CylinderGeometry radius radius height sgmt
+                    
+        if cfg.length
+            geom.translate 0 -cfg.length/2 0
+            geom.rotateX Math.PI/2
+        
+        Geom.mesh cfg geom
+            
+    #  0000000  00000000   000   000  00000000  00000000   00000000  
+    # 000       000   000  000   000  000       000   000  000       
+    # 0000000   00000000   000000000  0000000   0000000    0000000   
+    #      000  000        000   000  000       000   000  000       
+    # 0000000   000        000   000  00000000  000   000  00000000  
+    
+    @sphere: cfg={} ->
+
+        radius = cfg.radius ? 1
+        sgmt   = cfg.sgmt ? 16
+        
+        geom = new three.SphereGeometry radius sgmt sgmt
+        
+        geom.rotateX Math.PI/2
+        
+        Geom.mesh cfg geom
+        
+    # 000   0000000   0000000    0000000   0000000   
+    # 000  000       000   000  000       000   000  
+    # 000  000       000   000  0000000   000000000  
+    # 000  000       000   000       000  000   000  
+    # 000   0000000   0000000   0000000   000   000  
+    
+    @icosa: cfg={} ->
+        
+        radius = cfg.radius ? 1
+        detail = cfg.detail ? 1
+        
+        geom = new three.IcosahedronGeometry radius detail
+        
+        # geom.rotateX Math.PI/2
+        
+        Geom.mesh cfg geom
+        
+    # 00     00  00000000   0000000  000   000  
+    # 000   000  000       000       000   000  
+    # 000000000  0000000   0000000   000000000  
+    # 000 0 000  000            000  000   000  
+    # 000   000  00000000  0000000   000   000  
+    
+    @mesh: cfg geom ->
+        
+        mat = cfg.material ? new three.MeshStandardMaterial
+        mat = material[mat] if mat is str
+        
+        mesh = new three.Mesh geom mat
+        if cfg.pos
+            mesh.translateX cfg.pos.x 
+            mesh.translateY cfg.pos.y 
+            mesh.translateZ cfg.pos.z
+        mesh
+
+export Geom

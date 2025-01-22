@@ -1042,5 +1042,49 @@ mm
         NSInteger
         NSRect
     
+# 0000000  000   0000000   
+#    000   000  000        
+#   000    000  000  0000  
+#  000     000  000   000  
+# 0000000  000   0000000   
+
+zig
+    require
+        @import
+                        
+    keyword
+        if
+        else
+        while
+        and
+        or
+        orelse
+        defer
+        try
+        catch
+        return
+        pub
+        print
+        fn
+        
+    keyword type
+        str
+        u64
+        u32
+        u16
+        u8
+        f64
+        f32
+        f16
+        f8
+        void
+        int
+        float
+        
+    punct
+        const
+        var
+        _
+        
         
         

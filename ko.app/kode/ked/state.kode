@@ -1,0 +1,194 @@
+###
+ 0000000  000000000   0000000   000000000  00000000  
+000          000     000   000     000     000       
+0000000      000     000000000     000     0000000   
+     000     000     000   000     000     000       
+0000000      000     000   000     000     00000000  
+###
+
+use ../kxk ◆ immutable kstr
+use ◆ color
+
+function state
+
+    @: @cells -> @init ['']
+    
+    init: lines ->
+        
+        @s = immutable
+            lines:       lines
+            selections:  []
+            cursor:      [0 0]
+            view:        [0 0]
+            gutter:      @calcGutter(lines.length)
+
+        @setCursor 0 0
+        
+    calcGutter: numLines =>
+        
+        2 + Math.ceil(Math.log10(numLines))
+            
+    #  0000000  000   000  00000000    0000000   0000000   00000000   
+    # 000       000   000  000   000  000       000   000  000   000  
+    # 000       000   000  0000000    0000000   000   000  0000000    
+    # 000       000   000  000   000       000  000   000  000   000  
+    #  0000000   0000000   000   000  0000000    0000000   000   000  
+    
+    setCursor: x y =>
+        
+        y = clamp 0 @s.lines.length-1 y
+        x = clamp 0 @s.lines[y].length x
+                        
+        @s = @s.set 'cursor' [x y]
+        
+        if y >= @s.view[1] + @cells.t.rows()
+            view = @s.view.asMutable()
+            view[1] = y - @cells.t.rows() + 1
+            @s = @s.set 'view' view
+        else if y < @s.view[1]
+            view = @s.view.asMutable()
+            view[1] = y
+            @s = @s.set 'view' view
+            
+        @cells.t.setCursor x+@s.gutter y-@s.view[1]
+        
+    moveCursor: dir steps=1 =>
+        
+        c = @s.cursor.asMutable() 
+        
+        switch dir
+            'left'  ➜ c[0] -= 1
+            'right' ➜ c[0] += 1
+            'up'    ➜ c[1] -= steps
+            'down'  ➜ c[1] += steps 
+        
+        @deselect()
+        @setCursor c[0] c[1]
+        
+    moveCursorAndSelect: dir =>
+        
+        if empty @s.selections
+            selections = [[@s.cursor[0] @s.cursor[1] @s.cursor[0] @s.cursor[1]]] 
+            selection = selections[0]
+            switch dir
+                'up'
+                'left'  ➜ cpos = 0
+                'down'
+                'right' ➜ cpos = 2
+        else 
+            selections = @s.selections.asMutable()
+            for selection in selections
+                if @s.cursor[0] == selection[0] and @s.cursor[1] == selection[1]
+                    cpos = 0
+                    break
+                else if @s.cursor[0] == selection[2] and @s.cursor[1] == selection[3]
+                    cpos = 2
+                    break
+
+        @moveCursor dir
+        
+        switch dir
+            'left'  ➜ selection[cpos] = max 0 selection[cpos]-1 
+            'right' ➜ selection[cpos] = min @s.lines[selection[cpos+1]].length selection[cpos]+1  
+            'up'    ➜ selection[cpos+1] = max 0 selection[cpos+1]-1
+            'down'  ➜ selection[cpos+1] = min @s.lines.length selection[cpos+1]+1
+            
+        @s = @s.set 'selections' selections
+            
+        true
+        
+    #  0000000  00000000  000      00000000   0000000  000000000  
+    # 000       000       000      000       000          000     
+    # 0000000   0000000   000      0000000   000          000     
+    #      000  000       000      000       000          000     
+    # 0000000   00000000  0000000  00000000   0000000     000     
+    
+    select: from to =>
+        
+        selections = []
+        
+        @setCursor to[0] to[1]
+        
+        if from[1] > to[1]
+            [from to] = [to from]
+        else if from[1] == to[1] and from[0] > to[0]
+            [from to] = [to from]
+
+        to[0] = clamp 0 @s.lines[to[1]].length to[0]
+        from[0] = clamp 0 @s.lines[from[1]].length from[0]
+                
+        selections.push [from[0] from[1] to[0] to[1]]
+        
+        @s = @s.set 'selections' selections
+        
+        true
+        
+    selectChunk: x y =>
+        
+        line = @s.lines[y]
+        
+        [rs re] = kstr.rangeOfClosestChunk line x
+        if rs >= 0 and re >= 0
+            @select [rs y] [re+1 y]
+
+    selectWord: x y =>
+        
+        line = @s.lines[y]
+        
+        [rs re] = kstr.rangeOfClosestWord line x
+        if rs >= 0 and re >= 0
+            @select [rs y] [re+1 y]
+            
+    isSelectedLine: y =>
+        
+        for selection in @s.selections
+            if selection[1] <= y <= selection[3]
+                ⮐ true
+        false
+            
+    selectLine: y =>
+        
+        @select [0 y] [@s.lines.length-1 y]
+        
+    deselect: =>
+        
+        if valid @s.selections
+            @s = @s.set 'selections' []
+            ⮐ true
+                        
+    # 0000000    00000000    0000000   000   000  
+    # 000   000  000   000  000   000  000 0 000  
+    # 000   000  0000000    000000000  000000000  
+    # 000   000  000   000  000   000  000   000  
+    # 0000000    000   000  000   000  00     00  
+    
+    draw: =>
+        
+        for y in 0...@cells.t.rows()
+            li = y+@s.view[1]
+            line = @s.lines[li]
+            for x in 0...min(line.length @cells.t.cols()-@s.gutter)
+                if x+@s.gutter < @cells.t.cols()
+                    @cells.c[y][x+@s.gutter].fg   = 'ffffff'
+                    @cells.c[y][x+@s.gutter].char = line[x]
+                    
+        for selection in @s.selections
+            for li in selection[1]..selection[3]
+                y  = li-@s.view[1]
+                if @s.view[1] <= li < @s.view[1] + @cells.t.rows()
+                    
+                    if li == selection[1]
+                        xs = selection[0]
+                    else
+                        xs = 0
+                        
+                    if li == selection[3]
+                        xe = selection[2]
+                    else
+                        xe = @s.lines[li].length
+                        
+                    for x in xs...xe
+                        if x+@s.gutter < @cells.t.cols()
+                            @cells.c[y][x+@s.gutter].bg = color.selection
+
+export state

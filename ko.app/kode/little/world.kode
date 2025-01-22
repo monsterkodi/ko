@@ -1,4 +1,4 @@
- ###
+###
 000   000   0000000   00000000   000      0000000  
 000 0 000  000   000  000   000  000      000   000
 000000000  000   000  0000000    000      000   000
@@ -24,7 +24,7 @@ COL_TUBE    = gry 5
 COL_PLANT   = clr 0 5 0
 COL_LEAF    = clr 0 5 0
 COL_EGG     = gry 10
-COL_CRITTER = clr 5 5 10
+COL_CRITTER = clr 4 4 10
 COL_STARVE  = gry 2.5
 COL_DEAD    = gry 1
 COL_EGG_DOT = gry 0 5
@@ -50,6 +50,11 @@ function world extends matrix
                 
         @tweaky = new tweaky @main
         
+        @g = new gee @main
+        @h = new gee @main
+        
+        @g.useFBO = true
+        
         super()
                 
         @inventory  = x:0  y:-1 s:0.5 slots:[
@@ -70,10 +75,7 @@ function world extends matrix
         @activeSlot = @slots[@PLANT]
         
         @main.focus()
-                                
-        @g = new gee @main
-        @h = new gee @main
-        
+                                        
         @g.camScale = 0.08
         @g.camPosX  = 1 / @g.camScale
         @g.camPosY  = 1 / @g.camScale
@@ -490,7 +492,7 @@ function world extends matrix
     tick: @tickInfo ->
         
         @simulate @tickInfo
-        @tweaky.update()
+        @tweaky?.update()
         
         @roundedQuadRect  0    -0.5  @ws-0.5  @ws-1    COL_SHADOW
         @roundedQuadRect -0.25 -0.25 @ws-0.75 @ws-0.75 COL_BG

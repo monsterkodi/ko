@@ -16,19 +16,19 @@ use           ◆ util ffs elem post prefs slash stash keyinfo title
 
 function Delegate
     
-    onWindowWillLoadStash:    win          -> log "onWindowWillLoadStash #{win.id}"
-    onWindowDidLoadStash:     win          -> log "onWindowDidLoadStash #{win.id}"
-    onWindowWithoutStash:     win          -> log "onWindowWithoutStash #{win.id}"
-    onWindowWillShow:         win          -> log "onWindowWillShow #{win.id}"
-    onWindowCreated:          win          -> log "win #{win.id}"
+    onWindowWillLoadStash:    win          -> #log "onWindowWillLoadStash #{win.id}"
+    onWindowDidLoadStash:     win          -> #log "onWindowDidLoadStash #{win.id}"
+    onWindowWithoutStash:     win          -> #log "onWindowWithoutStash #{win.id}"
+    onWindowWillShow:         win          -> #log "onWindowWillShow #{win.id}"
+    onWindowCreated:          win          -> #log "win #{win.id}"
     onWindowAnimationTick:    win tickInfo -> #log("onWindowAnimationTick" tickInfo) if tickInfo.fps < 20
-    onWindowResize:           win event    -> log "onWindowResize" event
-    onWindowFocus:            win          -> log "onWindowFocus"
-    onWindowBlur:             win          -> log "onWindowBlur"
-    onWindowKeyDown:          keyInfo      -> log "onWindowKeyDown " keyInfo.combo if not empty keyInfo.combo; 'unhandled'
-    onWindowKeyUp:            keyInfo      -> log "onWindowKeyUp "   keyInfo.combo if not empty keyInfo.combo; 'unhandled'
-    onWindowClose:            win          -> log "onWindowClose #{win.id}"
-    onWindowMenuTemplate:     win template -> log "onWindowMenuTemplate #{win.id}" template
+    onWindowResize:           win event    -> #log "onWindowResize" event
+    onWindowFocus:            win          -> #log "onWindowFocus"
+    onWindowBlur:             win          -> #log "onWindowBlur"
+    onWindowKeyDown:          keyInfo      -> #log "onWindowKeyDown " keyInfo.combo if not empty keyInfo.combo; 'unhandled'
+    onWindowKeyUp:            keyInfo      -> #log "onWindowKeyUp "   keyInfo.combo if not empty keyInfo.combo; 'unhandled'
+    onWindowClose:            win          -> #log "onWindowClose #{win.id}"
+    onWindowMenuTemplate:     win template -> #log "onWindowMenuTemplate #{win.id}" template
     
 class Win
 
@@ -66,7 +66,8 @@ class Win
         window.addEventListener 'keyup'   @onKeyUp
         window.addEventListener 'resize'  @onResize
         
-        window.requestAnimationFrame @animate
+        if not @delegate.noAnimation
+            window.requestAnimationFrame @animate
         
         if main =$ 'main'
             main.focus()
@@ -227,7 +228,7 @@ class Win
     # 000   000  00000000     000
     
     onKeyDown: event =>
-
+        
         info = keyinfo.forEvent event
         info.event = event
         

@@ -21,47 +21,47 @@ listAssign = []
 # 000   000  000       000  0000  000   000  000       000   000  
 # 000   000  00000000  000   000  0000000    00000000  000   000  
 
-render = (block, text, amps=[]) ->
+render = block text amps=[] ->
     
     if block.fillet[0]?.match == '//'
-        return text
+        ⮐ text
         
     if block.fillet[1]?.match == '='
         varName = block.fillet[0]?.match
         varValue = unfillet calculus(subvars(block.fillet[2..]))
         vars[varName] = varValue
-        return text
+        ⮐ text
         
     if block.fillet[1]?.match == '()'
         funcName = block.fillet[0]?.match
         
         if funcs[funcName]
             text += funcs[funcName]
-            return text
+            ⮐ text
         
         funcValue = ''
         for cb in block.blocks
-            funcValue = render cb, funcValue, amps
+            funcValue = render cb funcValue amps
         funcs[funcName] = funcValue
-        return text
+        ⮐ text
 
     if block.fillet[1]?.match[0] == '('
         funcName = block.fillet[0]?.match
         if funcVar[funcName]
-            varValue = kstr.strip unfillet(block.fillet[1..]), '()' 
+            varValue = kstr.strip unfillet(block.fillet[1..]) '()' 
             vars[funcVar[funcName].var] = varValue
             for cb in funcVar[funcName].blocks
-                text += render cb, ''
+                text += render cb ''
             delete vars[funcVar[funcName].var]
-            return text
-        funcVar[funcName] = blocks:block.blocks, var:block.fillet[2].match
-        return text
+            ⮐ text
+        funcVar[funcName] = blocks:block.blocks var:block.fillet[2].match
+        ⮐ text
         
     for f in block.fillet
         if f.match == '{' and last(block.fillet).match == '}'
             text += unfillet block.fillet
             text += '\n'
-            return text
+            ⮐ text
         
     idt = rpad block.indent
         
@@ -88,7 +88,7 @@ render = (block, text, amps=[]) ->
         text += '\n' + idt + unfillet(block.fillet)
         text += '\n' + idt + '{'
         for b in childBlocks
-            text += render b, ''
+            text += render b ''
         text += '\n' + idt + '}\n'
         
     else
@@ -110,7 +110,7 @@ render = (block, text, amps=[]) ->
             while assign = amp.assign.shift()
                 text += '\n' + assign + ','
             
-        text += render amp, ''
+        text += render amp ''
 
     text
     
@@ -120,7 +120,7 @@ render = (block, text, amps=[]) ->
 #      000  000   000  000   000     000     000   000  000   000       000  
 # 0000000    0000000   0000000        0      000   000  000   000  0000000   
 
-subvars = (fillets) ->
+subvars = fillets ->
     
     fillets = clone fillets
     
@@ -136,7 +136,7 @@ subvars = (fillets) ->
 # 000       000   000  000      000       000   000  000      000   000       000  
 #  0000000  000   000  0000000   0000000   0000000   0000000   0000000   0000000   
 
-calculus = (fillets) ->
+calculus = fillets ->
     
     for fillet,index in fillets
         if index == 0
@@ -169,7 +169,7 @@ calculus = (fillets) ->
 #      000     000        000     000      
 # 0000000      000        000     0000000  
 
-styl = (srcText) ->
+styl = srcText ->
     
     vars = {}
     funcs = {}

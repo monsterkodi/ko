@@ -1,0 +1,135 @@
+###
+0000000    000   0000000    0000000   00000000  00000000   
+000   000  000  000        000        000       000   000  
+000   000  000  000  0000  000  0000  0000000   0000000    
+000   000  000  000   000  000   000  000       000   000  
+0000000    000   0000000    0000000   00000000  000   000  
+###
+
+import * as three from 'three'
+
+use ../kakao
+use ../kxk ▪ $ win fps drag post elem stopEvent
+use ◆ world scene input player camera
+
+function Delegate extends win.Delegate
+    
+    @: ->
+
+        @noAnimation = true
+        @menuNoon  = kakao.bundle.res 'menu_digger.noon'
+        
+        post.on 'menuAction' @onMenuAction
+                
+    onWindowAnimationTick: win tickInfo =>
+        
+        log 'tickInfo' tickInfo
+        
+        ⮐ if not @world
+        
+        @world.tick tickInfo
+        
+    onWindowWillShow: =>
+        
+        ⮐ if @world
+        
+        @main =$ 'main'
+        @main.focus()
+                
+        window.titlebar.hideMenu()
+        
+        @scene  = new scene  @main
+        @player = new player @scene
+        @camera = new camera @scene @player
+        @world  = new world  @scene @player @camera
+            
+        @player.input.init
+            moveLeft:  ['a' 'left' ]
+            moveRight: ['d' 'right']
+            moveUp:    ['w' 'up'   ]
+            moveDown:  ['s' 'down' ]
+        
+        if 0
+            @fps = new fps @main topDown:true
+        
+        @drag = new drag
+            target:    @main
+            stopEvent: false
+            onStart: @onDragMove
+            onMove:  @onDragMove
+            onStop:  @onDragStop
+        
+        main.addEventListener 'wheel' @onWheel
+            
+        @world.start()
+        
+    onWheel: event =>
+        
+        @camera.zoom -event.deltaY/100
+        
+    onDragMove: drag event =>
+                
+        wh = main.clientWidth / 2
+        ch = main.clientHeight / 2
+        @player.dragScreen ?= new three.Vector2
+        @player.dragScreen.set (drag.pos.x - wh) / wh (drag.pos.y - 30 - ch) / ch
+            
+    onDragStop: drag event =>
+        
+        delete @player.dragScreen
+        
+    onWindowWithoutStash: =>
+        
+        kakao 'window.setSize' 1920 1080
+        kakao 'window.center'
+        
+    onWindowCreated: =>
+        
+        kakao 'window.setMinSize' 400 400
+        
+    onWindowResize: => post.emit 'resize'
+    
+    # 000   000  00000000  000   000  
+    # 000  000   000        000 000   
+    # 0000000    0000000     00000    
+    # 000  000   000          000     
+    # 000   000  00000000     000     
+    
+    onWindowKeyDown: keyInfo => 
+        
+        @player.input.onKeyDown keyInfo
+                
+        stopEvent keyInfo.event
+    
+        'unhandled'
+        
+    onWindowKeyUp: keyInfo => 
+        
+        @player.input.onKeyUp keyInfo
+        
+        stopEvent keyInfo.event
+        
+        'unhandled'
+        
+    # 00     00  00000000  000   000  000   000   0000000    0000000  000000000  000   0000000   000   000  
+    # 000   000  000       0000  000  000   000  000   000  000          000     000  000   000  0000  000  
+    # 000000000  0000000   000 0 000  000   000  000000000  000          000     000  000   000  000 0 000  
+    # 000 0 000  000       000  0000  000   000  000   000  000          000     000  000   000  000  0000  
+    # 000   000  00000000  000   000   0000000   000   000   0000000     000     000   0000000   000   000  
+
+    onMenuAction: action args =>
+
+        switch action
+            
+            'Zoom In'  ➜ ⮐ @camera.zoom 1
+            'Zoom Out' ➜ ⮐ @camera.zoom -1
+            'Pause'    ➜ ⮐ @world.togglePause()
+            'Step'     ➜ ⮐ @world.singleStep()
+            'Restart'  ➜ ⮐ @world.start()
+            'Tweaky'   ➜ ⮐ post.emit 'tweaky.toggle'
+            'FPS'      ➜ ⮐ post.emit 'fps.toggle'
+            
+        'unhandled'
+
+kakao.init -> new win new Delegate
+    

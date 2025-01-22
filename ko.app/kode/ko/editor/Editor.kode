@@ -153,12 +153,12 @@ function Editor extends Buffer
         @multiComment = switch @fileType
             'coffee' 'kode'                              ➜ open:'###'  close:'###'
             'html' 'md'                                  ➜ open:'<!--' close:'-->'
-            'styl' 'cpp' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs'
+            'styl' 'cpp' 'zig' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs'
             'js' 'mjs' 'scss' 'ts' 'swift' 'frag' 'vert' ➜ open:'/*'   close:'*/'
 
         @lineComment = switch @fileType
              'coffee' 'kode' 'sh' 'bat' 'noon' 'ko' 'txt' 'fish'    ➜ '#'
-             'styl' 'cpp' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs'
+             'styl' 'cpp' 'zig' 'mm' 'c' 'h' 'hpp' 'cxx' 'cs'
              'js' 'mjs' 'scss' 'ts' 'swift' 'frag' 'vert'           ➜ '//'
              'iss' 'ini'                                            ➜ ';'
 
@@ -183,6 +183,8 @@ function Editor extends Buffer
             if lines[0].endsWith '\r'
                 lines = text.split /\r?\n/
                 @newlineCharacters = '\r\n'
+                
+        lines = lines.map (l) -> kstr.detab l
 
         @setLines lines
 

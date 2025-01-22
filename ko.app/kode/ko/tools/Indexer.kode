@@ -138,7 +138,7 @@ class Indexer
     addFuncInfo: funcName funcInfo ->
         
         if not funcName
-            log "addFuncInfo #{funcName}" funcInfo
+            # log "addFuncInfo #{funcName}" funcInfo
             ⮐ 
         
         if funcName.length > 1 and funcName.startsWith '@'

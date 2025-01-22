@@ -237,7 +237,7 @@ function Title
         menu = @templateCache
         
         if empty menu ➜ return 'unhandled'
-        keypaths = sds.find.key menu, 'combo'
+        keypaths = sds.find.key menu 'combo'
         
         for keypath in keypaths 
             combos = sds.get(menu, keypath).split ' '
@@ -254,9 +254,9 @@ function Title
                     trail.unshift sds.get(menu, keypath).text
                 trail = trail.join '▸'
                 
-                # log 'Title.handleKeyInfo post menuAction' action, trail
-                post.emit 'menuAction' action, trail
-                return action
+                # log 'Title.handleKeyInfo post menuAction' action trail
+                post.emit 'menuAction' action trail
+                ⮐ action
 
         'unhandled'
             

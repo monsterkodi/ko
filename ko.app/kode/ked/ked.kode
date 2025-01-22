@@ -1,0 +1,260 @@
+###
+000   000  00000000  0000000    
+000  000   000       000   000  
+0000000    0000000   000   000  
+000  000   000       000   000  
+000   000  00000000  0000000    
+###
+
+use ◆ ttio gutter cells state
+use ../kxk ▪ karg
+use ../kxk/nfs
+
+args = karg """
+    ked [file]
+        options                                   **
+        version    log version                    = false
+    """
+
+function KED
+
+    @: ->
+
+        @t = new ttio
+        
+        @cells  = new cells @t
+        @state  = new state  @cells
+        @gutter = new gutter @cells @state
+        
+        @t.on 'key'    @onKey
+        @t.on 'mouse'  @onMouse
+        @t.on 'wheel'  @onWheel
+        @t.on 'resize' @onResize
+        @t.on 'focus'  -> 
+        @t.on 'blur'   -> 
+            
+        if args.version ➜ log '0.0.1'; process.exit 0
+                        
+        if valid args.options
+            log 'file(s):' args.options
+            @loadFile args.options[0]
+        else
+            @state.init ['']
+            @t.setCursor 4 0
+            @onResize @t.cols() @t.rows()
+        
+    @run: -> new KED()
+    
+    # 000       0000000    0000000   0000000    
+    # 000      000   000  000   000  000   000  
+    # 000      000   000  000000000  000   000  
+    # 000      000   000  000   000  000   000  
+    # 0000000   0000000   000   000  0000000    
+    
+    loadFile: p ○=>
+        
+        text =○ nfs.read p
+        lines = text.split /\r?\n/
+        @state.init lines
+        @redraw()
+        
+    #  0000000  000   000  00000000    0000000   0000000   00000000   
+    # 000       000   000  000   000  000       000   000  000   000  
+    # 000       000   000  0000000    0000000   000   000  0000000    
+    # 000       000   000  000   000       000  000   000  000   000  
+    #  0000000   0000000   000   000  0000000    0000000   000   000  
+
+    moveCursorAndSelect: dir =>
+        
+        @state.moveCursorAndSelect dir
+        @redraw()
+    
+    moveCursor: dir steps =>
+        
+        @state.moveCursor dir steps
+        @redraw()
+            
+    setCursor: x y =>
+        
+        @state.setCursor x y
+        @redraw()
+    
+    # 00     00   0000000   000   000   0000000  00000000  
+    # 000   000  000   000  000   000  000       000       
+    # 000000000  000   000  000   000  0000000   0000000   
+    # 000 0 000  000   000  000   000       000  000       
+    # 000   000   0000000    0000000   0000000   00000000  
+    
+    onMouse: event col row button mods count =>
+        
+        switch event
+            
+            'press'
+                        
+                if count > 1
+                    
+                    @state.deselect()
+                    
+                    x = col + @state.s.view[0] - @state.s.gutter
+                    y = row + @state.s.view[1]
+                    
+                    if count == 2
+                        if mods == 'alt'
+                            @state.selectChunk x y
+                        else
+                            @state.selectWord x y
+                    else
+                        @state.selectLine y
+                        
+                    @dragStart = copy @state.s.selections[0]
+                    
+                    @redraw()
+                    
+                else
+                    
+                    x = col + @state.s.view[0] - @state.s.gutter
+                    y = row + @state.s.view[1]
+                    
+                    @dragStart = [x y x]
+                                    
+                    redraw  = @state.deselect()
+                    redraw |= @state.setCursor(x y)
+                    if redraw ➜ @redraw()
+                    
+            'drag'
+            
+                x = col + @state.s.view[0] - @state.s.gutter
+                y = row + @state.s.view[1]
+                
+                start = [@dragStart[0] @dragStart[1]]
+                
+                if y < @dragStart[1] 
+                    start = [@dragStart[2] @dragStart[1]]
+                
+                if @state.select start [x y]
+                    @redraw()
+                    
+            'release'
+            
+                delete @dragStart
+        
+        # log 'mouse' event col row button
+                
+    # 000   000  000   000  00000000  00000000  000      
+    # 000 0 000  000   000  000       000       000      
+    # 000000000  000000000  0000000   0000000   000      
+    # 000   000  000   000  000       000       000      
+    # 00     00  000   000  00000000  00000000  0000000  
+    
+    onWheel: dir mods =>
+        
+        steps = switch mods
+            
+            'shift'          ➜ 4
+            'shift+ctrl'     ➜ 8
+            'alt'            ➜ 16
+            'shift+alt'      ➜ 32
+            'ctrl+alt'       ➜ 64
+            'shift+ctrl+alt' ➜ 128
+            ➜ 2
+        
+        if @dragStart
+            
+            x = @state.s.cursor[0]
+            y = @state.s.cursor[1]
+            
+            switch dir
+                'up'    ➜ y -= steps    
+                'down'  ➜ y += steps    
+                'left'  ➜ x -= 1    
+                'right' ➜ x += 1    
+                
+            y = clamp 0 @state.s.lines.length-1 y
+            x = clamp 0 @state.s.lines[y].length-1 x
+            
+            start = [@dragStart[0] @dragStart[1]]
+            
+            if y < @dragStart[1] 
+                start = [@dragStart[2] @dragStart[1]]
+            
+            if @state.select start [x y]
+                @redraw()
+            
+            ⮐ 
+                
+        switch dir
+            'up'        
+            'down'      
+            'left'      
+            'right'     ➜ ⮐ @moveCursor dir steps
+    
+    # 000   000  00000000  000   000  
+    # 000  000   000        000 000   
+    # 0000000    0000000     00000    
+    # 000  000   000          000     
+    # 000   000  00000000     000     
+    
+    onKey: key => 
+        
+        switch key
+            
+            'up'        
+            'down'      
+            'left'      
+            'right'                 ➜ ⮐ @moveCursor key
+            
+            'ctrl+up'               ➜ ⮐ @moveCursor 'up'    4
+            'ctrl+down'             ➜ ⮐ @moveCursor 'down'  4
+            'ctrl+left'             ➜ ⮐ @moveCursor 'left'  4
+            'ctrl+right'            ➜ ⮐ @moveCursor 'right' 4
+                   
+            'ctrl+alt+up'           ➜ ⮐ @moveCursor 'up'    8
+            'ctrl+alt+down'         ➜ ⮐ @moveCursor 'down'  8
+            'ctrl+alt+left'         ➜ ⮐ @moveCursor 'left'  8
+            'ctrl+alt+right'        ➜ ⮐ @moveCursor 'right' 8
+
+            'shift+ctrl+alt+up'     ➜ ⮐ @moveCursor 'up'    16
+            'shift+ctrl+alt+down'   ➜ ⮐ @moveCursor 'down'  16
+            'shift+ctrl+alt+left'   ➜ ⮐ @moveCursor 'left'  16
+            'shift+ctrl+alt+right'  ➜ ⮐ @moveCursor 'right' 16
+            
+            'ctrl+a'        ➜ ⮐ @setCursor 0 @state.s.cursor[1]
+            'ctrl+e'        ➜ ⮐ @setCursor @state.s.lines[@state.s.cursor[1]].length @state.s.cursor[1]
+            'ctrl+h'        ➜ ⮐ @setCursor 0 0
+            'ctrl+j'
+            'shift+ctrl+h'  ➜ ⮐ @setCursor @state.s.lines[-1].length @state.s.lines.length-1
+            
+            'ctrl+k'    ➜ ⮐ @t.write '\x1b[0K'
+            'return'    ➜ ⮐ @t.write '\n'
+            'space'     ➜ ⮐ @t.write ' '
+            'delete'    ➜ ⮐ @t.write '\x1b[D\x1b[P'
+            'tab'       ➜ ⮐ @t.write '    '
+            'ctrl+c'    ➜ ⮐ process.exit 0
+            'ctrl+q'    ➜ ⮐ process.exit 0
+            
+            'shift+up'    ➜ ⮐ @moveCursorAndSelect 'up'
+            'shift+down'  ➜ ⮐ @moveCursorAndSelect 'down'
+            'shift+left'  ➜ ⮐ @moveCursorAndSelect 'left'
+            'shift+right' ➜ ⮐ @moveCursorAndSelect 'right'
+            
+        @t.write key
+        
+    onResize: cols rows => @redraw()
+    
+    # 00000000   00000000  0000000    00000000    0000000   000   000  
+    # 000   000  000       000   000  000   000  000   000  000 0 000  
+    # 0000000    0000000   000   000  0000000    000000000  000000000  
+    # 000   000  000       000   000  000   000  000   000  000   000  
+    # 000   000  00000000  0000000    000   000  000   000  00     00  
+    
+    redraw: =>
+        
+        @t.hideCursor()
+        @cells.init()
+        @gutter.draw()
+        @state.draw()
+        @cells.render()
+        @t.showCursor()
+        
+export KED.run
+

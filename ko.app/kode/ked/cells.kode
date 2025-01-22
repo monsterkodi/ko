@@ -1,0 +1,52 @@
+###
+ 0000000  00000000  000      000       0000000  
+000       000       000      000      000       
+000       0000000   000      000      0000000   
+000       000       000      000           000  
+ 0000000  00000000  0000000  0000000  0000000   
+###
+
+use ◆ color
+
+makeCells = rows cols ->
+
+    lines = []
+    for l in 0...rows
+        cells = []
+        for c in 0...cols
+            cells.push bg:0 fg:0 char:' '
+        lines.push cells
+    lines
+
+function cells
+
+    @: @t -> @init()
+    
+    init: => @c = makeCells @t.rows() @t.cols()
+        
+    bg_rect: x1 y1 x2 y2 c =>
+    
+        x1 = @t.cols() + x1 if x1 < 0
+        x2 = @t.cols() + x2 if x2 < 0
+
+        y1 = @t.rows() + y1 if y1 < 0
+        y2 = @t.rows() + y2 if y2 < 0
+        
+        for row in y1..y2
+            if row < @t.rows()
+                for col in x1..x2
+                    if col < @t.cols()
+                        @c[row][col].bg = c
+        
+    render: =>
+        
+        @t.store()
+        for y in 0...@t.rows()
+            for x in 0...@t.cols()
+                @t.setCursor x y
+                @t.write color.bg_rgb(@c[y][x].bg)
+                @t.write color.fg_rgb(@c[y][x].fg)
+                @t.write @c[y][x].char
+        @t.restore()
+
+export cells

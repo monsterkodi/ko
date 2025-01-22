@@ -42,7 +42,7 @@
     {
         NSOpenPanel* openPanel = [NSOpenPanel openPanel];
 
-        openPanel.showsResizeIndicator      = YES;
+        // openPanel.showsResizeIndicator      = YES;
         openPanel.showsHiddenFiles          = YES;
         openPanel.canChooseDirectories      = NO;
         openPanel.canCreateDirectories      = YES;
@@ -82,7 +82,7 @@
     {
         NSSavePanel* panel = [NSSavePanel savePanel];
 
-        panel.showsResizeIndicator      = YES;
+        // panel.showsResizeIndicator      = YES;
         panel.showsHiddenFiles          = YES;
         panel.canCreateDirectories      = YES;
 

@@ -35,7 +35,8 @@ export default {
         "bash",
         "fish",
         "iss",
-        "ini"
+        "ini",
+        "zig"
     ],
     "lang": {
         "coffee": {
@@ -2857,6 +2858,37 @@ export default {
         "ini": {
             "true": "keyword",
             "false": "nil"
+        },
+        "zig": {
+            "@import": "require",
+            "if": "keyword",
+            "else": "keyword",
+            "while": "keyword",
+            "and": "keyword",
+            "or": "keyword",
+            "orelse": "keyword",
+            "defer": "keyword",
+            "try": "keyword",
+            "catch": "keyword",
+            "return": "keyword",
+            "pub": "keyword",
+            "print": "keyword",
+            "fn": "keyword",
+            "str": "keyword type",
+            "u64": "keyword type",
+            "u32": "keyword type",
+            "u16": "keyword type",
+            "u8": "keyword type",
+            "f64": "keyword type",
+            "f32": "keyword type",
+            "f16": "keyword type",
+            "f8": "keyword type",
+            "void": "keyword type",
+            "int": "keyword type",
+            "float": "keyword type",
+            "const": "punct",
+            "var": "punct",
+            "_": "punct"
         }
     }
 }

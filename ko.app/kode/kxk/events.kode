@@ -12,18 +12,19 @@ function events
         
         @dispatcher = new EventTarget
         
-    on: (eventName, cb) ->
+    on: eventName cb ->
         
-        @dispatcher.addEventListener eventName, (e) -> cb.apply cb, e.args
+        @dispatcher.addEventListener eventName, (e) -> cb.apply(cb, e.args)
         
-    emit: (eventName, args...) ->
+    emit: eventName args... ->
         
         event = new Event eventName
         event.args = args
+        
         @dispatcher.dispatchEvent event
         
-    removeListener: (eventName, listener) ->
+    removeListener: eventName listener ->
         
-        @dispatcher.removeEventListener eventName, listener
+        @dispatcher.removeEventListener eventName listener
 
 export events

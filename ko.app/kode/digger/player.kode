@@ -1,0 +1,106 @@
+###
+00000000   000       0000000   000   000  00000000  00000000 
+000   000  000      000   000   000 000   000       000   000
+00000000   000      000000000    00000    0000000   0000000  
+000        000      000   000     000     000       000   000
+000        0000000  000   000     000     00000000  000   000
+###
+
+import * as three from 'three'
+
+use ../kxk ▪ deg2rad rad2deg fade
+use ./lib/geom
+use ./lib/polar
+use ◆ input
+
+function Player
+
+    @: @scene ->
+        
+        @input = new input @
+        
+        @eat      = 0
+        @maxVel   = 0.7
+        @speed    = 1
+        @friction = 0.985
+        @angle    = 0
+        
+        @ray  = new three.Ray 
+        @mesh = geom.pill length:1 radius:0.5 material:'player'
+                
+        for child in @mesh.children
+            child.castShadow = true
+            
+        @scene.scene.add @mesh
+                
+        @pos    = new three.Vector3
+        @vec    = new three.Vector3
+        @dir    = new three.Vector3
+        @mat    = new three.Matrix4
+        @tqt    = new three.Quaternion
+        
+        @sphere = new three.Sphere @vec 50
+        
+        @unitX  = new three.Vector3 1 0 0
+        @unitY  = new three.Vector3 0 1 0
+        @unitZ  = new three.Vector3 0 0 1
+        
+        @steer  = new three.Vector2
+        
+        @tgtDot = geom.icosa radius:0.3 material:'wireframe'
+        @tgtDot.scale.set 0 0 0
+        @tgtDot.position.set 0 0 50
+        @scene.scene.add @tgtDot
+        
+    start: -> 
+
+        @vel   = new three.Vector2
+        @polar = new polar dist:50
+
+        @mesh.position.copy @polar.pos()
+        @mesh.quaternion.copy @polar.quat
+        
+        @tgtDot.position.set 0 0 50
+        
+    startAction: action ->
+        
+    stopAction: action ->
+        
+    update: deltaSec ->
+        
+        deg = 0.7
+        acc = [0 0]
+                                
+        if @input.action.moveUp    ➜ acc[1] += deg
+        if @input.action.moveDown  ➜ acc[1] -= deg
+        if @input.action.moveRight ➜ acc[0] += deg
+        if @input.action.moveLeft  ➜ acc[0] -= deg
+                   
+        @vel.x += @speed * deltaSec * acc[0]
+        @vel.y += @speed * deltaSec * acc[1]
+        
+        @vel.x *= @friction
+        @vel.y *= @friction
+        
+        @vel.clampLength 0 @maxVel
+
+        if @dragScreen
+            @steer.copy @dragScreen
+        else if @vel.length() > 0.01
+            @steer.x =   @vel.x
+            @steer.y = - @vel.y
+        
+        # @steer.clampLength 0 @maxVel
+        
+        @ray.origin.copy @scene.camera.position
+        @ray.direction.set( @steer.x -@steer.y 0.5 ).unproject( @scene.camera ).sub( @ray.origin ).normalize()
+        if @ray.intersectSphere @sphere @pos
+            @tgtDot.position.copy @pos
+            
+        @polar.target @tgtDot.position deltaSec * @speed
+            
+        @mesh.position.copy @polar.pos()
+        
+        @polar.orient @mesh.quaternion
+        
+export Player

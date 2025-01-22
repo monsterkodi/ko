@@ -1,0 +1,80 @@
+###
+000   000  00000000  00000000  0000000      
+000 0 000  000       000       000   000    
+000000000  0000000   0000000   000   000    
+000   000  000       000       000   000    
+00     00  00000000  00000000  0000000      
+###
+
+import * as three from 'three'
+
+use ./lib/geom
+
+function Weed
+
+    @: @scene @gyroid ->
+        
+        @count = 1000
+        cylinder = geom.cylinder length:4 radius:0.5 sgmt:6 material:'white' # 'flatwhite'
+        @dummy = new three.Object3D()
+        @color = new three.Color()
+        @pos   = new three.Vector3()
+        @norm  = new three.Vector3()
+        @rot   = new three.Quaternion()
+        @scale = new three.Vector3()
+        @mesh  = new three.InstancedMesh(cylinder.geometry cylinder.material @count)
+        @mesh.instanceMatrix.setUsage three.StaticDrawUsage
+        @mesh.castShadow = true
+        @mesh.receiveShadow = true
+        @scene.scene.add @mesh
+        
+    spawn: ->
+        
+        i = 0
+        while i < @count
+            
+            @gyroid.sampler.sample @pos @norm
+            @pos.multiplyScalar 50
+            if @pos.length() < 40
+                continue
+                
+            @dummy.position.copy @pos
+            
+            @pos.normalize()
+            if @norm.dot(@pos) < 0.7
+                continue
+                
+            @norm.multiplyScalar -1
+            @norm.add @dummy.position
+            
+            color = @gyroid.getColor @dummy.position
+            if Math.random() < color[0]*50 + color[2]*50
+                @dummy.lookAt @norm
+                @dummy.updateMatrix()
+                @mesh.setMatrixAt i @dummy.matrix
+                @color.set color[0] color[1] color[2]
+                @mesh.setColorAt i @color
+                i++
+        
+        @mesh.instanceMatrix.needsUpdate = true
+        @mesh.instanceColor.needsUpdate = true
+        
+    update: deltaSec timeMs ->
+        
+        for i in 0...@count
+            
+            @mesh.getMatrixAt i @dummy.matrix
+            @dummy.matrix.decompose @pos @rot @scale
+            color = @gyroid.getColor @pos
+            @color.set color[0] color[1] color[2]
+            f = (Math.sin(timeMs*1000/(2000-(color[0]+color[2])*900))+1.2)*2
+            @color.multiplyScalar 6 * f
+            @mesh.setColorAt i @color
+            @scale.set 1 1 0.1+color[0]*90*f
+            @dummy.matrix.compose @pos @rot @scale
+            @mesh.setMatrixAt i @dummy.matrix
+
+        @mesh.instanceMatrix.needsUpdate = true
+        @mesh.instanceColor.needsUpdate = true
+            
+export Weed

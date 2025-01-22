@@ -31,6 +31,7 @@
 ([~\/\.\-\_\ \(\)\w]+)(\.cp?p?)([\d\:]*\b)      . cpp     . cpp.ext       . cpp.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.cc)([\d\:]*\b)         . cpp     . cpp.ext       . cpp.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.mm)([\d\:]*\b)         . cpp     . cpp.ext       . cpp.linepos
+([~\/\.\-\_\ \(\)\w]+)(\.zig)([\d\:]*\b)        . cpp     . cpp.ext       . cpp.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.hp?p?)([\d\:]*\b)      . hpp     . hpp.ext       . hpp.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.js.map)([\d\:]*\b)     . dotfile . dotfile.ext   . dotfile.linepos
 ([~\/\.\-\_\ \(\)\w]+)(\.mjs)([\d\:]*\b)        . mjs     . mjs.ext       . mjs.linepos

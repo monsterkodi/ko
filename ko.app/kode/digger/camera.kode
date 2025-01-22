@@ -1,0 +1,51 @@
+###
+ 0000000   0000000   00     00  00000000  00000000    0000000 
+000       000   000  000   000  000       000   000  000   000
+000       000000000  000000000  0000000   0000000    000000000
+000       000   000  000 0 000  000       000   000  000   000
+ 0000000  000   000  000   000  00000000  000   000  000   000
+###
+
+import * as three from 'three'
+
+use ../kxk ▪ deg2rad
+use ./lib/polar
+
+np = new three.Vector3()
+rv = new three.Vector3()
+
+function Camera
+
+    @: @scene @player ->
+        
+        @start()
+        
+    start: ->
+        
+        @polar = new polar dist:150
+        @scene.camera.up.set 0 1 0
+        
+    update: deltaSec ->
+        
+        @polar.slerp @player.polar @player.speed * deltaSec
+        
+        @scene.camera.position.copy @polar.pos()
+
+        np.copy(@scene.camera.position).normalize()
+        rv.crossVectors @scene.camera.up np
+        rv.normalize()
+        @scene.camera.up.crossVectors np rv
+
+        rv.set(0 1 0).applyMatrix4 @scene.camera.matrixWorld
+        rv.normalize()
+        @scene.camera.up.lerp rv @player.speed * deltaSec
+        
+        @scene.camera.up.normalize()
+        
+        @scene.camera.lookAt 0 0 0 
+        
+    zoom: delta ->
+        
+        @polar.dist = clamp 80 160 @polar.dist * (1.0 - delta/100)
+
+export Camera
