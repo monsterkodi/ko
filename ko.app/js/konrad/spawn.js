@@ -55,24 +55,41 @@ export default async function (args)
     {
         remove = remove.concat(['Contents/Resources/font/Lilex-Bold.woff2','Contents/Resources/font/devopicons.woff2','Contents/Resources/font/fa-regular-400.woff2','Contents/Resources/font/fa-solid-900.woff2','Contents/Resources/font/file-icons.woff2','Contents/Resources/font/fontawesome.woff2','Contents/Resources/font/mfixx.woff2','Contents/Resources/font/octicons.woff2'])
     }
-    list = await nfs.list(slash.path(tgt,'Contents'))
-    var list2 = _k_.list(list)
+    var list2 = _k_.list(remove)
     for (var _b_ = 0; _b_ < list2.length; _b_++)
     {
-        item = list2[_b_]
+        f = list2[_b_]
+        await nfs.remove(slash.path(tgt,f))
+    }
+    list = await nfs.list(slash.path(tgt,'Contents'))
+    var list3 = _k_.list(list)
+    for (var _c_ = 0; _c_ < list3.length; _c_++)
+    {
+        item = list3[_c_]
         if (slash.ext(item.path) === 'plist')
         {
+            if (slash.name(item.path) === 'Info')
+            {
+                continue
+            }
             if (slash.name(item.path) !== app)
             {
                 await nfs.remove(item.path)
             }
         }
     }
-    var list3 = _k_.list(remove)
-    for (var _c_ = 0; _c_ < list3.length; _c_++)
+    list = await nfs.list(slash.path(tgt,'Contents/Resources'))
+    var list4 = _k_.list(list)
+    for (var _d_ = 0; _d_ < list4.length; _d_++)
     {
-        f = list3[_c_]
-        await nfs.remove(slash.path(tgt,f))
+        item = list4[_d_]
+        if (slash.ext(item.path) === 'noon')
+        {
+            if (slash.name(item.path) !== `menu_${app}`)
+            {
+                await nfs.remove(item.path)
+            }
+        }
     }
     return await nfs.move(tmp,slash.path(tgt,'.stash'))
 };

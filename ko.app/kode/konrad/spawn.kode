@@ -78,15 +78,22 @@ export (args) ○->
             'Contents/Resources/font/mfixx.woff2'
             'Contents/Resources/font/octicons.woff2'
         ]
+
+    for f in remove
+        ○ nfs.remove slash.path(tgt f)
         
     list = ○ nfs.list slash.path(tgt 'Contents')
     for item in list
         if slash.ext(item.path) == 'plist'
+            continue if slash.name(item.path) == 'Info'
             if slash.name(item.path) != app
                 ○ nfs.remove item.path
 
-    for f in remove
-        ○ nfs.remove slash.path(tgt f)
+    list = ○ nfs.list slash.path(tgt 'Contents/Resources')
+    for item in list
+        if slash.ext(item.path) == 'noon'
+            if slash.name(item.path) != "menu_#{app}"
+                ○ nfs.remove item.path
         
     ○ nfs.move tmp slash.path(tgt '.stash') # put stash back in place    
             
